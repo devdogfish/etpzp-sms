@@ -1,5 +1,5 @@
 export const i18nConfig = {
   locales: ["en", "fr", "it", "pt"],
   defaultLocale: "en",
-  prefixDefault: true // add this if you want to always see a language even if english is selected it will show `/en` if set to true
+  prefixDefault: false // add this if you want to always see a language even if english is selected it will show `/en` if set to true
 };

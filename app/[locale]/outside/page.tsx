@@ -4,10 +4,11 @@ import initTranslations from "@/app/i18n";
 const i18Namespaces = ["AboutUs", "Common"];
 
 export default async function Outside({
-  params: {locale},
+  params,
 }: {
   params: { locale: string };
 }) {
+  const { locale } = await params;
   const { t } = await initTranslations(locale, i18Namespaces);
 
   const username = "Luigi";

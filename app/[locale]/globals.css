@@ -7,7 +7,7 @@ main {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
 }
 h1 {
   font-size: 35px;
@@ -17,3 +17,8 @@ a {
   color: #1a0dab
 }
 a:hover { text-decoration: underline;}
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+}
