@@ -1,7 +1,7 @@
 import Link from "next/link";
 import initTranslations from "../i18n";
-import ExampleClientComponent from "@/app/components/exampleClient";
-
+import ExampleClientComponent from "@/components/exampleClient";
+import ThemeToggle from "@/components/theme-mode-toggle";
 const i18Namespaces = ["Home", "Common"];
 
 export default async function Home({ params }: { params: { locale: string } }) {
@@ -11,6 +11,7 @@ export default async function Home({ params }: { params: { locale: string } }) {
     <main>
       <h1>{t("header")}</h1>
       <ExampleClientComponent />
+      <ThemeToggle />
       <Link href="/outside">{t("cta")}</Link>
     </main>
   );
