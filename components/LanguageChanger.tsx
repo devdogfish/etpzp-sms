@@ -45,9 +45,9 @@ export default function LanguageChanger() {
     <div>
       <Select defaultValue={currentLocale} onValueChange={handleChange}>
         <SelectTrigger className="w-[180px]" size="md">
-          <SelectValue placeholder="lang" />
+          <SelectValue placeholder="Select Language" />
         </SelectTrigger>
-        <SelectContent className="bg-white">
+        <SelectContent className="light:bg-white">
           <SelectItem value="en">English</SelectItem>
           <SelectItem value="pt">Portuguese</SelectItem>
           <SelectItem value="it">Italian</SelectItem>

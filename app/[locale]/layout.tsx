@@ -8,6 +8,8 @@ import TranslationsProvider from "../providers/TranslationsProvider";
 import initTranslations from "../i18n";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import ThemeProvider from "@/contexts/theme-data-provider";
+import { ThemeColorChanger } from "@/components/ThemeColorChanger";
+import ThemeModeChanger from "@/components/ThemeModeChanger";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -46,21 +48,26 @@ export default async function RootLayout({
       locale={locale}
       namespaces={i18Namespaces}
     >
-      <html lang={locale} dir={dir(locale)}>
+      <html lang={locale} dir={dir(locale)} suppressHydrationWarning>
         {/* <head></head> */}
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen`}
         >
-          <NextThemesProvider
+          <NextThemesProvider // this needs to wrap the ThemeProvider if you want to use useTheme context hook
             attribute="class"
             defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
           >
             <ThemeProvider>
-              <header className="flex justify-between items-center py-[10px] px-[15px] bg-slate-100">
-                HEADER
-                <LanguageChanger />
+              <header>
+                <nav className="flex justify-between items-center py-[10px] px-[15px] light:bg-primary-foreground gap-x-1 ">
+                  HEADER
+                  <div className="w-full" />
+                  <LanguageChanger />
+                  <ThemeColorChanger />
+                  <ThemeModeChanger />
+                </nav>
               </header>
 
               {children}

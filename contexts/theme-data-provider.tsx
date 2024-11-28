@@ -12,9 +12,10 @@ const ThemeContext = createContext<ThemeColorStateParams>(
 export default function ThemeDataProvider({ children }: ThemeProviderProps) {
   const getSavedThemeColor = () => {
     try {
-      return (localStorage.getItem("themeColor") as ThemeColors) || "Zink";
+      return (localStorage.getItem("themeColor") as ThemeColors) || "Zinc";
     } catch (error) {
-      return "Zinc" as ThemeColors;
+      return new Error(`Error reading color theme: ${error}`);
+      // return "Zinc" as ThemeColors;
     }
   };
 
@@ -31,7 +32,7 @@ export default function ThemeDataProvider({ children }: ThemeProviderProps) {
     if (!isMounted) {
       setIsMounted(true);
     }
-  }, [themeColor, theme]);
+  }, [themeColor, theme, isMounted]);
   if (!isMounted) {
     return null;
   }

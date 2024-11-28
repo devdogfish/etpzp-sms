@@ -25,7 +25,7 @@ const themes = {
     dark: {
       background: "20 14.3% 4.1%",
       foreground: "60 9.1% 97.8%",
-      card: "20 14.3% 4.1%",
+      card: "24 9.8% 10%",
       cardForeground: "60 9.1% 97.8%",
       popover: "20 14.3% 4.1%",
       popoverForeground: "60 9.1% 97.8%",
@@ -70,7 +70,7 @@ const themes = {
     dark: {
       background: "222.2 84% 4.9%",
       foreground: "210 40% 98%",
-      card: "222.2 84% 4.9%",
+      card: "24 9.8% 10%",
       cardForeground: "210 40% 98%",
       popover: "222.2 84% 4.9%",
       popoverForeground: "210 40% 98%",
@@ -98,7 +98,7 @@ const themes = {
       popover: "0 0% 100%",
       popoverForeground: "240 10% 3.9%",
       primary: "142.1 76.2% 36.3%",
-      primaryForeground: "355.7 100% 97.3%",
+      primaryForeground: "128 83% 97%",
       secondary: "240 4.8% 95.9%",
       secondaryForeground: "240 5.9% 10%",
       muted: "240 4.8% 95.9%",
@@ -205,7 +205,7 @@ const themes = {
     dark: {
       background: "240 10% 3.9%",
       foreground: "0 0% 98%",
-      card: "240 10% 3.9%",
+      card: "24 9.8% 10%",
       cardForeground: "0 0% 98%",
       popover: "240 10% 3.9%",
       popoverForeground: "0 0% 98%",
@@ -230,10 +230,12 @@ export default function setGlobalColorTheme(
   themeMode: "light" | "dark",
   color: ThemeColors
 ) {
+  console.log(color)
   const theme = themes[color][themeMode] as {
     [key: string]: string;
   };
   for (const key in theme) {
+    if (key !== theme[key]) console.log("Color variable changed. Prev:", key, ", New:", theme[key])
     document.documentElement.style.setProperty(`--${key}`, theme[key]);
   }
 }
