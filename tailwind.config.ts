@@ -9,58 +9,68 @@ export default {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {
-      colors: {
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--cardForeground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popoverForeground))",
-        },
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primaryForeground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondaryForeground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--mutedForeground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accentForeground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructiveForeground))",
-        },
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        chart: {
-          1: "hsl(var(--chart1))",
-          2: "hsl(var(--chart2))",
-          3: "hsl(var(--chart3))",
-          4: "hsl(var(--chart4))",
-          5: "hsl(var(--chart5))",
-        },
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-    },
-    aspectRatio: {
-      1: "1 / 1",
-    },
+  	extend: {
+  		colors: {
+  			background: 'hsl(var(--background))',
+  			foreground: 'hsl(var(--foreground))',
+  			card: {
+  				DEFAULT: 'hsl(var(--card))',
+  				foreground: 'hsl(var(--cardForeground))'
+  			},
+  			popover: {
+  				DEFAULT: 'hsl(var(--popover))',
+  				foreground: 'hsl(var(--popoverForeground))'
+  			},
+  			primary: {
+  				DEFAULT: 'hsl(var(--primary))',
+  				foreground: 'hsl(var(--primaryForeground))'
+  			},
+  			secondary: {
+  				DEFAULT: 'hsl(var(--secondary))',
+  				foreground: 'hsl(var(--secondaryForeground))'
+  			},
+  			muted: {
+  				DEFAULT: 'hsl(var(--muted))',
+  				foreground: 'hsl(var(--mutedForeground))'
+  			},
+  			accent: {
+  				DEFAULT: 'hsl(var(--accent))',
+  				foreground: 'hsl(var(--accentForeground))'
+  			},
+  			destructive: {
+  				DEFAULT: 'hsl(var(--destructive))',
+  				foreground: 'hsl(var(--destructiveForeground))'
+  			},
+  			border: 'hsl(var(--border))',
+  			input: 'hsl(var(--input))',
+  			ring: 'hsl(var(--ring))',
+  			chart: {
+  				'1': 'hsl(var(--chart1))',
+  				'2': 'hsl(var(--chart2))',
+  				'3': 'hsl(var(--chart3))',
+  				'4': 'hsl(var(--chart4))',
+  				'5': 'hsl(var(--chart5))'
+  			},
+  			sidebar: {
+  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				foreground: 'hsl(var(--sidebar-foreground))',
+  				primary: 'hsl(var(--sidebar-primary))',
+  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+  				border: 'hsl(var(--sidebar-border))',
+  				ring: 'hsl(var(--sidebar-ring))'
+  			}
+  		},
+  		borderRadius: {
+  			lg: 'var(--radius)',
+  			md: 'calc(var(--radius) - 2px)',
+  			sm: 'calc(var(--radius) - 4px)'
+  		}
+  	},
+  	aspectRatio: {
+  		'1': '1 / 1'
+  	}
   },
   plugins: [tailwindcssAnimate],
 } satisfies Config;

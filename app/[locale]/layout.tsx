@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import LanguageChanger from "@/components/LanguageChanger";
 import { i18nConfig } from "@/i18nConfig";
 import { dir } from "i18next";
 import TranslationsProvider from "../providers/TranslationsProvider";
 import initTranslations from "../i18n";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import ThemeProvider from "@/contexts/theme-data-provider";
-import { ThemeColorChanger } from "@/components/ThemeColorChanger";
-import ThemeModeChanger from "@/components/ThemeModeChanger";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import Sidebar from "@/components/Sidebar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -24,7 +23,7 @@ const geistMono = localFont({
 const i18Namespaces = ["Home", "Common"];
 
 export const metadata: Metadata = {
-  title: "Hello World",
+  title: "SMS app",
   description: "Created by me",
 };
 export function generateStaticParams() {
@@ -60,19 +59,13 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <ThemeProvider>
-              <header>
-                <nav className="flex justify-between items-center py-[10px] px-[15px] light:bg-primary-foreground gap-x-1 ">
-                  HEADER
-                  <div className="w-full" />
-                  <LanguageChanger />
-                  <ThemeColorChanger />
-                  <ThemeModeChanger />
-                </nav>
-              </header>
-
-              {children}
-
-              <footer>FOOTER</footer>
+              <SidebarProvider>
+                <Sidebar />
+                <main className="w-full">
+                  {children}
+                  <footer>FOOTER</footer>
+                </main>
+              </SidebarProvider>
             </ThemeProvider>
           </NextThemesProvider>
         </body>
