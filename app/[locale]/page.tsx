@@ -12,11 +12,9 @@ export default async function Home({ params }: { params: { locale: string } }) {
 
   
   return (
-    <main className="">
+    <div>
       <h1 className="">{t("header")}</h1>
       <ExampleClientComponent />
-      <Button className="bg-primary">Set Goal</Button>
-      <Link href="/outside" className="">{t("cta")}</Link>
-    </main>
+    </div>
   );
 }

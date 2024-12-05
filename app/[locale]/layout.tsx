@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { i18nConfig } from "@/i18nConfig";
 import { dir } from "i18next";
-import TranslationsProvider from "../providers/TranslationsProvider";
+import TranslationsProvider from "../../providers/TranslationsProvider";
 import initTranslations from "../i18n";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import ThemeProvider from "@/contexts/theme-data-provider";
@@ -11,12 +11,12 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import Sidebar from "@/components/Sidebar";
 
 const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
+  src: "../fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
 });
 const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
+  src: "../fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
 });
@@ -59,11 +59,16 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <ThemeProvider>
-              <SidebarProvider>
+              <SidebarProvider
+                style={{
+                  "--sidebar-width": "25rem",
+                  "--sidebar-width-mobile": "10rem",
+                }}
+              >
                 <Sidebar />
                 <main className="w-full">
                   {children}
-                  <footer>FOOTER</footer>
+                  {/* <footer>FOOTER</footer> */}
                 </main>
               </SidebarProvider>
             </ThemeProvider>

@@ -1,4 +1,13 @@
-import { Calendar, Home, Inbox, Menu, Search, Settings } from "lucide-react";
+import {
+  Calendar,
+  ChevronDown,
+  Home,
+  Inbox,
+  Menu,
+  Plus,
+  Search,
+  Settings,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -9,6 +18,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarHeader,
+  SidebarGroupAction,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -17,9 +27,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./ui/collapsible";
 
 // Menu items.
-const items = [
+const navItems = [
   {
     title: "Home",
     url: "/",
@@ -47,6 +62,37 @@ const items = [
   },
 ];
 
+const timeFrames = [
+  {
+    title: "Today",
+    description: "Messages sent today.",
+  },
+  {
+    title: "Last week",
+    description: "Messages sent this week without today.",
+  },
+  {
+    title: "Last month",
+    description: "Messages sent this month without this week.",
+  },
+  {
+    title: "This month - 2",
+    description: "Messages sent in month - 2.",
+  },
+  {
+    title: "This month - 3",
+    description: "Messages sent in month - 3.",
+  },
+  {
+    title: "Last year (2023)",
+    description: "When you reach all the months put the years.",
+  },
+  {
+    title: "Last year - 1 (2022)",
+    description: "When you reach all the months put the years.",
+  },
+];
+
 export default function MySidebar() {
   return (
     <Sidebar>
@@ -63,7 +109,7 @@ export default function MySidebar() {
                 className="w-[--radix-popper-anchor-width]"
                 align="start"
               >
-                {items.map((item) => (
+                {navItems.map((item) => (
                   <DropdownMenuItem key={item.title}>
                     <Link
                       href={item.url}
@@ -81,23 +127,53 @@ export default function MySidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {timeFrames.map((timeFrame) => (
+          <Collapsible
+            defaultOpen
+            className="group/collapsible"
+            key={timeFrame.title}
+          >
+            <SidebarGroup>
+              <SidebarGroupLabel asChild>
+                <CollapsibleTrigger>
+                  {timeFrame.title}
+                  <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                </CollapsibleTrigger>
+              </SidebarGroupLabel>
+              <CollapsibleContent>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    <SidebarMenuItem>
+                      {/* putting the className h-full on the asChild element is the same as putting it on the first child */}
+                      <SidebarMenuButton asChild>
+                        <div className="flex flex-col h-full">
+                          <div className="flex">
+                            <div className="rounded-full aspect-1 w-4 bg-white" />
+                            <p className="font-bold">MESSAGES DISPLAYED HERE</p>
+                          </div>
+                          <p>MORE INFO</p>
+                        </div>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+
+                  {/* <SidebarMenu>
+                    {navItems.map((item) => (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton asChild>
+                          <a href={item.url}>
+                            <item.icon />
+                            <span>{item.title}</span>
+                          </a>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu> */}
+                </SidebarGroupContent>
+              </CollapsibleContent>
+            </SidebarGroup>
+          </Collapsible>
+        ))}
       </SidebarContent>
     </Sidebar>
   );
