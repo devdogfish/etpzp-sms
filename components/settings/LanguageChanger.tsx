@@ -50,8 +50,6 @@ export default function LanguageChanger() {
         <SelectContent className="light:bg-white">
           <SelectItem value="en">English</SelectItem>
           <SelectItem value="pt">Portuguese</SelectItem>
-          <SelectItem value="it">Italian</SelectItem>
-          <SelectItem value="fr">French</SelectItem>
         </SelectContent>
       </Select>
     </div>

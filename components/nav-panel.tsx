@@ -1,16 +1,24 @@
 "use client";
 import {
+  MonitorCog,
+  Shield,
   AlertCircle,
   Archive,
   ArchiveX,
-  File,
+  Settings,
+  FilePen,
+  Clipboard,
   Inbox,
   MessagesSquare,
-  // Search,
+  Search,
   Send,
   ShoppingCart,
   Trash2,
   Users2,
+  Contact,
+  Contact2,
+  Palette,
+  Puzzle,
 } from "lucide-react";
 import * as React from "react";
 import { ResizablePanel } from "./ui/resizable";
@@ -18,6 +26,8 @@ import { cn } from "@/lib/utils";
 import { AccountSwitcher } from "./account-switcher";
 import { Separator } from "./ui/separator";
 import NavLinks from "./nav-links";
+import { useTranslation } from "react-i18next";
+
 interface MailProps {
   accounts: {
     label: string;
@@ -36,6 +46,7 @@ export default function NavPanel({
   accounts,
 }: MailProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
+  const { t } = useTranslation();
   return (
     <ResizablePanel
       defaultSize={defaultLayout[0]}
@@ -72,40 +83,39 @@ export default function NavPanel({
         isCollapsed={isCollapsed}
         links={[
           {
-            title: "Inbox",
-            label: "128",
-            icon: Inbox,
-            variant: "default",
-          },
-          {
-            title: "Drafts",
-            label: "9",
-            icon: File,
-            variant: "ghost",
-          },
-          {
-            title: "Sent",
+            title: t("sent_messages"),
             label: "",
             icon: Send,
             variant: "ghost",
+            href: "/",
           },
           {
-            title: "Junk",
-            label: "23",
-            icon: ArchiveX,
+            title: t("updates"),
+            label: "4",
+            icon: AlertCircle,
             variant: "ghost",
+            href: "/updates",
           },
           {
-            title: "Trash",
+            title: t("drafts"),
+            label: "9",
+            icon: FilePen,
+            variant: "ghost",
+            href: "/drafts",
+          },
+          {
+            title: t("templates"),
+            label: "",
+            icon: Clipboard,
+            variant: "ghost",
+            href: "/templates",
+          },
+          {
+            title: t("trash"),
             label: "",
             icon: Trash2,
             variant: "ghost",
-          },
-          {
-            title: "Archive",
-            label: "",
-            icon: Archive,
-            variant: "ghost",
+            href: "/trash",
           },
         ]}
       />
@@ -114,34 +124,49 @@ export default function NavPanel({
         isCollapsed={isCollapsed}
         links={[
           {
-            title: "Social",
-            label: "972",
-            icon: Users2,
+            title: t("settings"),
+            label: "",
+            icon: Settings,
             variant: "ghost",
+            href: "/settings",
           },
           {
-            title: "Updates",
-            label: "342",
-            icon: AlertCircle,
+            title: t("contacts"),
+            label: "",
+            icon: Contact2,
             variant: "ghost",
+            href: "/contacts",
+          },
+          // {
+          //   title: "Admin Dashboard",
+          //   label: "",
+          //   icon: Shield,
+          //   variant: "ghost",
+          // },
+          {
+            title: t("admin_dashboard"),
+            label: "",
+            icon: MonitorCog,
+            variant: "ghost",
+            href: "/dashboard",
+          },
+        ]}
+      />
+      <Separator />
+      <NavLinks
+        isCollapsed={isCollapsed}
+        links={[
+          {
+            title: "Color Palette",
+            icon: Palette,
+            variant: "ghost",
+            href: "/colors",
           },
           {
-            title: "Forums",
-            label: "128",
-            icon: MessagesSquare,
+            title: "Components Preview",
+            icon: Puzzle,
             variant: "ghost",
-          },
-          {
-            title: "Shopping",
-            label: "8",
-            icon: ShoppingCart,
-            variant: "ghost",
-          },
-          {
-            title: "Promotions",
-            label: "21",
-            icon: Archive,
-            variant: "ghost",
+            href: "/ui",
           },
         ]}
       />

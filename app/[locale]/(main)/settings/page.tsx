@@ -1,6 +1,7 @@
 import LanguageChanger from "@/components/settings/LanguageChanger";
 import { ThemeColorChanger } from "@/components/settings/ThemeColorChanger";
 import ThemeModeChanger from "@/components/settings/ThemeModeChanger";
+import { ResizablePanel } from "@/components/ui/resizable";
 
 export default function Settings() {
   return (
