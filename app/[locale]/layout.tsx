@@ -18,7 +18,7 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
   weight: "100 900",
 });
-const i18Namespaces = ["Home", "Common"];
+const i18Namespaces = ["Common"];
 
 export const metadata: Metadata = {
   title: "SMS app",
@@ -57,10 +57,10 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <ThemeProvider>
-              <main className="h-full">
+              <div className="h-full">
                 {children}
                 {/* <footer>FOOTER</footer> */}
-              </main>
+              </div>
             </ThemeProvider>
           </NextThemesProvider>
         </body>

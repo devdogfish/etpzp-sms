@@ -37,8 +37,12 @@ export function MailList({ items }: MailListProps) {
               <div className="flex items-center">
                 <div className="flex items-center gap-2">
                   <div className="font-semibold">{item.name}</div>
-                  {!item.read && (
-                    <span className="flex h-2 w-2 rounded-full bg-blue-600" />
+                  {item.status === "scheduled" ? (
+                    <span className="flex h-2 w-2 rounded-full bg-yellow-600" />
+                  ) : (
+                    item.status === "failed" && (
+                      <span className="flex h-2 w-2 rounded-full bg-red-600" />
+                    )
                   )}
                 </div>
                 <div

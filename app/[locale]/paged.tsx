@@ -8,9 +8,6 @@ export default async function Home({ params }: { params: { locale: string } }) {
   const { locale } = await params;
   const { t } = await initTranslations(locale, i18Namespaces);
 
-  
-
-  
   return (
     <div>
       <h1 className="">{t("header")}</h1>

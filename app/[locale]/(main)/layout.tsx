@@ -11,14 +11,17 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { MailList } from "@/components/mail-list";
 
-export default function HomeLayout({
+export default async function HomeLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const layout = cookies().get("react-resizable-panels:layout:mail");
-  const collapsed = cookies().get("react-resizable-panels:collapsed");
+  const cookieStore = await cookies();
+  const layout = cookieStore.get("react-resizable-panels:layout:mail");
+  const collapsed = cookieStore.get("react-resizable-panels:collapsed");
 
+  // getting prev. sizes resizable-sidebar-panels and using it as default value
   const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
   const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
+
   return (
     <TooltipProvider delayDuration={0}>
       <MailLayoutWrapper>
@@ -30,7 +33,10 @@ export default function HomeLayout({
         />
         <ResizableHandle withHandle />
 
-        <ResizablePanel defaultSize={defaultLayout[1]} minSize={22}>
+        <ResizablePanel
+          defaultSize={defaultLayout[1] || [20, 32, 48]}
+          minSize={22}
+        >
           <Tabs defaultValue="all">
             <div className="flex items-center justify-between px-4 py-2">
               <h1 className="font-bold text-xl">Inbox</h1>
@@ -49,15 +55,18 @@ export default function HomeLayout({
                 </div>
               </form>
             </div>
-            <Separator />
             <TabsContent value="all">
               <MailList items={mails} />
             </TabsContent>
             <TabsContent value="scheduled">
-              <MailList items={mails.filter((item) => !item.read)} />
+              <MailList
+                items={mails.filter((item) => item.status === "scheduled")}
+              />
             </TabsContent>
             <TabsContent value="failed">
-              View your failed messages here.
+              <MailList
+                items={mails.filter((item) => item.status === "failed")}
+              />
             </TabsContent>
           </Tabs>
         </ResizablePanel>

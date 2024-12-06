@@ -230,12 +230,10 @@ export default function setGlobalColorTheme(
   themeMode: "light" | "dark",
   color: ThemeColors
 ) {
-  console.log(color)
   const theme = themes[color][themeMode] as {
     [key: string]: string;
   };
   for (const key in theme) {
-    if (key !== theme[key]) console.log("Color variable changed. Prev:", key, ", New:", theme[key])
     document.documentElement.style.setProperty(`--${key}`, theme[key]);
   }
 }
