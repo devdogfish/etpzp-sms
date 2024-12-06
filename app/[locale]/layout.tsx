@@ -7,8 +7,6 @@ import TranslationsProvider from "../../providers/TranslationsProvider";
 import initTranslations from "../i18n";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import ThemeProvider from "@/contexts/theme-data-provider";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import Sidebar from "@/components/Sidebar";
 
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
@@ -59,18 +57,10 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <ThemeProvider>
-              <SidebarProvider
-                style={{
-                  "--sidebar-width": "25rem",
-                  "--sidebar-width-mobile": "10rem",
-                }}
-              >
-                <Sidebar />
-                <main className="w-full">
-                  {children}
-                  {/* <footer>FOOTER</footer> */}
-                </main>
-              </SidebarProvider>
+              <main className="h-full">
+                {children}
+                {/* <footer>FOOTER</footer> */}
+              </main>
             </ThemeProvider>
           </NextThemesProvider>
         </body>
