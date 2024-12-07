@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
+import { ResizablePanel } from "@/components/ui/resizable";
 
 export default function UI() {
   return (
-    <div>
+    <ResizablePanel>
       <div>
         <h1>Buttons</h1>
         <div className="flex gap-1">
-          <Button>Set Goal</Button>
+          <Button variant="default">Default</Button>
           <Button variant="secondary">Secondary</Button>
           <Button variant="outline">Outline</Button>
           <Button variant="ghost">Ghost</Button>
@@ -20,6 +21,6 @@ export default function UI() {
         <div></div>
         Tip use <i>popover</i> color and <i>popoverForeground</i> for tooltips and something like that. It is often times the same as primary but separated in a category so you can target it.
       </div>
-    </div>
+    </ResizablePanel>
   );
 }

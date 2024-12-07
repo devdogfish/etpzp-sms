@@ -1,21 +1,12 @@
 "use client";
 import {
   MonitorCog,
-  Shield,
   AlertCircle,
-  Archive,
-  ArchiveX,
   Settings,
   FilePen,
   Clipboard,
-  Inbox,
-  MessagesSquare,
-  Search,
   Send,
-  ShoppingCart,
   Trash2,
-  Users2,
-  Contact,
   Contact2,
   Palette,
   Puzzle,
@@ -27,6 +18,8 @@ import { AccountSwitcher } from "./account-switcher";
 import { Separator } from "./ui/separator";
 import NavLinks from "./nav-links";
 import { useTranslation } from "react-i18next";
+import { useLayout } from "@/contexts/use-layout";
+import { FormatDateOptions } from "date-fns";
 
 interface MailProps {
   accounts: {
@@ -34,22 +27,44 @@ interface MailProps {
     email: string;
     icon: React.ReactNode;
   }[];
-  defaultLayout: number[] | undefined;
+  defaultLayout?: number[] | undefined;
   defaultCollapsed?: boolean;
   navCollapsedSize: number;
 }
 
-export default function NavPanel({
-  defaultCollapsed = false,
-  navCollapsedSize,
-  defaultLayout = [20, 32, 48],
-  accounts,
-}: MailProps) {
-  const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
+function getTime() {
+  const options: Intl.DateTimeFormatOptions = {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hourCycle: "h23",
+    timeZone: "UTC",
+  };
+
+  const date = new Date();
+  return new Intl.DateTimeFormat("en-US", options).format(date);
+}
+export default function NavPanel({ navCollapsedSize, accounts }: MailProps) {
+  const { layout, isCollapsed, setIsCollapsed } = useLayout();
+  React.useEffect(() => {
+    console.log(
+      `RENDERING Navbar with a width of ${layout[0]}. Layout available: ${layout}`
+    );
+  }, []);
+  console.log(
+    `RENDERING Navbar with a width of ${layout[0]}. Layout available: ${layout}`
+  );
+  // console.log(`RENDERING NAV PANEL on ${getTime()}`);
+
+  // console.log(
+  //   `LAYOUT COORDINATES: ${layout}`
+  // );
+  // console.log(`isCollapsed: ${isCollapsed}, setIsCollapsed: ${setIsCollapsed}`);
+
   const { t } = useTranslation();
   return (
     <ResizablePanel
-      defaultSize={defaultLayout[0]}
+      defaultSize={layout && Number(layout[0])}
       collapsedSize={navCollapsedSize}
       collapsible={true}
       minSize={13}

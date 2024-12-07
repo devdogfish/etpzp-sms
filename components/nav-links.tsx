@@ -10,6 +10,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { usePathname } from "next/navigation";
 
 interface NavProps {
   isCollapsed: boolean;
@@ -23,6 +24,7 @@ interface NavProps {
 }
 
 export default function NavLinks({ links, isCollapsed }: NavProps) {
+  const pathname = usePathname();
   return (
     <div
       data-collapsed={isCollapsed}
@@ -39,7 +41,8 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
                     buttonVariants({ variant: link.variant, size: "icon" }),
                     "h-9 w-9",
                     link.variant === "default" &&
-                      "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
+                      "hover:bg-accent hover:text-accent-foreground",
+                      link.href === pathname && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                   )}
                 >
                   <link.icon className="h-4 w-4" />
@@ -62,8 +65,9 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
               className={cn(
                 buttonVariants({ variant: link.variant, size: "sm" }),
                 link.variant === "default" &&
-                  "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
-                "justify-start"
+                  "hover:bg-accent hover:text-accent-foreground",
+                "justify-start",
+                link.href === pathname && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
               )}
             >
               <link.icon className="mr-2 h-4 w-4" />

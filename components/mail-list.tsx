@@ -5,7 +5,6 @@ import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-// import { Separator } from "@/components/ui/separator"
 import { Mail } from "@/lib/test-data.tsx";
 import { useMail } from "@/hooks/use-mail";
 
@@ -17,7 +16,7 @@ export function MailList({ items }: MailListProps) {
   const [mail, setMail] = useMail();
 
   return (
-    <ScrollArea className="h-screen">
+    <ScrollArea className="h-[calc(100vh-var(--message-panel-header-height))] ">
       <div className="flex flex-col gap-2 p-4 pt-0">
         {items.map((item) => (
           <button

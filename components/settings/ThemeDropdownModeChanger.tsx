@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default function ModeChanger() {
+export default function ModeChanger(props: React.ReactNode) {
   const { setTheme, theme } = useTheme();
 
   return (
