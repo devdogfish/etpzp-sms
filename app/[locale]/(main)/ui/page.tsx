@@ -1,9 +1,12 @@
+"use client"
 import { Button } from "@/components/ui/button";
 import { ResizablePanel } from "@/components/ui/resizable";
+import { useLayout } from "@/contexts/use-layout";
 
 export default function UI() {
+  const { layout } = useLayout();
   return (
-    <ResizablePanel>
+    <ResizablePanel defaultSize={100 - layout[0]}>
       <div>
         <h1>Buttons</h1>
         <div className="flex gap-1">

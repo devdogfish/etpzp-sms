@@ -46,13 +46,17 @@ function getTime() {
 }
 export default function NavPanel({ navCollapsedSize, accounts }: MailProps) {
   const { layout, isCollapsed, setIsCollapsed } = useLayout();
-  React.useEffect(() => {
-    console.log(
-      `RENDERING Navbar with a width of ${layout[0]}. Layout available: ${layout}`
-    );
-  }, []);
+  // React.useEffect(() => {
+  //   console.log(
+  //     `RENDERING "${
+  //       isCollapsed === true && "COLLAPSED"
+  //     }"NAVBAR with a width of ${layout[0]}. Layout available: ${layout}`
+  //   );
+  // }, []);
   console.log(
-    `RENDERING Navbar with a width of ${layout[0]}. Layout available: ${layout}`
+    `RE-RENDERING ${
+      isCollapsed === true ? `"COLLAPSED" ` : ""
+    }NAVBAR with a width of ${layout[0]}. Layout available: ${layout}`
   );
   // console.log(`RENDERING NAV PANEL on ${getTime()}`);
 

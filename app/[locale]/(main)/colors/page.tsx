@@ -9,9 +9,6 @@ export default function Page() {
       className="flex flex-col gap-3"
       style={{ overflow: "auto" }}
     >
-      {/* <h1>COLOR PALETTE 1</h1> */}
-      {/* <ColorPalette /> */}
-      {/* <h1>COLOR PALETTE 2</h1> */}
 
       <ColorPalette2 />
       <div className="flex flex-col p-3 gap-3">

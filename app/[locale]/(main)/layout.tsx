@@ -57,6 +57,7 @@ export default async function RootLayout({
   const initialIsCollapsed: boolean = collapsedCookie
     ? JSON.parse(collapsedCookie.value)
     : undefined;
+    console.log(`RE-FETCHED COOKIES ${initialLayout}, ${initialIsCollapsed}`)
   return (
     <TranslationsProvider
       resources={resources}

@@ -5,6 +5,7 @@ import {
   Dispatch,
   SetStateAction,
   useContext,
+  useEffect,
   useState,
 } from "react";
 
@@ -28,6 +29,11 @@ export function LayoutProvider({
   const [layout, setLayout] = useState(initialLayout);
   const [isCollapsed, setIsCollapsed] = useState(initialIsCollapsed);
 
+  useEffect(() => {
+    console.log(`layout changed: ${layout}`)
+  
+  }, [layout])
+  
   return (
     <LayoutContext.Provider value={{ layout, setLayout, isCollapsed, setIsCollapsed }}>
       {children}
