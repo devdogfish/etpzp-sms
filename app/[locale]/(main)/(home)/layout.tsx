@@ -1,12 +1,17 @@
+import ChildrenPanel from "@/components/children-panel";
 import MessagesPanel from "@/components/messages-panel";
-import { ResizableHandle, ResizablePanel } from "@/components/ui/resizable";
+import { ResizableHandle } from "@/components/ui/resizable";
 
-export default function HomeLayout({ children }: { children: Readonly<React.ReactNode>}) {
+export default function HomeLayout({
+  children,
+}: {
+  children: Readonly<React.ReactNode>;
+}) {
   return (
     <>
       <MessagesPanel />
       <ResizableHandle withHandle />
-      <ResizablePanel>{children}</ResizablePanel>
+      <ChildrenPanel>{children}</ChildrenPanel>
     </>
   );
 }

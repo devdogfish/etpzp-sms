@@ -1,12 +1,13 @@
 import ColorPalette from "@/components/color-palette";
+import Header from "@/components/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ResizablePanel } from "@/components/ui/resizable";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Page() {
   return (
-    <ResizablePanel className="flex flex-col gap-3">
-      <ScrollArea className="h-full">
+    <div className="p-3">
+      <Header />
+      <ScrollArea className="h-[calc(100vh-50px)]">
         <ColorPalette />
         <div className="flex flex-col p-3 gap-3">
           <Card>
@@ -46,6 +47,6 @@ export default function Page() {
           </Card>
         </div>
       </ScrollArea>
-    </ResizablePanel>
+    </div>
   );
 }

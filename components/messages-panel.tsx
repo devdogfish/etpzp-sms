@@ -10,22 +10,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useLayout } from "@/contexts/use-layout";
 
 import { ResizablePanel } from "./ui/resizable";
+import { useTranslation } from "react-i18next";
 
 export default function MessagesPanel() {
   const { layout, fallbackLayout } = useLayout();
+  const { t } = useTranslation();
 
   // debug
   React.useEffect(() => {
-    console.log("Messages Panel: ");
+    // console.log("Messages Panel: ");
 
-    if (layout === undefined)
-      console.log(
-        `Prev layout not found: ${layout}. Using fallback: ${fallbackLayout} to render global panel.`
-      );
-    else if (Array.isArray(layout) && layout.length !== 3)
-      console.log(`Layout is defined, but NOT a 3 column layout: ${layout}.`);
-    else console.log(`Everything is good, using previous layout: ${layout}.`);
-    console.log("");
+    // if (layout === undefined)
+    //   console.log(
+    //     `Prev layout not found: ${layout}. Using fallback: ${fallbackLayout} to render global panel.`
+    //   );
+    // else if (Array.isArray(layout) && layout.length !== 3)
+    //   console.log(`Layout is defined, but NOT a 3 column layout: ${layout}.`);
+    // else console.log(`Everything is good, using previous layout: ${layout}.`);
+    // console.log("");
 
     // keep this
     const header = document.getElementById("message-panel-header");
@@ -48,7 +50,7 @@ export default function MessagesPanel() {
       <Tabs defaultValue="all">
         <div id="message-panel-header">
           <div className="flex items-center justify-between px-4 py-2">
-            <h1 className="font-bold text-xl">Inbox</h1>
+            <h2>{t("Titles:messages")}</h2>
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
@@ -77,9 +79,7 @@ export default function MessagesPanel() {
           />
         </TabsContent>
         <TabsContent value="failed">
-          <MailList 
-            items={mails.filter((item) => item.status === "failed")} 
-          />
+          <MailList items={mails.filter((item) => item.status === "failed")} />
         </TabsContent>
       </Tabs>
     </ResizablePanel>

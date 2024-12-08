@@ -19,7 +19,6 @@ import { Separator } from "./ui/separator";
 import NavLinks from "./nav-links";
 import { useTranslation } from "react-i18next";
 import { useLayout } from "@/contexts/use-layout";
-import { FormatDateOptions } from "date-fns";
 
 interface MailProps {
   accounts: {
@@ -32,36 +31,15 @@ interface MailProps {
   navCollapsedSize: number;
 }
 
-function getTime() {
-  const options: Intl.DateTimeFormatOptions = {
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-    hourCycle: "h23",
-    timeZone: "UTC",
-  };
-
-  const date = new Date();
-  return new Intl.DateTimeFormat("en-US", options).format(date);
-}
 export default function NavPanel({ navCollapsedSize, accounts }: MailProps) {
   const { layout, isCollapsed, setIsCollapsed } = useLayout();
-  React.useEffect(() => {
-    console.log(
-      `RENDERING Navbar with a width of ${layout[0]}. Layout available: ${layout}`
-    );
-  }, []);
-  console.log(
-    `RENDERING Navbar with a width of ${layout[0]}. Layout available: ${layout}`
-  );
-  // console.log(`RENDERING NAV PANEL on ${getTime()}`);
-
-  // console.log(
-  //   `LAYOUT COORDINATES: ${layout}`
-  // );
-  // console.log(`isCollapsed: ${isCollapsed}, setIsCollapsed: ${setIsCollapsed}`);
-
   const { t } = useTranslation();
+
+  // React.useEffect(() => {
+  //   console.log(
+  //     `RENDERING Navbar with a width of ${layout[0]}. Layout available: ${layout}`
+  //   );
+  // }, []);
   return (
     <ResizablePanel
       defaultSize={layout && Number(layout[0])}
@@ -172,13 +150,13 @@ export default function NavPanel({ navCollapsedSize, accounts }: MailProps) {
         isCollapsed={isCollapsed}
         links={[
           {
-            title: "Color Palette",
+            title: t("color_palette"),
             icon: Palette,
             variant: "ghost",
             href: "/colors",
           },
           {
-            title: "Components Preview",
+            title: t("component_preview"),
             icon: Puzzle,
             variant: "ghost",
             href: "/ui",

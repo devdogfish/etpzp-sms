@@ -1,9 +1,11 @@
+import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { ResizablePanel } from "@/components/ui/resizable";
 
 export default function UI() {
   return (
-    <ResizablePanel>
+    <div className="p-3">
+      <Header />
       <div>
         <h1>Buttons</h1>
         <div className="flex gap-1">
@@ -14,13 +16,16 @@ export default function UI() {
           <Button variant="destructive">Destructive</Button>
           <Button variant="link">Link</Button>
         </div>
-        Tip: use <i>default</i> in combination with <i>ghost</i> in popup modals (submit and cancel).
+        Tip: use <i>default</i> in combination with <i>ghost</i> in popup modals
+        (submit and cancel).
       </div>
       <div>
         <h1>Popover</h1>
         <div></div>
-        Tip use <i>popover</i> color and <i>popoverForeground</i> for tooltips and something like that. It is often times the same as primary but separated in a category so you can target it.
+        Tip use <i>popover</i> color and <i>popoverForeground</i> for tooltips
+        and something like that. It is often times the same as primary but
+        separated in a category so you can target it.
       </div>
-    </ResizablePanel>
+    </div>
   );
 }
