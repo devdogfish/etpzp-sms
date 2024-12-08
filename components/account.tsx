@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -13,16 +12,11 @@ import {
 } from "./ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-interface AccountSwitcherProps {
+interface AccountProps {
   isCollapsed: boolean;
-  accounts: {
-    label: string;
-    email: string;
-    icon: React.ReactNode;
-  }[];
 }
 
-export function AccountSwitcher({ isCollapsed }: AccountSwitcherProps) {
+export default function Account({ isCollapsed }: AccountProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -35,16 +29,20 @@ export function AccountSwitcher({ isCollapsed }: AccountSwitcherProps) {
           <AvatarImage src="https://github.com/devdogfish.png" />
           <AvatarFallback>D</AvatarFallback>
         </Avatar>
-        <span className={cn(" asflkjslkdjf", isCollapsed && "hidden")}>
-          User Name
-        </span>
+        <div
+          className={cn("flex flex-col items-start", isCollapsed && "hidden")}
+        >
+          <p className="font-semibold mb-[-3px]">User Name</p>
+          <span className="text-xs">Admin</span>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {/* <DropdownMenuGroup> */}
-          <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuItem>Profile</DropdownMenuItem>
+        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuItem>Report a bug</DropdownMenuItem>
         {/* </DropdownMenuGroup> */}
         <DropdownMenuSeparator />
         <DropdownMenuItem>Log out</DropdownMenuItem>

@@ -2,6 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { ThemeColorChanger } from "./settings/ThemeColorChanger";
 import ThemeModeToggle from "./settings/ThemeModeToggle";
+import Header from "./header";
 
 const colorClasses = [
   {
@@ -189,16 +190,9 @@ const ColorCard = ({
   </div>
 );
 
-export function ColorPalette2() {
+export default function ColorPalette() {
   return (
-    <div className="p-3 bg-background text-foreground">
-      <div className="flex gap-1">
-        <h2 className="text-2xl font-bold mb-6 whitespace-nowrap mr-auto">
-          Color Palette
-        </h2>
-        <ThemeColorChanger />
-        <ThemeModeToggle />
-      </div>
+    <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {colorClasses.map((color) => (
           <ColorCard key={color.name} {...color} />
@@ -210,6 +204,6 @@ export function ColorPalette2() {
           <ColorCard key={color.name} {...color} />
         ))}
       </div>
-    </div>
+    </>
   );
 }

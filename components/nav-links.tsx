@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, normalizePath } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Tooltip,
@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 interface NavProps {
   isCollapsed: boolean;
@@ -25,6 +26,12 @@ interface NavProps {
 
 export default function NavLinks({ links, isCollapsed }: NavProps) {
   const pathname = usePathname();
+  const { i18n } = useTranslation();
+
+  // isActive takes Link, compares it to the current url, and returns whether it is the same link we are on or not.
+  const isActive = (href: string) => {
+    return normalizePath(href, i18n) === normalizePath(pathname, i18n);
+  };
   return (
     <div
       data-collapsed={isCollapsed}
@@ -42,7 +49,8 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
                     "h-9 w-9",
                     link.variant === "default" &&
                       "hover:bg-accent hover:text-accent-foreground",
-                      link.href === pathname && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
+                    isActive(link.href) &&
+                      "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                   )}
                 >
                   <link.icon className="h-4 w-4" />
@@ -67,7 +75,8 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
                 link.variant === "default" &&
                   "hover:bg-accent hover:text-accent-foreground",
                 "justify-start",
-                link.href === pathname && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
+                isActive(link.href) &&
+                  "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
               )}
             >
               <link.icon className="mr-2 h-4 w-4" />

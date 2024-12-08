@@ -4,6 +4,7 @@ import { I18nextProvider } from "react-i18next";
 import initTranslations from "@/app/[locale]/i18n";
 import { createInstance } from "i18next";
 
+// This provider is for client-component useTranslation() hook
 export default function TranslationsProvider({
   children,
   locale,

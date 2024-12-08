@@ -83,7 +83,7 @@ const ColorRow = ({
   </tr>
 );
 
-export function ColorPalette() {
+export function ColorPalette2() {
   return (
     <div className="p-6 bg-background text-foreground">
       <h2 className="text-2xl font-bold mb-4">Color Palette</h2>

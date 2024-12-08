@@ -8,7 +8,7 @@ import initTranslations from "../i18n";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import ThemeProvider from "@/contexts/theme-data-provider";
 
-import { ResizablePanelWrapper } from "@/components/mail-layout-wrapper";
+import ResizablePanelWrapper from "@/components/resizable-panel-wrapper";
 import { ResizableHandle, ResizablePanel } from "@/components/ui/resizable";
 import NavPanel from "@/components/nav-panel";
 import { cookies } from "next/headers";
@@ -34,15 +34,16 @@ export function generateStaticParams() {
   return i18nConfig.locales.map((locale) => ({ locale }));
 }
 
-type RootLayoutProps = {
+interface RootLayoutProps {
   children: React.ReactNode;
   params: { locale: string };
-};
-const i18nNamespaces = ["Home", "Common"];
+}
+
 export default async function RootLayout({
   children,
   params,
 }: RootLayoutProps) {
+  const i18nNamespaces = ["Navigation", "Common", "Titles"];
   const { locale } = await params;
   const { resources } = await initTranslations(locale, i18nNamespaces);
 
