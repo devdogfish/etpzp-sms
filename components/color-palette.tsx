@@ -189,13 +189,11 @@ const ColorCard = ({
   </div>
 );
 
-export function ColorPalette2() {
+export default function ColorPalette() {
   return (
-    <div className="p-3 bg-background text-foreground">
+    <>
       <div className="flex gap-1">
-        <h2 className="text-2xl font-bold mb-6 whitespace-nowrap mr-auto">
-          Color Palette
-        </h2>
+        <h2 className="whitespace-nowrap mr-auto">Color Palette</h2>
         <ThemeColorChanger />
         <ThemeModeToggle />
       </div>
@@ -210,6 +208,6 @@ export function ColorPalette2() {
           <ColorCard key={color.name} {...color} />
         ))}
       </div>
-    </div>
+    </>
   );
 }

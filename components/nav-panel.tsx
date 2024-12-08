@@ -14,7 +14,7 @@ import {
 import * as React from "react";
 import { ResizablePanel } from "./ui/resizable";
 import { cn } from "@/lib/utils";
-import { AccountSwitcher } from "./account-switcher";
+import Account from "./account";
 import { Separator } from "./ui/separator";
 import NavLinks from "./nav-links";
 import { useTranslation } from "react-i18next";
@@ -91,7 +91,7 @@ export default function NavPanel({ navCollapsedSize, accounts }: MailProps) {
           isCollapsed ? "h-[52px]" : "px-2"
         )}
       >
-        <AccountSwitcher isCollapsed={isCollapsed} accounts={accounts} />
+        <Account isCollapsed={isCollapsed} />
       </div>
       <Separator />
       <NavLinks

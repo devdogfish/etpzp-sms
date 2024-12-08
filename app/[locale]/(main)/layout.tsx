@@ -8,7 +8,7 @@ import initTranslations from "../i18n";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import ThemeProvider from "@/contexts/theme-data-provider";
 
-import { ResizablePanelWrapper } from "@/components/mail-layout-wrapper";
+import ResizablePanelWrapper from "@/components/resizable-panel-wrapper";
 import { ResizableHandle, ResizablePanel } from "@/components/ui/resizable";
 import NavPanel from "@/components/nav-panel";
 import { cookies } from "next/headers";

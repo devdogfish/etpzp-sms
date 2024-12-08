@@ -5,6 +5,6 @@ export default function Greeting() {
   const { t } = useTranslation();
 
   // in this case I used username variable interpolation, so pass that as well
-  const username = "Luigi";
+  const username = "User Name";
   return <div>{t("greeting", { username })}</div>;
 }
