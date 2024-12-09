@@ -1,6 +1,7 @@
 import ChildrenPanel from "@/components/children-panel";
 import MessagesPanel from "@/components/messages-panel";
 import { ResizableHandle } from "@/components/ui/resizable";
+import { useLayout } from "@/contexts/use-layout";
 
 export default function HomeLayout({
   children,
@@ -11,7 +12,12 @@ export default function HomeLayout({
     <>
       <MessagesPanel />
       <ResizableHandle withHandle />
-      <ChildrenPanel>{children}</ChildrenPanel>
+      <ChildrenPanel
+        // use the prev layout if possible
+        hasMiddleBar={true}
+      >
+        {children}
+      </ChildrenPanel>
     </>
   );
 }

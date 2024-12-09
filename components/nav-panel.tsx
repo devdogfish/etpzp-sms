@@ -40,11 +40,12 @@ export default function NavPanel({ navCollapsedSize, accounts }: MailProps) {
   //     }"NAVBAR with a width of ${layout[0]}. Layout available: ${layout}`
   //   );
   // }, []);
-  console.log(
-    `RE-RENDERING ${
-      isCollapsed === true ? `"COLLAPSED" ` : ""
-    }NAVBAR with a width of ${layout[0]}. Layout available: ${layout}`
-  );
+  // layout[0] CAN BE UNDEFINED
+  // console.log(
+  //   `RE-RENDERING ${
+  //     isCollapsed === true ? `"COLLAPSED" ` : ""
+  //   }NAVBAR with a width of ${layout[0]}. Layout available: ${layout}`
+  // );
   // console.log(`RENDERING NAV PANEL on ${getTime()}`);
 
   // console.log(
