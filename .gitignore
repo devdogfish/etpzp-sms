@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Languages
 /locales/
+
+# Sensible data
+/lib/data/*

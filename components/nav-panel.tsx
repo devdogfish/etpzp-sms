@@ -21,17 +21,12 @@ import { useTranslation } from "react-i18next";
 import { useLayout } from "@/contexts/use-layout";
 
 interface MailProps {
-  accounts: {
-    label: string;
-    email: string;
-    icon: React.ReactNode;
-  }[];
   defaultLayout?: number[] | undefined;
   defaultCollapsed?: boolean;
   navCollapsedSize: number;
 }
 
-export default function NavPanel({ navCollapsedSize, accounts }: MailProps) {
+export default function NavPanel({ navCollapsedSize }: MailProps) {
   const { layout, isCollapsed, setIsCollapsed } = useLayout();
   // React.useEffect(() => {
   //   console.log(
