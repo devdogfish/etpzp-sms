@@ -1,0 +1,78 @@
+[
+  {
+    "dn": "CN=Administradores,CN=Builtin,DC=etpzp,DC=local",
+    "cn": "Administradores",
+    "description": "Os administradores têm acesso completo e sem restrições ao computador/domínio",
+    "distinguishedName": "CN=Administradores,CN=Builtin,DC=etpzp,DC=local",
+    "objectCategory": "CN=Group,CN=Schema,CN=Configuration,DC=etpzp,DC=local"
+  },
+  {
+    "dn": "CN=Administradores de Hyper-V,CN=Builtin,DC=etpzp,DC=local",
+    "cn": "Administradores de Hyper-V",
+    "description": "Os membros deste grupo têm acesso completo e sem restrições a todas as funcionalidades de Hyper-V.",
+    "distinguishedName": "CN=Administradores de Hyper-V,CN=Builtin,DC=etpzp,DC=local",
+    "objectCategory": "CN=Group,CN=Schema,CN=Configuration,DC=etpzp,DC=local"
+  },
+  {
+    "dn": "CN=Administradores de Réplicas de Armazenamento,CN=Builtin,DC=etpzp,DC=local",
+    "cn": "Administradores de Réplicas de Armazenamento",
+    "description": "Os membros deste grupo têm acesso completo e sem restrições a todas as funcionalidades da Réplica de Armazenamento.",
+    "distinguishedName": "CN=Administradores de Réplicas de Armazenamento,CN=Builtin,DC=etpzp,DC=local",
+    "objectCategory": "CN=Group,CN=Schema,CN=Configuration,DC=etpzp,DC=local"
+  },
+  {
+    "dn": "CN=Admins de esquema,CN=Users,DC=etpzp,DC=local",
+    "cn": "Admins de esquema",
+    "description": "Administradores designados do esquema",
+    "distinguishedName": "CN=Admins de esquema,CN=Users,DC=etpzp,DC=local",
+    "objectCategory": "CN=Group,CN=Schema,CN=Configuration,DC=etpzp,DC=local"
+  },
+  {
+    "dn": "CN=Admins de empresa,CN=Users,DC=etpzp,DC=local",
+    "cn": "Admins de empresa",
+    "description": "Administradores designados da empresa",
+    "distinguishedName": "CN=Admins de empresa,CN=Users,DC=etpzp,DC=local",
+    "objectCategory": "CN=Group,CN=Schema,CN=Configuration,DC=etpzp,DC=local"
+  },
+  {
+    "dn": "CN=Admins do domínio,CN=Users,DC=etpzp,DC=local",
+    "cn": "Admins do domínio",
+    "description": "Administradores designados do domínio",
+    "distinguishedName": "CN=Admins do domínio,CN=Users,DC=etpzp,DC=local",
+    "objectCategory": "CN=Group,CN=Schema,CN=Configuration,DC=etpzp,DC=local"
+  },
+  {
+    "dn": "CN=Principais Administradores,CN=Users,DC=etpzp,DC=local",
+    "cn": "Principais Administradores",
+    "description": "Os membros deste grupo podem executar ações administrativas em objetos importantes no domínio.",
+    "distinguishedName": "CN=Principais Administradores,CN=Users,DC=etpzp,DC=local",
+    "objectCategory": "CN=Group,CN=Schema,CN=Configuration,DC=etpzp,DC=local"
+  },
+  {
+    "dn": "CN=Principais Administradores de Empresa,CN=Users,DC=etpzp,DC=local",
+    "cn": "Principais Administradores de Empresa",
+    "description": "Os membros deste grupo podem executar ações administrativas em objetos importantes na floresta.",
+    "distinguishedName": "CN=Principais Administradores de Empresa,CN=Users,DC=etpzp,DC=local",
+    "objectCategory": "CN=Group,CN=Schema,CN=Configuration,DC=etpzp,DC=local"
+  },
+  {
+    "dn": "CN=DnsAdmins,CN=Users,DC=etpzp,DC=local",
+    "cn": "DnsAdmins",
+    "description": "DNS Administrators Group",
+    "distinguishedName": "CN=DnsAdmins,CN=Users,DC=etpzp,DC=local",
+    "objectCategory": "CN=Group,CN=Schema,CN=Configuration,DC=etpzp,DC=local"
+  },
+  {
+    "dn": "CN=ADSyncAdmins,CN=Users,DC=etpzp,DC=local",
+    "cn": "ADSyncAdmins",
+    "description": "ADSyncAdmins",
+    "distinguishedName": "CN=ADSyncAdmins,CN=Users,DC=etpzp,DC=local",
+    "objectCategory": "CN=Group,CN=Schema,CN=Configuration,DC=etpzp,DC=local"
+  },
+  {
+    "dn": "CN=SERVIÇOS\\>ADMINISTRATIVOS,OU=01 SERVIÇOS,OU=02 GRUPOS,DC=etpzp,DC=local",
+    "cn": "SERVIÇOS>ADMINISTRATIVOS",
+    "distinguishedName": "CN=SERVIÇOS\\>ADMINISTRATIVOS,OU=01 SERVIÇOS,OU=02 GRUPOS,DC=etpzp,DC=local",
+    "objectCategory": "CN=Group,CN=Schema,CN=Configuration,DC=etpzp,DC=local"
+  }
+]

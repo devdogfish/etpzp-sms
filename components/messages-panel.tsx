@@ -1,11 +1,12 @@
 "use client";
+// this component has been copied over completely to the message container, and is not used anywhere anymore
 import React from "react";
 
 import { Separator } from "@/components/ui/separator";
 import { Search } from "lucide-react";
 import { Input } from "./ui/input";
-import { MailList } from "./mail-list";
-import { mails } from "@/lib/test-data";
+import { MessageList } from "./message-list";
+import { messages } from "@/lib/test-data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useLayout } from "@/contexts/use-layout";
 
@@ -18,17 +19,6 @@ export default function MessagesPanel() {
 
   // debug
   React.useEffect(() => {
-    // console.log("Messages Panel: ");
-
-    // if (layout === undefined)
-    //   console.log(
-    //     `Prev layout not found: ${layout}. Using fallback: ${fallbackLayout} to render global panel.`
-    //   );
-    // else if (Array.isArray(layout) && layout.length !== 3)
-    //   console.log(`Layout is defined, but NOT a 3 column layout: ${layout}.`);
-    // else console.log(`Everything is good, using previous layout: ${layout}.`);
-    // console.log("");
-
     // keep this
     const header = document.getElementById("message-panel-header");
     document.documentElement.style.setProperty(
@@ -71,15 +61,25 @@ export default function MessagesPanel() {
           </div>
         </div>
         <TabsContent value="all">
-          <MailList items={mails} />
+          <MessageList
+            messages={messages}
+            selectedMessageId={selectedMessage?.id || null}
+            onSelectMessage={setSelected}
+          />
         </TabsContent>
         <TabsContent value="scheduled">
-          <MailList
-            items={mails.filter((item) => item.status === "scheduled")}
+          <MessageList
+            messages={messages}
+            selectedMessageId={selectedMessage?.id || null}
+            onSelectMessage={setSelected}
           />
         </TabsContent>
         <TabsContent value="failed">
-          <MailList items={mails.filter((item) => item.status === "failed")} />
+          <MessageList
+            messages={messages}
+            selectedMessageId={selectedMessage?.id || null}
+            onSelectMessage={setSelected}
+          />
         </TabsContent>
       </Tabs>
     </ResizablePanel>

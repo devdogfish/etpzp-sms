@@ -5,32 +5,31 @@ import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Mail } from "@/lib/test-data.tsx";
-import { useMail } from "@/hooks/use-mail";
+import { Message } from "@/lib/test-data.tsx";
+import { useMessage } from "@/hooks/use-message";
 
-interface MailListProps {
-  items: Mail[];
+interface MessageListProps {
+  messages: Message[];
+  selectedMessageId: string | null;
+  onSelectMessage: (id: string) => void;
 }
 
-export function MailList({ items }: MailListProps) {
-  const [mail, setMail] = useMail();
-
+export function MessageList({
+  messages,
+  selectedMessageId,
+  onSelectMessage,
+}: MessageListProps) {
   return (
     <ScrollArea className="h-[calc(100vh-var(--message-panel-header-height))]">
       <div className="flex flex-col gap-2 p-4 pt-0">
-        {items.map((item) => (
+        {messages.map((item) => (
           <button
             key={item.id}
             className={cn(
               "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-              mail.selected === item.id && "bg-muted"
+              selectedMessageId === item.id && "bg-muted"
             )}
-            onClick={() =>
-              setMail({
-                ...mail,
-                selected: item.id,
-              })
-            }
+            onClick={() => onSelectMessage(item.id)}
           >
             <div className="flex w-full flex-col gap-1">
               <div className="flex items-center">
@@ -47,7 +46,7 @@ export function MailList({ items }: MailListProps) {
                 <div
                   className={cn(
                     "ml-auto text-xs",
-                    mail.selected === item.id
+                    selectedMessageId === item.id
                       ? "text-foreground"
                       : "text-muted-foreground"
                   )}
