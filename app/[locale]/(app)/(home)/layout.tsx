@@ -1,5 +1,5 @@
 import MessageContainer from "@/components/message-container";
-import { SelectedMessageProvider } from "@/contexts/use-selected-message";
+import { MessageProvider } from "@/contexts/use-message";
 import { Message, messages } from "@/lib/test-data";
 
 async function getMessages(): Promise<Message[]> {
@@ -13,8 +13,8 @@ export default async function MessagePage({
   const initialMessages = await getMessages();
 
   return (
-    <MessageContainer initialMessages={initialMessages}>
-      {children}
-    </MessageContainer>
+    <MessageProvider initialMessages={initialMessages}>
+      <MessageContainer>{children}</MessageContainer>
+    </MessageProvider>
   );
 }

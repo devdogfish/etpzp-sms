@@ -1,36 +1,28 @@
 "use client";
 import React from "react";
 
-import { Separator } from "@/components/ui/separator";
 import { Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useLayout } from "@/contexts/use-layout";
 
-import { useMessage } from "@/hooks/use-message";
-import { messages, Message } from "@/lib/test-data";
-import { MessageDisplay } from "./message-display";
+import { useMessage } from "@/contexts/use-message";
 import { MessageList } from "./message-list";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useTranslation } from "react-i18next";
 import ChildrenPanel from "./children-panel";
-import { SelectedMessageProvider } from "@/contexts/use-selected-message";
+import PageHeader from "./page-header";
 
 interface MessageContainerProps {
   children: React.ReactNode;
-  initialMessages: Message[];
 }
 
-export default function MessageContainer({
-  children,
-  initialMessages,
-}: MessageContainerProps) {
-  const { messages, selectedMessage, setSelected } =
-    useMessage(initialMessages);
+export default function MessageContainer({ children }: MessageContainerProps) {
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation();
+  const { messages, setSelected, selected } = useMessage();
   return (
-    <SelectedMessageProvider selectedMessage={selectedMessage}>
+    <>
       {/* Start message panel */}
       <ResizablePanel
         // Check if the layout is a 3-column middle-bar panel. Use the previous 3-column layout if available; otherwise, render the fallback for different or undefined layouts.
@@ -44,15 +36,13 @@ export default function MessageContainer({
       >
         <Tabs defaultValue="all">
           <div id="message-panel-header">
-            <div className="flex items-center justify-between px-4 py-2">
-              <h2>{t("Titles:messages")}</h2>
+            <PageHeader title={t("sent_messages")}>
               <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
                 <TabsTrigger value="failed">Failed</TabsTrigger>
               </TabsList>
-            </div>
-            <Separator />
+            </PageHeader>
             <div className="p-4">
               <form>
                 <div className="relative">
@@ -68,21 +58,21 @@ export default function MessageContainer({
           <TabsContent value="all">
             <MessageList
               messages={messages}
-              selectedMessageId={selectedMessage?.id || null}
+              selectedMessageId={selected?.id || null}
               onSelectMessage={setSelected}
             />
           </TabsContent>
           <TabsContent value="scheduled">
             <MessageList
-              messages={messages}
-              selectedMessageId={selectedMessage?.id || null}
+              messages={messages.filter((m) => m.status === "scheduled")}
+              selectedMessageId={selected?.id || null}
               onSelectMessage={setSelected}
             />
           </TabsContent>
           <TabsContent value="failed">
             <MessageList
-              messages={messages}
-              selectedMessageId={selectedMessage?.id || null}
+              messages={messages.filter((m) => m.status === "failed")}
+              selectedMessageId={selected?.id || null}
               onSelectMessage={setSelected}
             />
           </TabsContent>
@@ -90,6 +80,6 @@ export default function MessageContainer({
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ChildrenPanel hasMiddleBar>{children}</ChildrenPanel>
-    </SelectedMessageProvider>
+    </>
   );
 }

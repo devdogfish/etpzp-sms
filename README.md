@@ -106,10 +106,11 @@ lib/
 ```
 I want to use the same structure for my components.
 ## TODO
-1. Connect a postgres database using `pg` and create a query helper function.
+1. Add graceful 404s with correct layout. It gave me an error saying there is no root layout
 2. Do a test deployment
 3. Add authentication
 4. Get started on the sms api.
 5. Think about responsiveness!!
 6. Work on home page and message actions.
 7. Work on settings page, think about how I can add a font size setting to configure the font size globally.
+8. 

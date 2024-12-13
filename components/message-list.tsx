@@ -1,17 +1,16 @@
 "use client";
-import { ComponentProps } from "react";
+import { ComponentProps, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Message } from "@/lib/test-data.tsx";
-import { useMessage } from "@/hooks/use-message";
 
 interface MessageListProps {
   messages: Message[];
   selectedMessageId: string | null;
-  onSelectMessage: (id: string) => void;
+  onSelectMessage: (message: Message) => void;
 }
 
 export function MessageList({
@@ -19,6 +18,14 @@ export function MessageList({
   selectedMessageId,
   onSelectMessage,
 }: MessageListProps) {
+  useEffect(() => {
+    const header = document.getElementById("message-panel-header");
+    document.documentElement.style.setProperty(
+      "--message-panel-header-height",
+      `${header?.offsetHeight}px` || `0px`
+    );
+  }, []);
+
   return (
     <ScrollArea className="h-[calc(100vh-var(--message-panel-header-height))]">
       <div className="flex flex-col gap-2 p-4 pt-0">
@@ -29,7 +36,7 @@ export function MessageList({
               "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
               selectedMessageId === item.id && "bg-muted"
             )}
-            onClick={() => onSelectMessage(item.id)}
+            onClick={() => onSelectMessage(item)}
           >
             <div className="flex w-full flex-col gap-1">
               <div className="flex items-center">
