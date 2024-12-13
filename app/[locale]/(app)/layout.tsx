@@ -12,7 +12,6 @@ import ResizablePanelWrapper from "@/components/resizable-panel-wrapper";
 import { ResizableHandle, ResizablePanel } from "@/components/ui/resizable";
 import NavPanel from "@/components/nav-panel";
 import { cookies } from "next/headers";
-import { accounts, mails } from "@/lib/test-data.tsx";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LayoutProvider } from "@/contexts/use-layout";
 const geistSans = localFont({
@@ -58,7 +57,7 @@ export default async function RootLayout({
   const initialIsCollapsed: boolean = collapsedCookie
     ? JSON.parse(collapsedCookie.value)
     : undefined;
-    console.log(`RE-FETCHED COOKIES ${initialLayout}, ${initialIsCollapsed}`)
+  console.log(`RE-FETCHED COOKIES ${initialLayout}, ${initialIsCollapsed}`);
   return (
     <TranslationsProvider
       resources={resources}
@@ -82,7 +81,7 @@ export default async function RootLayout({
                   initialIsCollapsed={initialIsCollapsed}
                 >
                   <ResizablePanelWrapper>
-                    <NavPanel navCollapsedSize={4} accounts={accounts} />
+                    <NavPanel navCollapsedSize={4} />
                     <ResizableHandle withHandle />
 
                     {children}

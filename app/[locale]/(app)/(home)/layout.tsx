@@ -1,6 +1,5 @@
-import ChildrenPanel from "@/components/children-panel";
 import MessageContainer from "@/components/message-container";
-import { ResizableHandle } from "@/components/ui/resizable";
+import { SelectedMessageProvider } from "@/contexts/use-selected-message";
 import { Message, messages } from "@/lib/test-data";
 
 async function getMessages(): Promise<Message[]> {
@@ -8,8 +7,14 @@ async function getMessages(): Promise<Message[]> {
   return messages;
 }
 
-export default async function MessagePage() {
+export default async function MessagePage({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const initialMessages = await getMessages();
 
-  return <MessageContainer initialMessages={initialMessages} />;
+  return (
+    <MessageContainer initialMessages={initialMessages}>
+      {children}
+    </MessageContainer>
+  );
 }

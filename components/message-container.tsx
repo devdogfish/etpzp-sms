@@ -14,12 +14,15 @@ import { MessageList } from "./message-list";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useTranslation } from "react-i18next";
 import ChildrenPanel from "./children-panel";
+import { SelectedMessageProvider } from "@/contexts/use-selected-message";
 
 interface MessageContainerProps {
+  children: React.ReactNode;
   initialMessages: Message[];
 }
 
 export default function MessageContainer({
+  children,
   initialMessages,
 }: MessageContainerProps) {
   const { messages, selectedMessage, setSelected } =
@@ -27,7 +30,7 @@ export default function MessageContainer({
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation();
   return (
-    <>
+    <SelectedMessageProvider selectedMessage={selectedMessage}>
       {/* Start message panel */}
       <ResizablePanel
         // Check if the layout is a 3-column middle-bar panel. Use the previous 3-column layout if available; otherwise, render the fallback for different or undefined layouts.
@@ -85,10 +88,8 @@ export default function MessageContainer({
           </TabsContent>
         </Tabs>
       </ResizablePanel>
-      <ResizableHandle />
-      <ChildrenPanel hasMiddleBar>
-        <MessageDisplay message={selectedMessage} />
-      </ChildrenPanel>
-    </>
+      <ResizableHandle withHandle />
+      <ChildrenPanel hasMiddleBar>{children}</ChildrenPanel>
+    </SelectedMessageProvider>
   );
 }
