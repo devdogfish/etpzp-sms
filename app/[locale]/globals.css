@@ -4,6 +4,10 @@
 
 @layer base {
   :root {
+    /* Custom variables */
+    --header-height: 52px;
+  }
+  :root {
     --background: 0 0% 100%;
     --foreground: 20 14.3% 4.1%;
     --card: 0 0% 100%;
@@ -118,10 +122,11 @@ main {
   justify-content: center;
   flex-direction: column; */
 }
-h1 {
-  font-size: 35px;
-}
 
 h2 {
   @apply font-bold text-xl;
+}
+h6 {
+  font-size: 1.15em;
+  line-height: 1.5;
 }

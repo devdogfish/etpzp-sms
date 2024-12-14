@@ -37,7 +37,7 @@ export default function Account({ isCollapsed }: AccountProps) {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>My account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {/* <DropdownMenuGroup> */}
         <DropdownMenuItem>Profile</DropdownMenuItem>

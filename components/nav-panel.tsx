@@ -40,15 +40,15 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
       maxSize={35}
       onCollapse={() => {
         setIsCollapsed(true);
-        document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-          true
-        )}`;
+        const cookieValue = JSON.stringify(true);
+        const cookiePath = "/";
+        document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
       }}
       onResize={() => {
         setIsCollapsed(false);
-        document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-          false
-        )}`;
+        const cookieValue = JSON.stringify(false);
+        const cookiePath = "/";
+        document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
       }}
       className={cn(
         isCollapsed && "min-w-[50px] transition-all duration-300 ease-in-out"
@@ -56,8 +56,8 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
     >
       <div
         className={cn(
-          "flex h-[52px] items-center justify-center",
-          isCollapsed ? "h-[52px]" : "px-2"
+          "flex h-[var(--header-height)] items-center justify-center",
+          isCollapsed ? "h-[var(--header-height)]" : "px-2"
         )}
       >
         <Account isCollapsed={isCollapsed} />
@@ -67,12 +67,12 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
         isCollapsed={isCollapsed}
         links={[
           {
-            title: t("new"),
+            title: t("new_message"),
             label: "",
             icon: Pencil,
             variant: "default",
             href: "/new",
-            size:"xl"
+            size: "xl",
           },
           {
             title: t("sent_messages"),

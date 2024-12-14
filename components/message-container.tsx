@@ -49,7 +49,7 @@ export default function MessageContainer({ children }: MessageContainerProps) {
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search"
-                    className="pl-8 placeholder:text-muted-foreground "
+                    className="pl-8 placeholder:text-muted-foreground border"
                   />
                 </div>
               </form>

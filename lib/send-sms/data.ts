@@ -4,3 +4,4 @@ export async function testFetch() {
   const result = await db("SELECT NOW()");
   return result.rows;
 }
+
