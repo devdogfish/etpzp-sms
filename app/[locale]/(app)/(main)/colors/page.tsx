@@ -4,11 +4,8 @@ import PageHeader from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-export default async function Page({
-  params: { locale },
-}: {
-  params: { locale: string };
-}) {
+export default async function Page({ params }: { params: { locale: string } }) {
+  const { locale } = await params;
   const { t } = await initTranslations(locale, ["Navigation"]);
   return (
     <>

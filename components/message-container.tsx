@@ -20,7 +20,7 @@ interface MessageContainerProps {
 export default function MessageContainer({ children }: MessageContainerProps) {
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation();
-  const { messages, setSelected, selected } = useMessage();
+  const { messages, selected, navigateToMessage } = useMessage();
   return (
     <>
       {/* Start message panel */}
@@ -59,21 +59,21 @@ export default function MessageContainer({ children }: MessageContainerProps) {
             <MessageList
               messages={messages}
               selectedMessageId={selected?.id || null}
-              onSelectMessage={setSelected}
+              onSelectMessage={navigateToMessage}
             />
           </TabsContent>
           <TabsContent value="scheduled">
             <MessageList
               messages={messages.filter((m) => m.status === "scheduled")}
               selectedMessageId={selected?.id || null}
-              onSelectMessage={setSelected}
+              onSelectMessage={navigateToMessage}
             />
           </TabsContent>
           <TabsContent value="failed">
             <MessageList
               messages={messages.filter((m) => m.status === "failed")}
               selectedMessageId={selected?.id || null}
-              onSelectMessage={setSelected}
+              onSelectMessage={navigateToMessage}
             />
           </TabsContent>
         </Tabs>

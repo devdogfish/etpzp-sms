@@ -1,3 +1,4 @@
+"use client";
 import { addDays } from "date-fns/addDays";
 import { addHours } from "date-fns/addHours";
 import { format } from "date-fns/format";
@@ -39,14 +40,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Message } from "@/lib/test-data.tsx";
+import { useMessage } from "@/contexts/use-message";
 
 interface MessageDisplayProps {
-  message: Message | null;
+  messageId: string | null;
 }
 
-export function MessageDisplay({ message }: MessageDisplayProps) {
+export function MessageDisplay({ messageId }: MessageDisplayProps) {
   const today = new Date();
-
+  const { messages } = useMessage();
+  const message = messages.find((m) => m.id === messageId);
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center p-2">

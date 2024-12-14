@@ -52,6 +52,7 @@ import initTranslations from "@/app/i18n";
 #### Tips
 
 1. If you want to use the functions above, make sure you are using it inside the **TranslationsProvider**:
+2. When logging an object and it is logging `[object Object]`, `JSON.stringify()` actually logs the object 
 
 ```tsx
 export default async function RootLayout({

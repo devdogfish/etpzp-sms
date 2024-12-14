@@ -11,7 +11,6 @@ export default async function MessagePage({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const initialMessages = await getMessages();
-
   return (
     <MessageProvider initialMessages={initialMessages}>
       <MessageContainer>{children}</MessageContainer>

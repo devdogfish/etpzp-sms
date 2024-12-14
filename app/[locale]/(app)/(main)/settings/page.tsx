@@ -3,13 +3,13 @@ import PageHeader from "@/components/page-header";
 import LanguageChanger from "@/components/settings/LanguageChanger";
 import { ThemeColorChanger } from "@/components/settings/ThemeColorChanger";
 import ThemeModeToggle from "@/components/settings/ThemeModeToggle";
-import { ResizablePanel } from "@/components/ui/resizable";
 
 export default async function Settings({
-  params: { locale },
+  params,
 }: {
   params: { locale: string };
 }) {
+  const { locale } = await params;
   const { t } = await initTranslations(locale, ["Navigation"]);
   return (
     <>
@@ -20,8 +20,7 @@ export default async function Settings({
       <div className="p-3 flex flex-col">
         Hello Settings!
         <LanguageChanger />
-        {/* <LanguageChanger />
-        <ThemeColorChanger />
+        {/* <ThemeColorChanger />
         <ThemeModeToggle /> */}
       </div>
     </>

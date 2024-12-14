@@ -3,11 +3,8 @@ import PageHeader from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { ResizablePanel } from "@/components/ui/resizable";
 
-export default async function Page({
-  params: { locale },
-}: {
-  params: { locale: string };
-}) {
+export default async function Page({ params }: { params: { locale: string } }) {
+  const { locale } = await params;
   const { t } = await initTranslations(locale, ["Navigation"]);
   return (
     <>
