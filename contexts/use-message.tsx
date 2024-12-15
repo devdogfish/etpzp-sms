@@ -1,12 +1,7 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-} from "react";
-import { Message } from "@/lib/test-data";
+import React, { createContext, useContext, useState, useCallback } from "react";
+import { Message } from "@/lib/data.test";
 import { useRouter, usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 

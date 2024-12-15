@@ -1,6 +1,6 @@
 import MessageContainer from "@/components/message-container";
 import { MessageProvider } from "@/contexts/use-message";
-import { Message, messages } from "@/lib/test-data";
+import { Message, messages } from "@/lib/data.test";
 
 async function getMessages(): Promise<Message[]> {
   // This is a mock function. In a real app, you'd fetch from an API or database

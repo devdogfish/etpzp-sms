@@ -39,7 +39,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Message } from "@/lib/test-data.tsx";
+import { Message } from "@/lib/data.test";
 import { useMessage } from "@/contexts/use-message";
 
 interface MessageDisplayProps {

@@ -1,6 +1,6 @@
 "use server";
-import db from "@/lib/db";
-import { newMessageFormSchema } from "../form-schemas";
+import db from "@/lib/db/.";
+import { newMessageFormSchema } from "../form.schemas";
 import { z } from "zod";
 
 export async function send(values: z.infer<typeof newMessageFormSchema>) {

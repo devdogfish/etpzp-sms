@@ -7,7 +7,7 @@ import SendButton from "./send-button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import PageHeader from "./page-header";
-import { send } from "@/lib/new/actions";
+import { send } from "@/lib/actions/message.create";
 import UnloadListener from "./shared/unload-listener";
 // Form
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,9 +16,9 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import FormInput from "./form-input";
-import { newMessageFormSchema } from "@/lib/form-schemas";
+import { newMessageFormSchema } from "@/lib/form.schemas";
 import { useRouter } from "next/navigation";
-import { saveDraft } from "@/lib/new/actions";
+import { saveDraft } from "@/lib/actions/message.create";
 import React, { useState } from "react";
 import ScheduleMessageDropdown from "./send-button";
 

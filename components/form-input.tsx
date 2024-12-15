@@ -9,7 +9,7 @@ import {
 import { Input } from "./ui/input";
 import { Control, FieldPath } from "react-hook-form";
 import { z } from "zod";
-import { newMessageFormSchema } from "@/lib/form-schemas";
+import { newMessageFormSchema } from "@/lib/form.schemas";
 
 interface FormInputProps {
   type: string;
@@ -54,4 +54,3 @@ export default function FormInput({
     />
   );
 }
-

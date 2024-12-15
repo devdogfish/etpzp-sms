@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Message } from "@/lib/test-data.tsx";
+import { Message } from "@/lib/data.test";
 
 interface MessageListProps {
   messages: Message[];
