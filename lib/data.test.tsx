@@ -1,4 +1,4 @@
-export const mails = [
+export const messages = [
   {
     id: "6c84fb90-12c4-11e1-840d-7b25c5ee775a",
     name: "William Smith",
@@ -171,7 +171,7 @@ export const mails = [
   },
 ];
 
-export type Mail = (typeof mails)[number];
+export type Message = (typeof messages)[number];
 
 export const accounts = [
   {

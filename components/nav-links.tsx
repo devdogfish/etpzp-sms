@@ -21,6 +21,7 @@ interface NavProps {
     icon: LucideIcon;
     href: string;
     variant: "default" | "ghost";
+    size?: "sm" | "md" | "xl";
   }[];
 }
 
@@ -28,9 +29,16 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
   const pathname = usePathname();
   const { i18n } = useTranslation();
 
+  const activeStyles =
+    "bg-accent text-primary-accent hover:bg-accent hover:text-accent-foreground";
+
+  const isNewButton = (href: string) => normalizePath(href, i18n) === "/new";
   // isActive takes Link, compares it to the current url, and returns whether it is the same link we are on or not.
   const isActive = (href: string) => {
-    return normalizePath(href, i18n) === normalizePath(pathname, i18n);
+    return (
+      !isNewButton(href) &&
+      normalizePath(href, i18n) === normalizePath(pathname, i18n)
+    );
   };
   return (
     <div
@@ -46,14 +54,12 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
                   href={link.href}
                   className={cn(
                     buttonVariants({ variant: link.variant, size: "icon" }),
+                    isNewButton(link.href) && "mb-3",
                     "h-9 w-9",
-                    link.variant === "default" &&
-                      "hover:bg-accent hover:text-accent-foreground",
-                    isActive(link.href) &&
-                      "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
+                    isActive(link.href) && activeStyles
                   )}
                 >
-                  <link.icon className="h-4 w-4" />
+                <link.icon className="h-4 w-4" />
                   <span className="sr-only">{link.title}</span>
                 </Link>
               </TooltipTrigger>
@@ -71,15 +77,16 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
               key={index}
               href={link.href}
               className={cn(
-                buttonVariants({ variant: link.variant, size: "sm" }),
-                link.variant === "default" &&
-                  "hover:bg-accent hover:text-accent-foreground",
+                buttonVariants({
+                  variant: link.variant,
+                  size: isNewButton(link.href) ? "lg" : "sm",
+                }),
                 "justify-start",
-                isActive(link.href) &&
-                  "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
+                isActive(link.href) && activeStyles,
+                isNewButton(link.href) && "mb-3 justify-center",
               )}
             >
-              <link.icon className="mr-2 h-4 w-4" />
+              {!isNewButton(link.href) && <link.icon className="mr-2 h-4 w-4" />}
               {link.title}
               {link.label && (
                 <span

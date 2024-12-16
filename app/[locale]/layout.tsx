@@ -3,13 +3,12 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { i18nConfig } from "@/i18nConfig";
 import { dir } from "i18next";
-import TranslationsProvider from "../../providers/TranslationsProvider";
+import TranslationsProvider from "@/contexts/translations-provider";
 import initTranslations from "./i18n";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import ThemeProvider from "@/contexts/theme-data-provider";
 
 import { cookies } from "next/headers";
-import { accounts, mails } from "@/lib/test-data.tsx";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LayoutProvider } from "@/contexts/use-layout";
 const geistSans = localFont({
@@ -55,7 +54,7 @@ export default async function RootLayout({
   const initialIsCollapsed: boolean = collapsedCookie
     ? JSON.parse(collapsedCookie.value)
     : undefined;
-  console.log(`RE-FETCHED COOKIES ${initialLayout}, ${initialIsCollapsed}`);
+  // console.log(`RE-FETCHED COOKIES ${initialLayout}, ${initialIsCollapsed}`);
   return (
     <TranslationsProvider
       resources={resources}

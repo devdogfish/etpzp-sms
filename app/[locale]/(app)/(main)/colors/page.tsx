@@ -1,16 +1,19 @@
+import initTranslations from "@/app/[locale]/i18n";
 import ColorPalette from "@/components/color-palette";
-import Header from "@/components/header";
+import PageHeader from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-export default function Page() {
+export default async function Page({ params }: { params: { locale: string } }) {
+  const { locale } = await params;
+  const { t } = await initTranslations(locale, ["Navigation"]);
   return (
-    <div className="p-3">
-      <Header />
-      <ScrollArea className="h-[calc(100vh-50px)]">
+    <>
+      <PageHeader title={t("color_palette")}>asd</PageHeader>
+      <ScrollArea className="h-[calc(100vh-50px)] p-3">
         <ColorPalette />
-        <div className="flex flex-col p-3 gap-3">
-          <Card>
+        <div className="flex flex-col gap-3">
+          <Card className="mt-3">
             <CardHeader>
               <CardTitle>Color palette explained</CardTitle>
             </CardHeader>
@@ -47,6 +50,6 @@ export default function Page() {
           </Card>
         </div>
       </ScrollArea>
-    </div>
+    </>
   );
 }

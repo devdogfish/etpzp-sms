@@ -30,10 +30,10 @@ export function LayoutProvider({
   const [isCollapsed, setIsCollapsed] = useState(initialIsCollapsed);
   const fallbackLayout = [20, 32, 48];
 
-  useEffect(() => {
-    console.log(`layout changed: ${layout}`)
+  // useEffect(() => {
+  //   console.log(`layout changed: ${layout}`)
   
-  }, [layout])
+  // }, [layout])
   
   return (
     <LayoutContext.Provider

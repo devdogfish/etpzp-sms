@@ -1,5 +1,6 @@
 "use client";
 import {
+  CirclePlus,
   MonitorCog,
   AlertCircle,
   Settings,
@@ -10,6 +11,7 @@ import {
   Contact2,
   Palette,
   Puzzle,
+  Pencil,
 } from "lucide-react";
 import * as React from "react";
 import { ResizablePanel } from "./ui/resizable";
@@ -28,33 +30,7 @@ interface MailProps {
 
 export default function NavPanel({ navCollapsedSize }: MailProps) {
   const { layout, isCollapsed, setIsCollapsed } = useLayout();
-  // React.useEffect(() => {
-  //   console.log(
-  //     `RENDERING "${
-  //       isCollapsed === true && "COLLAPSED"
-  //     }"NAVBAR with a width of ${layout[0]}. Layout available: ${layout}`
-  //   );
-  // }, []);
-  // layout[0] CAN BE UNDEFINED
-  // console.log(
-  //   `RE-RENDERING ${
-  //     isCollapsed === true ? `"COLLAPSED" ` : ""
-  //   }NAVBAR with a width of ${layout[0]}. Layout available: ${layout}`
-  // );
-  // console.log(`RENDERING NAV PANEL on ${getTime()}`);
-
-  // console.log(
-  //   `LAYOUT COORDINATES: ${layout}`
-  // );
-  // console.log(`isCollapsed: ${isCollapsed}, setIsCollapsed: ${setIsCollapsed}`);
-
   const { t } = useTranslation();
-
-  // React.useEffect(() => {
-  //   console.log(
-  //     `RENDERING Navbar with a width of ${layout[0]}. Layout available: ${layout}`
-  //   );
-  // }, []);
   return (
     <ResizablePanel
       defaultSize={layout && Number(layout[0])}
@@ -64,15 +40,15 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
       maxSize={35}
       onCollapse={() => {
         setIsCollapsed(true);
-        document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-          true
-        )}`;
+        const cookieValue = JSON.stringify(true);
+        const cookiePath = "/";
+        document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
       }}
       onResize={() => {
         setIsCollapsed(false);
-        document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-          false
-        )}`;
+        const cookieValue = JSON.stringify(false);
+        const cookiePath = "/";
+        document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
       }}
       className={cn(
         isCollapsed && "min-w-[50px] transition-all duration-300 ease-in-out"
@@ -80,8 +56,8 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
     >
       <div
         className={cn(
-          "flex h-[52px] items-center justify-center",
-          isCollapsed ? "h-[52px]" : "px-2"
+          "flex h-[var(--header-height)] items-center justify-center",
+          isCollapsed ? "h-[var(--header-height)]" : "px-2"
         )}
       >
         <Account isCollapsed={isCollapsed} />
@@ -91,6 +67,14 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
         isCollapsed={isCollapsed}
         links={[
           {
+            title: t("new_message"),
+            label: "",
+            icon: Pencil,
+            variant: "default",
+            href: "/new",
+            size: "xl",
+          },
+          {
             title: t("sent_messages"),
             label: "",
             icon: Send,
@@ -98,11 +82,11 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
             href: "/",
           },
           {
-            title: t("updates"),
+            title: t("notifications"),
             label: "4",
             icon: AlertCircle,
             variant: "ghost",
-            href: "/updates",
+            href: "/notifications",
           },
           {
             title: t("drafts"),
