@@ -1,10 +1,8 @@
 
 -- INSERTS NOT EXECUTED YET
 -- Seed Users Table
-INSERT INTO Users (email, password_hash, created_at, updated_at) VALUES
-('user1@example.com', 'hashed_password_1', NOW(), NOW()),
-('user2@example.com', 'hashed_password_2', NOW(), NOW()),
-('user3@example.com', 'hashed_password_3', NOW(), NOW());
+INSERT INTO user (email, password_hash, first_name, last_name, username) VALUES
+('luigi@gmail.com', 'hashed_password_1', "Luigi", "Girke", "Lui");
 
 -- Seed Contacts Table
 INSERT INTO Contacts (user_id, name, email, phone, address, created_at, updated_at) VALUES

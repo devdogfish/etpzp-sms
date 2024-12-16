@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { i18nConfig } from "@/i18nConfig";
 import { dir } from "i18next";
-import TranslationsProvider from "../../contexts/translations-provider";
+import TranslationsProvider from "@/contexts/translations-provider";
 import initTranslations from "./i18n";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import ThemeProvider from "@/contexts/theme-data-provider";
