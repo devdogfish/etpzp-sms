@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import FormInput from "./form-input";
+import Input from "./form-input";
 import { newMessageFormSchema } from "@/lib/form.schemas";
 import { useRouter } from "next/navigation";
 import { saveDraft } from "@/lib/actions/message.create";
@@ -123,7 +123,7 @@ export default function NewMessageForm({
           </PageHeader>
           <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
             <div className="flex flex-col px-4 mt-2">
-              <FormInput
+              <Input
                 name="from"
                 placeholder="From"
                 type="text"
@@ -131,14 +131,14 @@ export default function NewMessageForm({
                 disabled
                 control={form.control}
               />
-              <FormInput
+              <Input
                 name="to"
                 placeholder="To"
                 type="text"
                 className="h-11 rounded-none pl-5 shadow-none border-b-[1px] border-border focus-visible:border-b-ring focus-visible:ring-0 placeholder:text-muted-foreground"
                 control={form.control}
               />
-              <FormInput
+              <Input
                 name="subject"
                 placeholder="Subject (optional)"
                 type="text"

@@ -8,6 +8,11 @@ export const newMessageFormSchema = z.object({
   message: z.string(),
 });
 
+export const authFormSchema = z.object({
+  username: z.string().min(2).max(50),
+  password: z.string(),
+});
+
 /*
 <Form {...form}>
   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

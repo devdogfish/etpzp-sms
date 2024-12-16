@@ -6,6 +6,7 @@ export function middleware(request: NextRequest) {
   return i18nRouter(request, i18nConfig);
 }
 
+// Routes Middleware should not run on
 export const config = {
   matcher: "/((?!api|static|.*\\..*|_next).*)",
 };

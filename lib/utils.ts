@@ -34,3 +34,8 @@ function getTime() {
   const date = new Date();
   return new Intl.DateTimeFormat("en-US", options).format(date);
 }
+
+export function isNumericString(str: string): boolean {
+  const num = parseInt(str, 10);
+  return !isNaN(num) && num.toString() === str;
+}
