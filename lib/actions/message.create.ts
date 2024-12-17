@@ -1,9 +1,9 @@
 "use server";
-import db from "@/lib/db/.";
-import { newMessageFormSchema } from "../form.schemas";
+import db from "@/lib/db";
+import { NewMessageFormSchema } from "../form.schemas";
 import { z } from "zod";
 
-export async function send(values: z.infer<typeof newMessageFormSchema>) {
+export async function send(values: z.infer<typeof NewMessageFormSchema>) {
   // const formattedMessage = message ? message.replace(/\r\n/g, "\n") : "";
   console.log("VALUES RECEIVED ON SERVER");
   console.log(values);
@@ -17,7 +17,7 @@ export async function send(values: z.infer<typeof newMessageFormSchema>) {
   return result.rows;
 }
 
-export async function saveDraft(values: z.infer<typeof newMessageFormSchema>) {
+export async function saveDraft(values: z.infer<typeof NewMessageFormSchema>) {
   console.log("VALUES RECEIVED ON SERVER");
   console.log(values);
 

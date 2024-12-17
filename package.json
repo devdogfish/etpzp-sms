@@ -30,6 +30,7 @@
     "date-fns": "^4.1.0",
     "i18next": "^24.0.0",
     "i18next-resources-to-backend": "^1.2.1",
+    "iron-session": "^8.0.4",
     "lucide-react": "^0.460.0",
     "next": "15.0.3",
     "next-i18n-router": "^5.5.1",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@types/activedirectory2": "^1.2.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

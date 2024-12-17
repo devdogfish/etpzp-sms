@@ -1,5 +1,6 @@
 "use client";
 
+import { logout } from "@/lib/auth";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -11,12 +12,15 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useSession } from "@/hooks/use-session";
 
 interface AccountProps {
   isCollapsed: boolean;
 }
 
 export default function Account({ isCollapsed }: AccountProps) {
+  const { session, loading } = useSession();
+  if (loading) return <h2>Loading</h2>
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -32,8 +36,8 @@ export default function Account({ isCollapsed }: AccountProps) {
         <div
           className={cn("flex flex-col items-start", isCollapsed && "hidden")}
         >
-          <p className="font-semibold mb-[-3px]">User Name</p>
-          <span className="text-xs">Admin</span>
+          <p className="font-semibold mb-[-3px]">{session?.username}</p>
+          <span className="text-xs">{session?.isAdmin ? "Admin" : "User"}</span>
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
@@ -45,7 +49,9 @@ export default function Account({ isCollapsed }: AccountProps) {
         <DropdownMenuItem>Report a bug</DropdownMenuItem>
         {/* </DropdownMenuGroup> */}
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Log out</DropdownMenuItem>
+        <DropdownMenuItem onClick={async () => await logout()}>
+          Log out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

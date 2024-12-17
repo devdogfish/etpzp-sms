@@ -1,6 +1,9 @@
-import Link from "next/link";
+"use client";
 
-import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AuthFormSchema } from "@/lib/form.schemas";
 import {
   Card,
   CardContent,
@@ -8,67 +11,72 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { AuthInput, AuthInput as Input } from "@/components/form-input";
+import { useForm } from "react-hook-form";
 
-export function LoginForm() {
+import { login } from "@/lib/auth";
+
+export default function LoginForm() {
+  const form = useForm<z.infer<typeof AuthFormSchema>>({
+    resolver: zodResolver(AuthFormSchema),
+    // this makes the inputs controlled
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof AuthFormSchema>) {
+    console.log(values);
+    
+    await login(values);
+  }
+
   return (
-    <Card className="mx-auto max-w-sm">
-      <CardHeader>
-        <div className="relative w-[60%] h-10 overflow-hidden mb-2">
-          {/* Set a height for the parent */}
-          <Image
-            src="/microsoft-logo.png"
-            alt="Microsoft logo"
-            layout="fill" // This makes the image fill the parent container
-            objectFit="cover" // This will crop the image to fill the container
-            quality={100}
-          />
-        </div>
-        <CardTitle className="text-2xl">
-          Sign in {/**with Microsoft */}
-        </CardTitle>
-        <CardDescription>
-          with Microsoft to continue to Etpzp SMS
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="9120@etpzp.pt"
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-              {/* <Link href="#" className="ml-auto inline-block text-sm underline">
-                Forgot your password?
-              </Link> */}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <Card className="mx-auto max-w-sm">
+          <CardHeader>
+            <div className="relative w-[60%] h-10 overflow-hidden mb-2">
+              {/* Set a height for the parent */}
+              <Image
+                src="/microsoft-logo.png"
+                alt="Microsoft logo"
+                layout="fill" // This makes the image fill the parent container
+                objectFit="cover" // This will crop the image to fill the container
+                quality={100}
+              />
             </div>
-            <Input
-              id="password"
-              type="password"
-              placeholder="my_password452"
-              required
+            <CardTitle className="text-2xl">
+              Sign in {/**with Microsoft */}
+            </CardTitle>
+            <CardDescription>
+              with Microsoft to continue to Etpzp SMS
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AuthInput
+              name="username"
+              control={form.control}
+              type="text"
+              label="Username"
+              placeholder="9120@etpzp.pt"
             />
-          </div>
-          <Button type="submit" className="w-full">
-            Login
-          </Button>
-        </div>
-        {/* <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link href="#" className="underline">
-            Sign up
-          </Link>
-        </div> */}
-      </CardContent>
-    </Card>
+            <AuthInput
+              name="password"
+              control={form.control}
+              type="password"
+              label="Password"
+              placeholder="my_password452"
+            />
+            <Button type="submit" className="w-full">
+              Login
+            </Button>
+          </CardContent>
+        </Card>
+      </form>
+    </Form>
   );
 }

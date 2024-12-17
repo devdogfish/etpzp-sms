@@ -1,14 +1,14 @@
 import { z } from "zod";
 
 // Our one source of truth is the form schema. When you create a new field, add it here.
-export const newMessageFormSchema = z.object({
+export const NewMessageFormSchema = z.object({
   from: z.string(),
   to: z.string().email(),
   subject: z.string(),
   message: z.string(),
 });
 
-export const authFormSchema = z.object({
+export const AuthFormSchema = z.object({
   username: z.string().min(2).max(50),
   password: z.string(),
 });

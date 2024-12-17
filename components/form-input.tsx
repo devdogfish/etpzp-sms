@@ -8,48 +8,75 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input as ShadcnInput } from "./ui/input";
-import { Control, FieldPath } from "react-hook-form";
-import { z } from "zod";
-import { newMessageFormSchema, authFormSchema } from "@/lib/form.schemas";
+import { Control, FieldPath, FieldValues } from "react-hook-form";
 
-interface FormInputProps {
-  type: string;
-  name: FieldPath<z.infer<typeof authFormSchema>>;
-  control: Control<z.infer<typeof authFormSchema>>;
-  label?: string;
-  placeholder?: string;
-  className?: string;
-  disabled?: boolean;
+// interface NewMessageFormInputProps {
+//   name: FieldPath<z.infer<typeof NewMessageFormSchema>>;
+//   control: Control<z.infer<typeof NewMessageFormSchema>>;
+//   type: string;
+//   label?: string;
+//   placeholder?: string;
+//   className?: string;
+//   disabled?: boolean;
+// }
+
+// export function NewMessageInput({
+//   type,
+//   name,
+//   label,
+//   placeholder,
+//   control,
+//   className,
+//   disabled,
+// }: NewMessageFormInputProps) {
+//   return (
+//     <FormField
+//       control={control}
+//       name={name}
+//       render={({ field }) => (
+//         <FormItem>
+//           {!!label && <FormLabel>{label}</FormLabel>}
+//           <div className="flex w-full flex-col">
+//             <FormControl>
+//               <ShadcnInput
+//                 placeholder={placeholder}
+//                 type={type}
+//                 className={className}
+//                 disabled={disabled}
+//                 {...field}
+//               />
+//             </FormControl>
+//             <FormMessage />
+//           </div>
+//         </FormItem>
+//       )}
+//     />
+//   );
+// }
+
+interface AuthInputProps<T extends FieldValues> extends React.InputHTMLAttributes<HTMLInputElement> {
+  name: FieldPath<T>;
+  control: Control<T>;
+  label: string;
 }
 
-export default function Input({
-  type,
+export function AuthInput<T extends FieldValues>({
   name,
-  label,
-  placeholder,
   control,
-  className,
-  disabled,
-}: FormInputProps) {
+  label,
+  ...props
+}: AuthInputProps<T>) {
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
         <FormItem>
-          {!!label && <FormLabel>{label}</FormLabel>}
-          <div className="flex w-full flex-col">
-            <FormControl>
-              <ShadcnInput
-                placeholder={placeholder}
-                type={type}
-                className={className}
-                disabled={disabled}
-                {...field}
-              />
-            </FormControl>
-            <FormMessage />
-          </div>
+          <FormLabel>{label}</FormLabel>
+          <FormControl>
+            <ShadcnInput {...field} {...props} />
+          </FormControl>
+          <FormMessage />
         </FormItem>
       )}
     />
