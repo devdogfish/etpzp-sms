@@ -8,19 +8,19 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import PageHeader from "./page-header";
 import { send } from "@/lib/actions/message.create";
-import UnloadListener from "./shared/unload-listener";
+
 // Form
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import Input from "./form-input";
-import { newMessageFormSchema } from "@/lib/form.schemas";
+import { Input } from "./form-input";
+import { NewMessageFormSchema } from "@/lib/form.schemas";
 import { useRouter } from "next/navigation";
 import { saveDraft } from "@/lib/actions/message.create";
 import React, { useState } from "react";
-import ScheduleMessageDropdown from "./send-button";
+import RecipientsInput from "./recipients-input";
 
 export default function NewMessageForm({
   isFullScreen,
@@ -30,10 +30,10 @@ export default function NewMessageForm({
   const { t } = useTranslation();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-
+  
   // 1. Define your form.
-  const form = useForm<z.infer<typeof newMessageFormSchema>>({
-    resolver: zodResolver(newMessageFormSchema),
+  const form = useForm<z.infer<typeof NewMessageFormSchema>>({
+    resolver: zodResolver(NewMessageFormSchema),
     defaultValues: {
       from: "Test",
       to: "",
@@ -43,9 +43,10 @@ export default function NewMessageForm({
   });
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof newMessageFormSchema>) {
+  async function onSubmit(values: z.infer<typeof NewMessageFormSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+    values.contacts = [];
 
     // Here you would typically send the message
     setIsLoading(true);
@@ -58,7 +59,7 @@ export default function NewMessageForm({
   }
 
   // 3. Define a draft save handler.
-  async function onClose(values: z.infer<typeof newMessageFormSchema>) {
+  async function onClose(values: z.infer<typeof NewMessageFormSchema>) {
     const result = await saveDraft(values);
     if (result !== null) {
       // Redirect to home page after saving draft
@@ -127,22 +128,16 @@ export default function NewMessageForm({
                 name="from"
                 placeholder="From"
                 type="text"
-                className="h-11 rounded-none pl-5 shadow-none border-b-[1px] border-border focus-visible:border-b-ring focus-visible:ring-0 disabled:opacity-100 placeholder:text-muted-foreground"
+                className="new-message-input"
                 disabled
                 control={form.control}
               />
-              <Input
-                name="to"
-                placeholder="To"
-                type="text"
-                className="h-11 rounded-none pl-5 shadow-none border-b-[1px] border-border focus-visible:border-b-ring focus-visible:ring-0 placeholder:text-muted-foreground"
-                control={form.control}
-              />
+              <RecipientsInput name={"to"} control={form.control} />
               <Input
                 name="subject"
                 placeholder="Subject (optional)"
                 type="text"
-                className="h-11 rounded-none pl-5 shadow-none border-b-[1px] border-border focus-visible:border-b-ring focus-visible:ring-0 placeholder:text-muted-foreground"
+                className="new-message-input"
                 control={form.control}
               />
             </div>

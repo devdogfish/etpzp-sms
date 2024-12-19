@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { AuthInput, AuthInput as Input } from "@/components/form-input";
+import { Input } from "@/components/form-input";
 import { useForm } from "react-hook-form";
 
 import { login } from "@/lib/auth";
@@ -57,14 +57,14 @@ export default function LoginForm() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <AuthInput
+            <Input
               name="username"
               control={form.control}
               type="text"
               label="Username"
               placeholder="9120@etpzp.pt"
             />
-            <AuthInput
+            <Input
               name="password"
               control={form.control}
               type="password"

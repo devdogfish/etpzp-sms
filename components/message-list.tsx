@@ -68,15 +68,24 @@ export function MessageList({
             <div className="line-clamp-2 text-xs text-muted-foreground">
               {item.text.substring(0, 300)}
             </div>
-            {item.labels.length ? (
-              <div className="flex items-center gap-2">
-                {item.labels.map((label) => (
-                  <Badge key={label} variant={getBadgeVariantFromLabel(label)}>
-                    {label}
-                  </Badge>
-                ))}
-              </div>
-            ) : null}
+
+            <div className="flex items-center gap-2">
+              {item.status === "success" && (
+                <Badge variant={getBadgeVariantFromLabel(item.status)}>
+                  Success
+                </Badge>
+              )}
+              {item.status === "failed" && (
+                <Badge variant={getBadgeVariantFromLabel(item.status)}>
+                  Failed
+                </Badge>
+              )}
+              {/* {item.sendTime && (
+                <Badge variant={getBadgeVariantFromLabel("scheduled")}>
+                  Scheduled
+                </Badge>
+              )} */}
+            </div>
           </button>
         ))}
       </div>
@@ -87,11 +96,15 @@ export function MessageList({
 function getBadgeVariantFromLabel(
   label: string
 ): ComponentProps<typeof Badge>["variant"] {
-  if (["work"].includes(label.toLowerCase())) {
-    return "default";
+  // if (["success"].includes(label.toLowerCase())) {
+  //   return "positive";
+  // }
+
+  if (["failed"].includes(label.toLowerCase())) {
+    return "destructive";
   }
 
-  if (["personal"].includes(label.toLowerCase())) {
+  if (["scheduled"].includes(label.toLowerCase())) {
     return "outline";
   }
 

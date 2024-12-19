@@ -130,3 +130,14 @@ h6 {
   font-size: 1.15em;
   line-height: 1.5;
 }
+* {
+  box-sizing: border-box;
+}
+
+.new-message-input {
+  @apply h-11 rounded-none pl-5 shadow-none border-b-[1px] border-border focus-visible:border-b-ring focus-visible:ring-0 disabled:opacity-100 placeholder:text-muted-foreground;
+}
+
+.shadcn-input {
+  @apply flex h-9 w-full rounded-md bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-accent-foreground placeholder:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm;
+}

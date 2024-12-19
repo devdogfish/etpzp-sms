@@ -1,4 +1,11 @@
 import { z } from "zod";
+import validator from "validator";
+
+const recipientSchema = z.object({
+  id: z.string(),
+  name: z.string().min(2).max(50),
+  phone: z.string().refine(validator.isMobilePhone),
+});
 
 // Our one source of truth is the form schema. When you create a new field, add it here.
 export const NewMessageFormSchema = z.object({
@@ -6,6 +13,7 @@ export const NewMessageFormSchema = z.object({
   to: z.string().email(),
   subject: z.string(),
   message: z.string(),
+  contacts: z.array(recipientSchema),
 });
 
 export const AuthFormSchema = z.object({
@@ -13,26 +21,13 @@ export const AuthFormSchema = z.object({
   password: z.string(),
 });
 
-/*
-<Form {...form}>
-  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-    <FormInput
-      type="text"
-      name="username"
-      label="Username"
-      placeholder="Enter your username"
-      className=""
-      control={form.control}
-    />
-    <FormInput
-      type="password"
-      name="password"
-      label="Password"
-      placeholder="Enter your password"
-      className=""
-      control={form.control}
-    />
-    <Button type="submit">Submit</Button>
-  </form>
-</Form> 
-*/
+
+const contactSchema = z.object({
+  id: z.string(),
+  user_id: z.string(),
+  name: z.string().min(2).max(50),
+  phone: z.string().refine(validator.isMobilePhone),
+  description: z.string().max(255).optional(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});

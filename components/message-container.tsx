@@ -19,7 +19,7 @@ interface MessageContainerProps {
 
 export default function MessageContainer({ children }: MessageContainerProps) {
   const { layout, fallbackLayout } = useLayout();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["Titles"]);
   const { messages, selected, navigateToMessage } = useMessage();
   return (
     <>
