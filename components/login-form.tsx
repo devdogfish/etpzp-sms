@@ -1,6 +1,4 @@
 "use client";
-
-import { Form } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AuthFormSchema } from "@/lib/form.schemas";
@@ -15,7 +13,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/form-input";
 import { useForm } from "react-hook-form";
-
+import { Form } from "@/components/ui/form";
 import { login } from "@/lib/auth";
 
 export default function LoginForm() {
@@ -30,7 +28,7 @@ export default function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof AuthFormSchema>) {
     console.log(values);
-    
+
     await login(values);
   }
 

@@ -10,7 +10,8 @@ import {
 import { Input as ShadcnInput } from "./ui/input";
 import { Control, FieldPath, FieldValues } from "react-hook-form";
 
-interface InputProps<T extends FieldValues> extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps<T extends FieldValues>
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   name: FieldPath<T>;
   control: Control<T>;
   label?: string;
@@ -27,9 +28,9 @@ export function Input<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="">
-          {label && <FormLabel>{label}</FormLabel>}
-          <FormControl >
+        <FormItem>
+          {label && <FormLabel className="text-foreground">{label}</FormLabel>}
+          <FormControl>
             <ShadcnInput {...field} {...props} />
           </FormControl>
           <FormMessage />

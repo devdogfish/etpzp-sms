@@ -13,9 +13,6 @@ export async function getSession(req?: NextRequest, res?: NextResponse) {
       : await getIronSession<SessionData>(await cookies(), sessionOptions);
 
   // If user visits for the first time session returns an empty object.
-  console.log("Trying to get iron session");
-  console.log(session);
-
   // You could check for user in the database, or check server. If he got blocked or something, the user should get kicked out immediately
   return session;
 }

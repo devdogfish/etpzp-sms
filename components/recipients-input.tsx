@@ -2,12 +2,20 @@
 import { z } from "zod";
 import { Input } from "./form-input";
 import { Control, FieldPath, FieldValues } from "react-hook-form";
-import { NewMessageFormSchema } from "@/lib/form.schemas";
 import React, { useState, KeyboardEvent, ChangeEvent, useRef } from "react";
-import { cn } from "@/lib/utils";
-import { ScrollArea } from "./ui/scroll-area";
 import { UserPlus, X } from "lucide-react";
-import { Button } from "./ui/button";
+
+import { Button, buttonVariants } from "./ui/button";
+import { cn } from "@/lib/utils";
+import InsertContactModal from "./modals/insert-contact-modal";
+import { Contact } from "@/types/contact";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
 
 interface inputState {
   value: string;
@@ -16,9 +24,13 @@ interface inputState {
 export default function RecipientsInput<T extends FieldValues>({
   name,
   control,
+  placeholder,
+  contacts,
 }: {
   name: FieldPath<T>;
   control: Control<T>;
+  placeholder: string;
+  contacts: ActionResult<Contact[]>;
 }) {
   const [input, setInput] = useState<inputState>({
     value: "",
@@ -88,7 +100,7 @@ export default function RecipientsInput<T extends FieldValues>({
         <div className="w-full relative">
           <div
             className={cn(
-              "flex flex-wrap items-stretch gap-x-1 py-1 h-full border-b border-transparent pl-5",
+              "flex flex-wrap items-stretch gap-x-1 py-1 h-full border-b pl-5",
               input.isFocused && "border-primary"
             )}
           >
@@ -106,42 +118,58 @@ export default function RecipientsInput<T extends FieldValues>({
                 </div>
               </div>
             ))}
-            <Input // px-3 py-1 pl-5
-              className="ring-0 focus:ring-0 h-8 w-36 my-0.5 px-0 shadow-none pr-5"
-              name={name}
-              placeholder="To"
-              type="text"
+
+            <FormField
               control={control}
-              value={input.value}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setInput(({ isFocused }) => ({
-                  value: e.target.value,
-                  isFocused,
-                }))
-              }
-              onKeyDown={handleKeyDown}
-              // focus state
-              onFocus={() =>
-                setInput(({ value }) => ({
-                  value,
-                  isFocused: true,
-                }))
-              }
-              onBlur={() =>
-                setInput(({ value }) => ({
-                  value,
-                  isFocused: false,
-                }))
-              }
+              name={name}
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input // px-3 py-1 pl-5
+                      {...field}
+                      className="ring-0 focus:ring-0 h-8  my-0.5 px-0 shadow-none pr-8 placeholder:text-muted-foreground"
+                      name={name}
+                      placeholder={placeholder}
+                      type="text"
+                      control={control}
+                      value={input.value}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setInput(({ isFocused }) => ({
+                          value: e.target.value,
+                          isFocused,
+                        }))
+                      }
+                      onKeyDown={handleKeyDown}
+                      // focus state
+                      onFocus={() =>
+                        setInput(({ value }) => ({
+                          value,
+                          isFocused: true,
+                        }))
+                      }
+                      onBlur={() =>
+                        setInput(({ value }) => ({
+                          value,
+                          isFocused: false,
+                        }))
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
-          <Button
-            className="absolute right-0 bottom-1 p-2 aspect-1 z-index-0"
-            variant="ghost"
-            type="button"
-          >
-            <UserPlus className="h-1 w-1" />
-          </Button>
+
+          <InsertContactModal contacts={contacts}>
+            <Button
+              className="absolute right-[1px] bottom-[7px] p-2 aspect-1 z-index-0"
+              variant="ghost"
+              type="button"
+            >
+              <UserPlus className="h-1 w-1" />
+            </Button>
+          </InsertContactModal>
         </div>
       </div>
     </div>

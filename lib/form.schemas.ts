@@ -22,12 +22,10 @@ export const AuthFormSchema = z.object({
 });
 
 
-const contactSchema = z.object({
-  id: z.string(),
-  user_id: z.string(),
+export const ContactSchema = z.object({
   name: z.string().min(2).max(50),
-  phone: z.string().refine(validator.isMobilePhone),
+  phone: z.string().refine(validator.isMobilePhone, {
+    message: "Invalid phone number."
+  }),
   description: z.string().max(255).optional(),
-  created_at: z.date(),
-  updated_at: z.date(),
 });

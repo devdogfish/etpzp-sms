@@ -123,9 +123,11 @@ main {
   flex-direction: column; */
 }
 
+h2,
 h2 {
   @apply font-bold text-xl;
 }
+h6,
 h6 {
   font-size: 1.15em;
   line-height: 1.5;
