@@ -1,3 +1,4 @@
+import parsePhoneNumber, { CountryCode } from "libphonenumber-js";
 import { clsx, type ClassValue } from "clsx";
 import { i18n } from "i18next";
 import { twMerge } from "tailwind-merge";
@@ -42,4 +43,42 @@ export function isNumericString(str: string): boolean {
 
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function generateUniqueId() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+export function validatePhoneNumber(input: string): { type: "error" | "warning"; message: string } | undefined {
+  const countryCode: CountryCode = "PT";
+
+  try {
+    const phoneNumber = parsePhoneNumber(input, countryCode);
+
+    if (phoneNumber?.isValid()) {
+      if (phoneNumber.country === countryCode) {
+        return;
+      } else {
+        return {
+          type: "warning",
+          message:
+            "Warning: The phone number is valid but not from the specified country.",
+        };
+      }
+    } else {
+      return {
+        type: "error",
+        message: "The phone number is invalid.",
+      };
+    }
+  } catch (error) {
+    return {
+      type: "error",
+      message: "The phone number is invalid.",
+    };
+  }
 }

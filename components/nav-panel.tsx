@@ -15,12 +15,13 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import { ResizablePanel } from "./ui/resizable";
-import { cn } from "@/lib/utils";
+import { cn, normalizePath } from "@/lib/utils";
 import Account from "./account";
 import { Separator } from "./ui/separator";
 import NavLinks from "./nav-links";
 import { useTranslation } from "react-i18next";
 import { useLayout } from "@/contexts/use-layout";
+import { usePathname } from "next/navigation";
 
 interface MailProps {
   defaultLayout?: number[] | undefined;
@@ -28,12 +29,25 @@ interface MailProps {
   navCollapsedSize: number;
 }
 
+const validLocationPaths = ["/sent", "/drafts", "/trash"];
+
 export default function NavPanel({ navCollapsedSize }: MailProps) {
-  const { layout, isCollapsed, setIsCollapsed } = useLayout();
-  const { t } = useTranslation();
+  const { layout, isCollapsed, setIsCollapsed, fallbackLayout } = useLayout();
+  const { t, i18n } = useTranslation();
+  const pathname = usePathname();
+  const isValidLocation = validLocationPaths.includes(
+    normalizePath(pathname, i18n)
+  );
+
+  //debug
+  // if (!Array.isArray(layout)) {
+  //   console.error("NavPanel: could not read layout from cookies");
+  // } else {
+  //   console.log("rendering navpanel with a width of ", layout[0], "%");
+  // }
   return (
     <ResizablePanel
-      defaultSize={layout && Number(layout[0])}
+      defaultSize={layout ? layout[0] : fallbackLayout[0]}
       collapsedSize={navCollapsedSize}
       collapsible={true}
       minSize={13}
@@ -71,22 +85,15 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
             label: "",
             icon: Pencil,
             variant: "default",
-            href: "/new",
+            href: isValidLocation ? pathname + "/new-message" : "/new-message",
             size: "xl",
           },
           {
-            title: t("sent_messages"),
+            title: t("sent"),
             label: "",
             icon: Send,
             variant: "ghost",
-            href: "/",
-          },
-          {
-            title: t("notifications"),
-            label: "4",
-            icon: AlertCircle,
-            variant: "ghost",
-            href: "/notifications",
+            href: "/sent",
           },
           {
             title: t("drafts"),
@@ -95,6 +102,7 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
             variant: "ghost",
             href: "/drafts",
           },
+          
           {
             title: t("templates"),
             label: "",
@@ -108,6 +116,13 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
             icon: Trash2,
             variant: "ghost",
             href: "/trash",
+          },
+          {
+            title: t("notifications"),
+            label: "4",
+            icon: AlertCircle,
+            variant: "ghost",
+            href: "/notifications",
           },
         ]}
       />

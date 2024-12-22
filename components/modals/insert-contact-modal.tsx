@@ -14,15 +14,13 @@ import { Button, buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
 import CreateContactModal from "./create-contact-modal";
 import { useContactModal } from "@/contexts/use-contact-modal";
-import { Contact } from "@/types/contact";
+import { Contact } from "@/types";
 
 export default function InsertContactModal({
   children,
   contacts,
 }: Readonly<{ children: React.ReactNode; contacts: ActionResult<Contact[]> }>) {
   const [open, setOpen] = useState(false);
-  console.log(contacts.success);
-  console.log(contacts);
 
   const { setModal } = useContactModal();
   return (
@@ -36,7 +34,9 @@ export default function InsertContactModal({
           {contacts.success === true ? (
             <div className="flex flex-col gap-2">
               {contacts.data.map((contact: Contact) => (
-                <div key={contact.id} className="bg-muted">{contact.name}</div>
+                <div key={contact.id} className="bg-muted">
+                  {contact.name}
+                </div>
               ))}
             </div>
           ) : (

@@ -12,15 +12,27 @@ import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useTranslation } from "react-i18next";
 import ChildrenPanel from "./children-panel";
 import PageHeader from "./page-header";
+import { MessageLocation } from "@/types";
 
 interface MessageContainerProps {
   children: React.ReactNode;
+  location: MessageLocation;
 }
 
-export default function MessageContainer({ children }: MessageContainerProps) {
+export default function MessageContainer({
+  children,
+  location,
+}: MessageContainerProps) {
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation(["Titles"]);
   const { messages, selected, navigateToMessage } = useMessage();
+
+  // debug
+  // if (!Array.isArray(layout) || layout.length! <= 2) {
+  //   console.error("COuld not parse layout from cookies");
+  // } else {
+  //   console.log("Rendering MessageContainer with a width of ", layout[1], "%");
+  // }
   return (
     <>
       {/* Start message panel */}
@@ -36,7 +48,7 @@ export default function MessageContainer({ children }: MessageContainerProps) {
       >
         <Tabs defaultValue="all">
           <div id="message-panel-header">
-            <PageHeader title={t("sent_messages")}>
+            <PageHeader title={t(location)}>
               <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="scheduled">Scheduled</TabsTrigger>

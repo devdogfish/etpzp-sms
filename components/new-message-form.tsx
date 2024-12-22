@@ -7,7 +7,7 @@ import SendButton from "./send-button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import PageHeader from "./page-header";
-import { send } from "@/lib/actions/message.create";
+import { sendMessage, saveMessageTo, getStatus } from "@/lib/actions/message.create";
 import { Input as ShadcnInput } from "./ui/input";
 
 // Form
@@ -24,14 +24,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "./form-input";
-import { NewMessageFormSchema } from "@/lib/form.schemas";
+import { MessageSchema } from "@/lib/form.schemas";
 import { useRouter } from "next/navigation";
-import { saveDraft } from "@/lib/actions/message.create";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import RecipientsInput from "./recipients-input";
 import { ContactModalProvider } from "@/contexts/use-contact-modal";
 import CreateContactModal from "./modals/create-contact-modal";
-import { Contact } from "@/types/contact";
+import { Contact, Message, Recipient } from "@/types";
+import { useLocalStorage } from "@/hooks/use-localstorage";
+import { RecipientProvider, useRecipient } from "@/contexts/use-recipient";
 
 export default function NewMessageForm({
   isFullScreen,
@@ -41,40 +42,51 @@ export default function NewMessageForm({
   contacts: ActionResult<Contact[]>;
 }) {
   const { t } = useTranslation();
+  const { recipients } = useRecipient();
+  const defaultMessageValues = {
+    from: "Test",
+    to: [],
+    subject: "",
+    body: "",
+  };
+  // 1. Define your form.
+  const form = useForm<z.infer<typeof MessageSchema>>({
+    resolver: zodResolver(MessageSchema),
+    defaultValues: defaultMessageValues,
+  });
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [subject, setSubject] = useState<string>("");
-
-  // 1. Define your form.
-  const form = useForm<z.infer<typeof NewMessageFormSchema>>({
-    resolver: zodResolver(NewMessageFormSchema),
-    defaultValues: {
-      from: "Test",
-      to: "",
-      subject: "",
-      message: "",
-    },
-  });
+  const [message, setMessage] = useLocalStorage<z.infer<typeof MessageSchema>>(
+    "current_message",
+    defaultMessageValues
+  );
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof NewMessageFormSchema>) {
+  async function onSubmit(values: z.infer<typeof MessageSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    values.contacts = [];
+    const submitData = { ...values, to: recipients };
+    console.log(`Form submitted frontend:`);
+    console.log(submitData);
+
 
     // Here you would typically send the message
     setIsLoading(true);
-    const result = await send(values);
+    // const result = await sendMessage(submitData);
+    const result = await sendMessage({ ...values, to: recipients });
+    // const result = await getStatus()
+    console.log(`Logging result on the client: ${result}`);
 
-    console.log("RESULT HERE:");
-    console.log(result);
+    // console.log("RESULT HERE:");
+    // console.log(result);
 
     setIsLoading(false);
   }
 
   // 3. Define a draft save handler.
-  async function onClose(values: z.infer<typeof NewMessageFormSchema>) {
-    const result = await saveDraft(values);
+  async function onClose(values: z.infer<typeof MessageSchema>) {
+    const result = await saveMessageTo({ ...values, to: recipients }, "drafts");
     if (result !== null) {
       // Redirect to home page after saving draft
       router.push("/");
@@ -86,27 +98,28 @@ export default function NewMessageForm({
 
   // 4. Handle full screen redirect
   function handleFullScreenRedirect() {
-    const { from, to, subject, message } = form.getValues();
-    const queryParams = new URLSearchParams({
-      from,
-      to,
-      subject,
-      message,
-    }).toString();
-    const page = isFullScreen ? "new" : "new-fullscreen";
-    router.push(`/${page}?${queryParams}`);
+    // const { from, to, subject, body } = form.getValues();
+    // const queryParams = new URLSearchParams({
+    //   from,
+    //   to,
+    //   subject,
+    //   body,
+    // }).toString();
+    // const page = isFullScreen ? "new" : "new-fullscreen";
+    // router.push(`/${page}?${queryParams}`);
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-
+    // TODO implement recipient recovery through LocalStorage
     form.reset({
       from: params.get("from") || "Test",
-      to: params.get("to") || "",
+      to: recipients,
       subject: params.get("subject") || "",
-      message: params.get("message") || "",
+      body: params.get("message") || "",
     });
   }, [isFullScreen]);
+
   return (
     <>
       <ContactModalProvider>
@@ -148,11 +161,16 @@ export default function NewMessageForm({
                   disabled
                   control={form.control}
                 />
-                <RecipientsInput
-                  name={"to"}
+                <FormField
                   control={form.control}
-                  placeholder="To"
-                  contacts={contacts}
+                  name="to"
+                  render={({ field }) => (
+                    <FormItem className="flex-1 py-1">
+                      <FormControl>
+                        <RecipientsInput contacts={contacts} />
+                      </FormControl>
+                    </FormItem>
+                  )}
                 />
                 <FormField
                   control={form.control}
@@ -178,7 +196,7 @@ export default function NewMessageForm({
               </div>
               <div className="px-4 flex-grow mt-5 mb-2">
                 <Textarea
-                  {...form.register("message")}
+                  {...form.register("body")}
                   className="border-none rounded-none h-full p-0 focus-visible:ring-0 shadow-none resize-none placeholder:text-muted-foreground"
                   placeholder="Start writing your message"
                 />

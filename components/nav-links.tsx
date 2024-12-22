@@ -13,17 +13,18 @@ import {
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 
-interface NavProps {
+type NavLink = {
+  title: string;
+  label?: string;
+  icon: LucideIcon;
+  href: string;
+  variant: "default" | "ghost";
+  size?: "sm" | "md" | "xl";
+};
+type NavProps = {
   isCollapsed: boolean;
-  links: {
-    title: string;
-    label?: string;
-    icon: LucideIcon;
-    href: string;
-    variant: "default" | "ghost";
-    size?: "sm" | "md" | "xl";
-  }[];
-}
+  links: NavLink[];
+};
 
 export default function NavLinks({ links, isCollapsed }: NavProps) {
   const pathname = usePathname();
@@ -32,12 +33,12 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
   const activeStyles =
     "bg-accent text-primary-accent hover:bg-accent hover:text-accent-foreground";
 
-  const isNewButton = (href: string) => normalizePath(href, i18n) === "/new";
+  const isNewButton = (size: string | undefined) => size === "xl"; // we only have one xl button and that is the new-message button
   // isActive takes Link, compares it to the current url, and returns whether it is the same link we are on or not.
-  const isActive = (href: string) => {
+  const isActive = (link: NavLink) => {
     return (
-      !isNewButton(href) &&
-      normalizePath(href, i18n) === normalizePath(pathname, i18n)
+      !isNewButton(link.size) &&
+      normalizePath(link.href, i18n) === normalizePath(pathname, i18n)
     );
   };
   return (
@@ -47,19 +48,19 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
     >
       <nav className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
         {links.map((link, index) =>
-          isCollapsed ? (
+          isCollapsed ? ( // NavPanel is collapsed = render with tooltips
             <Tooltip key={index} delayDuration={0}>
               <TooltipTrigger asChild>
                 <Link
                   href={link.href}
                   className={cn(
                     buttonVariants({ variant: link.variant, size: "icon" }),
-                    isNewButton(link.href) && "mb-3",
+                    isNewButton(link.size) && "mb-3",
                     "h-9 w-9",
-                    isActive(link.href) && activeStyles
+                    isActive(link) && activeStyles
                   )}
                 >
-                <link.icon className="h-4 w-4" />
+                  <link.icon className="h-4 w-4" />
                   <span className="sr-only">{link.title}</span>
                 </Link>
               </TooltipTrigger>
@@ -72,21 +73,23 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
                 )}
               </TooltipContent>
             </Tooltip>
-          ) : (
+          ) : ( // NavPanel is not collapsed = render links normally without tooltips
             <Link
               key={index}
               href={link.href}
               className={cn(
                 buttonVariants({
                   variant: link.variant,
-                  size: isNewButton(link.href) ? "lg" : "sm",
+                  size: isNewButton(link.size) ? "lg" : "sm",
                 }),
                 "justify-start",
-                isActive(link.href) && activeStyles,
-                isNewButton(link.href) && "mb-3 justify-center",
+                isActive(link) && activeStyles,
+                isNewButton(link.size) && "mb-3 justify-center"
               )}
             >
-              {!isNewButton(link.href) && <link.icon className="mr-2 h-4 w-4" />}
+              {!isNewButton(link.size) && (
+                <link.icon className="mr-2 h-4 w-4" />
+              )}
               {link.title}
               {link.label && (
                 <span

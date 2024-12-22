@@ -11,13 +11,27 @@ export default function ChildrenPanel({
   hasMiddleBar?: boolean;
 }) {
   const { layout, fallbackLayout } = useLayout();
-  const middleBarLayout =
-    Array.isArray(layout) && layout.length === 3 ? layout[3] : undefined;
-  const fallbackWidth = Array.isArray(layout) ? 100 - layout[0] : fallbackLayout[0];
+  const middleBarWidth =
+    Array.isArray(layout) && layout.length === 3 ? layout[2] : undefined;
+
+  const fallbackWidth = Array.isArray(layout)
+    ? 100 - layout[0]
+    : fallbackLayout[0];
+
+  //debug
+  // if (!Array.isArray(layout)) {
+  //   console.error("Could not parse layout from cookies");
+  // } else {
+  //   console.log(
+  //     "rendering childrenLayout with a width of ",
+  //     hasMiddleBar ? middleBarWidth : fallbackWidth,
+  //     "%"
+  //   );
+  // }
   return (
     <ResizablePanel
       // width at null means don't specify any width, if it has a value use that, else use fallback
-      defaultSize={hasMiddleBar ? middleBarLayout : fallbackWidth}
+      defaultSize={hasMiddleBar ? middleBarWidth : fallbackWidth}
     >
       {children}
     </ResizablePanel>

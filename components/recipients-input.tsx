@@ -1,101 +1,58 @@
 "use client";
 import { z } from "zod";
-import { Input } from "./form-input";
-import { Control, FieldPath, FieldValues } from "react-hook-form";
+import { Input } from "./ui/input";
 import React, { useState, KeyboardEvent, ChangeEvent, useRef } from "react";
 import { UserPlus, X } from "lucide-react";
 
 import { Button, buttonVariants } from "./ui/button";
-import { cn } from "@/lib/utils";
+import { cn, generateUniqueId } from "@/lib/utils";
 import InsertContactModal from "./modals/insert-contact-modal";
-import { Contact } from "@/types/contact";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./ui/form";
+import { Contact } from "@/types";
 
-interface inputState {
+import { useRecipient } from "@/contexts/use-recipient";
+
+interface InputState {
   value: string;
   isFocused: boolean;
+  error?: string;
 }
-export default function RecipientsInput<T extends FieldValues>({
-  name,
-  control,
-  placeholder,
+export default function RecipientsInput({
   contacts,
 }: {
-  name: FieldPath<T>;
-  control: Control<T>;
-  placeholder: string;
   contacts: ActionResult<Contact[]>;
 }) {
-  const [input, setInput] = useState<inputState>({
+  const [input, setInput] = useState<InputState>({
     value: "",
     isFocused: false,
+    error: undefined,
   });
   const container = useRef<HTMLDivElement | null>(null);
 
-  const [recipients, setRecipients] = useState([
-    {
-      id: "a",
-      name: "William Smith",
-      phone: 123454641,
-    },
-    {
-      id: "advb",
-      name: "Donald Trump",
-      phone: 168345492,
-    },
-    {
-      id: "advblks",
-      name: "Putin Valenski",
-      phone: 462923492,
-    },
-  ]);
-  const addRecipient = (value: string) => {
-    // 1. validate the type to make sure it is a valid phone number
-    // 2. make sure it doesnt exist yet by first finding out if it is a name or a number and comparing it to the contacts
-    // 3. add it to the recipients array
-    // setRecipients(prevRecipients => [...prevRecipients, contacts.find(value)])
-
-    // dummy demo
-    const id = String(
-      `${recipients.length} ${Math.floor(Math.random() * 1000)}`
-    );
-    setRecipients((prevRecipients) => [
-      ...prevRecipients,
-      {
-        id: id,
-        name: `Willy Wonka ${id}`,
-        phone: 12819591287,
-      },
-    ]);
-    setInput((i) => ({ ...i, value: "" }));
-  };
-  const removeRecipient = (index: number) => {
-    setRecipients(
-      (prevRecipients) => prevRecipients.filter((_, i) => i !== index) // Filter out the item at the specified index
-    );
-  };
+  const { recipients, setRecipients, addRecipient, removeRecipient } =
+    useRecipient();
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === " " && input.value.trim()) {
+    if (e.key === "Enter" && input.value.trim()) {
       e.preventDefault();
-      addRecipient(input.value.trim());
+
+      addRecipient({
+        id: generateUniqueId(),
+        phone: input.value.trim(),
+      });
+      input.value = ""; // reset the input
     }
+
     if (e.key === "Backspace" && input.value === "") {
-      setRecipients((prevRecipients) => prevRecipients.slice(0, -1));
+      removeRecipient(recipients[recipients.length - 1]); // remove last recipient in the array
     }
+
     setTimeout(() => {
       if (container.current)
-        container.current.scrollTop += container.current.scrollHeight;
+        container.current.scrollTop += container.current.scrollHeight; // automatically scroll to the bottom of the recipients when user starts typing
     }, 0);
   };
   return (
-    <div className="py-1">
+    <div className="flex-1 py-1">
       <div className="max-h-24 overflow-auto" ref={container}>
         <div className="w-full relative">
           <div
@@ -104,14 +61,24 @@ export default function RecipientsInput<T extends FieldValues>({
               input.isFocused && "border-primary"
             )}
           >
-            {recipients.map(({ id, name }, idx) => (
-              <div key={id} className="my-0.5 h-8">
-                <div className="px-0.5 flex items-center text-xs border border-primary rounded-md whitespace-nowrap h-full">
-                  <span>{name}</span>
+            {recipients.map((recipient) => (
+              <div key={recipient.id} className="my-auto h-6">
+                <div
+                  className={cn(
+                    "px-1.5 flex items-center text-xs border border-primary rounded-xl whitespace-nowrap h-full",
+                    recipient.error?.type === "warning" && "bg-yellow-100",
+                    recipient.error?.type === "error" && "bg-destructive/20"
+                  )}
+                >
+                  <span>
+                    {recipient.contactName
+                      ? recipient.contactName
+                      : recipient.phone}
+                  </span>
                   <Button
                     variant="none"
                     className="p-0 h-4 cursor-pointer"
-                    onClick={() => removeRecipient(idx)}
+                    onClick={() => removeRecipient(recipient)}
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -119,51 +86,38 @@ export default function RecipientsInput<T extends FieldValues>({
               </div>
             ))}
 
-            <FormField
-              control={control}
-              name={name}
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormControl>
-                    <Input // px-3 py-1 pl-5
-                      {...field}
-                      className="ring-0 focus:ring-0 h-8  my-0.5 px-0 shadow-none pr-8 placeholder:text-muted-foreground"
-                      name={name}
-                      placeholder={placeholder}
-                      type="text"
-                      control={control}
-                      value={input.value}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                        setInput(({ isFocused }) => ({
-                          value: e.target.value,
-                          isFocused,
-                        }))
-                      }
-                      onKeyDown={handleKeyDown}
-                      // focus state
-                      onFocus={() =>
-                        setInput(({ value }) => ({
-                          value,
-                          isFocused: true,
-                        }))
-                      }
-                      onBlur={() =>
-                        setInput(({ value }) => ({
-                          value,
-                          isFocused: false,
-                        }))
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <Input // px-3 py-1 pl-5
+              // {...field}
+              className="ring-0 focus:ring-0 h-8 my-0.5 px-0 shadow-none pr-8 placeholder:text-muted-foreground w-min flex-1"
+              // name="{name}"
+              placeholder={recipients.length === 0 ? "Recipient/s" : undefined}
+              value={input.value}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setInput((prevInput) => ({
+                  ...prevInput,
+                  value: e.target.value,
+                }))
+              }
+              onKeyDown={handleKeyDown}
+              // focus state
+              onFocus={() =>
+                setInput((prevInput) => ({
+                  ...prevInput,
+                  isFocused: true,
+                }))
+              }
+              onBlur={() =>
+                setInput((prevInput) => ({
+                  ...prevInput,
+                  isFocused: false,
+                }))
+              }
             />
           </div>
 
           <InsertContactModal contacts={contacts}>
             <Button
-              className="absolute right-[1px] bottom-[7px] p-2 aspect-1 z-index-0"
+              className="absolute right-[1px] bottom-[6px] p-2 aspect-1 z-index-0"
               variant="ghost"
               type="button"
             >

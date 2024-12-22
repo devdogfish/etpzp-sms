@@ -1,7 +1,6 @@
 import initTranslations from "@/app/[locale]/i18n";
 import PageHeader from "@/components/page-header";
 import { Button } from "@/components/ui/button";
-import { ResizablePanel } from "@/components/ui/resizable";
 
 export default async function Page({ params }: { params: { locale: string } }) {
   const { locale } = await params;
