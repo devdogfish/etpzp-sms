@@ -4,6 +4,7 @@ import { MessageSchema } from "../form.schemas";
 import { z } from "zod";
 import { Message, MessageLocation } from "@/types";
 import { getSession } from "../auth/sessions";
+import { errorResponse} from './responses'
 
 export async function sendMessage(
   values: z.infer<typeof MessageSchema>
@@ -42,73 +43,37 @@ export async function sendMessage(
         Authorization: `Token ${token}`,
       },
     });
+    // const resp = errorResponse;
 
     // console.log(resp.json());
     // console.log(resp);
 
     // 1. Create the message and insert the recipient with the message id from the previous query
-    const contactIdPlaceholders = values.to
-      .map((_, index) => `$${index + 7}`)
-      .join(", ");
-    const phoneNumberPlaceholders = values.to
-      .map((_, index) => `$${index + 7 + values.to.length - 1}`)
-      .join(", ");
-      // there's something he doesnt like about the array unnesting
-    console.log(
+    const insertMessageResult = await db(
       `
-        WITH insert_message AS (
-            INSERT INTO message (user_id, subject, body, status, location, failure_reason) 
-            VALUES ($1, $2, $3, $4, $5, $6) 
-            RETURNING id
-        )
-        INSERT INTO recipient (message_id, contact_id, phone)
-        SELECT 
-            id, 
-            unnest(ARRAY[${contactIdPlaceholders}]) AS contact_id_,  
-            unnest(ARRAY[${phoneNumberPlaceholders}]) AS phone_     
-        FROM insert_message;
-    `,
+      WITH insert_message AS (
+        INSERT INTO message (user_id, subject, body, status, location, failure_reason) 
+        VALUES ($1, $2, $3, $4, $5, $6) 
+        RETURNING id
+      )
+      INSERT INTO recipient (message_id, contact_id, phone)
+      SELECT 
+        insert_message.id, 
+        unnest($7::int[]) as contact_id,
+        unnest($8::text[]) as phone
+      FROM insert_message;
+      `,
       [
         // message parameters
-        user.id,
+        1,
         values.subject,
         values.body,
         resp.ok ? "sent" : "failed", // status here
         "sent", // location here
         resp.statusText || null,
         // recipient parameters:
-        values.to.map((recipient) => 1), // can be null
-        values.to.map((recipient) => recipient.phone), // phone number
-      ]
-    );
-
-    const insertMessageResult = db(
-      `
-        WITH insert_message AS (
-            INSERT INTO message (user_id, subject, body, status, location, failure_reason) 
-            VALUES ($1, $2, $3, $4, $5, $6) 
-            RETURNING id
-        )
-        INSERT INTO recipient (message_id, contact_id, phone)
-        SELECT 
-            id, 
-            $7,  
-            $8     
-        FROM insert_message;
-    `,
-      [
-        // message parameters
-        user.id,
-        values.subject,
-        values.body,
-        resp.ok ? "sent" : "failed", // status here
-        "sent", // location here
-        resp.statusText || null,
-        // recipient parameters:
-        // values.to.map((recipient) => 1), // can be null
-        // values.to.map((recipient) => recipient.phone), // phone number
-        null,
-        "162345678930",
+        [null, null], // contact_id array
+        ["162345678900", "162245678900"], // phone number array
       ]
     );
     console.log(insertMessageResult);
