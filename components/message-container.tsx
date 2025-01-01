@@ -6,7 +6,7 @@ import { Input } from "./ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useLayout } from "@/contexts/use-layout";
 
-import { useMessage } from "@/contexts/use-message";
+import { useMessages } from "@/contexts/use-messages";
 import { MessageList } from "./message-list";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useTranslation } from "react-i18next";
@@ -25,7 +25,7 @@ export default function MessageContainer({
 }: MessageContainerProps) {
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation(["Titles"]);
-  const { messages, selected, navigateToMessage } = useMessage();
+  const { messages, selected, navigateToMessage } = useMessages();
 
   // debug
   // if (!Array.isArray(layout) || layout.length! <= 2) {

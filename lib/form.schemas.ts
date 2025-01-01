@@ -15,6 +15,12 @@ export const MessageSchema = z.object({
   subject: z.string(),
   body: z.string(),
 });
+export const defaultMessage = {
+  from: "Test",
+  to: [],
+  subject: "",
+  body: "",
+};
 
 export const AuthFormSchema = z.object({
   username: z.string().min(2).max(50),

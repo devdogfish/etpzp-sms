@@ -1,5 +1,5 @@
 import MessageContainer from "@/components/message-container";
-import { MessageProvider } from "@/contexts/use-message";
+import { MessageProvider } from "@/contexts/use-messages";
 import { Message, messages } from "@/lib/data.test";
 import { MessageLocation } from "@/types";
 import { notFound } from "next/navigation";
@@ -13,7 +13,10 @@ const validLocations = ["sent", "drafts", "trash"];
 export default async function MessagePage({
   children,
   params,
-}: Readonly<{ children: React.ReactNode; params: { location: MessageLocation } }>) {
+}: Readonly<{
+  children: React.ReactNode;
+  params: { location: MessageLocation };
+}>) {
   const { location } = params;
 
   const initialMessages = await getMessages();

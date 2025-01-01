@@ -64,10 +64,10 @@ export function MessageProvider({
   );
 }
 
-export function useMessage() {
+export function useMessages() {
   const context = useContext(MessageContext);
   if (!context) {
-    throw new Error("useMessageContext must be used within a MessageProvider");
+    throw new Error("useMessagesContext must be used within a MessageProvider");
   }
   return context;
 }

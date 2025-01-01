@@ -2,7 +2,7 @@ export type MessageLocation = "sent" | "drafts" | "trash";
 
 export type Message = {
   from: string;
-  to: string[];
+  to: Recipient[];
   subject: string;
   body: string;
 };

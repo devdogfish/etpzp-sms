@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 export function useLocalStorage<T>(key: string, fallbackValue: T) {
-  const [value, setValue] = useState(JSON.stringify(fallbackValue));
-  useEffect(() => {
+  const [value, setValue] = useState<T>(() => {
+    if (typeof window === "undefined") return fallbackValue;
     const stored = localStorage.getItem(key);
-    setValue(stored !== null ? JSON.parse(stored) : fallbackValue);
-  }, [fallbackValue, key]);
+    return stored ? JSON.parse(stored) : fallbackValue;
+  });
 
   useEffect(() => {
     localStorage.setItem(key, JSON.stringify(value));

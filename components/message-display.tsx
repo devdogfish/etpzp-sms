@@ -40,7 +40,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Message } from "@/lib/data.test";
-import { useMessage } from "@/contexts/use-message";
+import { useMessages } from "@/contexts/use-messages";
 
 interface MessageDisplayProps {
   messageId: string | null;
@@ -48,7 +48,7 @@ interface MessageDisplayProps {
 
 export function MessageDisplay({ messageId }: MessageDisplayProps) {
   const today = new Date();
-  const { messages } = useMessage();
+  const { messages } = useMessages();
   const message = messages.find((m) => m.id === messageId);
   return (
     <div className="flex h-full flex-col">

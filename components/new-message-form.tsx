@@ -7,7 +7,11 @@ import SendButton from "./send-button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import PageHeader from "./page-header";
-import { sendMessage, saveMessageTo, getStatus } from "@/lib/actions/message.create";
+import {
+  sendMessage,
+  saveMessageTo,
+  getStatus,
+} from "@/lib/actions/message.create";
 import { Input as ShadcnInput } from "./ui/input";
 
 // Form
@@ -30,9 +34,8 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import RecipientsInput from "./recipients-input";
 import { ContactModalProvider } from "@/contexts/use-contact-modal";
 import CreateContactModal from "./modals/create-contact-modal";
-import { Contact, Message, Recipient } from "@/types";
-import { useLocalStorage } from "@/hooks/use-localstorage";
-import { RecipientProvider, useRecipient } from "@/contexts/use-recipient";
+import { Contact } from "@/types";
+import { useNewMessage } from "@/contexts/use-new-message";
 
 export default function NewMessageForm({
   isFullScreen,
@@ -42,7 +45,7 @@ export default function NewMessageForm({
   contacts: ActionResult<Contact[]>;
 }) {
   const { t } = useTranslation();
-  const { recipients } = useRecipient();
+  const { recipients } = useNewMessage();
   const defaultMessageValues = {
     from: "Test",
     to: [],
@@ -57,10 +60,7 @@ export default function NewMessageForm({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [subject, setSubject] = useState<string>("");
-  const [message, setMessage] = useLocalStorage<z.infer<typeof MessageSchema>>(
-    "current_message",
-    defaultMessageValues
-  );
+  const { message, setMessage } = useNewMessage();
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof MessageSchema>) {
@@ -69,7 +69,6 @@ export default function NewMessageForm({
     const submitData = { ...values, to: recipients };
     console.log(`Form submitted frontend:`);
     console.log(submitData);
-
 
     // Here you would typically send the message
     setIsLoading(true);
@@ -97,7 +96,10 @@ export default function NewMessageForm({
   }
 
   // 4. Handle full screen redirect
-  function handleFullScreenRedirect() {
+  function handleFullScreenRedirect(values: z.infer<typeof MessageSchema>) {
+    setMessage(values);
+    console.log(values);
+
     // const { from, to, subject, body } = form.getValues();
     // const queryParams = new URLSearchParams({
     //   from,
@@ -105,8 +107,8 @@ export default function NewMessageForm({
     //   subject,
     //   body,
     // }).toString();
-    // const page = isFullScreen ? "new" : "new-fullscreen";
-    // router.push(`/${page}?${queryParams}`);
+    const page = isFullScreen ? "new-message" : "new-fullscreen";
+    router.push(`/${page}`);
   }
 
   useEffect(() => {
@@ -133,7 +135,7 @@ export default function NewMessageForm({
               <Button
                 variant="ghost"
                 className="aspect-1 p-0"
-                onClick={handleFullScreenRedirect}
+                onClick={form.handleSubmit(handleFullScreenRedirect)}
                 type="button"
               >
                 {isFullScreen ? (

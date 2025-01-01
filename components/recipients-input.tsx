@@ -9,7 +9,7 @@ import { cn, generateUniqueId } from "@/lib/utils";
 import InsertContactModal from "./modals/insert-contact-modal";
 import { Contact } from "@/types";
 
-import { useRecipient } from "@/contexts/use-recipient";
+import { useNewMessage } from "@/contexts/use-new-message";
 
 interface InputState {
   value: string;
@@ -28,28 +28,31 @@ export default function RecipientsInput({
   });
   const container = useRef<HTMLDivElement | null>(null);
 
-  const { recipients, setRecipients, addRecipient, removeRecipient } =
-    useRecipient();
+  const { recipients, addRecipient, removeRecipient } = useNewMessage();
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && input.value.trim()) {
-      e.preventDefault();
-
-      addRecipient({
-        id: generateUniqueId(),
-        phone: input.value.trim(),
-      });
-      input.value = ""; // reset the input
-    }
-
-    if (e.key === "Backspace" && input.value === "") {
-      removeRecipient(recipients[recipients.length - 1]); // remove last recipient in the array
-    }
-
     setTimeout(() => {
       if (container.current)
         container.current.scrollTop += container.current.scrollHeight; // automatically scroll to the bottom of the recipients when user starts typing
     }, 0);
+
+    if (e.key === "Enter") {
+      // submit the new recipient and store it in state
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (input.value.trim()) {
+        addRecipient({
+          id: generateUniqueId(),
+          phone: input.value.trim(),
+        });
+        setInput((prevInput) => ({ ...prevInput, value: "" }));
+      }
+    }
+
+    if (e.key === "Backspace" && input.value === "" && recipients.length) {
+      removeRecipient(recipients[recipients.length - 1]); // remove last recipient in the array
+    }
   };
   return (
     <div className="flex-1 py-1">
@@ -78,7 +81,9 @@ export default function RecipientsInput({
                   <Button
                     variant="none"
                     className="p-0 h-4 cursor-pointer"
-                    onClick={() => removeRecipient(recipient)}
+                    onClick={() => {
+                      removeRecipient(recipient);
+                    }}
                   >
                     <X className="h-4 w-4" />
                   </Button>
