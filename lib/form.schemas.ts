@@ -31,7 +31,6 @@ export const ContactSchema = z.object({
   name: z.string().min(2).max(50),
   phone: z.string().refine(
     (input: string) => {
-      console.log(input);
       const parsedPhone = parsePhoneNumberFromString(input);
       return parsedPhone && parsedPhone.isValid();
     },

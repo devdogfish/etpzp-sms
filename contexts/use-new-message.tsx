@@ -1,6 +1,6 @@
 "use client";
 import { Message, Recipient } from "@/types";
-import React, { useContext, createContext, useState, useEffect } from "react";
+import React, { useContext, createContext, useState } from "react";
 import { validatePhoneNumber } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/use-localstorage";
 import { defaultMessage, MessageSchema } from "@/lib/form.schemas";
@@ -41,7 +41,6 @@ export function NewMessageProvider({
   };
 
   const removeRecipient = (recipient: Recipient) => {
-    console.log("removing recipient");
     
     setMessage((prev) => {
       const updated = {
@@ -65,9 +64,7 @@ export function NewMessageProvider({
     };
   };
 
-  useEffect(() => {
-    console.log(message);
-  }, [message]);
+ 
 
   return (
     <NewMessageContext.Provider

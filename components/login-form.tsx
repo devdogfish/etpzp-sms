@@ -15,8 +15,13 @@ import { Input } from "@/components/form-input";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { login } from "@/lib/auth";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof AuthFormSchema>>({
     resolver: zodResolver(AuthFormSchema),
     // this makes the inputs controlled
@@ -27,9 +32,12 @@ export default function LoginForm() {
   });
 
   async function onSubmit(values: z.infer<typeof AuthFormSchema>) {
-    console.log(values);
-
-    await login(values);
+    const result = await login(values);
+    if (result.success) {
+      router.push("/");
+    } else {
+      setError(result.error);
+    }
   }
 
   return (
@@ -54,13 +62,14 @@ export default function LoginForm() {
               with Microsoft to continue to Etpzp SMS
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col gap-2">
             <Input
               name="username"
               control={form.control}
               type="text"
               label="Username"
               placeholder="9120@etpzp.pt"
+              error={!!error}
             />
             <Input
               name="password"
@@ -68,7 +77,11 @@ export default function LoginForm() {
               type="password"
               label="Password"
               placeholder="my_password452"
+              error={!!error}
             />
+            {error && (
+              <p className="text-sm text-foreground text-center">{error}</p>
+            )}
             <Button type="submit" className="w-full">
               Login
             </Button>

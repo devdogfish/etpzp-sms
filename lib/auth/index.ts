@@ -15,13 +15,11 @@ export async function login({
   username,
   password,
 }: z.infer<typeof AuthFormSchema>) {
-  console.log("loggin you in HERE");
-  // Check if the user session is authenticated if not check the server
+  // Authenticate the user by checking his credentials
   // const user: SessionData & { errors: string[] } = await authenticate({
   //   username,
   //   password,
   // });
-  console.log(username, password);
 
   const user: SessionData = await dummyAuthenticate({
     username,
@@ -29,22 +27,19 @@ export async function login({
   });
 
   if (!user.isAuthenticated) {
-    console.log("wrong credentials");
+    console.log("Wrong credentials!");
 
     return { success: false, error: "Wrong credentials. Try again" };
   }
-
 
   // I need to think about how I will return different errors, because it is hard to access them in this file.
   // if (user.errors.find((i: any) => i !== "")) {
   //   return { success: false, error: "Wrong credentials. Try again" };
   // }
-console.log(`Creating Session ${user}`);
 
-  // create the session using the returned sessionData
+  // If everything went well create a new session and redirect user to dashboard
   await createSession(user);
-
-  redirect("/");
+  return { success: true, error: null };
 }
 
 export async function logout() {

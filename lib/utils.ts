@@ -53,7 +53,9 @@ export function generateUniqueId() {
   });
 }
 
-export function validatePhoneNumber(input: string): { type: "error" | "warning"; message: string } | undefined {
+export function validatePhoneNumber(
+  input: string
+): { type: "error" | "warning"; message: string } | undefined {
   const countryCode: CountryCode = "PT";
 
   try {

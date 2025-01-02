@@ -7,9 +7,9 @@ export default async function LoginPage() {
   // const activeSession = { isAuthenticated = false };
 
   if (activeSession.isAuthenticated) {
-    console.log("You are already logged in");
-    console.log(activeSession)
-    redirect("/");
+    // console.log("You are already logged in");
+    // console.log(activeSession)
+    // redirect("/");
   }
 
   return (

@@ -36,7 +36,7 @@ export default function Account({ isCollapsed }: AccountProps) {
         <div
           className={cn("flex flex-col items-start", isCollapsed && "hidden")}
         >
-          <p className="font-semibold mb-[-3px]">{session?.username}</p>
+          <p className="font-semibold mb-[-3px]">{session?.user.name}</p>
           <span className="text-xs">{session?.isAdmin ? "Admin" : "User"}</span>
         </div>
       </DropdownMenuTrigger>

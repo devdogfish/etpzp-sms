@@ -17,7 +17,7 @@ export default async function MessagePage({
   children: React.ReactNode;
   params: { location: MessageLocation };
 }>) {
-  const { location } = params;
+  const { location } = await params;
 
   const initialMessages = await getMessages();
   if (!validLocations.includes(location)) notFound();

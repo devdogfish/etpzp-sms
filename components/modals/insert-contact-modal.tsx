@@ -31,7 +31,7 @@ export default function InsertContactModal({
           <DialogHeader>
             <DialogTitle className="text-start">Insert Contacts</DialogTitle>
           </DialogHeader>
-          {contacts.success === true ? (
+          {contacts.success && contacts.data.length ? (
             <div className="flex flex-col gap-2">
               {contacts.data.map((contact: Contact) => (
                 <div key={contact.id} className="bg-muted">

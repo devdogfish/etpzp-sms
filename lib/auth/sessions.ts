@@ -4,6 +4,7 @@ import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { defaultSession, SessionData, sessionOptions } from "@/lib/auth.config";
 import { NextRequest, NextResponse } from "next/server";
+import fetchUser from "../db/user";
 
 // helper function for getting the current session
 export async function getSession(req?: NextRequest, res?: NextResponse) {
@@ -35,17 +36,15 @@ export async function updateSession() {
   console.log("Updating session...");
 }
 
-export async function getSessionOnClient() {
-  const session = await getIronSession<SessionData>(
+export async function getSessionOnClient(): Promise<SessionData> {
+  const { user, isAuthenticated, isAdmin } = await getIronSession<SessionData>(
     await cookies(),
     sessionOptions
   );
 
-  const { isAuthenticated, isAdmin, username, id } = session;
   return {
+    user,
     isAuthenticated,
     isAdmin,
-    username,
-    id,
   };
 }

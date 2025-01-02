@@ -35,7 +35,7 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout } = useLayout();
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
-  const isValidLocation = validLocationPaths.includes(
+  const isAuthenticatedLocation = validLocationPaths.includes(
     normalizePath(pathname, i18n)
   );
 
@@ -85,7 +85,9 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
             label: "",
             icon: Pencil,
             variant: "default",
-            href: isValidLocation ? pathname + "/new-message" : "/new-message",
+            href: isAuthenticatedLocation
+              ? pathname + "/new-message"
+              : "/new-message",
             size: "xl",
           },
           {
@@ -102,7 +104,7 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
             variant: "ghost",
             href: "/drafts",
           },
-          
+
           {
             title: t("templates"),
             label: "",
