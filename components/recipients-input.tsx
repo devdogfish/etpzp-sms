@@ -120,7 +120,7 @@ export default function RecipientsInput({
             />
           </div>
 
-          <InsertContactModal contacts={contacts}>
+          <InsertContactModal contacts={contacts.success ? contacts.data : []}>
             <Button
               className="absolute right-[1px] bottom-[6px] p-2 aspect-1 z-index-0"
               variant="ghost"

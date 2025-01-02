@@ -11,6 +11,7 @@ import ThemeProvider from "@/contexts/theme-data-provider";
 import { cookies } from "next/headers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LayoutProvider } from "@/contexts/use-layout";
+import { Toaster } from "sonner";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -77,6 +78,7 @@ export default async function RootLayout({
                   initialLayout={initialLayout}
                   initialIsCollapsed={initialIsCollapsed}
                 >
+                  <Toaster richColors position="top-center" />
                   {children}
                 </LayoutProvider>
               </TooltipProvider>

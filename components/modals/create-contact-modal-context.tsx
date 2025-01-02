@@ -1,5 +1,4 @@
-"use client";
-import React, { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +22,6 @@ import { Form, FormControl } from "../ui/form";
 import { createContact } from "@/lib/db/contact.actions";
 
 export default function CreateContactModal() {
-  const [open, setOpen] = useState(false);
-
   const form = useForm<z.infer<typeof ContactSchema>>({
     resolver: zodResolver(ContactSchema),
     defaultValues: {
@@ -33,22 +30,17 @@ export default function CreateContactModal() {
       description: "",
     },
   });
+
   async function onSubmit(values: z.infer<typeof ContactSchema>) {
     console.log(values);
 
     const result = await createContact(values);
     console.log(result);
-    if (result.success) setOpen(false);
   }
 
+  const { modal, setModal } = useContactModal();
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        className={buttonVariants({ variant: "default" })}
-        type="button"
-      >
-        New
-      </DialogTrigger>
+    <Dialog open={modal} onOpenChange={setModal}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-start">Create new Contact</DialogTitle>

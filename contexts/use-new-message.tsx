@@ -1,10 +1,11 @@
 "use client";
-import { Message, Recipient } from "@/types";
+import { Contact, Message, Recipient } from "@/types";
 import React, { useContext, createContext, useState } from "react";
 import { validatePhoneNumber } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/use-localstorage";
 import { defaultMessage, MessageSchema } from "@/lib/form.schemas";
 import { z } from "zod";
+import { toast } from "sonner";
 
 type MessageContextValues = {
   message: Message;
@@ -12,6 +13,7 @@ type MessageContextValues = {
   recipients: Recipient[];
   addRecipient: (recipient: Recipient) => void;
   removeRecipient: (recipient: Recipient) => void;
+  getValidatedRecipient: (recipient: Recipient) => void;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
@@ -25,23 +27,25 @@ export function NewMessageProvider({
     "new_message",
     defaultMessage
   );
+  const [message, setMessage] = useState<Message>(stored); // stored is guaranteed to be defined
 
-  // stored is guaranteed to be defined
-  const [message, setMessage] = useState<Message>(stored); 
-
-  const addRecipient = (r: Recipient) => {
-    setMessage((prev) => {
-      const updated = {
-        ...prev,
-        to: [...prev.to, getValidatedRecipient(r)],
-      };
-      setStored(updated);
-      return updated;
-    });
+  const addRecipient = (recipient: Recipient) => {
+    // Check if the recipient already exists in the array. The result is inverted because it returns the opposite from what we want.
+    if (!message.to.some((item) => item.id === recipient.id)) {
+      setMessage((prev) => {
+        const updated = {
+          ...prev,
+          to: [...prev.to, getValidatedRecipient(recipient)],
+        };
+        setStored(updated);
+        return updated;
+      });
+    } else {
+      toast.error("You cannot add the same recipient multiple times");
+    }
   };
 
   const removeRecipient = (recipient: Recipient) => {
-    
     setMessage((prev) => {
       const updated = {
         ...prev,
@@ -64,8 +68,6 @@ export function NewMessageProvider({
     };
   };
 
- 
-
   return (
     <NewMessageContext.Provider
       value={{
@@ -74,6 +76,7 @@ export function NewMessageProvider({
         recipients: message.to,
         addRecipient,
         removeRecipient,
+        getValidatedRecipient,
       }}
     >
       {children}
