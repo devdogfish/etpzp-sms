@@ -12,7 +12,7 @@ import {
   saveMessageTo,
   getStatus,
 } from "@/lib/actions/message.create";
-import { Input as ShadcnInput } from "./ui/input";
+import { Input as ShadcnInput } from "./shared/input";
 
 // Form
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -158,6 +158,7 @@ export default function NewMessageForm({
                 <Input
                   name="from"
                   placeholder="From"
+                  value={"ETPZP"}
                   type="text"
                   className="new-message-input placeholder:text-muted-foreground"
                   disabled

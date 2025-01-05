@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatSimpleDate } from "@/lib/utils";
 import { Contact } from "@/types";
 
 export default function ContactsTable({
@@ -17,6 +18,10 @@ export default function ContactsTable({
   contacts: Contact[];
   variant: "sm" | "lg";
 }) {
+  console.log("logging contacts from table");
+  console.log(contacts);
+  
+  
   return (
     <Table>
       {/* <TableCaption>A list of your contacts.</TableCaption> */}
@@ -44,9 +49,9 @@ export default function ContactsTable({
               {variant === "lg" && (
                 <>
                   <TableCell>{description ? description : "-"}</TableCell>
-                  <TableCell>{created_at && created_at.toString()}</TableCell>
+                  <TableCell>{created_at ? formatSimpleDate(created_at) : "-"}</TableCell>
                   <TableCell className="">
-                    {updated_at && updated_at.toString()}
+                  {updated_at ? formatSimpleDate(updated_at) : "-"}
                   </TableCell>
                 </>
               )}

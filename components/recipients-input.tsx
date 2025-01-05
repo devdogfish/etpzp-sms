@@ -1,6 +1,6 @@
 "use client";
 import { z } from "zod";
-import { Input } from "./ui/input";
+import { Input } from "./shared/input";
 import React, { useState, KeyboardEvent, ChangeEvent, useRef } from "react";
 import { UserPlus, X } from "lucide-react";
 

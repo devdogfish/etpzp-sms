@@ -7,7 +7,7 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import { Input as ShadcnInput } from "./ui/input";
+import { Input as ShadcnInput } from "./shared/input";
 import { Control, FieldPath, FieldValues } from "react-hook-form";
 import { cn } from "@/lib/utils";
 

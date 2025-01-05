@@ -2,7 +2,7 @@
 import React from "react";
 
 import { Search } from "lucide-react";
-import { Input } from "./ui/input";
+import { Input } from "./shared/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useLayout } from "@/contexts/use-layout";
 
