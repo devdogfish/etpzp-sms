@@ -1,11 +1,11 @@
 "use server";
 export async function sendMessage() {
   const bearerToken = process.env.API_KEY;
-  const from = "Test";
-  const to = process.env.MY_NUMBER;
+  const sender = "Test";
+  const recipients = process.env.MY_NUMBER;
   const message = "Hello this is me";
 
-  if (!bearerToken || !to || !from || !message) {
+  if (!bearerToken || !recipients || !sender || !message) {
     throw new Error("Required parameters are not set");
   }
 
@@ -14,7 +14,7 @@ export async function sendMessage() {
   console.log(`Current url before adding all params: ${url}`);
 
   console.log(
-    `ABOUT TO FETCH WITH FOLLOWING PARAMS: token:${bearerToken}, to: ${to}, from: ${from}, content: ${message}`
+    `ABOUT TO FETCH WITH FOLLOWING PARAMS: token:${bearerToken}, to: ${recipients}, from: ${sender}, content: ${message}`
   );
 
   const response = await fetch(url, {
@@ -24,8 +24,8 @@ export async function sendMessage() {
       "Content-Type": "application/json",
     },
     body: new URLSearchParams({
-      from: from.toString(),
-      to: to.toString(),
+      sender: sender.toString(),
+      recipients: recipients.toString(),
       message: message.toString(),
     }),
   });
@@ -39,5 +39,5 @@ export async function sendMessage() {
 
 // you can try some stuff to find out why it wasnt working:
 // 1. change "Content type" to x-www-form-urlencoded
-// 2. move the toSTring() to the end of the body
-// 3. 
+// 2. move the toString() to the end of the body
+// 3.

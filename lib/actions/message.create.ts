@@ -2,26 +2,74 @@
 import db from "@/lib/db";
 import { MessageSchema } from "../form.schemas";
 import { z } from "zod";
-import { Message, MessageLocation } from "@/types";
+import { Message, MessageLocation, Recipient } from "@/types";
 import { getSession } from "../auth/sessions";
-import { errorResponse} from './responses'
+import { errorResponse } from "./responses";
+import { revalidatePath } from "next/cache";
+import parsePhoneNumberFromString from "libphonenumber-js";
 
-export async function sendMessage(
-  values: z.infer<typeof MessageSchema>
-): Promise<ActionResult<any>> {
+type ActionResponse = {
+  success: boolean;
+  message: string;
+  errors?: {
+    [K in keyof Message]?: string[];
+  };
+  inputs?: {
+    sender: string;
+    recipients: Recipient[];
+    subject: string;
+    body: string;
+  };
+};
+
+export async function sendMessage(data: Message): Promise<ActionResponse> {
   // const formattedMessage = message ? message.replace(/\r\n/g, "\n") : "";
-  const user = await getSession();
-  console.log("VALUES RECEIVED ON SERVER");
-  console.log(values, user);
+  const {
+    isAuthenticated,
+    user: { id },
+  } = await getSession();
+  // console.log(`isAuth: ${isAuthenticated}, id: ${id}`);
+  if (!isAuthenticated)
+    return {
+      success: false,
+      message: "Failed to authenticate user.",
+    };
 
-  // TODO implement scheduling message (maybe store if it is scheduled in a differnt field than status because once the sendTime is reached the message's status should change from `scheduled` to `sent`)
+  // Ensure all numeric strings remain as strings (passing via server-actions numeric strings are automatically converted to integers)
+  const sanitizedData = {
+    ...data,
+    recipients: data.recipients.map((recipient) => ({
+      ...recipient,
+      id: String(recipient.id),
+      contactId: recipient.contactId ? String(recipient.contactId) : undefined,
+    })),
+  };
+
+  const validatedData = MessageSchema.safeParse(sanitizedData);
+  // 1. validate all fields first
+  if (!validatedData.success) {
+    return {
+      success: false,
+      message: "Please fix the errors in the form.",
+      errors: validatedData.error.flatten().fieldErrors,
+    };
+  }
+
+  // 2. validate recipients
+  validatedData.data.recipients.forEach((recipient) => {
+    const parsedPhone = parsePhoneNumberFromString(recipient.phone);
+    // console.log("validated phone number result");
+    // console.log(parsedPhone);
+
+    // TODO - create an array of valid numbers, and handle the error case where there are no valid recipients at all
+  });
+
+  // TODO implement scheduling message (maybe store if it is scheduled in a different field than status because once the sendTime is reached the message's status should change from `scheduled` to `sent`)
   try {
-    console.log("Server: about to send sms!");
-
     const token = process.env.GATEWAYAPI_TOKEN;
     const payload = {
-      sender: "TESTSMS", // this shit can only be one fulll word with no special characters or spaces
-      message: values.body, // this can be anything
+      sender: validatedData.data.sender, // this shit can only be one fulll word with no special characters or spaces
+      message: validatedData.data.body, // this can be anything
       // the other parameters also don't matter
       // encoding: "UTF8",
       // class: "premium",
@@ -48,8 +96,8 @@ export async function sendMessage(
     // console.log(resp.json());
     // console.log(resp);
 
-    // 1. Create the message and insert the recipient with the message id from the previous query
-    const insertMessageResult = await db(
+    // Create the message & recipient with the message id from the first insert
+    await db(
       `
       WITH insert_message AS (
         INSERT INTO message (user_id, subject, body, status, location, failure_reason) 
@@ -65,32 +113,35 @@ export async function sendMessage(
       `,
       [
         // message parameters
-        1,
-        values.subject,
-        values.body,
+        id,
+        validatedData.data.subject,
+        validatedData.data.body,
         resp.ok ? "sent" : "failed", // status here
         "sent", // location here
         resp.statusText || null,
         // recipient parameters:
-        [null, null], // contact_id array
-        ["162345678900", "162245678900"], // phone number array
+        validatedData.data.recipients.forEach(
+          (recipient) => recipient.contactId
+        ), // contact_id array
+        validatedData.data.recipients.forEach((recipient) => recipient.phone), // phone number array
       ]
     );
-    console.log(insertMessageResult);
+    console.log("------");
+    console.log("\n");
+    console.log("\n");
 
+    revalidatePath("/messages");
     return {
       success: true,
-      data: null,
+      message: "Message sent and saved successfully!",
+      inputs: data,
     };
   } catch (error) {
     console.error(error);
 
     return {
       success: false,
-      error: {
-        message: "Failed to save and/or send message to the database.",
-        code: "UNKNOWN_ERROR",
-      },
+      message: "Failed to save and/or send message to the database.",
     };
   }
 }

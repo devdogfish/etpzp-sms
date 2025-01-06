@@ -12,20 +12,16 @@ import {
 } from "./ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-export default function ScheduleMessageDropdown({
-  isLoading,
-}: {
-  isLoading: boolean;
-}) {
+export default function ScheduleMessageDropdown({ loading }: { loading: boolean}) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="flex ml-auto">
       <Button
         type="submit"
         className="rounded-tr-none rounded-br-none border-primary-foreground border-r"
-        disabled={isLoading}
+        disabled={loading}
       >
-        {isLoading ? <Loader2 className="animate-spin" /> : ""}
+        {loading ? <Loader2 className="animate-spin" /> : ""}
         Send
       </Button>
       <DropdownMenu onOpenChange={setIsOpen}>
@@ -36,7 +32,7 @@ export default function ScheduleMessageDropdown({
           <Button
             className="px-[1px] rounded-tl-none rounded-bl-none shadow-none"
             type="button"
-            disabled={isLoading}
+            disabled={loading}
           >
             <ChevronDown
               className={cn(

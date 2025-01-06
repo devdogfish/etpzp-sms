@@ -11,8 +11,8 @@ export type User = {
 };
 
 export type Message = {
-  from: string;
-  to: Recipient[];
+  sender: string;
+  recipients: Recipient[];
   subject: string;
   body: string;
 };

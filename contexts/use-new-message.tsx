@@ -1,6 +1,6 @@
 "use client";
 import { Contact, Message, Recipient } from "@/types";
-import React, { useContext, createContext, useState } from "react";
+import React, { useContext, createContext, useState, useEffect } from "react";
 import { validatePhoneNumber } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/use-localstorage";
 import { defaultMessage, MessageSchema } from "@/lib/form.schemas";
@@ -23,19 +23,20 @@ export function NewMessageProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [stored, setStored] = useLocalStorage<z.infer<typeof MessageSchema>>(
+  const [stored, setStored] = useLocalStorage<Message>(
     "new_message",
     defaultMessage
   );
   const [message, setMessage] = useState<Message>(stored); // stored is guaranteed to be defined
 
   const addRecipient = (recipient: Recipient) => {
+
     // Check if the recipient already exists in the array. The result is inverted because it returns the opposite from what we want.
-    if (!message.to.some((item) => item.id === recipient.id)) {
+    if (!message.recipients.some((item) => item.id === recipient.id)) {
       setMessage((prev) => {
         const updated = {
           ...prev,
-          to: [...prev.to, getValidatedRecipient(recipient)],
+          recipients: [...prev.recipients, getValidatedRecipient(recipient)],
         };
         setStored(updated);
         return updated;
@@ -49,7 +50,7 @@ export function NewMessageProvider({
     setMessage((prev) => {
       const updated = {
         ...prev,
-        to: prev.to.filter((r) => r !== recipient),
+        recipients: prev.recipients.filter((r) => r !== recipient),
       };
       setStored(updated);
       return updated;
@@ -67,13 +68,16 @@ export function NewMessageProvider({
       error: error,
     };
   };
+  useEffect(() => {
+    console.log(message.recipients);
+  }, [message]);
 
   return (
     <NewMessageContext.Provider
       value={{
         message,
         setMessage,
-        recipients: message.to,
+        recipients: message.recipients,
         addRecipient,
         removeRecipient,
         getValidatedRecipient,

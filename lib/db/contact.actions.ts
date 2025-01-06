@@ -47,16 +47,16 @@ export async function createContact(
     phone: formData.get("phone") as string,
     description: formData.get("description") as string,
   };
+  const validatedData = ContactSchema.safeParse(rawData);
+  if (!validatedData.success) {
+    return {
+      success: false,
+      message: "Please fix the errors in the form",
+      errors: validatedData.error.flatten().fieldErrors,
+      inputs: rawData,
+    };
+  }
   try {
-    const validatedData = ContactSchema.safeParse(rawData);
-    if (!validatedData.success) {
-      return {
-        success: false,
-        message: "Please fix the errors in the form",
-        errors: validatedData.error.flatten().fieldErrors,
-        inputs: rawData,
-      };
-    }
     console.log("Fields validated");
     console.log(validatedData);
 
@@ -70,7 +70,8 @@ export async function createContact(
     return { success: true, message: "Contact created successfully!" };
   } catch (error) {
     let message = "";
-    if (error instanceof DatabaseError && error.code === "23505") { // check if it is a duplicate key error by comparing it with the error code
+    if (error instanceof DatabaseError && error.code === "23505") {
+      // check if it is a duplicate key error by comparing it with the error code
       message = "Phone number already exists in another contact";
     } else {
       message = "An unknown error occurred. Failed to create contact.";

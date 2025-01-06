@@ -114,4 +114,8 @@ I want to use the same structure for my components.
 5. Think about responsiveness!!
 6. Work on home page and message actions.
 7. Work on settings page, think about how I can add a font size setting to configure the font size globally.
-8. 
+Post winter break:
+- handle recipient save, my query doesn't seem to work
+- handle error case for no valid recipients, if there some, are just send to the valid ones
+- extract errors from serverState and display them on the client
+- display messages from database instead of hardcoded data like we have now

@@ -12,31 +12,30 @@ import {
   saveMessageTo,
   getStatus,
 } from "@/lib/actions/message.create";
-import { Input as ShadcnInput } from "./shared/input";
 
 // Form
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "./form-input";
-import { MessageSchema } from "@/lib/form.schemas";
-import { useRouter } from "next/navigation";
-import React, { ChangeEvent, useEffect, useState } from "react";
+
+import { Input } from "@/components/ui/input";
+import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
 import RecipientsInput from "./recipients-input";
 import { ContactModalProvider } from "@/contexts/use-contact-modal";
 import CreateContactModal from "./modals/create-contact-modal-context";
-import { Contact } from "@/types";
+import { Contact, Message, Recipient } from "@/types";
 import { useNewMessage } from "@/contexts/use-new-message";
+import { useRouter } from "next/navigation";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
+const initialState = {
+  success: false,
+  message: "",
+};
 export default function NewMessageForm({
   isFullScreen,
   contacts,
@@ -45,187 +44,111 @@ export default function NewMessageForm({
   contacts: ActionResult<Contact[]>;
 }) {
   const { t } = useTranslation();
-  const { recipients } = useNewMessage();
-  const defaultMessageValues = {
-    from: "Test",
-    to: [],
-    subject: "",
-    body: "",
-  };
-  // 1. Define your form.
-  const form = useForm<z.infer<typeof MessageSchema>>({
-    resolver: zodResolver(MessageSchema),
-    defaultValues: defaultMessageValues,
-  });
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [subject, setSubject] = useState<string>("");
-  const { message, setMessage } = useNewMessage();
+  const { recipients } = useNewMessage();
+  const [loading, setLoading] = useState(false);
+  const [subject, setSubject] = useState("");
+  const [serverState, setServerState] = useState(initialState);
 
-  // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof MessageSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    const submitData = { ...values, to: recipients };
-    console.log(`Form submitted frontend:`);
-    console.log(submitData);
-
-    // Here you would typically send the message
-    setIsLoading(true);
-    // const result = await sendMessage(submitData);
-    const result = await sendMessage({ ...values, to: recipients });
-    // const result = await getStatus()
-    console.log(`Logging result on the client: ${result}`);
-
-    // console.log("RESULT HERE:");
-    // console.log(result);
-
-    setIsLoading(false);
-  }
-
-  // 3. Define a draft save handler.
-  async function onClose(values: z.infer<typeof MessageSchema>) {
-    const result = await saveMessageTo({ ...values, to: recipients }, "drafts");
-    if (result !== null) {
-      // Redirect to home page after saving draft
-      router.push("/");
-    } else {
-      // Handle error
-      console.error("Failed to save draft");
-    }
-  }
-
-  // 4. Handle full screen redirect
-  function handleFullScreenRedirect(values: z.infer<typeof MessageSchema>) {
-    setMessage(values);
-    console.log(values);
-
-    // const { from, to, subject, body } = form.getValues();
-    // const queryParams = new URLSearchParams({
-    //   from,
-    //   to,
-    //   subject,
-    //   body,
-    // }).toString();
-    const page = isFullScreen ? "new-message" : "new-fullscreen";
-    router.push(`/${page}`);
-  }
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    // TODO implement recipient recovery through LocalStorage
-    form.reset({
-      from: params.get("from") || "Test",
-      to: recipients,
-      subject: params.get("subject") || "",
-      body: params.get("message") || "",
-    });
-  }, [isFullScreen]);
-
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    setLoading(true);
+    const data = {
+      sender: formData.get("sender") as string,
+      recipients: recipients as Recipient[],
+      subject: formData.get("subject") as string,
+      body: formData.get("body") as string,
+    };
+    
+    const result = await sendMessage(data);
+    console.log(`result on client`);
+    console.log(result);
+    
+    setLoading(false);
+    setServerState(result);
+  };
+  const handleFullScreenRedirect = () => {};
   return (
     <>
       <ContactModalProvider>
         <CreateContactModal />
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="h-screen flex flex-col"
-          >
-            <PageHeader title={subject ? subject : t("new_message")}>
-              <Button
-                variant="ghost"
-                className="aspect-1 p-0"
-                onClick={form.handleSubmit(handleFullScreenRedirect)}
-                type="button"
-              >
-                {isFullScreen ? (
-                  <Minimize2 className="h-4 w-4" />
-                ) : (
-                  <Maximize2 className="h-4 w-4" />
-                )}
-              </Button>
-              <Button
-                variant="ghost"
-                className="aspect-1 p-0"
-                onClick={form.handleSubmit(onClose)}
-                type="button"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </PageHeader>
-            <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
-              <div className="flex flex-col px-4 mt-2">
-                <Input
-                  name="from"
-                  placeholder="From"
-                  value={"ETPZP"}
-                  type="text"
-                  className="new-message-input placeholder:text-muted-foreground"
-                  disabled
-                  control={form.control}
-                />
-                <FormField
-                  control={form.control}
-                  name="to"
-                  render={({ field }) => (
-                    <FormItem className="flex-1 py-1">
-                      <FormControl>
-                        <RecipientsInput contacts={contacts} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="subject"
-                  render={({ field }) => (
-                    <FormItem className="">
-                      <FormControl>
-                        <ShadcnInput
-                          {...field}
-                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            field.onChange(e);
-
-                            setSubject(e.target.value);
-                          }}
-                          placeholder="Message subject (optional)"
-                          className="new-message-input placeholder:text-muted-foreground"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+        <form onSubmit={handleSubmit} className="h-screen flex flex-col">
+          <PageHeader title={subject ? subject : t("new_message")}>
+            <Button
+              variant="ghost"
+              className="aspect-1 p-0"
+              onClick={handleFullScreenRedirect}
+              type="button"
+            >
+              {isFullScreen ? (
+                <Minimize2 className="h-4 w-4" />
+              ) : (
+                <Maximize2 className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              className="aspect-1 p-0"
+              onClick={() => {
+                console.log("save a draft");
+              }}
+              type="button"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </PageHeader>
+          <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
+            <div className="flex flex-col px-4 mt-2">
+              <div className="border-b focus-within:border-black ">
+                <Select name="sender" defaultValue="ETPZP">
+                  {/** It defaults to the first SelectItem */}
+                  <SelectTrigger className="w-full p-0 rounded-none border-none shadow-none focus:ring-0 px-[1.25rem] py-1 h-[2.75rem]">
+                    <SelectValue placeholder="ETPZP" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ETPZP">ETPZP</SelectItem>
+                    <SelectItem value="Test">Test</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="px-4 flex-grow mt-5 mb-2">
-                <Textarea
-                  {...form.register("body")}
-                  className="border-none rounded-none h-full p-0 focus-visible:ring-0 shadow-none resize-none placeholder:text-muted-foreground"
-                  placeholder="Start writing your message"
-                />
-              </div>
-
-              <Separator />
-              <div className="flex px-4 py-2 justify-between">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      type="button"
-                      onClick={() => router.push("/")}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Delete draft</TooltipContent>
-                </Tooltip>
-
-                <SendButton isLoading={isLoading} />
-              </div>
+              <RecipientsInput contacts={contacts} />
+              <Input
+                name="subject"
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setSubject(e.target.value)
+                }
+                placeholder="Message subject (optional)"
+                className="new-message-input focus-visible:ring-0 placeholder:text-muted-foreground"
+              />
             </div>
-          </form>
-        </Form>
+            <div className="px-4 flex-grow mt-[1.25rem] mb-2">
+              <Textarea
+                name="body"
+                className="border-none rounded-none h-full p-0 focus-visible:ring-0 shadow-none resize-none placeholder:text-muted-foreground"
+                placeholder="Start writing your message"
+              />
+            </div>
+
+            <Separator />
+            <div className="flex px-4 py-2 justify-between">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    onClick={() => router.push("/")}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Delete draft</TooltipContent>
+              </Tooltip>
+              <SendButton loading={loading} />
+            </div>
+          </div>
+        </form>
       </ContactModalProvider>
       {/* <UnloadListener /> */}
     </>

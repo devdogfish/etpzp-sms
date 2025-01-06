@@ -1,10 +1,11 @@
 import { z } from "zod";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
+import { Message } from "@/types";
 
 // Our one source of truth is the form schema. When you create a new field, add it here.
 export const MessageSchema = z.object({
-  from: z.string(),
-  to: z.array(
+  sender: z.string(),
+  recipients: z.array(
     z.object({
       id: z.string(),
       contactId: z.string().optional(),
@@ -15,9 +16,9 @@ export const MessageSchema = z.object({
   subject: z.string(),
   body: z.string(),
 });
-export const defaultMessage = {
-  from: "Test",
-  to: [],
+export const defaultMessage: Message = {
+  sender: "ETPZP",
+  recipients: [],
   subject: "",
   body: "",
 };
