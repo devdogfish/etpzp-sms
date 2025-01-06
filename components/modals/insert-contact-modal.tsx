@@ -144,13 +144,15 @@ export default function InsertContactModal({
               >
                 Close
               </DialogClose>
-              <Button disabled={!selected.length} onClick={onInsert}>
-                {selected.length === 0
-                  ? `Insert ${!selected.length && "0"} contacts`
-                  : selected.length === 1
-                  ? `Insert contact`
-                  : `Insert ${selected.length} contacts`}
-              </Button>
+              {contacts.length !== 0 && (
+                <Button disabled={!selected.length} onClick={onInsert}>
+                  {selected.length === 0
+                    ? `Insert ${!selected.length && "0"} contacts`
+                    : selected.length === 1
+                    ? `Insert contact`
+                    : `Insert ${selected.length} contacts`}
+                </Button>
+              )}
             </div>
           </DialogFooter>
         </DialogContent>

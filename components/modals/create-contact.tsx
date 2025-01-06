@@ -49,15 +49,11 @@ export default function CreateContact() {
     if (serverState.success) {
       setOpen(false);
       toast.success(serverState.message);
-    }
-  }, [serverState]);
-  useEffect(() => {
-    if (!open) {
       serverState.inputs = undefined;
       serverState.errors = undefined;
       serverState.message = "";
     }
-  }, [open]);
+  }, [serverState]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
