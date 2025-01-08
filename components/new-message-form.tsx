@@ -21,7 +21,7 @@ import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
 import RecipientsInput from "./recipients-input";
 import { ContactModalProvider } from "@/contexts/use-contact-modal";
 import CreateContactModal from "./modals/create-contact-modal-context";
-import { Contact, Message, Recipient } from "@/types";
+import { Contact, Recipient } from "@/types";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { useRouter } from "next/navigation";
 import {

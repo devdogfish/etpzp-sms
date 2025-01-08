@@ -1,16 +1,16 @@
 "use client";
 
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { Message } from "@/lib/data.test";
 import { useRouter, usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { DBMessage } from "@/types";
 
 type MessageContextType = {
-  messages: Message[];
-  selected: Message | null;
-  // setMessages: (messages: Message[]) => void;
-  // setSelected: (message: Message | null) => void;
-  navigateToMessage: (message: Message) => void;
+  messages: DBMessage[];
+  selected: DBMessage | null;
+  // setMessages: (messages: DBMessage[]) => void;
+  // setSelected: (message: DBMessage | null) => void;
+  navigateToMessage: (message: DBMessage) => void;
 };
 
 const MessageContext = createContext<MessageContextType | null>(null);
@@ -20,23 +20,29 @@ export function MessageProvider({
   initialMessages,
 }: {
   children: React.ReactNode;
-  initialMessages: Message[];
+  initialMessages: DBMessage[];
 }) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [selected, setSelected] = useState<Message | null>(null);
+  const { i18n } = useTranslation();
+  const [messages, setMessages] = useState<DBMessage[]>(initialMessages);
+  const [selected, setSelected] = useState<DBMessage | null>(null);
   const router = useRouter();
   const pathname = usePathname();
-  const { i18n } = useTranslation();
-
+  const segments = pathname.split("/").filter((segment) => segment !== "");
+  const location = segments[0];
+  
   // Instead of wrapping each message in a <a> tag, we are doing the redirection to / here,
   // because whenever a user selects a message this code will run anyway. This solution is genius!
   const navigateToMessage = useCallback(
-    (message: Message) => {
+    (message: DBMessage) => {
       if (message && message.id) {
         setSelected(message);
 
+        console.log("pathname");
+
+        console.log(pathname);
+
         const lang = i18n.language;
-        const newPath = `/${lang}/${message.id}`;
+        const newPath = `/${lang}/${location}/${message.id}`;
         if (pathname !== newPath) {
           router.push(newPath);
         }

@@ -16,12 +16,7 @@ export const MessageSchema = z.object({
   subject: z.string(),
   body: z.string(),
 });
-export const defaultMessage: Message = {
-  sender: "ETPZP",
-  recipients: [],
-  subject: "",
-  body: "",
-};
+
 
 export const LoginSchema = z.object({
   username: z.string().min(2).max(50),

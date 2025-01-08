@@ -8,7 +8,7 @@ CREATE TABLE "user" (
     updated_at TIMESTAMP DEFAULT NOW(),
     display_name VARCHAR(50) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL
 );
 
 -- Create Message Table
@@ -55,3 +55,5 @@ CREATE TABLE recipient (
 --     file_size INTEGER NOT NULL,
 --     created_at TIMESTAMP DEFAULT NOW()
 -- );
+
+--INSERT INTO public.user (email, name, role, display_name, first_name, last_name) VALUES ('pepe@gmail.com', 'Pepe Maximus', 'user', 'Pepe Maximus', 'Pepe', 'Maximus') RETURNING *;

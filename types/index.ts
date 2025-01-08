@@ -1,4 +1,4 @@
-export type MessageLocation = "sent" | "drafts" | "trash";
+export type MessageLocation = "sent" | "draft" | "trash";
 
 export type User = {
   id: string;
@@ -14,10 +14,23 @@ export type User = {
 };
 
 export type Message = {
+  id: string;
   sender: string;
   recipients: Recipient[];
   subject: string;
   body: string;
+};
+export type DBMessage = {
+  id: string;
+  user_id: string;
+  subject: string;
+  body: string;
+  created_at: Date;
+  updated_at: Date;
+  status: "sent" | "scheduled" | "failed" | null; // this can be null when the message is a draft
+  location: "sent" | "draft" | "trash" | null;
+  scheduled_time?: Date;
+  failure_reason?: string;
 };
 
 export type Recipient = {

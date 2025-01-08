@@ -22,7 +22,7 @@ interface AccountProps {
 export default function Account({ isCollapsed }: AccountProps) {
   const { session, loading } = useSession();
   const router = useRouter();
-  console.log(session);
+  // console.log(session);
 
   if (loading) return <h2>Loading</h2>;
   return (

@@ -29,7 +29,7 @@ interface MailProps {
   navCollapsedSize: number;
 }
 
-const validLocationPaths = ["/sent", "/drafts", "/trash"];
+const validLocationPaths = ["/sent", "/draft", "/trash"];
 
 export default function NavPanel({ navCollapsedSize }: MailProps) {
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout } = useLayout();
@@ -102,7 +102,7 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
             label: "9",
             icon: FilePen,
             variant: "ghost",
-            href: "/drafts",
+            href: "/draft",
           },
 
           {

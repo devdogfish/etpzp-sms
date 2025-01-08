@@ -24,12 +24,10 @@ type ActionResponse = {
 
 export async function sendMessage(data: Message): Promise<ActionResponse> {
   // const formattedMessage = message ? message.replace(/\r\n/g, "\n") : "";
-  const {
-    isAuthenticated,
-    user: { id },
-  } = await getSession();
+  const { isAuthenticated, user } = await getSession();
+  const id = user?.id;
   // console.log(`isAuth: ${isAuthenticated}, id: ${id}`);
-  if (!isAuthenticated)
+  if (!isAuthenticated || !id)
     return {
       success: false,
       message: "Failed to authenticate user.",

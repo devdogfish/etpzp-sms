@@ -23,6 +23,7 @@ import { createContact } from "@/lib/db/contact.actions";
 import { Label } from "../ui/label";
 import { toast } from "sonner";
 import { ActionResponse } from "@/types/contact";
+import SubmitButton from "../shared/submit-button";
 
 const initialState: ActionResponse = {
   success: false,
@@ -38,10 +39,7 @@ export default function CreateContactModal() {
     },
   });
 
-  const [serverState, action, pending] = useActionState(
-    createContact,
-    initialState
-  );
+  const [serverState, action] = useActionState(createContact, initialState);
   useEffect(() => {
     if (serverState.success) {
       setModal(false);
@@ -83,7 +81,7 @@ export default function CreateContactModal() {
               <DialogClose className={buttonVariants({ variant: "outline" })}>
                 Close
               </DialogClose>
-              <Button type="submit">Create</Button>
+              <SubmitButton type="submit">Create</SubmitButton>
             </div>
           </DialogFooter>
         </form>

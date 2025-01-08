@@ -1,9 +1,9 @@
 "use client";
 import { Contact, Message, Recipient } from "@/types";
 import React, { useContext, createContext, useState, useEffect } from "react";
-import { validatePhoneNumber } from "@/lib/utils";
+import { generateUniqueId, validatePhoneNumber } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/use-localstorage";
-import { defaultMessage, MessageSchema } from "@/lib/form.schemas";
+import { MessageSchema } from "@/lib/form.schemas";
 import { z } from "zod";
 import { toast } from "sonner";
 
@@ -23,14 +23,16 @@ export function NewMessageProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [stored, setStored] = useLocalStorage<Message>(
-    "new_message",
-    defaultMessage
-  );
+  const [stored, setStored] = useLocalStorage<Message>("new_message", {
+    id: generateUniqueId(),
+    sender: "ETPZP",
+    recipients: [],
+    subject: "",
+    body: "",
+  });
   const [message, setMessage] = useState<Message>(stored); // stored is guaranteed to be defined
 
   const addRecipient = (recipient: Recipient) => {
-
     // Check if the recipient already exists in the array. The result is inverted because it returns the opposite from what we want.
     if (!message.recipients.some((item) => item.id === recipient.id)) {
       setMessage((prev) => {

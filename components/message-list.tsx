@@ -5,12 +5,12 @@ import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Message } from "@/lib/data.test";
+import { DBMessage } from "@/types";
 
 interface MessageListProps {
-  messages: Message[];
+  messages: DBMessage[];
   selectedMessageId: string | null;
-  onSelectMessage: (message: Message) => void;
+  onSelectMessage: (message: DBMessage) => void;
 }
 
 export function MessageList({
@@ -41,7 +41,7 @@ export function MessageList({
             <div className="flex w-full flex-col gap-1">
               <div className="flex items-center">
                 <div className="flex items-center gap-2">
-                  <div className="font-semibold">{item.name}</div>
+                  <div className="font-semibold">{item.subject}</div>
                   {item.status === "scheduled" ? (
                     <span className="flex h-2 w-2 rounded-full bg-yellow-600" />
                   ) : (
@@ -58,7 +58,7 @@ export function MessageList({
                       : "text-muted-foreground"
                   )}
                 >
-                  {formatDistanceToNow(new Date(item.date), {
+                  {formatDistanceToNow(new Date(item.created_at), {
                     addSuffix: true,
                   })}
                 </div>
@@ -66,11 +66,11 @@ export function MessageList({
               <div className="text-xs font-medium">{item.subject}</div>
             </div>
             <div className="line-clamp-2 text-xs text-muted-foreground">
-              {item.text.substring(0, 300)}
+              {item.body.substring(0, 300)}
             </div>
 
             <div className="flex items-center gap-2">
-              {item.status === "success" && (
+              {item.status === "sent" && (
                 <Badge variant={getBadgeVariantFromLabel(item.status)}>
                   Success
                 </Badge>

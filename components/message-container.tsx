@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Search } from "lucide-react";
 import { Input } from "./shared/input";
@@ -12,7 +12,7 @@ import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useTranslation } from "react-i18next";
 import ChildrenPanel from "./children-panel";
 import PageHeader from "./page-header";
-import { MessageLocation } from "@/types";
+import { DBMessage, MessageLocation } from "@/types";
 
 interface MessageContainerProps {
   children: React.ReactNode;
@@ -26,6 +26,16 @@ export default function MessageContainer({
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation(["Titles"]);
   const { messages, selected, navigateToMessage } = useMessages();
+console.log(messages);
+
+  const [currentMessages, setCurrentMessages] = useState<DBMessage[]>([]);
+  useEffect(() => {
+    console.log(`CURRENT MESSAGES in ${location}`);
+    
+    console.log(currentMessages);
+    
+    setCurrentMessages(messages.filter((item) => item.location === location));
+  }, [location]);
 
   // debug
   // if (!Array.isArray(layout) || layout.length! <= 2) {
@@ -69,21 +79,21 @@ export default function MessageContainer({
           </div>
           <TabsContent value="all">
             <MessageList
-              messages={messages}
+              messages={currentMessages}
               selectedMessageId={selected?.id || null}
               onSelectMessage={navigateToMessage}
             />
           </TabsContent>
           <TabsContent value="scheduled">
             <MessageList
-              messages={messages.filter((m) => m.status === "scheduled")}
+              messages={currentMessages.filter((m) => m.status === "scheduled")}
               selectedMessageId={selected?.id || null}
               onSelectMessage={navigateToMessage}
             />
           </TabsContent>
           <TabsContent value="failed">
             <MessageList
-              messages={messages.filter((m) => m.status === "failed")}
+              messages={currentMessages.filter((m) => m.status === "failed")}
               selectedMessageId={selected?.id || null}
               onSelectMessage={navigateToMessage}
             />

@@ -1,9 +1,10 @@
 "use server";
 
-import authenticate from "./activedirectory/authenticate"; // dummyAuthenticate,
+import authenticate, {
+  dummyAuthenticate,
+} from "./activedirectory/authenticate"; // dummyAuthenticate,
 import { createSession, getSession } from "./sessions";
 import { LoginSchema } from "@/lib/form.schemas";
-import { redirect } from "next/navigation";
 import { Login, SessionData } from "../auth.config";
 import { ActionResponse } from "@/types/action";
 
@@ -22,7 +23,7 @@ export async function login(
     return {
       success: false,
       message: "Invalid value types. Try again",
-      inputs: { username: username, password: "" },
+      inputs: { username, password },
       errors: validatedData.error.flatten().fieldErrors,
     };
   }
@@ -38,7 +39,7 @@ export async function login(
   //   password,
   // });
 
-  const user: SessionData = await authenticate({
+  const user: SessionData = await dummyAuthenticate({
     username,
     password,
   });
@@ -49,7 +50,7 @@ export async function login(
     return {
       success: false,
       message: "Wrong credentials! Try again",
-      inputs: { username: username, password: "" },
+      inputs: { username, password },
     };
   }
 

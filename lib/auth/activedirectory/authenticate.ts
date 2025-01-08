@@ -59,18 +59,27 @@ export async function dummyAuthenticate({
   username: string;
   password: string;
 }): Promise<SessionData> {
-  if (
-    username !== process.env.AD_USERNAME ||
-    password !== process.env.AD_PASSWORD
-  ) {
-    return {
-      isAuthenticated: false,
-      isAdmin: false,
-    };
-  }
+  // if (
+  //   username !== process.env.AD_USERNAME ||
+  //   password !== process.env.AD_PASSWORD
+  // ) {
+  //   return {
+  //     isAuthenticated: false,
+  //     isAdmin: false,
+  //   };
+  // }
   return {
+    user: {
+      id: "1",
+      email: "pepe@gmail.com",
+      name: "Pepe Maximus",
+      display_name: "Pepe Maximus",
+      first_name: "Pepe",
+      last_name: "Maximus",
+      role: "admin"
+    },
     isAuthenticated: true,
-    isAdmin: false,
+    isAdmin: true,
   };
 }
 

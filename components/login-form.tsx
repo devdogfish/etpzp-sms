@@ -19,6 +19,7 @@ import { ActionResponse } from "@/types/action";
 import { Login } from "@/lib/auth.config";
 import SubmitButton from "./shared/submit-button";
 import { useSession } from "@/hooks/use-session";
+import { Eye } from "lucide-react";
 
 const initialState: ActionResponse<Login> = {
   success: false,
@@ -26,6 +27,7 @@ const initialState: ActionResponse<Login> = {
 };
 export default function LoginForm() {
   const router = useRouter();
+  const [passInputType, setPassInputType] = useState("password");
 
   const [serverState, action] = useActionState(login, initialState);
 
@@ -66,15 +68,31 @@ export default function LoginForm() {
             name="username"
             id="username"
             type="text"
+            defaultValue={serverState.inputs?.username}
             placeholder="9120@etpzp.pt"
           />
           <Label htmlFor="password">Password</Label>
-          <Input
-            name="password"
-            id="password"
-            type="password"
-            placeholder="my_password452"
-          />
+          <div className="flex items-center gap-1 relative">
+            <Input
+              name="password"
+              id="password"
+              type={passInputType}
+              defaultValue={serverState.inputs?.password}
+              placeholder="my_password452"
+            />
+            <Button
+              className="absolute right-0 z-10"
+              type="button"
+              variant={"none"}
+              onClick={() =>
+                setPassInputType((prev) =>
+                  prev === "text" ? "password" : "text"
+                )
+              }
+            >
+              <Eye className="w-4 h-4" />
+            </Button>
+          </div>
           {!serverState.success && (
             <p className="text-sm text-destructive text-center">
               {serverState.message}

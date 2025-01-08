@@ -10,7 +10,7 @@ export default function SubmitButton({
   const { pending } = useFormStatus();
   return (
     <Button disabled={pending} {...props}>
-      {pending && <Loader2 className="w-4 h-4" />}
+      {pending && <Loader2 className="w-4 h-4 animate-spin" />}
       {children}
     </Button>
   );

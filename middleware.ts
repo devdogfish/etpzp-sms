@@ -2,6 +2,7 @@ import { i18nRouter } from "next-i18n-router";
 import { i18nConfig } from "./i18nConfig";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "./lib/auth/sessions";
+import { SessionData } from "./lib/auth.config";
 
 export async function middleware(request: NextRequest) {
   // Handle i18n routing
@@ -9,6 +10,8 @@ export async function middleware(request: NextRequest) {
 
   // Get the current session
   const session = await getSession(request, i18nResponse);
+  // console.log("middleware session");
+  // console.log(session);
 
   if (
     session.isAuthenticated &&
@@ -23,7 +26,11 @@ export async function middleware(request: NextRequest) {
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-  if (request.nextUrl.pathname.startsWith("/dashboard") && !session.isAdmin) {
+
+  if (
+    request.nextUrl.pathname.startsWith("/dashboard") &&
+    session?.user?.role !== "admin"
+  ) {
     // Don't allow non-admins to see admin-dashboard
     // Return unauthorized error if authenticated but not admin. This takes you to the typical api page...
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {

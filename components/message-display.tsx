@@ -39,7 +39,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Message } from "@/lib/data.test";
 import { useMessages } from "@/contexts/use-messages";
 
 interface MessageDisplayProps {
@@ -49,7 +48,8 @@ interface MessageDisplayProps {
 export function MessageDisplay({ messageId }: MessageDisplayProps) {
   const today = new Date();
   const { messages } = useMessages();
-  const message = messages.find((m) => m.id === messageId);
+  const message = messages.find((m) => m.id == messageId); // they are not of the same type so only ==
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center p-2">
@@ -193,31 +193,32 @@ export function MessageDisplay({ messageId }: MessageDisplayProps) {
           <div className="flex items-start p-4">
             <div className="flex items-start gap-4 text-sm">
               <Avatar>
-                <AvatarImage alt={message.name} />
+                <AvatarImage alt={message.subject} />
                 <AvatarFallback>
-                  {message.name
+                  {message.subject
                     .split(" ")
                     .map((chunk) => chunk[0])
                     .join("")}
                 </AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
-                <div className="font-semibold">{message.name}</div>
+                <div className="font-semibold">{message.subject}</div>
                 <div className="line-clamp-1 text-xs">{message.subject}</div>
                 <div className="line-clamp-1 text-xs">
-                  <span className="font-medium">Reply-To:</span> {message.email}
+                  <span className="font-medium">Reply-To:</span>{" "}
+                  {message.user_id}
                 </div>
               </div>
             </div>
-            {message.date && (
+            {message.created_at && (
               <div className="ml-auto text-xs text-muted-foreground">
-                {format(new Date(message.date), "PPpp")}
+                {format(new Date(message.created_at), "PPpp")}
               </div>
             )}
           </div>
           <Separator />
           <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
-            {message.text}
+            {message.body}
           </div>
           <Separator className="mt-auto" />
           <div className="p-4">
@@ -225,7 +226,7 @@ export function MessageDisplay({ messageId }: MessageDisplayProps) {
               <div className="grid gap-4">
                 <Textarea
                   className="p-4"
-                  placeholder={`Reply ${message.name}...`}
+                  placeholder={`Reply ${message.subject}...`}
                 />
                 <div className="flex items-center">
                   <Label

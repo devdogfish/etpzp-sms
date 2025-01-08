@@ -1,14 +1,10 @@
 import MessageContainer from "@/components/message-container";
 import { MessageProvider } from "@/contexts/use-messages";
-import { Message, messages } from "@/lib/data.test";
-import { MessageLocation } from "@/types";
+import { fetchMessages } from "@/lib/db/message";
+import { DBMessage, MessageLocation } from "@/types";
 import { notFound } from "next/navigation";
 
-async function getMessages(): Promise<Message[]> {
-  // This is a mock function. In a real app, you'd fetch from an API or database
-  return messages;
-}
-const validLocations = ["sent", "drafts", "trash"];
+const validLocations = ["sent", "draft", "trash"];
 
 export default async function MessagePage({
   children,
@@ -19,7 +15,8 @@ export default async function MessagePage({
 }>) {
   const { location } = await params;
 
-  const initialMessages = await getMessages();
+  const initialMessages = await fetchMessages();
+
   if (!validLocations.includes(location)) notFound();
   return (
     <MessageProvider initialMessages={initialMessages}>
