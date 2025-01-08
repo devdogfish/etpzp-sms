@@ -1,11 +1,14 @@
 -- Create User Table
 CREATE TABLE "user" (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    role VARCHAR(20) CHECK (role IN ('user', 'admin')),
+    role VARCHAR(20) CHECK (role IN ('user', 'admin')) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    updated_at TIMESTAMP DEFAULT NOW(),
+    display_name VARCHAR(50) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
 );
 
 -- Create Message Table

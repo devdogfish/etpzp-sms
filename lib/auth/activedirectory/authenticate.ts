@@ -1,10 +1,6 @@
 "use server";
 import ActiveDirectory from "activedirectory2";
-import {
-  activeDirectoryConfig,
-  defaultSession,
-  SessionData,
-} from "@/lib/auth.config";
+import { activeDirectoryConfig, SessionData } from "@/lib/auth.config";
 import userExists from "./user";
 import userInGroup from "./group";
 import fetchUser from "@/lib/db/user";
@@ -20,7 +16,13 @@ export default async function authenticate({
 
   // 1. Check if user exists on in the active directory server
   const exists = await userExists(ad, username, password);
-
+  if (!exists.success) {
+    return {
+      isAuthenticated: false,
+      isAdmin: false,
+      errors: [exists.error ? exists.error : ""],
+    };
+  }
   // 2. Check if user is allowed to use the app (inside the group)
   const userGroup = "Utilizadores-SMS";
   const hasAppPermission = await userInGroup(ad, username, userGroup);
@@ -34,12 +36,14 @@ export default async function authenticate({
   console.log(hasAdminPermission);
 
   // Sync all of this with the database
-  const userResult = await fetchUser(username);
+  const userResult = await fetchUser(ad, username, hasAdminPermission.success);
+  // console.log("DB SYNC ResULT");
+  // console.log(userResult);
 
   // TODO fetch the db here to get more info about the user like userId and profile picture as well as user settings maybe
   return {
-    user: userResult.success ? userResult.data : {},
-    isAuthenticated: hasAppPermission.success && hasAppPermission.success,
+    user: userResult.success ? userResult.data : undefined,
+    isAuthenticated: hasAppPermission.success,
     isAdmin: hasAdminPermission.success,
     errors: [
       exists.error !== null ? exists.error : "",
@@ -55,24 +59,19 @@ export async function dummyAuthenticate({
   username: string;
   password: string;
 }): Promise<SessionData> {
-  // 1. Do auth checks here
-  // 2. Check database for existing or create new db user.
-  const userResult = await fetchUser(username);
   if (
     username !== process.env.AD_USERNAME ||
-    password !== process.env.AD_PASSWORD ||
-    !userResult.success
+    password !== process.env.AD_PASSWORD
   ) {
     return {
-      user: {},
       isAuthenticated: false,
-      isAdmin: false
+      isAdmin: false,
     };
   }
-
-  const user = userResult.data;
-
-  return { user, isAuthenticated: true, isAdmin: true };
+  return {
+    isAuthenticated: true,
+    isAdmin: false,
+  };
 }
 
 export async function testConnection() {

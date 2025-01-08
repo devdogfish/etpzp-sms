@@ -12,6 +12,8 @@ export function useSession() {
     async function fetchSession() {
       try {
         const data = await getSessionOnClient();
+        console.log(data);
+
         setSession(data);
       } catch (error) {
         console.error("Failed to fetch session:", error);

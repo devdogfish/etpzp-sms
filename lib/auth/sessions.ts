@@ -2,7 +2,7 @@
 
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
-import { defaultSession, SessionData, sessionOptions } from "@/lib/auth.config";
+import { SessionData, sessionOptions } from "@/lib/auth.config";
 import { NextRequest, NextResponse } from "next/server";
 import fetchUser from "../db/user";
 

@@ -2,28 +2,17 @@ import { User } from "@/types";
 import { SessionOptions } from "iron-session";
 
 export interface SessionData {
-  user: User;
+  user?: User;
   isAuthenticated: boolean;
   isAdmin: boolean;
 }
-
-export const defaultSession: SessionData = {
-  user: {
-    id: "1000",
-    name: "Me Yin",
-    email: "yin@tin.ca",
-    username: "Test user",
-    role: "user",
-  },
-  isAuthenticated: true,
-  isAdmin: false,
+export type Login = {
+  username: string;
+  password: string;
 };
-
-export const emptyUser: User = {
-  id: "",
-  name: "",
-  email: "",
-  username: "",
+export const defaultSession: SessionData = {
+  isAuthenticated: false,
+  isAdmin: false,
 };
 
 export const sessionOptions: SessionOptions = {

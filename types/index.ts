@@ -2,8 +2,11 @@ export type MessageLocation = "sent" | "drafts" | "trash";
 
 export type User = {
   id: string;
-  name?: string;
-  username?: string;
+  name: string;
+  display_name: string;
+  first_name: string;
+  last_name: string;
+
   email: string;
   role?: "user" | "admin";
   created_at?: Date;

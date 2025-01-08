@@ -35,8 +35,8 @@ export async function createContact(
 
   const session = await getSession();
 
-  const id = parseInt(session.user.id);
-  if (isNaN(id)) {
+  const id = parseInt(session.user?.id ? session?.user?.id : "");
+  if (id && isNaN(id)) {
     return {
       success: false,
       message: "Invalid user id.",

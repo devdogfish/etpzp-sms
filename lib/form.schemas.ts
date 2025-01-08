@@ -23,7 +23,7 @@ export const defaultMessage: Message = {
   body: "",
 };
 
-export const AuthFormSchema = z.object({
+export const LoginSchema = z.object({
   username: z.string().min(2).max(50),
   password: z.string(),
 });

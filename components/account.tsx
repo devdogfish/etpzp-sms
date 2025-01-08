@@ -13,6 +13,7 @@ import {
 } from "./ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/hooks/use-session";
+import { useRouter } from "next/navigation";
 
 interface AccountProps {
   isCollapsed: boolean;
@@ -20,7 +21,10 @@ interface AccountProps {
 
 export default function Account({ isCollapsed }: AccountProps) {
   const { session, loading } = useSession();
-  if (loading) return <h2>Loading</h2>
+  const router = useRouter();
+  console.log(session);
+
+  if (loading) return <h2>Loading</h2>;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -36,7 +40,7 @@ export default function Account({ isCollapsed }: AccountProps) {
         <div
           className={cn("flex flex-col items-start", isCollapsed && "hidden")}
         >
-          <p className="font-semibold mb-[-3px]">{session?.user.name}</p>
+          <p className="font-semibold mb-[-3px]">{session?.user?.name}</p>
           <span className="text-xs">{session?.isAdmin ? "Admin" : "User"}</span>
         </div>
       </DropdownMenuTrigger>
@@ -49,7 +53,15 @@ export default function Account({ isCollapsed }: AccountProps) {
         <DropdownMenuItem>Report a bug</DropdownMenuItem>
         {/* </DropdownMenuGroup> */}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={async () => await logout()}>
+        <DropdownMenuItem
+          onClick={async () => {
+            const result = await logout();
+            if (result.success) {
+              router.push("/");
+              router.refresh();
+            }
+          }}
+        >
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>

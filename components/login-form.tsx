@@ -1,7 +1,5 @@
 "use client";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { AuthFormSchema } from "@/lib/form.schemas";
+
 import {
   Card,
   CardContent,
@@ -11,83 +9,80 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/form-input";
-import { useForm } from "react-hook-form";
-import { Form } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { login } from "@/lib/auth";
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Label } from "./ui/label";
+import { toast } from "sonner";
+import { ActionResponse } from "@/types/action";
+import { Login } from "@/lib/auth.config";
+import SubmitButton from "./shared/submit-button";
+import { useSession } from "@/hooks/use-session";
 
+const initialState: ActionResponse<Login> = {
+  success: false,
+  message: "",
+};
 export default function LoginForm() {
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof AuthFormSchema>>({
-    resolver: zodResolver(AuthFormSchema),
-    // this makes the inputs controlled
-    defaultValues: {
-      username: "",
-      password: "",
-    },
-  });
+  const [serverState, action] = useActionState(login, initialState);
 
-  async function onSubmit(values: z.infer<typeof AuthFormSchema>) {
-    const result = await login(values);
-    if (result.success) {
-      router.push("/");
-    } else {
-      setError(result.error);
+  useEffect(() => {
+    if (serverState.success) {
+      toast.success(serverState.message);
+      serverState.inputs = undefined;
+      serverState.errors = undefined;
+      serverState.message = "";
+      router.replace("/");
     }
-  }
+  }, [serverState]);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Card className="mx-auto max-w-sm">
-          <CardHeader>
-            <div className="relative w-[60%] h-10 overflow-hidden mb-2">
-              {/* Set a height for the parent */}
-              <Image
-                src="/microsoft-logo.png"
-                alt="Microsoft logo"
-                layout="fill" // This makes the image fill the parent container
-                objectFit="cover" // This will crop the image to fill the container
-                quality={100}
-              />
-            </div>
-            <CardTitle className="text-2xl">
-              Sign in {/**with Microsoft */}
-            </CardTitle>
-            <CardDescription>
-              with Microsoft to continue to Etpzp SMS
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-2">
-            <Input
-              name="username"
-              control={form.control}
-              type="text"
-              label="Username"
-              placeholder="9120@etpzp.pt"
-              error={!!error}
+    <form action={action}>
+      <Card className="mx-auto max-w-sm">
+        <CardHeader>
+          <div className="relative w-[60%] h-10 overflow-hidden mb-2">
+            {/* Set a height for the parent */}
+            <Image
+              src="/microsoft-logo.png"
+              alt="Microsoft logo"
+              layout="fill" // This makes the image fill the parent container
+              objectFit="cover" // This will crop the image to fill the container
+              quality={100}
             />
-            <Input
-              name="password"
-              control={form.control}
-              type="password"
-              label="Password"
-              placeholder="my_password452"
-              error={!!error}
-            />
-            {error && (
-              <p className="text-sm text-foreground text-center">{error}</p>
-            )}
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-          </CardContent>
-        </Card>
-      </form>
-    </Form>
+          </div>
+          <CardTitle className="text-2xl">
+            Sign in {/**with Microsoft */}
+          </CardTitle>
+          <CardDescription>
+            with Microsoft to continue to Etpzp SMS
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-2">
+          <Label htmlFor="username">Username</Label>
+          <Input
+            name="username"
+            id="username"
+            type="text"
+            placeholder="9120@etpzp.pt"
+          />
+          <Label htmlFor="password">Password</Label>
+          <Input
+            name="password"
+            id="password"
+            type="password"
+            placeholder="my_password452"
+          />
+          {!serverState.success && (
+            <p className="text-sm text-destructive text-center">
+              {serverState.message}
+            </p>
+          )}
+          <SubmitButton className="w-full">Login</SubmitButton>
+        </CardContent>
+      </Card>
+    </form>
   );
 }

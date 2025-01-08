@@ -1,27 +1,44 @@
 "use server";
 
-import { z } from "zod";
-import authenticate, {
-  dummyAuthenticate,
-} from "./activedirectory/authenticate";
+import authenticate from "./activedirectory/authenticate"; // dummyAuthenticate,
 import { createSession, getSession } from "./sessions";
-import { AuthFormSchema } from "@/lib/form.schemas";
+import { LoginSchema } from "@/lib/form.schemas";
 import { redirect } from "next/navigation";
-import { SessionData } from "../auth.config";
+import { Login, SessionData } from "../auth.config";
+import { ActionResponse } from "@/types/action";
 
 // This function is for actually authenticating the user and fetching all the users data
 // Once the data is fetched we save it to the session using createSession()
-export async function login({
-  username,
-  password,
-}: z.infer<typeof AuthFormSchema>) {
+export async function login(
+  _: ActionResponse<Login> | null,
+  formData: FormData
+): Promise<ActionResponse<Login>> {
+  // 1. Type validation
+  const username = formData.get("username") as string;
+  const password = formData.get("password") as string;
+
+  const validatedData = LoginSchema.safeParse({ username, password });
+  if (!validatedData.success) {
+    return {
+      success: false,
+      message: "Invalid value types. Try again",
+      inputs: { username: username, password: "" },
+      errors: validatedData.error.flatten().fieldErrors,
+    };
+  }
+
+  console.log("\n");
+  console.log("\n");
+  console.log("STARTING AUTHENTICATION");
+  console.log(username, password);
+
   // Authenticate the user by checking his credentials
   // const user: SessionData & { errors: string[] } = await authenticate({
   //   username,
   //   password,
   // });
 
-  const user: SessionData = await dummyAuthenticate({
+  const user: SessionData = await authenticate({
     username,
     password,
   });
@@ -29,7 +46,11 @@ export async function login({
   if (!user.isAuthenticated) {
     console.log("Wrong credentials!");
 
-    return { success: false, error: "Wrong credentials. Try again" };
+    return {
+      success: false,
+      message: "Wrong credentials! Try again",
+      inputs: { username: username, password: "" },
+    };
   }
 
   // I need to think about how I will return different errors, because it is hard to access them in this file.
@@ -39,11 +60,11 @@ export async function login({
 
   // If everything went well create a new session and redirect user to dashboard
   await createSession(user);
-  return { success: true, error: null };
+  return { success: true, message: "User authenticated successfully" };
 }
 
 export async function logout() {
   const session = await getSession();
   session.destroy();
-  redirect("/");
+  return { success: true };
 }

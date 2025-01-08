@@ -1,9 +1,27 @@
 import { User } from "@/types";
 import db from ".";
+import ActiveDirectory from "activedirectory2";
+
+// These are guaranteed properties when you find the user using A.D.
+type userResult = {
+  displayName: string; // display name
+
+  givenName: string; // first name
+  sn: string; // surname
+
+  cn: string; // full name
+};
+type ActionResponse<T> = {
+  success: boolean;
+  message?: string;
+  data?: T;
+};
 
 export default async function fetchUser(
-  email: string
-): Promise<ActionResult<User>> {
+  ad: ActiveDirectory,
+  email: string,
+  isAdmin: boolean
+): Promise<ActionResponse<User>> {
   try {
     const selectResult = await db(
       "SELECT * FROM public.user WHERE email = $1;",
@@ -11,20 +29,52 @@ export default async function fetchUser(
     );
     if (selectResult.rows.length) {
       console.log("User already exists in db. Authentication successful!");
-      
+
       return { success: true, data: selectResult.rows[0] };
     } else {
-      const insertResult = await db(
-        "INSERT INTO public.user (email, name) VALUES ($1, $2) RETURNING *;",
-        [email, email]
-      );
-      console.log("New user created in db. Authentication successful!");
-      return { success: true, data: insertResult.rows[0] };
+      console.log("Trying to create new user in DB.");
+
+      return new Promise((resolve) => {
+        ad.findUser(email, async (err, user: any) => {
+          if (err || !user) {
+            console.log("ERROR: " + JSON.stringify(err));
+            resolve({ success: false, message: "User not found." });
+            return;
+          }
+
+          console.log("USER INFORMATION FOUND");
+          const { cn, displayName, givenName, sn } = user;
+          try {
+            const insertResult = await db(
+              "INSERT INTO public.user (email, name, role, display_name, first_name, last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
+              [
+                email,
+                cn,
+                isAdmin ? "admin" : "user",
+                displayName,
+                givenName,
+                sn,
+              ]
+            );
+
+            resolve({
+              success: true,
+              message: "Authentication successful! New user created.",
+              data: insertResult.rows[0],
+            });
+          } catch (error) {
+            resolve({
+              success: false,
+              message: "Failed to create user in database.",
+            });
+          }
+        });
+      });
     }
   } catch (error) {
     return {
       success: false,
-      error: { message: "Failed to create or fetch user.", code: "DB_ERROR" },
+      message: "Failed to create or fetch user.",
     };
   }
 }

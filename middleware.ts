@@ -10,16 +10,21 @@ export async function middleware(request: NextRequest) {
   // Get the current session
   const session = await getSession(request, i18nResponse);
 
-  // Always redirect to login if not authenticated
   if (
+    session.isAuthenticated &&
+    request.nextUrl.pathname.startsWith("/login")
+  ) {
+    // Redirect to "/" if authenticated
+    return NextResponse.redirect(new URL("/", request.url));
+  } else if (
+    // Redirect to login if not authenticated
     !session.isAuthenticated &&
     !request.nextUrl.pathname.startsWith("/login")
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-
-  // Don't allow non-admins to see admin-dashboard
   if (request.nextUrl.pathname.startsWith("/dashboard") && !session.isAdmin) {
+    // Don't allow non-admins to see admin-dashboard
     // Return unauthorized error if authenticated but not admin. This takes you to the typical api page...
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
       status: 403,
