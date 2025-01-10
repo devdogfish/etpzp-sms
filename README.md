@@ -136,6 +136,7 @@ I want to use the same structure for my components.
 - rename "drafts" translation in nav panel to "draft"
 - Think about what to display on different location pages
 - Implement search functionality that queries the database with debounce and loading skeleton
+- Rename username to email throughout the database except in the A.D. functions.
 
 ## Database
 
@@ -148,5 +149,9 @@ DROP TABLE recipient, contact, message, user;
 Executing seed file
 
 ```psql
+-- bash:
 \i ~/dev/etpzp-sms/lib/db/migrations/seed.sql
+
+-- psql shell (windows):
+
 ```

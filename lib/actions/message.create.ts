@@ -128,7 +128,7 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
     console.log("\n");
     console.log("\n");
 
-    revalidatePath("/messages");
+    revalidatePath("/");
     return {
       success: true,
       message: "Message sent and saved successfully!",

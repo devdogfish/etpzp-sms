@@ -2,7 +2,7 @@
 
 import authenticate, {
   dummyAuthenticate,
-} from "./activedirectory/authenticate"; // dummyAuthenticate,
+} from "./activedirectory/authenticate";
 import { createSession, getSession } from "./sessions";
 import { LoginSchema } from "@/lib/form.schemas";
 import { Login, SessionData } from "../auth.config";
@@ -39,7 +39,7 @@ export async function login(
   //   password,
   // });
 
-  const user: SessionData = await dummyAuthenticate({
+  const user: SessionData = await authenticate({
     username,
     password,
   });

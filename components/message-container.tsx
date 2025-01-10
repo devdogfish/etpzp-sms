@@ -26,14 +26,14 @@ export default function MessageContainer({
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation(["Titles"]);
   const { messages, selected, navigateToMessage } = useMessages();
-console.log(messages);
+  console.log(messages);
 
   const [currentMessages, setCurrentMessages] = useState<DBMessage[]>([]);
   useEffect(() => {
     console.log(`CURRENT MESSAGES in ${location}`);
-    
+
     console.log(currentMessages);
-    
+
     setCurrentMessages(messages.filter((item) => item.location === location));
   }, [location]);
 

@@ -8,9 +8,10 @@ export async function fetchMessages(): Promise<DBMessage[]> {
   try {
     const userId = session?.user?.id;
     if (!userId) throw new Error("Invalid user id.");
-    const result = await db("SELECT * FROM message WHERE user_id = $1", [
-      userId,
-    ]);
+    const result = await db(
+      "SELECT * FROM message WHERE user_id = $1 ORDER BY created_at DESC;",
+      [userId]
+    );
     return result.rows;
   } catch (error) {
     return [];
