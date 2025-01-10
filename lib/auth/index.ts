@@ -39,7 +39,7 @@ export async function login(
   //   password,
   // });
 
-  const user: SessionData = await authenticate({
+  const user: SessionData = await dummyAuthenticate({
     username,
     password,
   });

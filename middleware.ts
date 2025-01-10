@@ -7,32 +7,29 @@ import { SessionData } from "./lib/auth.config";
 export async function middleware(request: NextRequest) {
   // Handle i18n routing
   const i18nResponse = await i18nRouter(request, i18nConfig);
-
-  // Get the current session
   const session = await getSession(request, i18nResponse);
-  // console.log("middleware session");
-  // console.log(session);
 
+  // Redirect to "/" if authenticated
   if (
     session.isAuthenticated &&
     request.nextUrl.pathname.startsWith("/login")
   ) {
-    // Redirect to "/" if authenticated
     return NextResponse.redirect(new URL("/", request.url));
-  } else if (
-    // Redirect to login if not authenticated
+  }
+
+  // Redirect to login if not authenticated
+  if (
     !session.isAuthenticated &&
     !request.nextUrl.pathname.startsWith("/login")
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  // Don't allow non-admins to see admin-dashboard. Return unauthorized error if authenticated but not admin. This takes you to the typical api page...
   if (
     request.nextUrl.pathname.startsWith("/dashboard") &&
-    session?.user?.role !== "admin"
+    session?.user?.role !== "ADMIN"
   ) {
-    // Don't allow non-admins to see admin-dashboard
-    // Return unauthorized error if authenticated but not admin. This takes you to the typical api page...
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
       status: 403,
       headers: { "content-type": "application/json" },

@@ -1,10 +1,10 @@
 "use client";
+
 import {
   CirclePlus,
   MonitorCog,
   AlertCircle,
   Settings,
-  FilePen,
   Clipboard,
   Send,
   Trash2,
@@ -12,6 +12,9 @@ import {
   Palette,
   Puzzle,
   Pencil,
+  Mails,
+  MailCheck,
+  FileText,
 } from "lucide-react";
 import * as React from "react";
 import { ResizablePanel } from "./ui/resizable";
@@ -24,20 +27,19 @@ import { useLayout } from "@/contexts/use-layout";
 import { usePathname } from "next/navigation";
 
 interface MailProps {
-  defaultLayout?: number[] | undefined;
-  defaultCollapsed?: boolean;
+  // defaultLayout?: number[] | undefined;
+  // defaultCollapsed?: boolean;
   navCollapsedSize: number;
+  amountIndicators: any;
 }
 
-const validLocationPaths = ["/sent", "/draft", "/trash"];
-
-export default function NavPanel({ navCollapsedSize }: MailProps) {
+export default function NavPanel({
+  navCollapsedSize,
+  amountIndicators,
+}: MailProps) {
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout } = useLayout();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const pathname = usePathname();
-  const isAuthenticatedLocation = validLocationPaths.includes(
-    normalizePath(pathname, i18n)
-  );
 
   //debug
   // if (!Array.isArray(layout)) {
@@ -81,46 +83,56 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
         isCollapsed={isCollapsed}
         links={[
           {
-            title: t("new_message"),
-            label: "",
+            title: t("NEW_MESSAGE"),
+            label: amountIndicators[0].rows[0].count,
             icon: Pencil,
             variant: "default",
-            href: isAuthenticatedLocation
-              ? pathname + "/new-message"
-              : "/new-message",
+            href: "/new-message",
             size: "xl",
           },
           {
-            title: t("sent"),
+            title: t("SENT"),
             label: "",
-            icon: Send,
+            icon: MailCheck,
             variant: "ghost",
             href: "/sent",
           },
           {
-            title: t("drafts"),
+            title: t("DRAFT"),
             label: "9",
-            icon: FilePen,
+            icon: FileText,
             variant: "ghost",
-            href: "/draft",
+            href: "/drafts",
           },
-
+          // {
+          //   title: t("templates"),
+          //   label: "",
+          //   icon: Clipboard,
+          //   variant: "ghost",
+          //   href: "/templates",
+          // },
           {
-            title: t("templates"),
-            label: "",
-            icon: Clipboard,
-            variant: "ghost",
-            href: "/templates",
-          },
-          {
-            title: t("trash"),
+            title: t("TRASH"),
             label: "",
             icon: Trash2,
             variant: "ghost",
             href: "/trash",
           },
+        ]}
+      />
+      <Separator />
+      <NavLinks
+        isCollapsed={isCollapsed}
+        links={[
           {
-            title: t("notifications"),
+            title: t("ALL"),
+            label: "4",
+            icon: Mails,
+            variant: "ghost",
+            href: "/all",
+          },
+          {
+            title: t("NOTIFICATION"),
             label: "4",
             icon: AlertCircle,
             variant: "ghost",
@@ -133,14 +145,14 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
         isCollapsed={isCollapsed}
         links={[
           {
-            title: t("settings"),
+            title: t("SETTING"),
             label: "",
             icon: Settings,
             variant: "ghost",
             href: "/settings",
           },
           {
-            title: t("contacts"),
+            title: t("CONTACT"),
             label: "",
             icon: Contact2,
             variant: "ghost",
@@ -153,7 +165,7 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
           //   variant: "ghost",
           // },
           {
-            title: t("admin_dashboard"),
+            title: t("DASHBOARD"),
             label: "",
             icon: MonitorCog,
             variant: "ghost",
@@ -166,13 +178,13 @@ export default function NavPanel({ navCollapsedSize }: MailProps) {
         isCollapsed={isCollapsed}
         links={[
           {
-            title: t("color_palette"),
+            title: t("COLOR_PALETTE"),
             icon: Palette,
             variant: "ghost",
             href: "/colors",
           },
           {
-            title: t("component_preview"),
+            title: t("COMPONENT_PREVIEW"),
             icon: Puzzle,
             variant: "ghost",
             href: "/ui",

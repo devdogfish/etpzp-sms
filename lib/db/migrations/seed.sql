@@ -3,9 +3,9 @@ CREATE TABLE "user" (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    role VARCHAR(20) CHECK (role IN ('user', 'admin')) NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
+    role VARCHAR(20) CHECK (role IN ('USER', 'ADMIN')) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     display_name VARCHAR(50) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL
@@ -17,10 +17,10 @@ CREATE TABLE "message" (
     user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
     subject VARCHAR(255),
     body TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    status VARCHAR(20) CHECK (status IN ('sent', 'scheduled', 'failed')), -- this can be null when the message is a draft
-    location VARCHAR(20) NOT NULL CHECK (location IN ('sent', 'draft', 'trash')),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    status VARCHAR(20) NOT NULL CHECK (status IN ('SENT', 'SCHEDULED', 'FAILED', 'DRAFTED')), 
+    location VARCHAR(20) NOT NULL CHECK (location IN ('SENT', 'DRAFT', 'TRASH')),
     scheduled_time TIMESTAMP,
     failure_reason VARCHAR(255)
 );
@@ -29,11 +29,11 @@ CREATE TABLE "message" (
 CREATE TABLE "contact" (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
-    name VARCHAR(255),
-    phone VARCHAR(50) UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(50) UNIQUE NOT NULL,
     description VARCHAR(255),
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 -- Create Recipient Table
@@ -41,10 +41,13 @@ CREATE TABLE recipient (
 	id SERIAL PRIMARY KEY,     
 	message_id INTEGER REFERENCES message(id) ON DELETE CASCADE,     
 	contact_id INTEGER REFERENCES contact(id) ON DELETE SET NULL,     
-	phone VARCHAR(15) NOT NULL,   -- Store phone numbers as VARCHAR to accommodate various formats  
+	phone VARCHAR(15) NOT NULL,        -- Store phone numbers as VARCHAR to accommodate various formats  
 	UNIQUE (message_id, contact_id),   -- Ensure a contact can only be added once per message. This is not an actual field in the table, but it will make sure that there are no recipients with duplicate links
-	UNIQUE (message_id, phone)  -- Ensure a phone number can only be added once per message. This is not an actual field in the table, but it will make sure that there are no recipients with duplicate links
+	UNIQUE (message_id, phone)         -- Ensure a phone number can only be added once per message. This is not an actual field in the table, but it will make sure that there are no recipients with duplicate links
 );
+
+-- ALTER TABLE public.user ALTER COLUMN created_at SET NOT NULL;
+-- ALTER TABLE public.user ALTER COLUMN updated_at SET NOT NULL;
 
 -- Create Attachment Table
 -- CREATE TABLE "attachment" (
@@ -55,5 +58,5 @@ CREATE TABLE recipient (
 --     file_size INTEGER NOT NULL,
 --     created_at TIMESTAMP DEFAULT NOW()
 -- );
-
---INSERT INTO public.user (email, name, role, display_name, first_name, last_name) VALUES ('pepe@gmail.com', 'Pepe Maximus', 'user', 'Pepe Maximus', 'Pepe', 'Maximus') RETURNING *;
+-- if on mac uncomment this as well
+-- INSERT INTO public.user (email, name, role, display_name, first_name, last_name) VALUES ('pepe@gmail.com', 'Pepe Maximus', 'USER', 'Pepe Maximus', 'Pepe', 'Maximus') RETURNING *;

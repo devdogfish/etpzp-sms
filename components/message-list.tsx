@@ -6,28 +6,21 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DBMessage } from "@/types";
+import { Button } from "./ui/button";
 
 interface MessageListProps {
   messages: DBMessage[];
   selectedMessageId: string | null;
-  onSelectMessage: (message: DBMessage) => void;
+  setSelected: (message: DBMessage) => void;
 }
 
 export function MessageList({
   messages,
   selectedMessageId,
-  onSelectMessage,
+  setSelected,
 }: MessageListProps) {
-  useEffect(() => {
-    const header = document.getElementById("message-panel-header");
-    document.documentElement.style.setProperty(
-      "--message-panel-header-height",
-      `${header?.offsetHeight}px` || `0px`
-    );
-  }, []);
-
   return (
-    <ScrollArea className="h-[calc(100vh-var(--message-panel-header-height))]">
+    <ScrollArea className="h-[calc(100vh-52px-68px)]">
       <div className="flex flex-col gap-2 p-4 pt-0">
         {messages.map((item) => (
           <button
@@ -36,16 +29,18 @@ export function MessageList({
               "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
               selectedMessageId === item.id && "bg-muted"
             )}
-            onClick={() => onSelectMessage(item)}
+            onClick={() => setSelected(item)}
           >
             <div className="flex w-full flex-col gap-1">
               <div className="flex items-center">
                 <div className="flex items-center gap-2">
-                  <div className="font-semibold">{item.subject}</div>
-                  {item.status === "scheduled" ? (
+                  <div className="font-semibold">
+                    {item.subject ? item.subject : "No Subject"}
+                  </div>
+                  {item.status === "SCHEDULED" ? (
                     <span className="flex h-2 w-2 rounded-full bg-yellow-600" />
                   ) : (
-                    item.status === "failed" && (
+                    item.status === "FAILED" && (
                       <span className="flex h-2 w-2 rounded-full bg-red-600" />
                     )
                   )}
@@ -70,18 +65,18 @@ export function MessageList({
             </div>
 
             <div className="flex items-center gap-2">
-              {item.status === "sent" && (
+              {item.status === "SENT" && (
                 <Badge variant={getBadgeVariantFromLabel(item.status)}>
                   Success
                 </Badge>
               )}
-              {item.status === "failed" && (
+              {item.status === "FAILED" && (
                 <Badge variant={getBadgeVariantFromLabel(item.status)}>
                   Failed
                 </Badge>
               )}
               {/* {item.sendTime && (
-                <Badge variant={getBadgeVariantFromLabel("scheduled")}>
+                <Badge variant={getBadgeVariantFromLabel("SCHEDULED")}>
                   Scheduled
                 </Badge>
               )} */}
@@ -100,11 +95,11 @@ function getBadgeVariantFromLabel(
   //   return "positive";
   // }
 
-  if (["failed"].includes(label.toLowerCase())) {
+  if (["FAILED"].includes(label.toLowerCase())) {
     return "destructive";
   }
 
-  if (["scheduled"].includes(label.toLowerCase())) {
+  if (["SCHEDULED"].includes(label.toLowerCase())) {
     return "outline";
   }
 

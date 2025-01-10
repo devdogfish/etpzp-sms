@@ -27,11 +27,12 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
   const { isAuthenticated, user } = await getSession();
   const id = user?.id;
   // console.log(`isAuth: ${isAuthenticated}, id: ${id}`);
-  if (!isAuthenticated || !id)
+  if (!isAuthenticated || !id) {
     return {
       success: false,
       message: "Failed to authenticate user.",
     };
+  }
 
   // Ensure all numeric strings remain as strings (passing via server-actions numeric strings are automatically converted to integers)
   const sanitizedData = {

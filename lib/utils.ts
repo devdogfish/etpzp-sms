@@ -2,6 +2,7 @@ import parsePhoneNumber, { CountryCode } from "libphonenumber-js";
 import { clsx, type ClassValue } from "clsx";
 import { i18n } from "i18next";
 import { twMerge } from "tailwind-merge";
+import { DBMessage } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -95,4 +96,20 @@ export function formatSimpleDate(date: Date) {
     .getHours()
     .toString()
     .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+}
+
+export function searchMessages(messages: DBMessage[], searchTerm: string) {
+  // Convert searchTerm to lowercase for case-insensitive comparison
+  const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+  // Filter messages based on userId and search term
+  const filteredMessages = messages.filter(
+    (message) =>
+      (message.subject &&
+        message.subject.toLowerCase().includes(lowerCaseSearchTerm)) ||
+      message.body.toLowerCase().includes(lowerCaseSearchTerm) ||
+      message.status.toLowerCase() === lowerCaseSearchTerm // Assuming status is also part of the search
+  );
+
+  return filteredMessages;
 }

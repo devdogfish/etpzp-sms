@@ -40,15 +40,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useMessages } from "@/contexts/use-messages";
+import { DBMessage } from "@/types";
 
-interface MessageDisplayProps {
-  messageId: string | null;
-}
-
-export function MessageDisplay({ messageId }: MessageDisplayProps) {
+export function MessageDisplay({ message }: { message: DBMessage | null }) {
   const today = new Date();
-  const { messages } = useMessages();
-  const message = messages.find((m) => m.id == messageId); // they are not of the same type so only ==
 
   return (
     <div className="flex h-full flex-col">
@@ -193,12 +188,13 @@ export function MessageDisplay({ messageId }: MessageDisplayProps) {
           <div className="flex items-start p-4">
             <div className="flex items-start gap-4 text-sm">
               <Avatar>
-                <AvatarImage alt={message.subject} />
+                <AvatarImage alt={message.subject || "No Subject"} />
                 <AvatarFallback>
-                  {message.subject
-                    .split(" ")
-                    .map((chunk) => chunk[0])
-                    .join("")}
+                  {message.subject &&
+                    message.subject
+                      .split(" ")
+                      .map((chunk) => chunk[0])
+                      .join("")}
                 </AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
@@ -233,8 +229,8 @@ export function MessageDisplay({ messageId }: MessageDisplayProps) {
                     htmlFor="mute"
                     className="flex items-center gap-2 text-xs font-normal"
                   >
-                    <Switch id="mute" aria-label="Mute thread" /> Mute this
-                    thread
+                    <Switch id="mute" aria-label="Mute thread" />
+                    Mute this thread
                   </Label>
                   <Button
                     onClick={(e) => e.preventDefault()}

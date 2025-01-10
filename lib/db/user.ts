@@ -50,7 +50,7 @@ export default async function fetchUser(
               [
                 email,
                 cn,
-                isAdmin ? "admin" : "user",
+                isAdmin ? "ADMIN" : "USER",
                 displayName,
                 givenName,
                 sn,

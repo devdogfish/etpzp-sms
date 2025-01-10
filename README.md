@@ -132,10 +132,7 @@ I want to use the same structure for my components.
 - handle error case for no valid recipients, if there some, are just send to the valid ones
 - extract errors from serverState and display them on the client
 - display messages from database instead of hardcoded data like we have now
-- add all messages page
-- rename "drafts" translation in nav panel to "draft"
-- Think about what to display on different location pages
-- Implement search functionality that queries the database with debounce and loading skeleton
+- Add Type errors to login form frontend
 - Rename username to email throughout the database except in the A.D. functions.
 
 ## Database
@@ -143,7 +140,7 @@ I want to use the same structure for my components.
 Deleting all tables
 
 ```sql
-DROP TABLE recipient, contact, message, user;
+DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```
 
 Executing seed file

@@ -76,7 +76,7 @@ export async function dummyAuthenticate({
       display_name: "Pepe Maximus",
       first_name: "Pepe",
       last_name: "Maximus",
-      role: "admin"
+      role: "ADMIN"
     },
     isAuthenticated: true,
     isAdmin: true,
