@@ -46,8 +46,12 @@ CREATE TABLE recipient (
 	UNIQUE (message_id, phone)         -- Ensure a phone number can only be added once per message. This is not an actual field in the table, but it will make sure that there are no recipients with duplicate links
 );
 
--- ALTER TABLE public.user ALTER COLUMN created_at SET NOT NULL;
--- ALTER TABLE public.user ALTER COLUMN updated_at SET NOT NULL;
+-- if on mac uncomment this as well
+-- INSERT INTO public.user (email, name, role, display_name, first_name, last_name) VALUES ('pepe@gmail.com', 'Pepe Maximus', 'USER', 'Pepe Maximus', 'Pepe', 'Maximus') RETURNING *;
+
+
+
+
 
 -- Create Attachment Table
 -- CREATE TABLE "attachment" (
@@ -58,5 +62,6 @@ CREATE TABLE recipient (
 --     file_size INTEGER NOT NULL,
 --     created_at TIMESTAMP DEFAULT NOW()
 -- );
--- if on mac uncomment this as well
--- INSERT INTO public.user (email, name, role, display_name, first_name, last_name) VALUES ('pepe@gmail.com', 'Pepe Maximus', 'USER', 'Pepe Maximus', 'Pepe', 'Maximus') RETURNING *;
+
+-- ALTER TABLE public.user ALTER COLUMN created_at SET NOT NULL;
+-- ALTER TABLE public.user ALTER COLUMN updated_at SET NOT NULL;

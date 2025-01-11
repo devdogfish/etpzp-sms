@@ -3,13 +3,9 @@
 import { ResizablePanelGroup } from "@/components/ui/resizable";
 import { useLayout } from "@/contexts/use-layout";
 
-interface ResizablePanelWrapperProps {
-  children: React.ReactNode;
-}
-
 export default function ResizablePanelWrapper({
   children,
-}: ResizablePanelWrapperProps) {
+}: Readonly<{ children: React.ReactNode }>) {
   const { setLayout } = useLayout();
   return (
     <ResizablePanelGroup

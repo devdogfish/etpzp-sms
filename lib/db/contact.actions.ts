@@ -9,15 +9,20 @@ import { notFound } from "next/navigation";
 import { sleep } from "../utils";
 import { revalidatePath } from "next/cache";
 import { DatabaseError } from "pg";
+import { ActionResult } from "@/types/action";
 
 export async function fetchContacts(): Promise<ActionResult<Contact[]>> {
   try {
     const result = await db("SELECT * FROM contact");
-    return { success: true, data: result.rows };
+    return {
+      success: true,
+      message: "Contacts fetched successfully!",
+      data: result.rows,
+    };
   } catch (error) {
     return {
       success: false,
-      error: { message: "Failed to fetch contacts.", code: "DB_ERROR" },
+      message: "Failed to fetch contacts.",
     };
   }
 }

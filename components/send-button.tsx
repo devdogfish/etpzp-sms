@@ -11,9 +11,15 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useFormStatus } from "react-dom";
 
-export default function ScheduleMessageDropdown({ loading }: { loading: boolean}) {
+export default function ScheduleMessageDropdown({
+  loading,
+}: {
+  loading: boolean;
+}) {
   const [isOpen, setIsOpen] = useState(false);
+  // const { loading } = useFormStatus();
   return (
     <div className="flex ml-auto">
       <Button

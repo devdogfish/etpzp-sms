@@ -15,11 +15,7 @@ import { cn } from "@/lib/utils";
 import { useSession } from "@/hooks/use-session";
 import { useRouter } from "next/navigation";
 
-interface AccountProps {
-  isCollapsed: boolean;
-}
-
-export default function Account({ isCollapsed }: AccountProps) {
+export default function Account({ isCollapsed }: { isCollapsed: boolean }) {
   const { session, loading } = useSession();
   const router = useRouter();
   // console.log(session);

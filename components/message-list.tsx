@@ -8,11 +8,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { DBMessage } from "@/types";
 import { Button } from "./ui/button";
 
-interface MessageListProps {
+type MessageListProps = {
   messages: DBMessage[];
   selectedMessageId: string | null;
   setSelected: (message: DBMessage) => void;
-}
+};
 
 export function MessageList({
   messages,

@@ -3,20 +3,17 @@ import { ResizableHandle } from "@/components/ui/resizable";
 import NavPanel from "@/components/nav-panel";
 import { fetchAmountIndicators } from "@/lib/db/message";
 
-interface AppLayoutProps {
+type AppLayoutProps = {
   children: React.ReactNode;
   params: { locale: string };
-}
+};
 
 export default async function AppLayout({ children, params }: AppLayoutProps) {
-  const amountIndicatorResults = await fetchAmountIndicators();
-  const amountIndicators = amountIndicatorResults?.map((amount) => amount.rows[0].count);
-  console.log(amountIndicators);
-  
+  const amountIndicators = await fetchAmountIndicators();
 
   return (
     <ResizablePanelWrapper>
-      <NavPanel navCollapsedSize={4} amountIndicators={amountIndicatorResults} />
+      <NavPanel navCollapsedSize={4} amountIndicators={amountIndicators} />
       <ResizableHandle withHandle />
 
       {children}

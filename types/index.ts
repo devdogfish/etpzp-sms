@@ -27,8 +27,8 @@ export type User = {
   updated_at?: Date;
 };
 
-export type Message = {
-  id: string;
+export type Message = { // new Message
+  id?: string;
   sender: string;
   recipients: Recipient[];
   subject: string;

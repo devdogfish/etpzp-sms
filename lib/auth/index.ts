@@ -15,15 +15,15 @@ export async function login(
   formData: FormData
 ): Promise<ActionResponse<Login>> {
   // 1. Type validation
-  const username = formData.get("username") as string;
+  const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const validatedData = LoginSchema.safeParse({ username, password });
+  const validatedData = LoginSchema.safeParse({ email, password });
   if (!validatedData.success) {
     return {
       success: false,
       message: "Invalid value types. Try again",
-      inputs: { username, password },
+      inputs: { email, password },
       errors: validatedData.error.flatten().fieldErrors,
     };
   }
@@ -31,18 +31,13 @@ export async function login(
   console.log("\n");
   console.log("\n");
   console.log("STARTING AUTHENTICATION");
-  console.log(username, password);
+  console.log(email, password);
 
-  // Authenticate the user by checking his credentials
-  // const user: SessionData & { errors: string[] } = await authenticate({
-  //   username,
-  //   password,
-  // });
-
-  const user: SessionData = await dummyAuthenticate({
-    username,
-    password,
-  });
+  const user: SessionData /**& { errors: string[] } */ =
+    await dummyAuthenticate({
+      email,
+      password,
+    });
 
   if (!user.isAuthenticated) {
     console.log("Wrong credentials!");
@@ -50,14 +45,9 @@ export async function login(
     return {
       success: false,
       message: "Wrong credentials! Try again",
-      inputs: { username, password },
+      inputs: { email, password },
     };
   }
-
-  // I need to think about how I will return different errors, because it is hard to access them in this file.
-  // if (user.errors.find((i: any) => i !== "")) {
-  //   return { success: false, error: "Wrong credentials. Try again" };
-  // }
 
   // If everything went well create a new session and redirect user to dashboard
   await createSession(user);

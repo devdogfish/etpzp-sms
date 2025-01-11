@@ -23,7 +23,7 @@ export default function MessagesPage({
   location: LocationEnums;
 }>) {
   const { layout, fallbackLayout } = useLayout();
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation(["Common Words"]);
   const [filteredMessages, setFilteredMessages] = useState(messages);
   const [selected, setSelected] = useState<DBMessage | null>(null);
 
@@ -49,9 +49,9 @@ export default function MessagesPage({
           <PageHeader title={t(location)}>
             {!error && (
               <TabsList>
-                <TabsTrigger value="ALL">All</TabsTrigger>
-                <TabsTrigger value="SCHEDULED">Scheduled</TabsTrigger>
-                <TabsTrigger value="FAILED">Failed</TabsTrigger>
+                <TabsTrigger value="ALL">{t("all")}</TabsTrigger>
+                <TabsTrigger value="SCHEDULED">{t("scheduled")}</TabsTrigger>
+                <TabsTrigger value="FAILED">{t("failed")}</TabsTrigger>
               </TabsList>
             )}
           </PageHeader>
@@ -60,7 +60,7 @@ export default function MessagesPage({
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 name="search"
-                placeholder="Search"
+                placeholder={t("search") + " " + t(location).toLowerCase()}
                 className="pl-8 placeholder:text-muted-foreground border"
                 onChange={onSearchQuery}
               />

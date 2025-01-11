@@ -120,25 +120,23 @@ lib/
 I want to use the same structure for my components.
 
 ## TODO
-
 1. Do a test deployment
 2. Get started on the sms api.
-3. Think about responsiveness!!
-4. Work on home page and message actions.
-5. Work on settings page, think about how I can add a font size setting to configure the font size globally.
 
-## Post winter break:
+## !!IMPORTANT!!
+- Think about responsiveness!!
+- Work on settings page, think about how I can add a font size setting to configure the font size globally.
 
+## Message form:
+- extract errors from serverState and display them on the client in new message form
 - handle error case for no valid recipients, if there some, are just send to the valid ones
-- extract errors from serverState and display them on the client
-- display messages from database instead of hardcoded data like we have now
-- Add Type errors to login form frontend
-- Rename username to email throughout the database except in the A.D. functions.
+
+## Later on
+- Find a way to discard local storage safely so that if another user logs in to the machine they can't see the previous person's contacts
+- Work on home page
 
 ## Database
-
 Deleting all tables
-
 ```sql
 DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```
@@ -150,5 +148,5 @@ Executing seed file
 \i ~/dev/etpzp-sms/lib/db/migrations/seed.sql
 
 -- psql shell (windows):
-
+\i /Users/Utilizador/dev/etpzp-sms/lib/db/migrations/message.seed.1.sql
 ```

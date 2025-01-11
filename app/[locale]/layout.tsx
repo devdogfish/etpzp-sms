@@ -31,16 +31,16 @@ export function generateStaticParams() {
   return i18nConfig.locales.map((locale) => ({ locale }));
 }
 
-interface RootLayoutProps {
+type RootLayoutProps = {
   children: React.ReactNode;
   params: { locale: string };
-}
+};
 
 export default async function RootLayout({
   children,
   params,
 }: RootLayoutProps) {
-  const i18nNamespaces = ["Navigation", "Common", "Titles"];
+  const i18nNamespaces = ["Navigation", "Common Words", "Titles"];
   const { locale } = await params;
   const { resources } = await initTranslations(locale, i18nNamespaces);
 

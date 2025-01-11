@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-interface LayoutContextType {
+type LayoutContextType = {
   layout: number[];
   setLayout: Dispatch<SetStateAction<number[]>>;
   isCollapsed: boolean;

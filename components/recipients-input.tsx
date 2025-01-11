@@ -10,12 +10,13 @@ import InsertContactModal from "./modals/insert-contact-modal";
 import { Contact } from "@/types";
 
 import { useNewMessage } from "@/contexts/use-new-message";
+import { ActionResult } from "@/types/action";
 
-interface InputState {
+type InputState = {
   value: string;
   isFocused: boolean;
   error?: string;
-}
+};
 export default function RecipientsInput({
   contacts,
 }: {

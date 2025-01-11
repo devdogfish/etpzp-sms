@@ -18,7 +18,6 @@ import { toast } from "sonner";
 import { ActionResponse } from "@/types/action";
 import { Login } from "@/lib/auth.config";
 import SubmitButton from "./shared/submit-button";
-import { useSession } from "@/hooks/use-session";
 import { Eye } from "lucide-react";
 
 const initialState: ActionResponse<Login> = {
@@ -63,35 +62,51 @@ export default function LoginForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-2">
-          <Label htmlFor="username">Username</Label>
-          <Input
-            name="username"
-            id="username"
-            type="text"
-            defaultValue={serverState.inputs?.username}
-            placeholder="9120@etpzp.pt"
-          />
-          <Label htmlFor="password">Password</Label>
-          <div className="flex items-center gap-1 relative">
+          <div>
+            <Label htmlFor="email">Username</Label>
             <Input
-              name="password"
-              id="password"
-              type={passInputType}
-              defaultValue={serverState.inputs?.password}
-              placeholder="my_password452"
+              name="email"
+              id="email"
+              type="email"
+              defaultValue={serverState.inputs?.email}
+              placeholder="9120@etpzp.pt"
+              aria-describedby="email"
             />
-            <Button
-              className="absolute right-0 z-10"
-              type="button"
-              variant={"none"}
-              onClick={() =>
-                setPassInputType((prev) =>
-                  prev === "text" ? "password" : "text"
-                )
-              }
-            >
-              <Eye className="w-4 h-4" />
-            </Button>
+            {serverState.errors?.email && (
+              <p id="email-error" className="text-sm text-red-500">
+                {serverState.errors.email[0]}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <div className="flex items-center gap-1 relative">
+              <Input
+                name="password"
+                id="password"
+                type={passInputType}
+                defaultValue={serverState.inputs?.password}
+                placeholder="my_password452"
+                aria-describedby="password"
+              />
+              <Button
+                className="absolute right-0 z-10"
+                type="button"
+                variant="none"
+                onClick={() =>
+                  setPassInputType((prev) =>
+                    prev === "text" ? "password" : "text"
+                  )
+                }
+              >
+                <Eye className="w-4 h-4" />
+              </Button>
+            </div>
+            {serverState.errors?.password && (
+              <p id="password-error" className="text-sm text-red-500">
+                {serverState.errors.password[0]}
+              </p>
+            )}
           </div>
           {!serverState.success && (
             <p className="text-sm text-destructive text-center">

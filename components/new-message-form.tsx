@@ -1,7 +1,7 @@
 "use client";
 import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
-import { Loader2, Maximize2, Minimize2, Trash2, X } from "lucide-react";
+import { Maximize2, Minimize2, Trash2, X } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import SendButton from "./send-button";
 import { cn } from "@/lib/utils";
@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ActionResponse, ActionResult } from "@/types/action";
 
 const initialState = {
   success: false,
@@ -52,19 +53,19 @@ export default function NewMessageForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
     setLoading(true);
+    const formData = new FormData(e.currentTarget);
     const data = {
       sender: formData.get("sender") as string,
       recipients: recipients as Recipient[],
       subject: formData.get("subject") as string,
       body: formData.get("body") as string,
     };
-    
+
     const result = await sendMessage(data);
     console.log(`result on client`);
     console.log(result);
-    
+
     setLoading(false);
     setServerState(result);
   };
@@ -74,7 +75,7 @@ export default function NewMessageForm({
       <ContactModalProvider>
         <CreateContactModal />
         <form onSubmit={handleSubmit} className="h-screen flex flex-col">
-          <PageHeader title={subject ? subject : t("new_message")}>
+          <PageHeader title={subject ? subject : t("NEW_MESSAGE")}>
             <Button
               variant="ghost"
               className="aspect-1 p-0"

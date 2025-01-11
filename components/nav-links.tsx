@@ -84,7 +84,7 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
                 }),
                 "justify-start",
                 isActive(link) && activeStyles,
-                isNewButton(link.size) && "mb-3 justify-center"
+                isNewButton(link.size) && "justify-center"
               )}
             >
               {!isNewButton(link.size) && (

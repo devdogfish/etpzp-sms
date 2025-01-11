@@ -13,7 +13,7 @@ export default async function Settings({
   const { t } = await initTranslations(locale, ["Navigation"]);
   return (
     <>
-      <PageHeader title={t("settings")}>
+      <PageHeader title={t("SETTING")}>
         <ThemeColorChanger />
         <ThemeModeToggle />
       </PageHeader>

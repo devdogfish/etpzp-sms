@@ -1,10 +1,13 @@
-declare type SuccessResult<T> = { success: true; data: T };
-declare type ErrorResult = {
+export type SuccessResult<T> = { success: true; message: string; data: T };
+export type ErrorResult = {
   success: false;
-  error: { message: string; code: string };
+  message: string;
+  data?: [];
 };
-declare type ActionResult<T> = SuccessResult<T> | ErrorResult;
+// this is for any custom actions
+export type ActionResult<T> = SuccessResult<T> | ErrorResult;
 
+// this is for useActionState() forms
 export type ActionResponse<T> = {
   success: boolean;
   message: string;

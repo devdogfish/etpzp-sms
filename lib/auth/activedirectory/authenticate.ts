@@ -6,16 +6,16 @@ import userInGroup from "./group";
 import fetchUser from "@/lib/db/user";
 
 export default async function authenticate({
-  username,
+  email,
   password,
 }: {
-  username: string;
+  email: string;
   password: string;
 }): Promise<SessionData & { errors: string[] }> {
-  const ad = new ActiveDirectory(activeDirectoryConfig);
+  const ad = new ActiveDirectory(activeDirectoryConfig); // TODO: check if I can import this from auth.config, instead of initializing it 3 times in this file
 
   // 1. Check if user exists on in the active directory server
-  const exists = await userExists(ad, username, password);
+  const exists = await userExists(ad, email, password);
   if (!exists.success) {
     return {
       isAuthenticated: false,
@@ -25,18 +25,18 @@ export default async function authenticate({
   }
   // 2. Check if user is allowed to use the app (inside the group)
   const userGroup = "Utilizadores-SMS";
-  const hasAppPermission = await userInGroup(ad, username, userGroup);
+  const hasAppPermission = await userInGroup(ad, email, userGroup);
 
   // 3. Check if user has admin privileges (inside the group)
   const adminGroup = "Administradores-SMS";
-  const hasAdminPermission = await userInGroup(ad, username, adminGroup);
+  const hasAdminPermission = await userInGroup(ad, email, adminGroup);
 
   console.log(exists);
   console.log(hasAppPermission);
   console.log(hasAdminPermission);
 
   // Sync all of this with the database
-  const userResult = await fetchUser(ad, username, hasAdminPermission.success);
+  const userResult = await fetchUser(ad, email, hasAdminPermission.success);
   // console.log("DB SYNC ResULT");
   // console.log(userResult);
 
@@ -53,14 +53,14 @@ export default async function authenticate({
   };
 }
 export async function dummyAuthenticate({
-  username,
+  email,
   password,
 }: {
-  username: string;
+  email: string;
   password: string;
 }): Promise<SessionData> {
   // if (
-  //   username !== process.env.AD_USERNAME ||
+  //   email !== process.env.AD_EMAIL ||
   //   password !== process.env.AD_PASSWORD
   // ) {
   //   return {
@@ -76,7 +76,7 @@ export async function dummyAuthenticate({
       display_name: "Pepe Maximus",
       first_name: "Pepe",
       last_name: "Maximus",
-      role: "ADMIN"
+      role: "ADMIN",
     },
     isAuthenticated: true,
     isAdmin: true,
@@ -84,24 +84,22 @@ export async function dummyAuthenticate({
 }
 
 export async function testConnection() {
-  const config = {
-    url: process.env.AD_URL!,
-    baseDN: process.env.AD_BASE_DN!,
-    username: process.env.AD_USERNAME!,
-    password: process.env.AD_PASSWORD!,
-  };
-  const ad = new ActiveDirectory(config);
+  const ad = new ActiveDirectory(activeDirectoryConfig);
 
-  ad.authenticate(config.username, config.password, function (err, auth) {
-    if (err) {
-      console.log("ERROR: " + JSON.stringify(err));
-      return;
-    }
+  ad.authenticate(
+    activeDirectoryConfig.username, // what they call username is actually an email
+    activeDirectoryConfig.password,
+    function (err, auth) {
+      if (err) {
+        console.log("ERROR: " + JSON.stringify(err));
+        return;
+      }
 
-    if (auth) {
-      console.log("Authenticated!");
-    } else {
-      console.log("Authentication failed!");
+      if (auth) {
+        console.log("Authenticated!");
+      } else {
+        console.log("Authentication failed!");
+      }
     }
-  });
+  );
 }

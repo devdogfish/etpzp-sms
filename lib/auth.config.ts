@@ -1,13 +1,13 @@
 import { User } from "@/types";
 import { SessionOptions } from "iron-session";
 
-export interface SessionData {
+export type SessionData = {
   user?: User;
   isAuthenticated: boolean;
   isAdmin: boolean;
-}
+};
 export type Login = {
-  username: string;
+  email: string;
   password: string;
 };
 export const defaultSession: SessionData = {
@@ -29,6 +29,6 @@ export const sessionOptions: SessionOptions = {
 export const activeDirectoryConfig = {
   url: process.env.AD_URL!,
   baseDN: process.env.AD_BASE_DN!,
-  username: process.env.AD_USERNAME!,
+  username: process.env.AD_EMAIL!, // what they call username - is what we store as email!
   password: process.env.AD_PASSWORD!,
 };

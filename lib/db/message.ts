@@ -1,75 +1,10 @@
-import { DBMessage, LocationEnums } from "@/types";
+"use server";
 import db from ".";
+import { DBMessage, LocationEnums } from "@/types";
 import { getSession } from "../auth/sessions";
-import { ActionResponse } from "@/types/action";
+import { ActionResult } from "@/types/action";
 
-export async function fetchMessages(): Promise<DBMessage[]> {
-  const session = await getSession();
-  try {
-    const userId = session?.user?.id;
-    if (!userId) throw new Error("Invalid user id.");
-    const result = await db(
-      "SELECT * FROM message WHERE user_id = $1 ORDER BY created_at DESC;",
-      [userId]
-    );
-    return result.rows;
-  } catch (error) {
-    return [];
-  }
-}
-
-export async function fetchMessagesByQuery(
-  _: ActionResponse<DBMessage> | null,
-  formData: FormData
-) {
-  console.log("fetching messages");
-  const searchTerm = formData.get("search") as string;
-  const { isAuthenticated, user } = await getSession();
-  const userId = user?.id;
-  if (!isAuthenticated || !userId) {
-    return {
-      success: false,
-      message: "Failed to authenticate user.",
-    };
-  }
-
-  if (typeof searchTerm !== "string") {
-    return { success: false, message: "Invalid search term." };
-  }
-  try {
-    const result = await db(
-      `
-      SELECT * FROM message 
-      WHERE user_id = $1 AND
-        OR subject ILIKE '%' || $2 || '%'
-        OR body ILIKE '%' || $2 || '%'
-        OR status = $2;
-    `,
-      [userId, searchTerm.trim()]
-    );
-  } catch (error) {
-    return [];
-  }
-}
-
-export async function fetchMessagesByLocation(location: LocationEnums) {
-  console.log(`Fetching messages that are in ${location}.`);
-  const session = await getSession();
-  try {
-    const userId = session?.user?.id;
-    if (!userId) throw new Error("Invalid user id.");
-    const result = await db(
-      "SELECT * FROM message WHERE user_id = $1 AND location = $2 ORDER BY created_at DESC;",
-      [userId, location]
-    );
-
-    return { success: true, message: "", data: result.rows };
-  } catch (error) {
-    return { success: false, message: "An unknown error occurred.", data: [] };
-  }
-}
-
-export async function fetchAllMessages() {
+export async function fetchAllMessages(): Promise<ActionResult<DBMessage[]>> {
   const session = await getSession();
   try {
     const userId = session?.user?.id;
@@ -89,6 +24,25 @@ export async function fetchAllMessages() {
   }
 }
 
+export async function fetchMessagesByLocation(
+  location: LocationEnums
+): Promise<ActionResult<DBMessage[]>> {
+  console.log(`Fetching messages that are in ${location}.`);
+  const session = await getSession();
+  try {
+    const userId = session?.user?.id;
+    if (!userId) throw new Error("Invalid user id.");
+    const result = await db(
+      "SELECT * FROM message WHERE user_id = $1 AND location = $2 ORDER BY created_at DESC;",
+      [userId, location]
+    );
+
+    return { success: true, message: "", data: result.rows };
+  } catch (error) {
+    return { success: false, message: "An unknown error occurred.", data: [] };
+  }
+}
+
 export async function fetchAmountIndicators() {
   const session = await getSession();
   try {
@@ -97,15 +51,15 @@ export async function fetchAmountIndicators() {
     const allMessages = db("SELECT COUNT(*) FROM message WHERE user_id = $1;", [
       userId,
     ]);
-    const sent = db(
+    const sentResult = db(
       "SELECT COUNT(*) FROM message WHERE user_id = $1 AND location = $2;",
       [userId, "SENT"]
     );
-    const drafts = db(
+    const draftsResult = db(
       "SELECT COUNT(*) FROM message WHERE user_id = $1 AND location = $2;",
       [userId, "DRAFT"]
     );
-    const trash = db(
+    const trashResult = db(
       "SELECT COUNT(*) FROM message WHERE user_id = $1 AND location = $2;",
       [userId, "TRASH"]
     );
@@ -113,13 +67,18 @@ export async function fetchAmountIndicators() {
     //   "SELECT COUNT(*) FROM message WHERE user_id = $1 AND location $2;",
     //   [userId, "DRAFT"]
     // );
-    const results = await Promise.all([
-      sent,
-      drafts,
-      trash,
+    const [sent, drafts, trash, all] = await Promise.all([
+      sentResult,
+      draftsResult,
+      trashResult,
       allMessages,
       // notifications,
     ]);
-    return results;
+    return {
+      sent: sent.rows[0].count,
+      drafts: drafts.rows[0].count,
+      trash: trash.rows[0].count,
+      all: all.rows[0].count,
+    };
   } catch (error) {}
 }

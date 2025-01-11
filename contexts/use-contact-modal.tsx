@@ -2,12 +2,12 @@
 
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
-interface ModalState {
+type ModalState = {
   isOpen: boolean;
   message: string;
 }
 
-interface ModalContextType {
+type ModalContextType = {
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
