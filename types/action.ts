@@ -1,11 +1,11 @@
 export type SuccessResult<T> = { success: true; message: string; data: T };
-export type ErrorResult = {
+export type ErrorResult<T> = {
   success: false;
   message: string;
-  data?: [];
+  data?: T;
 };
 // this is for any custom actions
-export type ActionResult<T> = SuccessResult<T> | ErrorResult;
+export type ActionResult<T> = SuccessResult<T> | ErrorResult<T>;
 
 // this is for useActionState() forms
 export type ActionResponse<T> = {

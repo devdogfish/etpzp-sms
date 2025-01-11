@@ -12,6 +12,7 @@ import { cookies } from "next/headers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LayoutProvider } from "@/contexts/use-layout";
 import { Toaster } from "sonner";
+import { NavPanelProvider } from "@/contexts/use-nav-panel";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -78,8 +79,10 @@ export default async function RootLayout({
                   initialLayout={initialLayout}
                   initialIsCollapsed={initialIsCollapsed}
                 >
-                  <Toaster richColors position="top-center" />
-                  {children}
+                  <NavPanelProvider>
+                    <Toaster richColors position="top-center" />
+                    {children}
+                  </NavPanelProvider>
                 </LayoutProvider>
               </TooltipProvider>
             </ThemeProvider>

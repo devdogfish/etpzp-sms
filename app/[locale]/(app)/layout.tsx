@@ -12,9 +12,8 @@ export default async function AppLayout({ children, params }: AppLayoutProps) {
   const amountIndicators = await fetchAmountIndicators();
 
   return (
-    <ResizablePanelWrapper>
-      <NavPanel navCollapsedSize={4} amountIndicators={amountIndicators} />
-      <ResizableHandle withHandle />
+    <ResizablePanelWrapper >
+        <NavPanel navCollapsedSize={4} amountIndicators={amountIndicators} />
 
       {children}
     </ResizablePanelWrapper>

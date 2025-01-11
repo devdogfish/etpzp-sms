@@ -1,4 +1,5 @@
 "use client";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   createContext,
   Dispatch,
@@ -14,7 +15,7 @@ type LayoutContextType = {
   isCollapsed: boolean;
   setIsCollapsed: Dispatch<SetStateAction<boolean>>;
   fallbackLayout: number[];
-}
+};
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
 export function LayoutProvider({
@@ -30,11 +31,19 @@ export function LayoutProvider({
   const [isCollapsed, setIsCollapsed] = useState(initialIsCollapsed);
   const fallbackLayout = [20, 32, 48];
 
-  // useEffect(() => {
-  //   console.log(`layout changed: ${layout}`)
-  
-  // }, [layout])
-  
+  const isMobile = useIsMobile();
+  useEffect(() => {
+    if (isMobile) {
+      console.log(isMobile);
+      setLayout([0, 40, 60]);
+      console.log("Layout changed to mobile:",[0, 40, 60]);
+      
+    } else {
+      setLayout(fallbackLayout)
+      console.log("Layout changed to desktop:", fallbackLayout);
+    }
+  }, [isMobile]);
+
   return (
     <LayoutContext.Provider
       value={{ layout, setLayout, isCollapsed, setIsCollapsed, fallbackLayout }}

@@ -40,7 +40,7 @@ export default function Account({ isCollapsed }: { isCollapsed: boolean }) {
           <span className="text-xs">{session?.isAdmin ? "Admin" : "User"}</span>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
+      <DropdownMenuContent align="start" className="z-[1000]">
         <DropdownMenuLabel>My account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {/* <DropdownMenuGroup> */}
