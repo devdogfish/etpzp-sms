@@ -63,7 +63,7 @@ export default function LoginForm() {
         </CardHeader>
         <CardContent className="flex flex-col gap-2">
           <div>
-            <Label htmlFor="email">Username</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
               name="email"
               id="email"
