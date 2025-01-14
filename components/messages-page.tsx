@@ -10,8 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { MessageList } from "./message-list";
 import { Input } from "./shared/input";
 import { Search } from "lucide-react";
-import { searchMessages } from "@/lib/utils";
+import { cn, searchMessages } from "@/lib/utils";
 import { MessageDisplay } from "./message-display";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function MessagesPage({
   messages,
@@ -26,6 +27,7 @@ export default function MessagesPage({
   const { t, i18n } = useTranslation(["Common Words"]);
   const [filteredMessages, setFilteredMessages] = useState(messages);
   const [selected, setSelected] = useState<DBMessage | null>(null);
+  const onMobile = useIsMobile();
 
   const onSearchQuery = (e: ChangeEvent<HTMLInputElement>) => {
     const searchTerm = e.target.value;
@@ -35,6 +37,7 @@ export default function MessagesPage({
   return (
     <>
       <ResizablePanel
+        className={cn(onMobile && selected !== null && "hidden")} // If we are on mobile and a message is selected we only want to show the column containing the selected message.
         // Check if the layout is a 3-column middle-bar panel. Use the previous 3-column layout if available; otherwise, render the fallback for different or undefined layouts.
         defaultSize={
           Array.isArray(layout) && layout.length === 3
@@ -94,9 +97,15 @@ export default function MessagesPage({
           </TabsContent>
         </Tabs>
       </ResizablePanel>
-      <ResizableHandle withHandle />
-      <ChildrenPanel hasMiddleBar>
-        <MessageDisplay message={selected} />
+      <ResizableHandle withHandle className={cn(onMobile && "hidden")} />
+      <ChildrenPanel
+        hasMiddleBar
+        className={cn(onMobile && selected === null && "hidden")} // like above we are using reverse logic here. If we are on mobile, and nothing is selected, this component should not be displayed.
+      >
+        <MessageDisplay
+          message={selected}
+          resetMessage={() => setSelected(null)}
+        />
       </ChildrenPanel>
     </>
   );

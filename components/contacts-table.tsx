@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Table,
   TableBody,
@@ -23,7 +24,6 @@ export default function ContactsTable({
   console.log(contacts);
   const isMobile = useIsMobile();
   console.log(isMobile);
-  
 
   return (
     <Table>
@@ -37,7 +37,7 @@ export default function ContactsTable({
             <>
               <TableHead>Description</TableHead>
               <TableHead>Created At</TableHead>
-              <TableHead className="">Last Updated</TableHead>
+              <TableHead>Last Updated</TableHead>
             </>
           )}
         </TableRow>

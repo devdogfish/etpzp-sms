@@ -1,4 +1,4 @@
-import ContactsTable from "@/components/modals/contacts-table";
+import ContactsTable from "@/components/contacts-table";
 import CreateContact from "@/components/modals/create-contact";
 import PageHeader from "@/components/page-header";
 import { fetchContacts } from "@/lib/db/contact.actions";

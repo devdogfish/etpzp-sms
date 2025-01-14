@@ -122,6 +122,7 @@ I want to use the same structure for my components.
 ## TODO
 1. Do a test deployment
 2. Get started on the sms api.
+3. BUG: table is causing hydration error on contacts page
 
 ## !!IMPORTANT!!
 - Think about responsiveness!!
