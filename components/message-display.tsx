@@ -1,4 +1,5 @@
 "use client";
+
 import { addDays } from "date-fns/addDays";
 import { addHours } from "date-fns/addHours";
 import { format } from "date-fns/format";
@@ -39,7 +40,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useMessages } from "@/contexts/use-messages";
 import { DBMessage } from "@/types";
 
 export function MessageDisplay({ message }: { message: DBMessage | null }) {

@@ -22,24 +22,24 @@ export default function ResizablePanelWrapper({
         document.cookie = `react-resizable-panels:layout:mail=${cookieValue}; path=${cookiePath};`;
       }}
       className="h-full items-stretch"
-      // onClick={(e) => {
-      //   if (isMobile) {
-      //     // Hide the mobile navPanel when user clicks outside of it.
-      //     const element = e.target as HTMLElement;
+      onClick={(e) => {
+        if (isMobile) {
+          // Hide the mobile navPanel when user clicks outside of it.
+          const element = e.target as HTMLElement;
 
-      //     console.log(element);
-      //     console.log(element.tagName);
+          console.log(element);
+          console.log(element.tagName);
 
-      //     // Get the mobile nav panel element
-      //     const navPanel = document.getElementById("mobile-nav-panel");
-      //     if (
-      //       (isExpanded && navPanel && !navPanel.contains(element)) ||
-      //       element.tagName === "A"
-      //     ) {
-      //       setIsExpanded(false);
-      //     }
-      //   }
-      // }}
+          // Get the mobile nav panel element
+          const navPanel = document.getElementById("mobile-nav-panel");
+          if (
+            (isExpanded && navPanel && !navPanel.contains(element)) ||
+            element.tagName === "A"
+          ) {
+            setIsExpanded(false);
+          }
+        }
+      }}
     >
       {children}
     </ResizablePanelGroup>

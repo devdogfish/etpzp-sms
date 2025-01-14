@@ -46,7 +46,7 @@ export default function NavPanel({
 }: NavPanelProps) {
   const { t } = useTranslation();
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout } = useLayout();
-  const isMobile = useIsMobile();
+  const onMobile = useIsMobile();
   const { isExpanded } = useNavPanel();
   const mobileNavPanelWidth = 250;
   //debug
@@ -57,304 +57,299 @@ export default function NavPanel({
   // }
   return (
     <>
-      {!isMobile ? (
-        <>
-          <ResizablePanel
-            defaultSize={layout ? layout[0] : fallbackLayout[0]}
-            collapsedSize={navCollapsedSize}
-            collapsible={true}
-            minSize={13}
-            maxSize={35}
-            onCollapse={() => {
-              setIsCollapsed(true);
-              const cookieValue = JSON.stringify(true);
-              const cookiePath = "/";
-              document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
-            }}
-            onResize={() => {
-              setIsCollapsed(false);
-              const cookieValue = JSON.stringify(false);
-              const cookiePath = "/";
-              document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
-            }}
+      {/**  */}
+      <>
+        <ResizablePanel
+          className={cn(
+            isCollapsed &&
+              "min-w-[50px] transition-all duration-300 ease-in-out",
+            onMobile && "hidden"
+          )}
+          defaultSize={layout ? layout[0] : fallbackLayout[0]}
+          collapsedSize={navCollapsedSize}
+          collapsible={true}
+          minSize={13}
+          maxSize={35}
+          onCollapse={() => {
+            setIsCollapsed(true);
+            const cookieValue = JSON.stringify(true);
+            const cookiePath = "/";
+            document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
+          }}
+          onResize={() => {
+            setIsCollapsed(false);
+            const cookieValue = JSON.stringify(false);
+            const cookiePath = "/";
+            document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
+          }}
+        >
+          <div
             className={cn(
-              isCollapsed &&
-                "min-w-[50px] transition-all duration-300 ease-in-out"
+              "flex h-[var(--header-height)] items-center justify-center",
+              isCollapsed ? "h-[var(--header-height)]" : "px-2"
             )}
           >
-            <div
-              className={cn(
-                "flex h-[var(--header-height)] items-center justify-center",
-                isCollapsed ? "h-[var(--header-height)]" : "px-2"
-              )}
-            >
-              <Account isCollapsed={isCollapsed} />
-            </div>
+            <Account isCollapsed={isCollapsed} />
+          </div>
+          <Separator />
+          <NavLinks
+            isCollapsed={isCollapsed}
+            links={[
+              {
+                title: t("NEW_MESSAGE"),
+                icon: Pencil,
+                variant: "default",
+                href: "/new-message",
+                size: "xl",
+              },
+            ]}
+          />
+
+          <ScrollArea className="h-[calc(100vh-52px-56px)]">
+            <NavLinks
+              isCollapsed={isCollapsed}
+              links={[
+                {
+                  title: t("SENT"),
+                  label: amountIndicators?.sent,
+                  icon: MailCheck,
+                  variant: "ghost",
+                  href: "/sent",
+                },
+                {
+                  title: t("DRAFT"),
+                  label: amountIndicators?.drafts,
+                  icon: FileText,
+                  variant: "ghost",
+                  href: "/drafts",
+                },
+                // {
+                //   title: t("templates"),
+                //   label: "",
+                //   icon: Clipboard,
+                //   variant: "ghost",
+                //   href: "/templates",
+                // },
+                {
+                  title: t("TRASH"),
+                  label: amountIndicators?.trash,
+                  icon: Trash2,
+                  variant: "ghost",
+                  href: "/trash",
+                },
+              ]}
+            />
             <Separator />
             <NavLinks
               isCollapsed={isCollapsed}
               links={[
                 {
-                  title: t("NEW_MESSAGE"),
-                  icon: Pencil,
-                  variant: "default",
-                  href: "/new-message",
-                  size: "xl",
+                  title: t("ALL"),
+                  label: amountIndicators?.all,
+                  icon: Mails,
+                  variant: "ghost",
+                  href: "/all",
+                },
+                {
+                  title: t("NOTIFICATION"),
+                  label: "4",
+                  icon: AlertCircle,
+                  variant: "ghost",
+                  href: "/notifications",
                 },
               ]}
             />
+            <Separator />
+            <NavLinks
+              isCollapsed={isCollapsed}
+              links={[
+                {
+                  title: t("SETTING"),
+                  label: "",
+                  icon: Settings,
+                  variant: "ghost",
+                  href: "/settings",
+                },
+                {
+                  title: t("CONTACT"),
+                  label: "",
+                  icon: Contact2,
+                  variant: "ghost",
+                  href: "/contacts",
+                },
+                // {
+                //   title: "Admin Dashboard",
+                //   label: "",
+                //   icon: Shield,
+                //   variant: "ghost",
+                // },
+                {
+                  title: t("DASHBOARD"),
+                  label: "",
+                  icon: MonitorCog,
+                  variant: "ghost",
+                  href: "/dashboard",
+                },
+              ]}
+            />
+            <Separator />
+            <NavLinks
+              isCollapsed={isCollapsed}
+              links={[
+                {
+                  title: t("COLOR_PALETTE"),
+                  icon: Palette,
+                  variant: "ghost",
+                  href: "/colors",
+                },
+                {
+                  title: t("COMPONENT_PREVIEW"),
+                  icon: Puzzle,
+                  variant: "ghost",
+                  href: "/ui",
+                },
+              ]}
+            />
+          </ScrollArea>
+        </ResizablePanel>
+        <ResizableHandle withHandle className={cn(onMobile && "hidden")} />
+      </>
 
-            <ScrollArea className="h-[calc(100vh-52px-56px)]">
-              <NavLinks
-                isCollapsed={isCollapsed}
-                links={[
-                  {
-                    title: t("SENT"),
-                    label: amountIndicators?.sent,
-                    icon: MailCheck,
-                    variant: "ghost",
-                    href: "/sent",
-                  },
-                  {
-                    title: t("DRAFT"),
-                    label: amountIndicators?.drafts,
-                    icon: FileText,
-                    variant: "ghost",
-                    href: "/drafts",
-                  },
-                  // {
-                  //   title: t("templates"),
-                  //   label: "",
-                  //   icon: Clipboard,
-                  //   variant: "ghost",
-                  //   href: "/templates",
-                  // },
-                  {
-                    title: t("TRASH"),
-                    label: amountIndicators?.trash,
-                    icon: Trash2,
-                    variant: "ghost",
-                    href: "/trash",
-                  },
-                ]}
-              />
-              <Separator />
-              <NavLinks
-                isCollapsed={isCollapsed}
-                links={[
-                  {
-                    title: t("ALL"),
-                    label: amountIndicators?.all,
-                    icon: Mails,
-                    variant: "ghost",
-                    href: "/all",
-                  },
-                  {
-                    title: t("NOTIFICATION"),
-                    label: "4",
-                    icon: AlertCircle,
-                    variant: "ghost",
-                    href: "/notifications",
-                  },
-                ]}
-              />
-              <Separator />
-              <NavLinks
-                isCollapsed={isCollapsed}
-                links={[
-                  {
-                    title: t("SETTING"),
-                    label: "",
-                    icon: Settings,
-                    variant: "ghost",
-                    href: "/settings",
-                  },
-                  {
-                    title: t("CONTACT"),
-                    label: "",
-                    icon: Contact2,
-                    variant: "ghost",
-                    href: "/contacts",
-                  },
-                  // {
-                  //   title: "Admin Dashboard",
-                  //   label: "",
-                  //   icon: Shield,
-                  //   variant: "ghost",
-                  // },
-                  {
-                    title: t("DASHBOARD"),
-                    label: "",
-                    icon: MonitorCog,
-                    variant: "ghost",
-                    href: "/dashboard",
-                  },
-                ]}
-              />
-              <Separator />
-              <NavLinks
-                isCollapsed={isCollapsed}
-                links={[
-                  {
-                    title: t("COLOR_PALETTE"),
-                    icon: Palette,
-                    variant: "ghost",
-                    href: "/colors",
-                  },
-                  {
-                    title: t("COMPONENT_PREVIEW"),
-                    icon: Puzzle,
-                    variant: "ghost",
-                    href: "/ui",
-                  },
-                ]}
-              />
-            </ScrollArea>
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-        </>
-      ) : (
-        // we are on mobile width:
-        <>
-          {isExpanded ? (
-            <div
-              className={`fixed z-[800] w-[${mobileNavPanelWidth}px] h-screen bg-background text-foreground border-r`}
-              id="mobile-nav-panel"
-            >
-              <div className="flex h-[var(--header-height)] items-center justify-center px-2">
-                <Account isCollapsed={false} />
-              </div>
-              <Separator />
-              <NavLinks
-                isCollapsed={false}
-                links={[
-                  {
-                    title: t("NEW_MESSAGE"),
-                    icon: Pencil,
-                    variant: "default",
-                    href: "/new-message",
-                    size: "xl",
-                  },
-                ]}
-              />
+      {isExpanded && onMobile && (
+        <div
+          className={`fixed z-[800] w-[${mobileNavPanelWidth}px] h-screen bg-background text-foreground border-r`}
+          id="mobile-nav-panel"
+        >
+          <div className="flex h-[var(--header-height)] items-center justify-center px-2">
+            <Account isCollapsed={false} />
+          </div>
+          <Separator />
+          <NavLinks
+            isCollapsed={false}
+            links={[
+              {
+                title: t("NEW_MESSAGE"),
+                icon: Pencil,
+                variant: "default",
+                href: "/new-message",
+                size: "xl",
+              },
+            ]}
+          />
 
-              <ScrollArea
-                className={`h-[calc(100vh-52px-56px)] w-[${mobileNavPanelWidth}px]`}
-              >
-                <NavLinks
-                  isMobileList
-                  isCollapsed={false}
-                  links={[
-                    {
-                      title: t("SENT"),
-                      label: amountIndicators?.sent,
-                      icon: MailCheck,
-                      variant: "ghost",
-                      href: "/sent",
-                    },
-                    {
-                      title: t("DRAFT"),
-                      label: amountIndicators?.drafts,
-                      icon: FileText,
-                      variant: "ghost",
-                      href: "/drafts",
-                    },
-                    // {
-                    //   title: t("templates"),
-                    //   label: "",
-                    //   icon: Clipboard,
-                    //   variant: "ghost",
-                    //   href: "/templates",
-                    // },
-                    {
-                      title: t("TRASH"),
-                      label: amountIndicators?.trash,
-                      icon: Trash2,
-                      variant: "ghost",
-                      href: "/trash",
-                    },
-                  ]}
-                />
-                <Separator />
-                <NavLinks
-                  isMobileList
-                  isCollapsed={false}
-                  links={[
-                    {
-                      title: t("ALL"),
-                      label: amountIndicators?.all,
-                      icon: Mails,
-                      variant: "ghost",
-                      href: "/all",
-                    },
-                    {
-                      title: t("NOTIFICATION"),
-                      label: "4",
-                      icon: AlertCircle,
-                      variant: "ghost",
-                      href: "/notifications",
-                    },
-                  ]}
-                />
-                <Separator />
-                <NavLinks
-                  isMobileList
-                  isCollapsed={false}
-                  links={[
-                    {
-                      title: t("SETTING"),
-                      label: "",
-                      icon: Settings,
-                      variant: "ghost",
-                      href: "/settings",
-                    },
-                    {
-                      title: t("CONTACT"),
-                      label: "",
-                      icon: Contact2,
-                      variant: "ghost",
-                      href: "/contacts",
-                    },
-                    // {
-                    //   title: "Admin Dashboard",
-                    //   label: "",
-                    //   icon: Shield,
-                    //   variant: "ghost",
-                    // },
-                    {
-                      title: t("DASHBOARD"),
-                      label: "",
-                      icon: MonitorCog,
-                      variant: "ghost",
-                      href: "/dashboard",
-                    },
-                  ]}
-                />
-                <Separator />
-                <NavLinks
-                  isMobileList
-                  isCollapsed={false}
-                  links={[
-                    {
-                      title: t("COLOR_PALETTE"),
-                      icon: Palette,
-                      variant: "ghost",
-                      href: "/colors",
-                    },
-                    {
-                      title: t("COMPONENT_PREVIEW"),
-                      icon: Puzzle,
-                      variant: "ghost",
-                      href: "/ui",
-                    },
-                  ]}
-                />
-              </ScrollArea>
-            </div>
-          ) : (
-            <></>
-          )}
-        </>
+          <ScrollArea
+            className={`h-[calc(100vh-52px-56px)] w-[${mobileNavPanelWidth}px]`}
+          >
+            <NavLinks
+              onMobile
+              isCollapsed={false}
+              links={[
+                {
+                  title: t("SENT"),
+                  label: amountIndicators?.sent,
+                  icon: MailCheck,
+                  variant: "ghost",
+                  href: "/sent",
+                },
+                {
+                  title: t("DRAFT"),
+                  label: amountIndicators?.drafts,
+                  icon: FileText,
+                  variant: "ghost",
+                  href: "/drafts",
+                },
+                // {
+                //   title: t("templates"),
+                //   label: "",
+                //   icon: Clipboard,
+                //   variant: "ghost",
+                //   href: "/templates",
+                // },
+                {
+                  title: t("TRASH"),
+                  label: amountIndicators?.trash,
+                  icon: Trash2,
+                  variant: "ghost",
+                  href: "/trash",
+                },
+              ]}
+            />
+            <Separator />
+            <NavLinks
+              onMobile
+              isCollapsed={false}
+              links={[
+                {
+                  title: t("ALL"),
+                  label: amountIndicators?.all,
+                  icon: Mails,
+                  variant: "ghost",
+                  href: "/all",
+                },
+                {
+                  title: t("NOTIFICATION"),
+                  label: "4",
+                  icon: AlertCircle,
+                  variant: "ghost",
+                  href: "/notifications",
+                },
+              ]}
+            />
+            <Separator />
+            <NavLinks
+              onMobile
+              isCollapsed={false}
+              links={[
+                {
+                  title: t("SETTING"),
+                  label: "",
+                  icon: Settings,
+                  variant: "ghost",
+                  href: "/settings",
+                },
+                {
+                  title: t("CONTACT"),
+                  label: "",
+                  icon: Contact2,
+                  variant: "ghost",
+                  href: "/contacts",
+                },
+                // {
+                //   title: "Admin Dashboard",
+                //   label: "",
+                //   icon: Shield,
+                //   variant: "ghost",
+                // },
+                {
+                  title: t("DASHBOARD"),
+                  label: "",
+                  icon: MonitorCog,
+                  variant: "ghost",
+                  href: "/dashboard",
+                },
+              ]}
+            />
+            <Separator />
+            <NavLinks
+              onMobile
+              isCollapsed={false}
+              links={[
+                {
+                  title: t("COLOR_PALETTE"),
+                  icon: Palette,
+                  variant: "ghost",
+                  href: "/colors",
+                },
+                {
+                  title: t("COMPONENT_PREVIEW"),
+                  icon: Puzzle,
+                  variant: "ghost",
+                  href: "/ui",
+                },
+              ]}
+            />
+          </ScrollArea>
+        </div>
       )}
     </>
   );
