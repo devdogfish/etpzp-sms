@@ -1,10 +1,10 @@
 "use client";
+
 import {
   createContext,
   Dispatch,
   SetStateAction,
   useContext,
-  useEffect,
   useState,
 } from "react";
 
@@ -14,7 +14,7 @@ type LayoutContextType = {
   isCollapsed: boolean;
   setIsCollapsed: Dispatch<SetStateAction<boolean>>;
   fallbackLayout: number[];
-}
+};
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
 export function LayoutProvider({
@@ -30,11 +30,6 @@ export function LayoutProvider({
   const [isCollapsed, setIsCollapsed] = useState(initialIsCollapsed);
   const fallbackLayout = [20, 32, 48];
 
-  // useEffect(() => {
-  //   console.log(`layout changed: ${layout}`)
-  
-  // }, [layout])
-  
   return (
     <LayoutContext.Provider
       value={{ layout, setLayout, isCollapsed, setIsCollapsed, fallbackLayout }}

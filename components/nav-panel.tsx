@@ -1,5 +1,14 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
 import {
   CirclePlus,
   MonitorCog,
@@ -16,16 +25,16 @@ import {
   MailCheck,
   FileText,
 } from "lucide-react";
-import * as React from "react";
-import { ResizablePanel } from "./ui/resizable";
+import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { cn, normalizePath } from "@/lib/utils";
 import Account from "./account";
 import { Separator } from "./ui/separator";
 import NavLinks from "./nav-links";
 import { useTranslation } from "react-i18next";
 import { useLayout } from "@/contexts/use-layout";
-import { usePathname } from "next/navigation";
 import { ScrollArea } from "./ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { usePathname, useRouter } from "next/navigation";
 
 type NavPanelProps = {
   // defaultLayout?: number[] | undefined;
@@ -45,36 +54,88 @@ export default function NavPanel({
 }: NavPanelProps) {
   const { t } = useTranslation();
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout } = useLayout();
+  const onMobile = useIsMobile();
 
-  //debug
-  // if (!Array.isArray(layout)) {
-  //   console.error("NavPanel: could not read layout from cookies");
-  // } else {
-  //   console.log("rendering navpanel with a width of ", layout[0], "%");
-  // }
   return (
-    <ResizablePanel
-      defaultSize={layout ? layout[0] : fallbackLayout[0]}
-      collapsedSize={navCollapsedSize}
-      collapsible={true}
-      minSize={13}
-      maxSize={35}
-      onCollapse={() => {
-        setIsCollapsed(true);
-        const cookieValue = JSON.stringify(true);
-        const cookiePath = "/";
-        document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
-      }}
-      onResize={() => {
-        setIsCollapsed(false);
-        const cookieValue = JSON.stringify(false);
-        const cookiePath = "/";
-        document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
-      }}
-      className={cn(
-        isCollapsed && "min-w-[50px] transition-all duration-300 ease-in-out"
-      )}
-    >
+    <>
+      <ResizablePanel
+        className={cn(
+          isCollapsed && "min-w-[50px] transition-all duration-300 ease-in-out",
+          onMobile && "hidden"
+        )}
+        defaultSize={layout ? layout[0] : fallbackLayout[0]}
+        collapsedSize={navCollapsedSize}
+        collapsible={true}
+        minSize={13}
+        maxSize={35}
+        onCollapse={() => {
+          setIsCollapsed(true);
+          const cookieValue = JSON.stringify(true);
+          const cookiePath = "/";
+          document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
+        }}
+        onResize={() => {
+          setIsCollapsed(false);
+          const cookieValue = JSON.stringify(false);
+          const cookiePath = "/";
+          document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
+        }}
+      >
+        <NavPanelContent
+          navCollapsedSize={navCollapsedSize}
+          amountIndicators={amountIndicators}
+          isCollapsed={isCollapsed}
+        />
+      </ResizablePanel>
+      <ResizableHandle withHandle className={cn(onMobile && "hidden")} />
+    </>
+  );
+}
+
+export function MobileNavPanel({ navCollapsedSize }: NavPanelProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  useEffect(() => {
+    setIsOpen(false);
+  }, [router]);
+
+  // we added an click event listener to the nav element
+  const handleNavClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement;
+    // when user clicks inside of this NavPanel, we check if the element clicked is a <Link> and close the NavPanel. This is so that we can have the nice closing animation
+    if (target.tagName === "A" || target.closest("a")) {
+      setIsOpen(false);
+    }
+  }, []);
+  return (
+    <Sheet open={isOpen} onOpenChange={setIsOpen} /* You can change the animation duration inside the shadCn component (easiest way) */>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="md:hidden">
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Toggle mobile menu</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-[300px] p-0">
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        <nav onClick={handleNavClick}>
+          <NavPanelContent
+            navCollapsedSize={navCollapsedSize}
+            isCollapsed={false} // on mobile it will never be collapsed
+          />
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function NavPanelContent({
+  navCollapsedSize,
+  amountIndicators,
+  isCollapsed,
+}: NavPanelProps & { isCollapsed: boolean }) {
+  const { t } = useTranslation();
+  return (
+    <>
       <div
         className={cn(
           "flex h-[var(--header-height)] items-center justify-center",
@@ -203,6 +264,6 @@ export default function NavPanel({
           ]}
         />
       </ScrollArea>
-    </ResizablePanel>
+    </>
   );
 }

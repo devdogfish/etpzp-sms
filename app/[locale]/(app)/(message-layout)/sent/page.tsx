@@ -6,7 +6,7 @@ export default async function AllMessagesPage() {
 
   return (
     <MessagesPage
-      messages={messages.data}
+      messages={messages.data || []}
       error={!messages.success ? messages.message : undefined}
       location="SENT"
     />

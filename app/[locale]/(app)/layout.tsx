@@ -1,7 +1,7 @@
 import ResizablePanelWrapper from "@/components/resizable-panel-wrapper";
-import { ResizableHandle } from "@/components/ui/resizable";
 import NavPanel from "@/components/nav-panel";
 import { fetchAmountIndicators } from "@/lib/db/message";
+import { cn } from "@/lib/utils";
 
 type AppLayoutProps = {
   children: React.ReactNode;
@@ -13,8 +13,11 @@ export default async function AppLayout({ children, params }: AppLayoutProps) {
 
   return (
     <ResizablePanelWrapper>
-      <NavPanel navCollapsedSize={4} amountIndicators={amountIndicators} />
-      <ResizableHandle withHandle />
+      <NavPanel
+        navCollapsedSize={4}
+        amountIndicators={amountIndicators}
+        /* Inside here is already the ResizableHandle */
+      />
 
       {children}
     </ResizablePanelWrapper>

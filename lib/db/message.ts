@@ -19,7 +19,6 @@ export async function fetchAllMessages(): Promise<ActionResult<DBMessage[]>> {
     return {
       success: false,
       message: "An unknown error occurred. Unable to fetch all messages.",
-      data: [],
     };
   }
 }

@@ -1,4 +1,5 @@
 "use client";
+
 import { addDays } from "date-fns/addDays";
 import { addHours } from "date-fns/addHours";
 import { format } from "date-fns/format";
@@ -6,6 +7,7 @@ import { nextSaturday } from "date-fns/nextSaturday";
 import {
   Archive,
   ArchiveX,
+  ArrowLeft,
   Clock,
   Forward,
   MoreVertical,
@@ -39,16 +41,35 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useMessages } from "@/contexts/use-messages";
 import { DBMessage } from "@/types";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
-export function MessageDisplay({ message }: { message: DBMessage | null }) {
+export function MessageDisplay({
+  message,
+  resetMessage,
+}: {
+  message: DBMessage | null;
+  resetMessage: () => void;
+}) {
   const today = new Date();
+  const onMobile = useIsMobile();
 
   return (
-    <div className="flex h-full flex-col">
+    <div className={cn("flex h-full flex-col")}>
       <div className="flex items-center p-2">
         <div className="flex items-center gap-2">
+          {onMobile && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={resetMessage}>
+                  <ArrowLeft className="h-4 w-4" />
+                  <span className="sr-only">Go back</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Go back</TooltipContent>
+            </Tooltip>
+          )}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" disabled={!message}>

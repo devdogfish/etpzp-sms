@@ -6,9 +6,11 @@ import { useLayout } from "@/contexts/use-layout";
 export default function ChildrenPanel({
   children,
   hasMiddleBar,
+  className,
 }: {
   children: Readonly<React.ReactNode>;
   hasMiddleBar?: boolean;
+  className?: string;
 }) {
   const { layout, fallbackLayout } = useLayout();
   const middleBarWidth =
@@ -32,6 +34,7 @@ export default function ChildrenPanel({
     <ResizablePanel
       // width at null means don't specify any width, if it has a value use that, else use fallback
       defaultSize={hasMiddleBar ? middleBarWidth : fallbackWidth}
+      className={className}
     >
       {children}
     </ResizablePanel>

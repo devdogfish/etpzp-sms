@@ -7,6 +7,7 @@ export default function ResizablePanelWrapper({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const { setLayout } = useLayout();
+
   return (
     <ResizablePanelGroup
       direction="horizontal"

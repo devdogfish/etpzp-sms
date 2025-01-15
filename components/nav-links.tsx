@@ -24,9 +24,10 @@ type NavLink = {
 type NavProps = {
   isCollapsed: boolean;
   links: NavLink[];
+  onMobile?: boolean
 };
 
-export default function NavLinks({ links, isCollapsed }: NavProps) {
+export default function NavLinks({ links, isCollapsed, onMobile }: NavProps) {
   const pathname = usePathname();
   const { i18n } = useTranslation();
 
@@ -44,7 +45,7 @@ export default function NavLinks({ links, isCollapsed }: NavProps) {
   return (
     <div
       data-collapsed={isCollapsed}
-      className="group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2"
+      className={cn(`group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2`, onMobile && "w-[250px]")}
     >
       <nav className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
         {links.map((link, index) =>
