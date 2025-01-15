@@ -7,7 +7,7 @@ export default function HomePage() {
   const { layout, fallbackLayout } = useLayout();
   return (
     <ChildrenPanel>
-      <PageHeader title="Welcome to the Etpzp SMS" />
+      <PageHeader title="Welcome to the Etpzp SMS App!" />
     </ChildrenPanel>
   );
 }

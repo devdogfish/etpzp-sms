@@ -36,16 +36,17 @@ import { ScrollArea } from "./ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePathname, useRouter } from "next/navigation";
 
+type AmountIndicators = {
+  sent: string;
+  drafts: string;
+  trash: string;
+  all: string;
+};
 type NavPanelProps = {
   // defaultLayout?: number[] | undefined;
   // defaultCollapsed?: boolean;
   navCollapsedSize: number;
-  amountIndicators?: {
-    sent: string;
-    drafts: string;
-    trash: string;
-    all: string;
-  };
+  amountIndicators?: AmountIndicators;
 };
 
 export default function NavPanel({
@@ -82,7 +83,6 @@ export default function NavPanel({
         }}
       >
         <NavPanelContent
-          navCollapsedSize={navCollapsedSize}
           amountIndicators={amountIndicators}
           isCollapsed={isCollapsed}
         />
@@ -99,7 +99,7 @@ export function MobileNavPanel({ navCollapsedSize }: NavPanelProps) {
     setIsOpen(false);
   }, [router]);
 
-  // we added an click event listener to the nav element
+  // add a click event listener to the nav element
   const handleNavClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     const target = event.target as HTMLElement;
     // when user clicks inside of this NavPanel, we check if the element clicked is a <Link> and close the NavPanel. This is so that we can have the nice closing animation
@@ -108,7 +108,12 @@ export function MobileNavPanel({ navCollapsedSize }: NavPanelProps) {
     }
   }, []);
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen} /* You can change the animation duration inside the shadCn component (easiest way) */>
+    <Sheet
+      open={isOpen}
+      onOpenChange={
+        setIsOpen
+      } /* You can change the animation duration inside the shadCn component (easiest way) */
+    >
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="md:hidden">
           <Menu className="h-5 w-5" />
@@ -119,7 +124,6 @@ export function MobileNavPanel({ navCollapsedSize }: NavPanelProps) {
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <nav onClick={handleNavClick}>
           <NavPanelContent
-            navCollapsedSize={navCollapsedSize}
             isCollapsed={false} // on mobile it will never be collapsed
           />
         </nav>
@@ -129,10 +133,12 @@ export function MobileNavPanel({ navCollapsedSize }: NavPanelProps) {
 }
 
 function NavPanelContent({
-  navCollapsedSize,
   amountIndicators,
   isCollapsed,
-}: NavPanelProps & { isCollapsed: boolean }) {
+}: {
+  amountIndicators?: AmountIndicators;
+  isCollapsed: boolean;
+}) {
   const { t } = useTranslation();
   return (
     <>
@@ -164,14 +170,16 @@ function NavPanelContent({
           links={[
             {
               title: t("SENT"),
-              label: amountIndicators?.sent,
+              label:
+                amountIndicators?.sent == "0" ? "" : amountIndicators?.sent,
               icon: MailCheck,
               variant: "ghost",
               href: "/sent",
             },
             {
               title: t("DRAFT"),
-              label: amountIndicators?.drafts,
+              label:
+                amountIndicators?.drafts == "0" ? "" : amountIndicators?.drafts,
               icon: FileText,
               variant: "ghost",
               href: "/drafts",
@@ -185,7 +193,8 @@ function NavPanelContent({
             // },
             {
               title: t("TRASH"),
-              label: amountIndicators?.trash,
+              label:
+                amountIndicators?.trash == "0" ? "" : amountIndicators?.trash,
               icon: Trash2,
               variant: "ghost",
               href: "/trash",
@@ -198,7 +207,7 @@ function NavPanelContent({
           links={[
             {
               title: t("ALL"),
-              label: amountIndicators?.all,
+              label: amountIndicators?.all == "0" ? "" : amountIndicators?.all,
               icon: Mails,
               variant: "ghost",
               href: "/all",

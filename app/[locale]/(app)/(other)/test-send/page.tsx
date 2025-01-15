@@ -1,13 +1,12 @@
 const url = "https://gatewayapi.com/rest/mtsms";
-const data = {
-  message: "Hello World",
-  //   destaddr: "DISPLAY", // flash sms
-  recipients: [{ msisdn: process.env.PHONE_NUMBER }],
+const body = {
+  sender: "ExampleSMS",
+  message: "Is this message saved?",
+  recipients: [{ msisdn: process.env.MY_NUMBER }],
+  destaddr: "DISPLAY", // flash sms
 };
-
 const headers = {
-  Authorization: `Basic ${process.env.API_KEY}`,
-  Accept: "application/json, text/javascript",
+  Authorization: `Token ${process.env.API_TOKEN}`,
   "Content-Type": "application/json",
 };
 
@@ -17,7 +16,7 @@ export default async function Page() {
       const response = await fetch(url, {
         method: "POST",
         headers: headers,
-        body: JSON.stringify(data),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
@@ -32,6 +31,7 @@ export default async function Page() {
   }
 
   // Call the function to send the message
-  sendMessage();
-  return <>hello your message has been sent</>;
+  // await sendMessage();
+  return <>Hello your message has been sent</>;
 }
+// http://localhost:3000/test-send
