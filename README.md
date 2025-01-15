@@ -120,24 +120,31 @@ lib/
 I want to use the same structure for my components.
 
 ## TODO
+
 1. Do a test deployment
 2. Get started on the sms api.
 3. BUG: table is causing hydration error on contacts page
 
 ## !!IMPORTANT!!
+
 - Think about responsiveness!!
+- Add amountIndicators to MobileNavPanel
 - Work on settings page, think about how I can add a font size setting to configure the font size globally.
 
 ## Message form:
+
 - extract errors from serverState and display them on the client in new message form
 - handle error case for no valid recipients, if there some, are just send to the valid ones
 
 ## Later on
+
 - Find a way to discard local storage safely so that if another user logs in to the machine they can't see the previous person's contacts
 - Work on home page
 
 ## Database
+
 Deleting all tables
+
 ```sql
 DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```

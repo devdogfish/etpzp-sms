@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -34,6 +34,7 @@ import { useTranslation } from "react-i18next";
 import { useLayout } from "@/contexts/use-layout";
 import { ScrollArea } from "./ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePathname, useRouter } from "next/navigation";
 
 type NavPanelProps = {
   // defaultLayout?: number[] | undefined;
@@ -93,9 +94,21 @@ export default function NavPanel({
 
 export function MobileNavPanel({ navCollapsedSize }: NavPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  useEffect(() => {
+    setIsOpen(false);
+  }, [router]);
 
+  // we added an click event listener to the nav element
+  const handleNavClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement;
+    // when user clicks inside of this NavPanel, we check if the element clicked is a <Link> and close the NavPanel. This is so that we can have the nice closing animation
+    if (target.tagName === "A" || target.closest("a")) {
+      setIsOpen(false);
+    }
+  }, []);
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={setIsOpen} /* You can change the animation duration inside the shadCn component (easiest way) */>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="md:hidden">
           <Menu className="h-5 w-5" />
@@ -104,7 +117,7 @@ export function MobileNavPanel({ navCollapsedSize }: NavPanelProps) {
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] p-0">
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-        <nav>
+        <nav onClick={handleNavClick}>
           <NavPanelContent
             navCollapsedSize={navCollapsedSize}
             isCollapsed={false} // on mobile it will never be collapsed
