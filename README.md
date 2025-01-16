@@ -122,14 +122,10 @@ I want to use the same structure for my components.
 ## TODO
 
 1. Do a test deployment
-2. Get started on the sms api.
-3. BUG: table is causing hydration error on contacts page
 
 ## !!IMPORTANT!!
 
-- Think about responsiveness!!
-- Add amountIndicators to MobileNavPanel
-- Work on settings page, think about how I can add a font size setting to configure the font size globally.
+2. Get started on the sms api.
 
 ## Message form:
 
@@ -139,7 +135,7 @@ I want to use the same structure for my components.
 ## Later on
 
 - Find a way to discard local storage safely so that if another user logs in to the machine they can't see the previous person's contacts
-- Work on home page
+- Work on home page, Work on settings page, think about how I can add a font size setting to configure the font size globally.
 
 ## Database
 

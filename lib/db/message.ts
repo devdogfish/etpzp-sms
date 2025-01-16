@@ -1,6 +1,6 @@
 "use server";
 import db from ".";
-import { DBMessage, LocationEnums } from "@/types";
+import { AmountIndicators, DBMessage, LocationEnums } from "@/types";
 import { getSession } from "../auth/sessions";
 import { ActionResult } from "@/types/action";
 
@@ -42,7 +42,9 @@ export async function fetchMessagesByLocation(
   }
 }
 
-export async function fetchAmountIndicators() {
+export async function fetchAmountIndicators(): Promise<
+  AmountIndicators | undefined
+> {
   const session = await getSession();
   try {
     const userId = session?.user?.id;

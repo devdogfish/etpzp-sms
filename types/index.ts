@@ -27,7 +27,8 @@ export type User = {
   updated_at?: Date;
 };
 
-export type Message = { // new Message
+export type Message = {
+  // new Message
   id?: string;
   sender: string;
   recipients: Recipient[];
@@ -64,3 +65,10 @@ export type Contact = {
   created_at: Date;
   updated_at: Date;
 };
+
+export type AmountIndicators = {
+  sent: string;
+  drafts: string;
+  trash: string;
+  all: string;
+} | undefined;

@@ -2,18 +2,32 @@
 
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MobileNavPanel } from "@/components/nav-panel";
+import { Menu } from "lucide-react";
+import { Button } from "./ui/button";
+import { useLayout } from "@/contexts/use-layout";
 
 type PageHeaderProps = {
   title: string;
   children?: React.ReactNode;
 };
+
 export default function PageHeader({ title, children }: PageHeaderProps) {
   const onMobile = useIsMobile();
+  const { setMobileNavPanel } = useLayout();
   return (
     <>
       <div className="flex items-center gap-2 px-4 h-[var(--header-height)]">
-        {onMobile && <MobileNavPanel navCollapsedSize={4} />}
+        {onMobile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setMobileNavPanel(true)}
+          >
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle mobile menu</span>
+          </Button>
+        )}
         <h2 className="mr-auto">{title}</h2>
         {children}
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -36,24 +36,11 @@ import { ScrollArea } from "./ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePathname, useRouter } from "next/navigation";
 
-type AmountIndicators = {
-  sent: string;
-  drafts: string;
-  trash: string;
-  all: string;
-};
-type NavPanelProps = {
-  // defaultLayout?: number[] | undefined;
-  // defaultCollapsed?: boolean;
-  navCollapsedSize: number;
-  amountIndicators?: AmountIndicators;
-};
-
 export default function NavPanel({
   navCollapsedSize,
-  amountIndicators,
-}: NavPanelProps) {
-  const { t } = useTranslation();
+}: {
+  navCollapsedSize: number;
+}) {
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout } = useLayout();
   const onMobile = useIsMobile();
 
@@ -82,21 +69,19 @@ export default function NavPanel({
           document.cookie = `react-resizable-panels:collapsed=${cookieValue}; path=${cookiePath};`;
         }}
       >
-        <NavPanelContent
-          amountIndicators={amountIndicators}
-          isCollapsed={isCollapsed}
-        />
+        <NavPanelContent isCollapsed={isCollapsed} />
       </ResizablePanel>
       <ResizableHandle withHandle className={cn(onMobile && "hidden")} />
     </>
   );
 }
 
-export function MobileNavPanel({ navCollapsedSize }: NavPanelProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function MobileNavPanel() {
+  const { mobileNavPanel, setMobileNavPanel } = useLayout();
   const router = useRouter();
+
   useEffect(() => {
-    setIsOpen(false);
+    setMobileNavPanel(false);
   }, [router]);
 
   // add a click event listener to the nav element
@@ -104,22 +89,15 @@ export function MobileNavPanel({ navCollapsedSize }: NavPanelProps) {
     const target = event.target as HTMLElement;
     // when user clicks inside of this NavPanel, we check if the element clicked is a <Link> and close the NavPanel. This is so that we can have the nice closing animation
     if (target.tagName === "A" || target.closest("a")) {
-      setIsOpen(false);
+      setMobileNavPanel(false);
     }
   }, []);
   return (
     <Sheet
-      open={isOpen}
-      onOpenChange={
-        setIsOpen
-      } /* You can change the animation duration inside the shadCn component (easiest way) */
+      open={mobileNavPanel}
+      onOpenChange={setMobileNavPanel}
+      /* You can change the animation duration inside the shadCn component (easiest way) */
     >
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle mobile menu</span>
-        </Button>
-      </SheetTrigger>
       <SheetContent side="left" className="w-[300px] p-0">
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <nav onClick={handleNavClick}>
@@ -132,14 +110,9 @@ export function MobileNavPanel({ navCollapsedSize }: NavPanelProps) {
   );
 }
 
-function NavPanelContent({
-  amountIndicators,
-  isCollapsed,
-}: {
-  amountIndicators?: AmountIndicators;
-  isCollapsed: boolean;
-}) {
+function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   const { t } = useTranslation();
+  const { amountIndicators } = useLayout();
   return (
     <>
       <div

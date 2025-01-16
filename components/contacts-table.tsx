@@ -22,8 +22,9 @@ export default function ContactsTable({
 }) {
   console.log("logging contacts from table");
   console.log(contacts);
-  const isMobile = useIsMobile();
-  console.log(isMobile);
+  // isMobile hook already doubles the renders
+  // const isMobile = useIsMobile();
+  // console.log(isMobile);
 
   return (
     <Table>
@@ -64,7 +65,6 @@ export default function ContactsTable({
           )
         )}
       </TableBody>
-      {isMobile ? <>Is mobile</> : <>Is not mobile</>}
     </Table>
   );
 }

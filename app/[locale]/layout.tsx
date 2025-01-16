@@ -12,6 +12,7 @@ import { cookies } from "next/headers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LayoutProvider } from "@/contexts/use-layout";
 import { Toaster } from "sonner";
+import { fetchAmountIndicators } from "@/lib/db/message";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -56,7 +57,8 @@ export default async function RootLayout({
   const initialIsCollapsed: boolean = collapsedCookie
     ? JSON.parse(collapsedCookie.value)
     : undefined;
-  // console.log(`RE-FETCHED COOKIES ${initialLayout}, ${initialIsCollapsed}`);
+
+  const amountIndicators = await fetchAmountIndicators();
   return (
     <TranslationsProvider
       resources={resources}
@@ -78,6 +80,7 @@ export default async function RootLayout({
                 <LayoutProvider
                   initialLayout={initialLayout}
                   initialIsCollapsed={initialIsCollapsed}
+                  amountIndicators={amountIndicators}
                 >
                   <Toaster richColors position="top-center" />
                   {children}
