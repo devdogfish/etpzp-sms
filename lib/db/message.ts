@@ -14,7 +14,6 @@ export async function fetchAllMessages(): Promise<ActionResult<DBMessage[]>> {
       "SELECT * FROM message WHERE user_id = $1 ORDER BY created_at DESC;",
       [userId]
     );
-    await sleep(1000);
     return { success: true, message: "", data: result.rows };
   } catch (error) {
     return {

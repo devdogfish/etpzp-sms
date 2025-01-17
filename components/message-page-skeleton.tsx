@@ -5,14 +5,12 @@ import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useLayout } from "@/contexts/use-layout";
 import { useTranslation } from "react-i18next";
 
-import { cn, searchMessages } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { MessageDisplay } from "./message-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PageHeader from "./page-header";
-import { Search } from "lucide-react";
-// Loading animation
-const shimmer =
-  "before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function MessagesPageSkeleton({
   location,
@@ -36,15 +34,22 @@ export default function MessagesPageSkeleton({
         minSize={22}
         maxSize={50}
       >
-        {/** HOW CAN I GET THIS FUCKING SHIMMER TO WORK */}
-        <PageHeader title={t(location)}></PageHeader>
-        <div className={`${shimmer} p-4 relative`}>
-          <div className="relative">
-            {/* <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" /> */}
-            <div
-              className={` h-9 bg-gray-100 rounded-md pl-8 placeholder:text-muted-foreground border`}
-            />
-          </div>
+        <PageHeader title={t(location)}>
+          <Skeleton
+            width={200}
+            height={36}
+            style={{ borderRadius: "0.5rem" }}
+          />
+        </PageHeader>
+
+        <div className="rounded-md p-4 h-[68px]">
+          <Skeleton className="h-9" style={{ borderRadius: "0.375rem" }} />
+        </div>
+
+        <div className="flex flex-col gap-2 p-4 pt-0 mt-2 overflow-hidden">
+          {Array.from({ length: 5 }).map((_, i) => {
+            return <MessageSkeleton key={i} />;
+          })}
         </div>
       </ResizablePanel>
       <ResizableHandle withHandle className={cn(onMobile && "hidden")} />
@@ -55,5 +60,28 @@ export default function MessagesPageSkeleton({
         <MessageDisplay message={null} />
       </ChildrenPanel>
     </>
+  );
+}
+
+function MessageSkeleton() {
+  return (
+    <div className="flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm">
+      <div className="flex w-full flex-col gap-1">
+        <div className="flex items-center h-[20px] w-full">
+          <h2 className="flex-1 mr-20">
+            <Skeleton />
+          </h2>
+          <p className="w-[15%] self-center">
+            <Skeleton height={16} />
+          </p>
+        </div>
+        <div className="text-xs font-medium w-[40%] ">
+          <Skeleton />
+        </div>
+      </div>
+      <div className="line-clamp-2 text-xs text-muted-foreground w-full">
+        <Skeleton count={2} />
+      </div>
+    </div>
   );
 }

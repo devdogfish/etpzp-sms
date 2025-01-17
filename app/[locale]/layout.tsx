@@ -13,6 +13,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { LayoutProvider } from "@/contexts/use-layout";
 import { Toaster } from "sonner";
 import { fetchAmountIndicators } from "@/lib/db/message";
+import { SkeletonTheme } from "react-loading-skeleton";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -82,8 +83,11 @@ export default async function RootLayout({
                   initialIsCollapsed={initialIsCollapsed}
                   amountIndicators={amountIndicators}
                 >
-                  <Toaster richColors position="top-center" />
-                  {children}
+                  <SkeletonTheme /**baseColor="#202020" highlightColor="#444" */
+                  >
+                    <Toaster richColors position="top-center" />
+                    {children}
+                  </SkeletonTheme>
                 </LayoutProvider>
               </TooltipProvider>
             </ThemeProvider>

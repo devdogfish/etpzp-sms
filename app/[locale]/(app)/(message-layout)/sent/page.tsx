@@ -1,9 +1,17 @@
+import MessagesPageSkeleton from "@/components/message-page-skeleton";
 import MessagesPage from "@/components/messages-page";
 import { fetchMessagesByLocation } from "@/lib/db/message";
+import { Suspense } from "react";
 
-export default async function AllMessagesPage() {
-  console.log("AllMessagesPageComponent re-rendered");
+export default function Page() {
+  return (
+    <Suspense fallback={<MessagesPageSkeleton location="SENT" />}>
+      <SentMessagesPage />
+    </Suspense>
+  );
+}
 
+export async function SentMessagesPage() {
   const messages = await fetchMessagesByLocation("SENT");
 
   return (

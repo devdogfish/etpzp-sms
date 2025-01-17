@@ -11,7 +11,6 @@ type SearchProps = React.InputHTMLAttributes<HTMLInputElement> & {
 export default function Search({ onSearch, ...props }: SearchProps) {
   const url = new URL(window.location.href);
   const params = new URLSearchParams(url.search);
-
   const handleSearch = (term: string) => {
     // update data by calling parent function
     onSearch(term);

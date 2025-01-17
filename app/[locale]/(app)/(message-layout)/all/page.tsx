@@ -3,7 +3,7 @@ import MessagesPage from "@/components/messages-page";
 import { fetchAllMessages } from "@/lib/db/message";
 import { Suspense } from "react";
 
-export default async function Page() {
+export default function Page() {
   return (
     <Suspense fallback={<MessagesPageSkeleton location="ALL" />}>
       <AllMessagesPage />

@@ -1,6 +1,6 @@
 "use client";
 import { DBMessage, LocationEnums } from "@/types";
-import React, { ChangeEvent, useCallback, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ChildrenPanel from "./children-panel";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useLayout } from "@/contexts/use-layout";
@@ -29,8 +29,6 @@ export default function MessagesPage({
   const [filteredMessages, setFilteredMessages] = useState(messages);
   const [selected, setSelected] = useState<DBMessage | null>(null);
   const onMobile = useIsMobile();
-
-  // Cation: if we update the searchparams, the server-component will re-render
   const searchParams = useSearchParams();
   const query = searchParams.get("query") || "";
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -40,6 +38,24 @@ export default function MessagesPage({
     setFilteredMessages(searchMessages(messages, query, currentPage));
   };
 
+  // also do this on-load
+  useEffect(() => {
+    setFilteredMessages(searchMessages(messages, query, currentPage));
+  }, []);
+
+  const onTabChange = (value: string) => {
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+    if (value) {
+      params.set("category", value);
+    } else {
+      params.delete("category");
+    }
+
+    // Update the URL without reloading the page
+    url.search = params.toString();
+    window.history.pushState({}, "", url);
+  };
   return (
     <>
       <ResizablePanel
@@ -53,33 +69,35 @@ export default function MessagesPage({
         minSize={22}
         maxSize={50}
       >
-        <Tabs defaultValue="ALL">
+        <Tabs
+          defaultValue={searchParams.get("category")?.toString()}
+          onValueChange={onTabChange}
+        >
           {/** WE WILL HAVE location SUBSTITUTED HERE */}
           <PageHeader title={t(location)}>
             {!error && (
               <TabsList>
-                <TabsTrigger value="ALL">{t("all")}</TabsTrigger>
-                <TabsTrigger value="SCHEDULED">{t("scheduled")}</TabsTrigger>
-                <TabsTrigger value="FAILED">{t("failed")}</TabsTrigger>
+                <TabsTrigger value="all">{t("all")}</TabsTrigger>
+                <TabsTrigger value="scheduled">{t("scheduled")}</TabsTrigger>
+                <TabsTrigger value="failed">{t("failed")}</TabsTrigger>
               </TabsList>
             )}
           </PageHeader>
           <Search
             onSearch={onSearch}
-            // name="search"
             placeholder={String(t("search") + " " + t(location).toLowerCase())}
             className="pl-8 placeholder:text-muted-foreground border"
           />
 
           {error && <p>{error}</p>}
-          <TabsContent value="ALL">
+          <TabsContent value="all">
             <MessageList
               messages={filteredMessages}
               selectedMessageId={selected?.id || null}
               setSelected={setSelected}
             />
           </TabsContent>
-          <TabsContent value="SCHEDULED">
+          <TabsContent value="scheduled">
             <MessageList
               messages={filteredMessages.filter(
                 ({ status }) => status === "SCHEDULED"
@@ -88,7 +106,7 @@ export default function MessagesPage({
               setSelected={setSelected}
             />
           </TabsContent>
-          <TabsContent value="FAILED">
+          <TabsContent value="failed">
             <MessageList
               messages={filteredMessages.filter(
                 ({ status }) => status === "FAILED"

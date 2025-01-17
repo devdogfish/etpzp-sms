@@ -44,6 +44,7 @@
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-hook-form": "^7.54.1",
     "react-i18next": "^15.1.1",
+    "react-loading-skeleton": "^3.5.0",
     "react-resizable-panels": "^2.1.7",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.4",
