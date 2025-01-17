@@ -124,6 +124,7 @@ I want to use the same structure for my components.
 1. Do a test deployment
 
 ## !!IMPORTANT!!
+- [DO THIS NEXT](https://nextjs.org/learn/dashboard-app/adding-search-and-pagination#4-updating-the-table): Move parts of the message-page.tsx to the server-component, and wrap the message list in a suspense, or actually, keep it all in one component and build a skeleton for the whole page.
 
 2. Get started on the sms api.
 

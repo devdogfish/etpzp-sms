@@ -2,6 +2,8 @@ import MessagesPage from "@/components/messages-page";
 import { fetchMessagesByLocation } from "@/lib/db/message";
 
 export default async function AllMessagesPage() {
+  console.log("AllMessagesPageComponent re-rendered");
+
   const messages = await fetchMessagesByLocation("SENT");
 
   return (

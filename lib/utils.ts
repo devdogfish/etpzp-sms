@@ -98,7 +98,11 @@ export function formatSimpleDate(date: Date) {
     .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
 }
 
-export function searchMessages(messages: DBMessage[], searchTerm: string) {
+export function searchMessages(
+  messages: DBMessage[],
+  searchTerm: string,
+  currentPage?: number
+) {
   // Convert searchTerm to lowercase for case-insensitive comparison
   const lowerCaseSearchTerm = searchTerm.toLowerCase();
 

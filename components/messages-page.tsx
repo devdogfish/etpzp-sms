@@ -8,11 +8,12 @@ import PageHeader from "./page-header";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { MessageList } from "./message-list";
-import { Input } from "./shared/input";
-import { Search } from "lucide-react";
+
 import { cn, searchMessages } from "@/lib/utils";
 import { MessageDisplay } from "./message-display";
 import { useIsMobile } from "@/hooks/use-mobile";
+import Search from "./shared/search";
+import { useSearchParams } from "next/navigation";
 
 export default function MessagesPage({
   messages,
@@ -29,11 +30,16 @@ export default function MessagesPage({
   const [selected, setSelected] = useState<DBMessage | null>(null);
   const onMobile = useIsMobile();
 
-  const onSearchQuery = (e: ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = e.target.value;
+  // Cation: if we update the searchparams, the server-component will re-render
+  const searchParams = useSearchParams();
+  const query = searchParams.get("query") || "";
+  const currentPage = Number(searchParams.get("page")) || 1;
 
-    setFilteredMessages(searchMessages(messages, searchTerm));
+  // Update ui based on search term
+  const onSearch = () => {
+    setFilteredMessages(searchMessages(messages, query, currentPage));
   };
+
   return (
     <>
       <ResizablePanel
@@ -58,17 +64,13 @@ export default function MessagesPage({
               </TabsList>
             )}
           </PageHeader>
-          <div className="p-4">
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                name="search"
-                placeholder={t("search") + " " + t(location).toLowerCase()}
-                className="pl-8 placeholder:text-muted-foreground border"
-                onChange={onSearchQuery}
-              />
-            </div>
-          </div>
+          <Search
+            onSearch={onSearch}
+            // name="search"
+            placeholder={String(t("search") + " " + t(location).toLowerCase())}
+            className="pl-8 placeholder:text-muted-foreground border"
+          />
+
           {error && <p>{error}</p>}
           <TabsContent value="ALL">
             <MessageList

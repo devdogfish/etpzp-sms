@@ -26,7 +26,6 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
   // const formattedMessage = message ? message.replace(/\r\n/g, "\n") : "";
   const { isAuthenticated, user } = await getSession();
   const id = user?.id;
-  // console.log(`isAuth: ${isAuthenticated}, id: ${id}`);
   if (!isAuthenticated || !id) {
     return {
       success: false,
@@ -65,29 +64,20 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
 
   // TODO implement scheduling message (maybe store if it is scheduled in a different field than status because once the sendTime is reached the message's status should change from `scheduled` to `sent`)
   try {
-    const token = process.env.GATEWAYAPI_TOKEN;
     const payload = {
-      sender: validatedData.data.sender, // this shit can only be one fulll word with no special characters or spaces
-      message: validatedData.data.body, // this can be anything
-      // the other parameters also don't matter
-      // encoding: "UTF8",
-      // class: "premium",
-      // destaddr: "MOBILE",
-      // priority: "BULK",
-      // tags: ["%Lastname%", "%Firstname%"],
-      // userref: "1234",
-      recipients: [
-        { msisdn: process.env.MY_NUMBER5 /**tagvalues: ["Maul", "Darth"] */ },
-        // { msisdn: process.env.MY_NUMBER5, tagvalues: ["Peter", "Darth"] },
-      ],
+      sender: validatedData.data.sender, // this shit can only be one full word with no special characters or spaces
+      message: validatedData.data.body, // this can be string
+
+      recipients: [{ msisdn: process.env.MY_NUMBER5 }],
+      destaddr: "DISPLAY", // flash sms
     };
 
     const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
       method: "POST",
       body: JSON.stringify(payload),
       headers: {
+        Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
         "Content-Type": "application/json",
-        Authorization: `Token ${token}`,
       },
     });
     // const resp = errorResponse;
