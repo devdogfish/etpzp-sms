@@ -16,7 +16,7 @@ export default function PageHeader({ title, children }: PageHeaderProps) {
   const { setMobileNavPanel } = useLayout();
   return (
     <>
-      <div className="flex items-center gap-2 px-4 h-[var(--header-height)]">
+      <div className="flex items-center gap-2 px-4 h-[52px]">
         {onMobile && (
           <Button
             variant="ghost"

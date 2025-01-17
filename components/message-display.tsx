@@ -50,7 +50,7 @@ export function MessageDisplay({
   resetMessage,
 }: {
   message: DBMessage | null;
-  resetMessage: () => void;
+  resetMessage?: () => void;
 }) {
   const today = new Date();
   const onMobile = useIsMobile();

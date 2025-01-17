@@ -3,6 +3,7 @@ import db from ".";
 import { AmountIndicators, DBMessage, LocationEnums } from "@/types";
 import { getSession } from "../auth/sessions";
 import { ActionResult } from "@/types/action";
+import { sleep } from "../utils";
 
 export async function fetchAllMessages(): Promise<ActionResult<DBMessage[]>> {
   const session = await getSession();
@@ -13,7 +14,7 @@ export async function fetchAllMessages(): Promise<ActionResult<DBMessage[]>> {
       "SELECT * FROM message WHERE user_id = $1 ORDER BY created_at DESC;",
       [userId]
     );
-
+    await sleep(1000);
     return { success: true, message: "", data: result.rows };
   } catch (error) {
     return {
