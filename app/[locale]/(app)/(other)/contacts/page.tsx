@@ -1,7 +1,7 @@
 import ContactsTable from "@/components/contacts-table";
 import CreateContact from "@/components/modals/create-contact";
 import PageHeader from "@/components/page-header";
-import { fetchContacts } from "@/lib/db/contact.actions";
+import { fetchContacts } from "@/lib/actions/contact.actions";
 
 export default async function ContactsPage() {
   const result = await fetchContacts();

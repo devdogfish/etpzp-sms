@@ -19,7 +19,7 @@ import { ContactSchema } from "@/lib/form.schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useContactModal } from "@/contexts/use-contact-modal";
 import { Form, FormControl } from "../ui/form";
-import { createContact } from "@/lib/db/contact.actions";
+import { createContact } from "@/lib/actions/contact.actions";
 import { Label } from "../ui/label";
 import { toast } from "sonner";
 import { ActionResponse } from "@/types/contact";

@@ -1,12 +1,12 @@
 "use server";
 
-import db from ".";
+import db from "../db";
 import { z } from "zod";
 import { ContactSchema } from "../form.schemas";
 import { ActionResponse, Contact } from "@/types/contact";
 import { getSession } from "../auth/sessions";
 import { notFound } from "next/navigation";
-import { sleep } from "../utils";
+import { formatPhone, sleep } from "../utils";
 import { revalidatePath } from "next/cache";
 import { DatabaseError } from "pg";
 import { ActionResult } from "@/types/action";
@@ -66,9 +66,13 @@ export async function createContact(
     console.log(validatedData);
 
     const { name, phone, description } = validatedData.data;
+    const validatedPhone = formatPhone(phone);
+    if (!validatedPhone)
+      throw new Error("Phone number is unexpectedly invalid!");
+
     const result = await db(
       "INSERT INTO contact (user_id, name, phone, description) VALUES ($1, $2, $3, $4) RETURNING *",
-      [id, name, phone, description || null]
+      [id, name, validatedPhone, description || null]
     );
 
     revalidatePath("/contacts");

@@ -1,4 +1,7 @@
-import parsePhoneNumber, { CountryCode } from "libphonenumber-js";
+import parsePhoneNumber, {
+  CountryCode,
+  parsePhoneNumberFromString,
+} from "libphonenumber-js";
 import { clsx, type ClassValue } from "clsx";
 import { i18n } from "i18next";
 import { twMerge } from "tailwind-merge";
@@ -116,4 +119,13 @@ export function searchMessages(
   );
 
   return filteredMessages;
+}
+
+export function formatPhone(phone: string): string | undefined {
+  const parsedPhone = parsePhoneNumberFromString(phone);
+  if (parsedPhone && parsedPhone.isValid()) {
+    return parsedPhone.number;
+  } else {
+    return undefined;
+  }
 }

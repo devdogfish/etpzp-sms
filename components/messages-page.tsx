@@ -70,7 +70,7 @@ export default function MessagesPage({
         maxSize={50}
       >
         <Tabs
-          defaultValue={searchParams.get("category")?.toString()}
+          defaultValue={searchParams.get("category")?.toString() || "all"}
           onValueChange={onTabChange}
         >
           {/** WE WILL HAVE location SUBSTITUTED HERE */}

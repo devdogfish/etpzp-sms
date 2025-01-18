@@ -123,15 +123,12 @@ I want to use the same structure for my components.
 
 1. Do a test deployment
 
-## !!IMPORTANT!!
-- [DO THIS NEXT](https://nextjs.org/learn/dashboard-app/adding-search-and-pagination#4-updating-the-table): Move parts of the message-page.tsx to the server-component, and wrap the message list in a suspense, or actually, keep it all in one component and build a skeleton for the whole page.
-
-2. Get started on the sms api.
 
 ## Message form:
 
 - extract errors from serverState and display them on the client in new message form
 - handle error case for no valid recipients, if there some, are just send to the valid ones
+- Right now if there are invalid recipients, the form doesn't submit because of client side validation. We want to let it submit but also only send to those who have valid numbers
 
 ## Later on
 

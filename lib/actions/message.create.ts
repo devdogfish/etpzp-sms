@@ -1,14 +1,11 @@
 "use server";
 import db from "@/lib/db";
 import { MessageSchema } from "../form.schemas";
-import { z } from "zod";
-import { Message, MessageLocation, Recipient } from "@/types";
+import { Message, Recipient } from "@/types";
 import { getSession } from "../auth/sessions";
-import { errorResponse } from "./responses";
-import { revalidatePath } from "next/cache";
-import parsePhoneNumberFromString from "libphonenumber-js";
+import { formatPhone } from "../utils";
 
-type ActionResponse = {
+export type ActionResponse = {
   success: boolean;
   message: string;
   errors?: {
@@ -23,69 +20,72 @@ type ActionResponse = {
 };
 
 export async function sendMessage(data: Message): Promise<ActionResponse> {
-  // const formattedMessage = message ? message.replace(/\r\n/g, "\n") : "";
+  // 1. Check user auth
   const { isAuthenticated, user } = await getSession();
-  const id = user?.id;
-  if (!isAuthenticated || !id) {
+  const userId = user?.id;
+  if (!isAuthenticated || !userId) {
     return {
       success: false,
       message: "Failed to authenticate user.",
     };
   }
 
-  // Ensure all numeric strings remain as strings (passing via server-actions numeric strings are automatically converted to integers)
-  const sanitizedData = {
-    ...data,
-    recipients: data.recipients.map((recipient) => ({
-      ...recipient,
-      id: String(recipient.id),
-      contactId: recipient.contactId ? String(recipient.contactId) : undefined,
-    })),
-  };
+  data.recipients = convertToValidRecipients(data.recipients);
 
-  const validatedData = MessageSchema.safeParse(sanitizedData);
-  // 1. validate all fields first
+  // 2. Validate field types
+  const validatedData = MessageSchema.safeParse(data);
   if (!validatedData.success) {
     return {
       success: false,
-      message: "Please fix the errors in the form.",
+      message: "Failed to send SMS. Please fix the errors in the form.",
       errors: validatedData.error.flatten().fieldErrors,
     };
   }
 
-  // 2. validate recipients
-  validatedData.data.recipients.forEach((recipient) => {
-    const parsedPhone = parsePhoneNumberFromString(recipient.phone);
-    // console.log("validated phone number result");
-    // console.log(parsedPhone);
+  // 3. The message has to have a valid recipient
+  if (!validatedData.data.recipients.length) {
+    return {
+      success: false,
+      message: "Please fix the errors in the form.",
+      errors: {
+        recipients: [
+          "Failed to send SMS. There must be at least one valid recipient.",
+        ],
+      },
+    };
+  }
 
-    // TODO - create an array of valid numbers, and handle the error case where there are no valid recipients at all
-  });
+  console.log("Recipients that are about to be FUCK-BOMBED & MOGGED:");
+  console.log(validatedData.data.recipients);
 
   // TODO implement scheduling message (maybe store if it is scheduled in a different field than status because once the sendTime is reached the message's status should change from `scheduled` to `sent`)
   try {
     const payload = {
-      sender: validatedData.data.sender, // this shit can only be one full word with no special characters or spaces
+      // this shit can only be one full word with no special characters or spaces
+      sender: validatedData.data.sender,
       message: validatedData.data.body, // this can be string
 
-      recipients: [{ msisdn: process.env.MY_NUMBER5 }],
+      recipients: validatedData.data.recipients.map(({ phone }) => ({
+        msisdn: phone,
+      })),
       destaddr: "DISPLAY", // flash sms
     };
 
     const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
       method: "POST",
-      body: JSON.stringify(payload),
       headers: {
-        Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
+        Authorization: `Token ${process.env.API_TOKEN}`,
         "Content-Type": "application/json",
       },
+      body: JSON.stringify(payload),
     });
-    // const resp = errorResponse;
+    console.log(resp);
 
-    // console.log(resp.json());
-    // console.log(resp);
+    if (!resp.ok) {
+      throw new Error("Network response was not ok " + resp.statusText);
+    }
 
-    // Create the message & recipient with the message id from the first insert
+    // Using message_id from the message insertion, to create recipient.
     await db(
       `
       WITH insert_message AS (
@@ -102,24 +102,22 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
       `,
       [
         // message parameters
-        id,
+        userId,
         validatedData.data.subject,
         validatedData.data.body,
-        resp.ok ? "sent" : "failed", // status here
-        "sent", // location here
+        resp.ok ? "SENT" : "FAILED", // status here
+        "SENT", // By default freshly sent messages are saved to Sent page
         resp.statusText || null,
+
         // recipient parameters:
         validatedData.data.recipients.forEach(
-          (recipient) => recipient.contactId
+          (recipient) => recipient.contactId || null
         ), // contact_id array
         validatedData.data.recipients.forEach((recipient) => recipient.phone), // phone number array
       ]
     );
-    console.log("------");
-    console.log("\n");
-    console.log("\n");
+    console.log("------\n\n");
 
-    revalidatePath("/");
     return {
       success: true,
       message: "Message sent and saved successfully!",
@@ -135,22 +133,23 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
   }
 }
 
-export async function saveMessageTo(
-  values: z.infer<typeof MessageSchema>,
-  location: MessageLocation
-) {}
+// export async function saveMessageTo(
+//   values: z.infer<typeof MessageSchema>,
+//   location: MessageLocation
+// ) {}
 
-export async function getStatus() {
-  const token = process.env.GATEWAYAPI_TOKEN;
-  const resp = await fetch("https://gatewayapi.com/rest/mtsms/1 HTTP/1.1", {
-    method: "GET",
-    headers: {
-      Authorization: `Token ${token}`,
-      Accept: "application/json, text/javascript",
-      "Content-Type": "application/json",
-    },
+function convertToValidRecipients(recipients: Recipient[]): Recipient[] {
+  const validRecipients: Recipient[] = [];
+
+  recipients.forEach((recipient) => {
+    const parsedPhone = formatPhone(recipient.phone);
+    if (parsedPhone) {
+      validRecipients.push({
+        ...recipient,
+        phone: parsedPhone as string,
+      });
+    }
   });
-  console.log(resp);
 
-  return resp.json();
+  return validRecipients;
 }

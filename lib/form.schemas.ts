@@ -1,20 +1,21 @@
 import { z } from "zod";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
-import { Message } from "@/types";
 
 // Our one source of truth is the form schema. When you create a new field, add it here.
 export const MessageSchema = z.object({
   sender: z.string(),
-  recipients: z.array(
-    z.object({
-      id: z.string(),
-      contactId: z.string().optional(),
-      contactName: z.string().optional(),
-      phone: z.string(),
-    })
-  ),
+  recipients: z
+    .array(
+      z.object({
+        id: z.string().or(z.number().transform((val) => val.toString())),
+        contactId: z.string().or(z.number().transform((val) => val.toString())),
+        contactName: z.string().optional(),
+        phone: z.string({ message: "Invalid phone number" }),
+      }, { message: "Recipient is not even an object"})
+    )
+    .min(1, "The message must have at least one recipient."),
   subject: z.string(),
-  body: z.string(),
+  body: z.string().min(1, "Message body can't be empty."),
 });
 
 export const LoginSchema = z.object({
@@ -29,9 +30,13 @@ export const LoginSchema = z.object({
 export const ContactSchema = z.object({
   name: z.string().min(2).max(50),
   phone: z.string().refine(
+    // this returns a boolean telling zod whether the phone data is valid or not
     (input: string) => {
       const parsedPhone = parsePhoneNumberFromString(input);
-      return parsedPhone && parsedPhone.isValid();
+      console.log("logging new contact from Schema file:");
+      console.log(parsedPhone);
+
+      return (parsedPhone && parsedPhone.isValid()) || false;
     },
     {
       message: "Invalid phone number.",

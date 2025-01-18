@@ -7,11 +7,7 @@ import SendButton from "./send-button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import PageHeader from "./page-header";
-import {
-  sendMessage,
-  saveMessageTo,
-  getStatus,
-} from "@/lib/actions/message.create";
+import { sendMessage, ActionResponse } from "@/lib/actions/message.create";
 
 // Form
 import { Button } from "@/components/ui/button";
@@ -31,9 +27,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ActionResponse, ActionResult } from "@/types/action";
+import { ActionResult } from "@/types/action";
+import { toast } from "sonner";
 
-const initialState = {
+const initialState: ActionResponse = {
   success: false,
   message: "",
 };
@@ -68,6 +65,12 @@ export default function NewMessageForm({
 
     setLoading(false);
     setServerState(result);
+
+    if (result.success) {
+      toast.success(result.message);
+    } else {
+      toast.error(result.message);
+    }
   };
   const handleFullScreenRedirect = () => {};
   return (
@@ -101,7 +104,12 @@ export default function NewMessageForm({
           </PageHeader>
           <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
             <div className="flex flex-col px-4 mt-2">
-              <div className="border-b focus-within:border-black ">
+              <div
+                className={cn(
+                  "border-b focus-within:border-black",
+                  serverState.errors?.sender && "border-red-500"
+                )}
+              >
                 <Select name="sender" defaultValue="ETPZP">
                   {/** It defaults to the first SelectItem */}
                   <SelectTrigger className="w-full p-0 rounded-none border-none shadow-none focus:ring-0 px-[1.25rem] py-1 h-[2.75rem]">
@@ -113,21 +121,34 @@ export default function NewMessageForm({
                   </SelectContent>
                 </Select>
               </div>
-              <RecipientsInput contacts={contacts} />
+              <RecipientsInput
+                contacts={contacts}
+                errors={serverState.errors?.recipients}
+              />
               <Input
                 name="subject"
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setSubject(e.target.value)
                 }
                 placeholder="Message subject (optional)"
-                className="new-message-input focus-visible:ring-0 placeholder:text-muted-foreground"
+                className={cn(
+                  "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground",
+                  serverState.errors?.subject && "border-red-500"
+                )}
               />
             </div>
             <div className="px-4 flex-grow mt-[1.25rem] mb-2">
               <Textarea
                 name="body"
-                className="border-none rounded-none h-full p-0 focus-visible:ring-0 shadow-none resize-none placeholder:text-muted-foreground"
-                placeholder="Start writing your message"
+                className={cn(
+                  "border-none rounded-none h-full p-0 focus-visible:ring-0 shadow-none resize-none placeholder:text-muted-foreground",
+                  serverState.errors?.body && "ring-red-500 placeholder:text-red-400"
+                )}
+                placeholder={
+                  serverState.errors?.body
+                    ? serverState.errors?.body[0]
+                    : "Start writing your message"
+                }
               />
             </div>
 

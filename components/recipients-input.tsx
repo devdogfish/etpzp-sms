@@ -19,8 +19,10 @@ type InputState = {
 };
 export default function RecipientsInput({
   contacts,
+  errors,
 }: {
   contacts: ActionResult<Contact[]>;
+  errors?: string[];
 }) {
   const [input, setInput] = useState<InputState>({
     value: "",
@@ -43,17 +45,21 @@ export default function RecipientsInput({
       e.stopPropagation();
 
       if (input.value.trim()) {
-        addRecipient({
-          id: generateUniqueId(),
-          phone: input.value.trim(),
-        });
-        setInput((prevInput) => ({ ...prevInput, value: "" }));
+        createRecipient(input.value.trim());
       }
     }
 
     if (e.key === "Backspace" && input.value === "" && recipients.length) {
       removeRecipient(recipients[recipients.length - 1]); // remove last recipient in the array
     }
+  };
+  const createRecipient = (phone: string) => {
+    addRecipient({
+      id: generateUniqueId(),
+      phone,
+    });
+    // reset input value
+    setInput((prevInput) => ({ ...prevInput, value: "" }));
   };
   return (
     <div className="flex-1 py-1">
@@ -62,7 +68,8 @@ export default function RecipientsInput({
           <div
             className={cn(
               "flex flex-wrap items-stretch gap-x-1 py-1 h-full border-b pl-5",
-              input.isFocused && "border-primary"
+              input.isFocused && "border-primary",
+              errors && "border-red-500"
             )}
           >
             {recipients.map((recipient) => (
@@ -112,12 +119,13 @@ export default function RecipientsInput({
                   isFocused: true,
                 }))
               }
-              onBlur={() =>
+              onBlur={() => {
                 setInput((prevInput) => ({
                   ...prevInput,
                   isFocused: false,
-                }))
-              }
+                }));
+                if (input.value.trim()) createRecipient(input.value.trim());
+              }}
             />
           </div>
 
