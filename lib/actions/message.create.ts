@@ -7,7 +7,7 @@ import { formatPhone } from "../utils";
 
 export type ActionResponse = {
   success: boolean;
-  message: string;
+  message: string[];
   errors?: {
     [K in keyof Message]?: string[];
   };
@@ -26,37 +26,33 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
   if (!isAuthenticated || !userId) {
     return {
       success: false,
-      message: "Failed to authenticate user.",
+      message: ["Authentication Error", "Please log in to continue."],
     };
   }
 
-  data.recipients = convertToValidRecipients(data.recipients);
+  const { validRecipients, invalidRecipients, recipientErrorMessage } =
+    analyzeRawRecipients(data.recipients);
 
+  if (recipientErrorMessage !== null) {
+    return {
+      success: false,
+      message: ["Invalid Recipients", recipientErrorMessage],
+    };
+  }
   // 2. Validate field types
   const validatedData = MessageSchema.safeParse(data);
   if (!validatedData.success) {
+    console.log(data);
+
     return {
       success: false,
-      message: "Failed to send SMS. Please fix the errors in the form.",
+      message: ["Error Occurred", ""],
       errors: validatedData.error.flatten().fieldErrors,
     };
   }
 
-  // 3. The message has to have a valid recipient
-  if (!validatedData.data.recipients.length) {
-    return {
-      success: false,
-      message: "Please fix the errors in the form.",
-      errors: {
-        recipients: [
-          "Failed to send SMS. There must be at least one valid recipient.",
-        ],
-      },
-    };
-  }
-
   console.log("Recipients that are about to be FUCK-BOMBED & MOGGED:");
-  console.log(validatedData.data.recipients);
+  console.log(validRecipients);
 
   // TODO implement scheduling message (maybe store if it is scheduled in a different field than status because once the sendTime is reached the message's status should change from `scheduled` to `sent`)
   try {
@@ -65,7 +61,7 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
       sender: validatedData.data.sender,
       message: validatedData.data.body, // this can be string
 
-      recipients: validatedData.data.recipients.map(({ phone }) => ({
+      recipients: validRecipients.map(({ phone }) => ({
         msisdn: phone,
       })),
       destaddr: "DISPLAY", // flash sms
@@ -110,17 +106,15 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
         resp.statusText || null,
 
         // recipient parameters:
-        validatedData.data.recipients.forEach(
-          (recipient) => recipient.contactId || null
-        ), // contact_id array
-        validatedData.data.recipients.forEach((recipient) => recipient.phone), // phone number array
+        validRecipients.forEach((recipient) => recipient.contactId || null), // contact_id array
+        validRecipients.forEach((recipient) => recipient.phone), // phone number array
       ]
     );
     console.log("------\n\n");
 
     return {
       success: true,
-      message: "Message sent and saved successfully!",
+      message: ["Success!", "Your message has been sent successfully."],
       inputs: data,
     };
   } catch (error) {
@@ -128,7 +122,10 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
 
     return {
       success: false,
-      message: "Failed to save and/or send message to the database.",
+      message: [
+        "Unknown Error",
+        "Something went wrong. Please try again later.",
+      ],
     };
   }
 }
@@ -138,8 +135,14 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
 //   location: MessageLocation
 // ) {}
 
-function convertToValidRecipients(recipients: Recipient[]): Recipient[] {
+function analyzeRawRecipients(recipients: Recipient[]): {
+  validRecipients: Recipient[];
+  invalidRecipients: Recipient[];
+  recipientErrorMessage: string | null;
+} {
   const validRecipients: Recipient[] = [];
+  const invalidRecipients: Recipient[] = [];
+  let recipientErrorMessage = null;
 
   recipients.forEach((recipient) => {
     const parsedPhone = formatPhone(recipient.phone);
@@ -148,8 +151,22 @@ function convertToValidRecipients(recipients: Recipient[]): Recipient[] {
         ...recipient,
         phone: parsedPhone as string,
       });
+    } else {
+      invalidRecipients.push(recipient);
     }
   });
 
-  return validRecipients;
+  if (validRecipients.length === 0 && invalidRecipients) {
+    const invalidPhoneNumbers = recipients.map((people) => people.phone);
+
+    recipientErrorMessage = `The following phone ${
+      invalidRecipients.length === 0 ? "number is" : "numbers are"
+    } not valid: ${invalidPhoneNumbers.join(", ")}`;
+  }
+
+  if (recipients.length === 0) {
+    recipientErrorMessage = "The message must have at least one recipient.";
+  }
+
+  return { validRecipients, invalidRecipients, recipientErrorMessage };
 }

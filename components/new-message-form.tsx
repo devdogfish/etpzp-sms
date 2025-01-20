@@ -32,7 +32,7 @@ import { toast } from "sonner";
 
 const initialState: ActionResponse = {
   success: false,
-  message: "",
+  message: [],
 };
 export default function NewMessageForm({
   isFullScreen,
@@ -52,14 +52,15 @@ export default function NewMessageForm({
     e.preventDefault();
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const data = {
+    console.log("submitting form with these recipients:", recipients);
+
+    const result = await sendMessage({
       sender: formData.get("sender") as string,
       recipients: recipients as Recipient[],
       subject: formData.get("subject") as string,
       body: formData.get("body") as string,
-    };
+    });
 
-    const result = await sendMessage(data);
     console.log(`result on client`);
     console.log(result);
 
@@ -67,9 +68,9 @@ export default function NewMessageForm({
     setServerState(result);
 
     if (result.success) {
-      toast.success(result.message);
+      toast.success(result.message[0], { description: result.message[1] });
     } else {
-      toast.error(result.message);
+      toast.error(result.message[0], { description: result.message[1] });
     }
   };
   const handleFullScreenRedirect = () => {};
@@ -112,7 +113,7 @@ export default function NewMessageForm({
               >
                 <Select name="sender" defaultValue="ETPZP">
                   {/** It defaults to the first SelectItem */}
-                  <SelectTrigger className="w-full p-0 rounded-none border-none shadow-none focus:ring-0 px-[1.25rem] py-1 h-[2.75rem]">
+                  <SelectTrigger className="w-full rounded-none border-none shadow-none focus:ring-0 px-5 py-1 h-11">
                     <SelectValue placeholder="ETPZP" />
                   </SelectTrigger>
                   <SelectContent>
@@ -142,7 +143,8 @@ export default function NewMessageForm({
                 name="body"
                 className={cn(
                   "border-none rounded-none h-full p-0 focus-visible:ring-0 shadow-none resize-none placeholder:text-muted-foreground",
-                  serverState.errors?.body && "ring-red-500 placeholder:text-red-400"
+                  serverState.errors?.body &&
+                    "ring-red-500 placeholder:text-red-400"
                 )}
                 placeholder={
                   serverState.errors?.body

@@ -4,16 +4,8 @@ import { parsePhoneNumberFromString } from "libphonenumber-js";
 // Our one source of truth is the form schema. When you create a new field, add it here.
 export const MessageSchema = z.object({
   sender: z.string(),
-  recipients: z
-    .array(
-      z.object({
-        id: z.string().or(z.number().transform((val) => val.toString())),
-        contactId: z.string().or(z.number().transform((val) => val.toString())),
-        contactName: z.string().optional(),
-        phone: z.string({ message: "Invalid phone number" }),
-      }, { message: "Recipient is not even an object"})
-    )
-    .min(1, "The message must have at least one recipient."),
+  // recipients are handled internally for more thorough error messages
+
   subject: z.string(),
   body: z.string().min(1, "Message body can't be empty."),
 });

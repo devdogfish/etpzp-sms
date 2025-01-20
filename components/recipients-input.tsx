@@ -64,74 +64,71 @@ export default function RecipientsInput({
   return (
     <div className="flex-1 py-1">
       <div className="max-h-24 overflow-auto" ref={container}>
-        <div className="w-full relative">
-          <div
-            className={cn(
-              "flex flex-wrap items-stretch gap-x-1 py-1 h-full border-b pl-5",
-              input.isFocused && "border-primary",
-              errors && "border-red-500"
-            )}
-          >
-            {recipients.map((recipient) => (
-              <div key={recipient.id} className="my-auto h-6">
-                <div
-                  className={cn(
-                    "px-1.5 flex items-center text-xs border border-primary rounded-xl whitespace-nowrap h-full",
-                    recipient.error?.type === "warning" && "bg-yellow-100",
-                    recipient.error?.type === "error" && "bg-destructive/20"
-                  )}
+        <div
+          className={cn(
+            "w-full flex flex-wrap items-stretch gap-x-1 py-1 h-full border-b px-5 relative",
+            input.isFocused && "border-primary",
+            errors && "border-red-500"
+          )}
+        >
+          {recipients.map((recipient) => (
+            <div key={recipient.id} className="my-auto h-6">
+              <div
+                className={cn(
+                  "px-1.5 flex items-center text-xs border border-primary rounded-xl whitespace-nowrap h-full",
+                  recipient.error?.type === "warning" && "bg-yellow-100",
+                  recipient.error?.type === "error" && "bg-destructive/20"
+                )}
+              >
+                <span>
+                  {recipient.contactName
+                    ? recipient.contactName
+                    : recipient.phone}
+                </span>
+                <Button
+                  variant="none"
+                  className="p-0 h-4 cursor-pointer"
+                  onClick={() => {
+                    removeRecipient(recipient);
+                  }}
                 >
-                  <span>
-                    {recipient.contactName
-                      ? recipient.contactName
-                      : recipient.phone}
-                  </span>
-                  <Button
-                    variant="none"
-                    className="p-0 h-4 cursor-pointer"
-                    onClick={() => {
-                      removeRecipient(recipient);
-                    }}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
-            ))}
+            </div>
+          ))}
 
-            <Input // px-3 py-1 pl-5
-              // {...field}
-              className="ring-0 focus:ring-0 h-8 my-0.5 px-0 shadow-none pr-8 placeholder:text-muted-foreground w-min flex-1"
-              // name="{name}"
-              placeholder={recipients.length === 0 ? "Recipient/s" : undefined}
-              value={input.value}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setInput((prevInput) => ({
-                  ...prevInput,
-                  value: e.target.value,
-                }))
-              }
-              onKeyDown={handleKeyDown}
-              // focus state
-              onFocus={() =>
-                setInput((prevInput) => ({
-                  ...prevInput,
-                  isFocused: true,
-                }))
-              }
-              onBlur={() => {
-                setInput((prevInput) => ({
-                  ...prevInput,
-                  isFocused: false,
-                }));
-                if (input.value.trim()) createRecipient(input.value.trim());
-              }}
-            />
-          </div>
-
+          <Input // px-3 py-1 pl-5
+            className="ring-0 focus:ring-0 h-8 my-0.5 px-0 shadow-none pr-8 pl-2 placeholder:text-muted-foreground w-min flex-1"
+            placeholder={
+              recipients.length === 0 ? "Recipients" : "Phone number"
+            }
+            value={input.value}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setInput((prevInput) => ({
+                ...prevInput,
+                value: e.target.value,
+              }))
+            }
+            onKeyDown={handleKeyDown}
+            // focus state
+            onFocus={() =>
+              setInput((prevInput) => ({
+                ...prevInput,
+                isFocused: true,
+              }))
+            }
+            onBlur={() => {
+              setInput((prevInput) => ({
+                ...prevInput,
+                isFocused: false,
+              }));
+              if (input.value.trim()) createRecipient(input.value.trim());
+            }}
+          />
           <InsertContactModal contacts={contacts.success ? contacts.data : []}>
             <Button
-              className="absolute right-[1px] bottom-[6px] p-2 aspect-1 z-index-0"
+              className="absolute right-2 bottom-[6px] p-2 aspect-1 z-index-0"
               variant="ghost"
               type="button"
             >
