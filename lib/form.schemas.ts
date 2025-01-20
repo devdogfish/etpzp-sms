@@ -9,7 +9,7 @@ export const MessageSchema = z.object({
   // recipients are handled internally for more thorough error messages
 
   subject: z.string(),
-  body: z.string().min(1, "Message body can't be empty."),
+  body: z.string().min(1, "Message can't be empty."),
 });
 
 export const LoginSchema = z.object({

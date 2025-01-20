@@ -125,9 +125,8 @@ I want to use the same structure for my components.
 
 ## Message form:
 
-- extract errors from serverState and display them on the client in new message form
-- handle error case for no valid recipients, if there some, are just send to the valid ones
-- Right now if there are invalid recipients, the form doesn't submit because of client side validation. We want to let it submit but also only send to those who have valid numbers
+- clear inputs on success
+- other message and contact actions
 
 ## Later on
 
