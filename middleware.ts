@@ -9,27 +9,25 @@ export async function middleware(request: NextRequest) {
   const i18nResponse = await i18nRouter(request, i18nConfig);
   const session = await getSession(request, i18nResponse);
 
+  const { pathname } = request.nextUrl;
+
+  // Allow public routes
+  if (pathname.startsWith("/_next") || pathname.startsWith("/static")) {
+    return i18nResponse;
+  }
+
   // Redirect to "/" if authenticated
-  if (
-    session.isAuthenticated &&
-    request.nextUrl.pathname.startsWith("/login")
-  ) {
+  if (session.isAuthenticated && pathname.startsWith("/login")) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   // Redirect to login if not authenticated
-  if (
-    !session.isAuthenticated &&
-    !request.nextUrl.pathname.startsWith("/login")
-  ) {
+  if (!session.isAuthenticated && !pathname.startsWith("/login")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   // Don't allow non-admins to see admin-dashboard. Return unauthorized error if authenticated but not admin. This takes you to the typical api page...
-  if (
-    request.nextUrl.pathname.startsWith("/dashboard") &&
-    session?.user?.role !== "ADMIN"
-  ) {
+  if (pathname.startsWith("/dashboard") && session?.user?.role !== "ADMIN") {
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
       status: 403,
       headers: { "content-type": "application/json" },

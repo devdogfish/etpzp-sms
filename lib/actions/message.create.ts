@@ -20,7 +20,7 @@ export type ActionResponse = {
 };
 
 export async function sendMessage(data: Message): Promise<ActionResponse> {
-  // 1. Check user auth
+  // 1. Check authentication
   const { isAuthenticated, user } = await getSession();
   const userId = user?.id;
   if (!isAuthenticated || !userId) {
@@ -42,11 +42,9 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
   // 2. Validate field types
   const validatedData = MessageSchema.safeParse(data);
   if (!validatedData.success) {
-    console.log(data);
-
     return {
       success: false,
-      message: ["Error Occurred", ""],
+      message: ["Error Occurred", `Please fix the errors in the below.`],
       errors: validatedData.error.flatten().fieldErrors,
     };
   }
@@ -156,16 +154,15 @@ function analyzeRawRecipients(recipients: Recipient[]): {
     }
   });
 
-  if (validRecipients.length === 0 && invalidRecipients) {
+  if (recipients.length === 0) {
+    recipientErrorMessage = "The message must have at least one recipient.";
+    console.log(recipientErrorMessage);
+  } else if (validRecipients.length === 0 && invalidRecipients) {
     const invalidPhoneNumbers = recipients.map((people) => people.phone);
 
     recipientErrorMessage = `The following phone ${
-      invalidRecipients.length === 0 ? "number is" : "numbers are"
+      invalidRecipients.length > 1 ? "numbers are" : "number is"
     } not valid: ${invalidPhoneNumbers.join(", ")}`;
-  }
-
-  if (recipients.length === 0) {
-    recipientErrorMessage = "The message must have at least one recipient.";
   }
 
   return { validRecipients, invalidRecipients, recipientErrorMessage };

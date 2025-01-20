@@ -33,8 +33,6 @@ export function NewMessageProvider({
   const [message, setMessage] = useState<Message>(stored); // stored is guaranteed to be defined
 
   const addRecipient = (recipient: Recipient) => {
-    console.log("adding recipient:", message.recipients);
-
     // Check if the recipient already exists in the array. The result is inverted because it returns the opposite from what we want.
     if (!message.recipients.some((item) => item.id === recipient.id)) {
       setMessage((prev) => {

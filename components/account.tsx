@@ -49,15 +49,7 @@ export default function Account({ isCollapsed }: { isCollapsed: boolean }) {
         <DropdownMenuItem>Report a bug</DropdownMenuItem>
         {/* </DropdownMenuGroup> */}
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={async () => {
-            const result = await logout();
-            if (result.success) {
-              router.push("/");
-              router.refresh();
-            }
-          }}
-        >
+        <DropdownMenuItem onClick={async () => await logout()}>
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>

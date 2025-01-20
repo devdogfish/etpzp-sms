@@ -123,7 +123,6 @@ I want to use the same structure for my components.
 
 1. Do a test deployment
 
-
 ## Message form:
 
 - extract errors from serverState and display them on the client in new message form

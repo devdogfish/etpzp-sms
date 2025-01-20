@@ -25,20 +25,8 @@ const initialState: ActionResponse<Login> = {
   message: "",
 };
 export default function LoginForm() {
-  const router = useRouter();
   const [passInputType, setPassInputType] = useState("password");
-
   const [serverState, action] = useActionState(login, initialState);
-
-  useEffect(() => {
-    if (serverState.success) {
-      toast.success(serverState.message);
-      serverState.inputs = undefined;
-      serverState.errors = undefined;
-      serverState.message = "";
-      router.replace("/");
-    }
-  }, [serverState]);
 
   return (
     <form action={action}>

@@ -70,10 +70,24 @@ export default function NewMessageForm({
     if (result.success) {
       toast.success(result.message[0], { description: result.message[1] });
     } else {
-      toast.error(result.message[0], { description: result.message[1] });
+      const zodErrors = result.errors || {};
+      let waitTime = 0;
+      const inBetweenTime = 300;
+      Object.entries(zodErrors).forEach(
+        ([input, errorArray], index) =>
+          setTimeout(() => {
+            toast.error(input, { description: errorArray.join(", ") });
+            waitTime += index * inBetweenTime;
+            console.log(index, waitTime);
+          }, index * inBetweenTime) // Increase delay by 50ms for each error
+      );
+      setTimeout(() => {
+        toast.error(result.message[0], { description: result.message[1] });
+      }, Object.entries(zodErrors).length * inBetweenTime);
     }
   };
   const handleFullScreenRedirect = () => {};
+
   return (
     <>
       <ContactModalProvider>
@@ -135,6 +149,7 @@ export default function NewMessageForm({
                 className={cn(
                   "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground",
                   serverState.errors?.subject && "border-red-500"
+                  // TODO: Add client side validation here take the red border away if
                 )}
               />
             </div>

@@ -69,6 +69,7 @@ export default function RecipientsInput({
             "w-full flex flex-wrap items-stretch gap-x-1 py-1 h-full border-b px-5 relative",
             input.isFocused && "border-primary",
             errors && "border-red-500"
+            // TODO: Add client side validation here
           )}
         >
           {recipients.map((recipient) => (
@@ -91,6 +92,7 @@ export default function RecipientsInput({
                   onClick={() => {
                     removeRecipient(recipient);
                   }}
+                  type="button"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -98,11 +100,17 @@ export default function RecipientsInput({
             </div>
           ))}
 
-          <Input // px-3 py-1 pl-5
-            className="ring-0 focus:ring-0 h-8 my-0.5 px-0 shadow-none pr-8 pl-2 placeholder:text-muted-foreground w-min flex-1"
-            placeholder={
-              recipients.length === 0 ? "Recipients" : "Phone number"
-            }
+          {recipients.length === 0 && !input.isFocused && (
+            <span className="my-0.5 px-0 flex items-center text-sm text-muted-foreground">
+              To
+            </span>
+          )}
+          <Input
+            className={cn(
+              "h-8 my-0.5 px-0 w-min flex-1 ring-0 focus:ring-0 shadow-none placeholder:text-muted-foreground",
+              recipients.length > 0 && "ml-3"
+            )}
+            placeholder={recipients.length > 0 ? "Phone number" : ""}
             value={input.value}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setInput((prevInput) => ({
@@ -126,6 +134,7 @@ export default function RecipientsInput({
               if (input.value.trim()) createRecipient(input.value.trim());
             }}
           />
+
           <InsertContactModal contacts={contacts.success ? contacts.data : []}>
             <Button
               className="absolute right-2 bottom-[6px] p-2 aspect-1 z-index-0"

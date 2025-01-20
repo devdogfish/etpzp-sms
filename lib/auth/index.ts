@@ -7,6 +7,8 @@ import { createSession, getSession } from "./sessions";
 import { LoginSchema } from "@/lib/form.schemas";
 import { Login, SessionData } from "../auth.config";
 import { ActionResponse } from "@/types/action";
+import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 
 // This function is for actually authenticating the user and fetching all the users data
 // Once the data is fetched we save it to the session using createSession()
@@ -50,11 +52,11 @@ export async function login(
 
   // If everything went well create a new session and redirect user to dashboard
   await createSession(user);
-  return { success: true, message: "User authenticated successfully" };
+  redirect("/");
 }
 
 export async function logout() {
   const session = await getSession();
   session.destroy();
-  return { success: true };
+  redirect("/login");
 }

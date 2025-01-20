@@ -3,7 +3,9 @@ import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 // Our one source of truth is the form schema. When you create a new field, add it here.
 export const MessageSchema = z.object({
-  sender: z.string(),
+  sender: z.enum(["ETPZP", "ExampleSMS", "Test"], {
+    message: "Sender can only be called ETPZP or ExampleSMS",
+  }),
   // recipients are handled internally for more thorough error messages
 
   subject: z.string(),
