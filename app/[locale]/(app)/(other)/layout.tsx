@@ -1,4 +1,4 @@
-import ChildrenPanel from "@/components/children-panel";
+import ChildrenPanel from "@/components/shared/children-panel";
 
 export default function Layout({
   children,

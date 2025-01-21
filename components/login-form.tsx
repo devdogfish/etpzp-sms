@@ -57,7 +57,7 @@ export default function LoginForm() {
               id="email"
               type="email"
               defaultValue={serverState.inputs?.email}
-              placeholder="9120@etpzp.pt"
+              placeholder="0000@etpzp.pt"
               aria-describedby="email"
             />
             {serverState.errors?.email && (
@@ -74,7 +74,6 @@ export default function LoginForm() {
                 id="password"
                 type={passInputType}
                 defaultValue={serverState.inputs?.password}
-                placeholder="my_password452"
                 aria-describedby="password"
               />
               <Button

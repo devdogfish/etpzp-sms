@@ -1,4 +1,4 @@
-import MessagesPageSkeleton from "@/components/message-page-skeleton";
+import MessagesPageSkeleton from "@/components/messages-page-skeleton";
 import MessagesPage from "@/components/messages-page";
 import { fetchAllMessages } from "@/lib/db/message";
 import { Suspense } from "react";

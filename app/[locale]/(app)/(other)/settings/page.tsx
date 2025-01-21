@@ -1,9 +1,10 @@
 import initTranslations from "@/app/[locale]/i18n";
 import PageHeader from "@/components/page-header";
-import LanguageChanger from "@/components/settings/LanguageChanger";
-import SettingsForm from "@/components/settings/settings-form";
-import { ThemeColorChanger } from "@/components/settings/ThemeColorChanger";
-import ThemeModeToggle from "@/components/settings/ThemeModeToggle";
+import {
+  LanguageChanger,
+  ThemeModeToggle,
+  ThemeColorChanger,
+} from "@/components/settings";
 
 export default async function Settings({
   params,
@@ -12,16 +13,14 @@ export default async function Settings({
 }) {
   const { locale } = await params;
   const { t } = await initTranslations(locale, ["Navigation"]);
+
   return (
     <>
-      <PageHeader title={t("SETTING")}>
+      <PageHeader title={t("SETTING")} />
+      <div className="p-4 space-y-8">
+        <LanguageChanger />
         <ThemeColorChanger />
         <ThemeModeToggle />
-      </PageHeader>
-      <div className="p-3 flex flex-col">
-        Hello Settings!
-        <LanguageChanger />
-        <SettingsForm />
       </div>
     </>
   );

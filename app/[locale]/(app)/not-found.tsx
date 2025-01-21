@@ -1,4 +1,4 @@
-import ChildrenPanel from "@/components/children-panel";
+import ChildrenPanel from "@/components/shared/children-panel";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Frown } from "lucide-react";
 import Link from "next/link";

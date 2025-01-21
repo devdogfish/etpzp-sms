@@ -1,7 +1,7 @@
 "use client";
 import { DBMessage, LocationEnums } from "@/types";
 import React, { useEffect, useState } from "react";
-import ChildrenPanel from "./children-panel";
+import ChildrenPanel from "./shared/children-panel";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useLayout } from "@/contexts/use-layout";
 import PageHeader from "./page-header";
@@ -14,6 +14,7 @@ import { MessageDisplay } from "./message-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Search from "./shared/search";
 import { useSearchParams } from "next/navigation";
+import { AlertTriangle, Calendar, List } from "lucide-react";
 
 export default function MessagesPage({
   messages,
@@ -28,19 +29,33 @@ export default function MessagesPage({
   const { t, i18n } = useTranslation(["Common Words"]);
   const [filteredMessages, setFilteredMessages] = useState(messages);
   const [selected, setSelected] = useState<DBMessage | null>(null);
+  const [isLarge, setIsLarge] = useState({
+    bool: window.matchMedia("(min-width: 1024px)").matches,
+    breakpoint: window.matchMedia("(min-width: 1024px)").matches ? 29 : 44,
+  });
   const onMobile = useIsMobile();
   const searchParams = useSearchParams();
   const query = searchParams.get("query") || "";
   const currentPage = Number(searchParams.get("page")) || 1;
-
+  const isMobile = useIsMobile();
   // Update ui based on search term
   const onSearch = () => {
     setFilteredMessages(searchMessages(messages, query, currentPage));
   };
 
-  // also do this on-load
   useEffect(() => {
+    // Filter the messages with URLsearchParams on page load
     setFilteredMessages(searchMessages(messages, query, currentPage));
+    // We are managing state for when to replace icons with words. The breakpoint be less on big screens while on smaller screens, the icons should show up faster.
+    const handleResize = () => {
+      const _isLarge = window.matchMedia("(min-width: 1024px)").matches;
+      setIsLarge({ bool: _isLarge, breakpoint: _isLarge ? 33 : 49 });
+    };
+
+    handleResize(); // Check on mount
+    window.addEventListener("resize", handleResize); // Check on resize
+
+    return () => window.removeEventListener("resize", handleResize); // Cleanup
   }, []);
 
   const onTabChange = (value: string) => {
@@ -75,11 +90,32 @@ export default function MessagesPage({
         >
           {/** WE WILL HAVE location SUBSTITUTED HERE */}
           <PageHeader title={t(location)}>
-            {!error && (
+            {!error && location !== "DRAFT" && (
               <TabsList>
-                <TabsTrigger value="all">{t("all")}</TabsTrigger>
-                <TabsTrigger value="scheduled">{t("scheduled")}</TabsTrigger>
-                <TabsTrigger value="failed">{t("failed")}</TabsTrigger>
+                <TabsTrigger value="all">
+                  {(isMobile && window.innerWidth < 450) ||
+                  (layout && layout[1] < isLarge.breakpoint) ? (
+                    <List className="w-4 h-5" />
+                  ) : (
+                    t("all")
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="scheduled">
+                  {(isMobile && window.innerWidth < 450) ||
+                  (layout && layout[1] < isLarge.breakpoint) ? (
+                    <Calendar className="w-4 h-5" />
+                  ) : (
+                    t("scheduled")
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="failed">
+                  {(isMobile && window.innerWidth < 450) ||
+                  (layout && layout[1] < isLarge.breakpoint) ? (
+                    <AlertTriangle className="w-4 h-5" />
+                  ) : (
+                    t("failed")
+                  )}
+                </TabsTrigger>
               </TabsList>
             )}
           </PageHeader>

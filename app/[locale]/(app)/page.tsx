@@ -1,5 +1,5 @@
 "use client";
-import ChildrenPanel from "@/components/children-panel";
+import ChildrenPanel from "@/components/shared/children-panel";
 import PageHeader from "@/components/page-header";
 import { useLayout } from "@/contexts/use-layout";
 

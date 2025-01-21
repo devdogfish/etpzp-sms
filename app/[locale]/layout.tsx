@@ -5,7 +5,7 @@ import { i18nConfig } from "@/i18nConfig";
 import { dir } from "i18next";
 import TranslationsProvider from "@/contexts/translations-provider";
 import initTranslations from "./i18n";
-import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import ThemeProvider from "@/contexts/theme-data-provider";
 
 import { cookies } from "next/headers";
@@ -13,7 +13,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { LayoutProvider } from "@/contexts/use-layout";
 import { Toaster } from "sonner";
 import { fetchAmountIndicators } from "@/lib/db/message";
-import { SkeletonTheme } from "react-loading-skeleton";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -83,11 +82,8 @@ export default async function RootLayout({
                   initialIsCollapsed={initialIsCollapsed}
                   amountIndicators={amountIndicators}
                 >
-                  <SkeletonTheme /**baseColor="#202020" highlightColor="#444" */
-                  >
-                    <Toaster richColors position="top-center" />
-                    {children}
-                  </SkeletonTheme>
+                  <Toaster richColors position="top-center" />
+                  {children}
                 </LayoutProvider>
               </TooltipProvider>
             </ThemeProvider>

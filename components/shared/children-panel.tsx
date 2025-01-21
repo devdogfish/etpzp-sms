@@ -1,6 +1,6 @@
 "use client";
 
-import { ResizablePanel } from "./ui/resizable";
+import { ResizablePanel } from "../ui/resizable";
 import { useLayout } from "@/contexts/use-layout";
 
 export default function ChildrenPanel({
