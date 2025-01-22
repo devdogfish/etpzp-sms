@@ -3,6 +3,7 @@ import { activeDirectoryConfig } from "@/lib/auth.config";
 import ActiveDirectory from "activedirectory2";
 
 export default async function LoginPage() {
+  TestActiveDirectory();
   return (
     <main className="flex items-center justify-center w-screen h-screen p-3">
       <LoginForm />
@@ -12,7 +13,6 @@ export default async function LoginPage() {
 
 async function TestActiveDirectory() {
   var ad = new ActiveDirectory(activeDirectoryConfig);
-  var username = "user@domain.com";
   var groupName = "Utilizadores-SMS";
   ad.getUsersForGroup(groupName, function (err, users) {
     if (err) {
@@ -22,7 +22,7 @@ async function TestActiveDirectory() {
 
     if (!users) console.log("Group: " + groupName + " not found.");
     else {
-      console.log(JSON.stringify(users));
+      console.log(users);
     }
   });
 

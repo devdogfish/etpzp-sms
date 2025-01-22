@@ -20,6 +20,13 @@ export default function Account({ isCollapsed }: { isCollapsed: boolean }) {
   const router = useRouter();
   // console.log(session);
 
+  const handleLogout = async () => {
+    const result = await logout();
+    if (result.success) {
+      router.push("/login");
+    }
+  };
+
   if (loading) return <h2>Loading</h2>;
   return (
     <DropdownMenu>
@@ -49,9 +56,7 @@ export default function Account({ isCollapsed }: { isCollapsed: boolean }) {
         <DropdownMenuItem>Report a bug</DropdownMenuItem>
         {/* </DropdownMenuGroup> */}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={async () => await logout()}>
-          Log out
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -16,8 +16,10 @@ import {
 import ContactDisplay from "./contact-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Search from "./shared/search";
-import { useSearchParams } from "next/navigation";
-import { AlertTriangle, Calendar, List } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { AlertTriangle, Calendar, CirclePlus, List } from "lucide-react";
+import CreateContact from "./modals/create-contact";
+import { Button } from "./ui/button";
 
 export default function ContactsPage({
   contacts,
@@ -37,6 +39,7 @@ export default function ContactsPage({
   const query = searchParams.get("query") || "";
   const currentPage = Number(searchParams.get("page")) || 1;
   const isMobile = useIsMobile();
+  const router = useRouter();
   // Update ui based on search term
   const onSearch = () => {
     // setFilteredContacts(searchContacts(contacts, query, currentPage));
@@ -70,6 +73,10 @@ export default function ContactsPage({
     url.search = params.toString();
     window.history.pushState({}, "", url);
   };
+
+  const refresh = () => {
+    router.refresh();
+  };
   return (
     <>
       <ResizablePanel
@@ -84,13 +91,22 @@ export default function ContactsPage({
         maxSize={50}
       >
         {/** WE WILL HAVE location SUBSTITUTED HERE */}
-        <PageHeader title={t("CONTACTS")}></PageHeader>
+        <PageHeader title={t("CONTACTS")}>
+          <Button size="sm" onClick={refresh}>
+            Refresh
+          </Button>
+          <CreateContact>
+            <Button size="sm">
+              <CirclePlus className="w-4 h-4" />
+              New Contact
+            </Button>
+          </CreateContact>
+        </PageHeader>
         <Search
           onSearch={onSearch}
           placeholder={String(t("search") + " " + t("CONTACTS"))}
           className="pl-8 placeholder:text-muted-foreground border"
         />
-
         <ContactsList
           contacts={filteredContacts}
           selectedContactId={selected?.id || null}
@@ -98,15 +114,15 @@ export default function ContactsPage({
         />
       </ResizablePanel>
       <ResizableHandle withHandle className={cn(onMobile && "hidden")} />
+
       <ChildrenPanel
         hasMiddleBar
         className={cn(onMobile && selected === null && "hidden")} // like above we are using reverse logic here. If we are on mobile, and nothing is selected, this component should not be displayed.
       >
-        ContactDisplay HERE
-        {/* <ContactDisplay
+        <ContactDisplay
           contact={selected}
           resetContact={() => setSelected(null)}
-        /> */}
+        />
       </ChildrenPanel>
     </>
   );

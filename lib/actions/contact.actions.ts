@@ -5,7 +5,7 @@ import { z } from "zod";
 import { ContactSchema } from "../form.schemas";
 import { ActionResponse, Contact } from "@/types/contact";
 import { getSession } from "../auth/sessions";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { formatPhone, sleep } from "../utils";
 import { revalidatePath } from "next/cache";
 import { DatabaseError } from "pg";
@@ -75,7 +75,8 @@ export async function createContact(
       [id, name, validatedPhone, description || null]
     );
 
-    revalidatePath("/contacts");
+    revalidatePath("/contacts", "page");
+
     return { success: true, message: "Contact created successfully!" };
   } catch (error) {
     let message = "";

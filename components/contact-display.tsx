@@ -41,16 +41,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { DBMessage } from "@/types";
+import { Contact } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 export default function ContactDisplay({
-  message,
-  resetMessage,
+  contact,
+  resetContact,
 }: {
-  message: DBMessage | null;
-  resetMessage?: () => void;
+  contact: Contact | null;
+  resetContact?: () => void;
 }) {
   const today = new Date();
   const onMobile = useIsMobile();
@@ -62,7 +62,7 @@ export default function ContactDisplay({
           {onMobile && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={resetMessage}>
+                <Button variant="ghost" size="icon" onClick={resetContact}>
                   <ArrowLeft className="h-4 w-4" />
                   <span className="sr-only">Go back</span>
                 </Button>
@@ -72,7 +72,7 @@ export default function ContactDisplay({
           )}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
+              <Button variant="ghost" size="icon" disabled={!contact}>
                 <Archive className="h-4 w-4" />
                 <span className="sr-only">Archive</span>
               </Button>
@@ -81,7 +81,7 @@ export default function ContactDisplay({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
+              <Button variant="ghost" size="icon" disabled={!contact}>
                 <ArchiveX className="h-4 w-4" />
                 <span className="sr-only">Move to junk</span>
               </Button>
@@ -90,7 +90,7 @@ export default function ContactDisplay({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
+              <Button variant="ghost" size="icon" disabled={!contact}>
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Move to trash</span>
               </Button>
@@ -102,7 +102,7 @@ export default function ContactDisplay({
             <Popover>
               <PopoverTrigger asChild>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" disabled={!message}>
+                  <Button variant="ghost" size="icon" disabled={!contact}>
                     <Clock className="h-4 w-4" />
                     <span className="sr-only">Snooze</span>
                   </Button>
@@ -161,7 +161,7 @@ export default function ContactDisplay({
         <div className="ml-auto flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
+              <Button variant="ghost" size="icon" disabled={!contact}>
                 <Reply className="h-4 w-4" />
                 <span className="sr-only">Reply</span>
               </Button>
@@ -170,7 +170,7 @@ export default function ContactDisplay({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
+              <Button variant="ghost" size="icon" disabled={!contact}>
                 <ReplyAll className="h-4 w-4" />
                 <span className="sr-only">Reply all</span>
               </Button>
@@ -179,7 +179,7 @@ export default function ContactDisplay({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
+              <Button variant="ghost" size="icon" disabled={!contact}>
                 <Forward className="h-4 w-4" />
                 <span className="sr-only">Forward</span>
               </Button>
@@ -190,7 +190,7 @@ export default function ContactDisplay({
         <Separator orientation="vertical" className="mx-2 h-6" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" disabled={!message}>
+            <Button variant="ghost" size="icon" disabled={!contact}>
               <MoreVertical className="h-4 w-4" />
               <span className="sr-only">More</span>
             </Button>
@@ -204,38 +204,38 @@ export default function ContactDisplay({
         </DropdownMenu>
       </div>
       <Separator />
-      {message ? (
+      {contact ? (
         <div className="flex flex-1 flex-col">
           <div className="flex items-start p-4">
             <div className="flex items-start gap-4 text-sm">
               <Avatar>
-                <AvatarImage alt={message.subject || "No Subject"} />
+                <AvatarImage alt={contact.subject || "No Subject"} />
                 <AvatarFallback>
-                  {message.subject &&
-                    message.subject
+                  {contact.subject &&
+                    contact.subject
                       .split(" ")
                       .map((chunk) => chunk[0])
                       .join("")}
                 </AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
-                <div className="font-semibold">{message.subject}</div>
-                <div className="line-clamp-1 text-xs">{message.subject}</div>
+                <div className="font-semibold">{contact.subject}</div>
+                <div className="line-clamp-1 text-xs">{contact.subject}</div>
                 <div className="line-clamp-1 text-xs">
                   <span className="font-medium">Reply-To:</span>{" "}
-                  {message.user_id}
+                  {contact.user_id}
                 </div>
               </div>
             </div>
-            {message.created_at && (
+            {contact.created_at && (
               <div className="ml-auto text-xs text-muted-foreground">
-                {format(new Date(message.created_at), "PPpp")}
+                {format(new Date(contact.created_at), "PPpp")}
               </div>
             )}
           </div>
           <Separator />
           <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
-            {message.body}
+            {contact.body}
           </div>
           <Separator className="mt-auto" />
           <div className="p-4">
@@ -243,7 +243,7 @@ export default function ContactDisplay({
               <div className="grid gap-4">
                 <Textarea
                   className="p-4"
-                  placeholder={`Reply ${message.subject}...`}
+                  placeholder={`Reply ${contact.subject}...`}
                 />
                 <div className="flex items-center">
                   <Label
@@ -267,7 +267,7 @@ export default function ContactDisplay({
         </div>
       ) : (
         <div className="p-8 text-center text-muted-foreground">
-          No message selected
+          No contact selected
         </div>
       )}
     </div>

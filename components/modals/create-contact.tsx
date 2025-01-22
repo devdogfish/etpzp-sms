@@ -32,18 +32,22 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
+import { useRouter } from "next/navigation";
 
 const initialState: ActionResponse = {
   success: false,
   message: "",
 };
 
-export default function CreateContact() {
+export default function CreateContact({
+  children,
+}: Readonly<{ children?: React.ReactNode }>) {
   const [open, setOpen] = useState(false);
   const [serverState, action, pending] = useActionState(
     createContact,
     initialState
   );
+  const router = useRouter();
 
   useEffect(() => {
     if (serverState.success) {
@@ -53,12 +57,13 @@ export default function CreateContact() {
       serverState.errors = undefined;
       serverState.message = "";
     }
+    router.refresh();
   }, [serverState]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default">New</Button>
+        {children ? children : <Button variant="default">New</Button>}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

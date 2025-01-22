@@ -129,3 +129,22 @@ export function formatPhone(phone: string): string | undefined {
     return undefined;
   }
 }
+
+export function getNameInitials(fullName: string) {
+  // Split the full name into parts
+  const nameParts = fullName.trim().split(/\s+/);
+
+  // Get the first letter of the first name
+  const firstInitial = nameParts[0][0].toUpperCase();
+
+  // If there's only one name, return just that initial
+  if (nameParts.length === 1) {
+    return firstInitial;
+  }
+
+  // Get the first letter of the last name
+  const lastInitial = nameParts[nameParts.length - 1][0].toUpperCase();
+
+  // Return the initials
+  return firstInitial + lastInitial;
+}

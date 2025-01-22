@@ -2,11 +2,13 @@
 import { ComponentProps, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 
-import { cn } from "@/lib/utils";
+import { cn, getNameInitials } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Contact } from "@/types";
 import { Button } from "./ui/button";
+import { CirclePlus } from "lucide-react";
+import CreateContact from "./modals/create-contact";
 
 type ContactListProps = {
   contacts: Contact[];
@@ -27,18 +29,29 @@ export default function ContactsList({
             <button
               key={contact.id}
               className={cn(
-                "flex flex-col contacts-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
+                "flex contacts-start items-center gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
                 selectedContactId === contact.id && "bg-muted"
               )}
               onClick={() => setSelected(contact)}
             >
-              <div className="font-semibold">{contact.name}</div>
-              <div className="text-xs font-medium">{contact.phone}</div>
+              <div className="rounded-full h-12 w-12 border centered ">
+                {getNameInitials(contact.name)}
+              </div>
+              <div className="space-y-1">
+                <div className="font-semibold">{contact.name}</div>
+                <div className="text-xs font-medium">{contact.phone}</div>
+              </div>
             </button>
           ))
         ) : (
-          <div className="p-8 text-center text-muted-foreground">
-            No contacts found
+          <div className="space-y-3 p-8 text-center text-muted-foreground">
+            <p>You don't have any contacts yet</p>
+            <CreateContact>
+              <Button size="sm">
+                <CirclePlus className="w-4 h-4" />
+                Create
+              </Button>
+            </CreateContact>
           </div>
         )}
       </div>

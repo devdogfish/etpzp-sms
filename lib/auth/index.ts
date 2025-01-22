@@ -35,7 +35,7 @@ export async function login(
   console.log("STARTING AUTHENTICATION");
   console.log(email, password);
 
-  const user: SessionData /**& { errors: string[] } */ = await dummyAuthenticate({
+  const user: SessionData /**& { errors: string[] } */ = await authenticate({
     email,
     password,
   });
@@ -58,5 +58,6 @@ export async function login(
 export async function logout() {
   const session = await getSession();
   session.destroy();
-  redirect("/login");
+
+  return { success: true };
 }

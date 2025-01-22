@@ -1,12 +1,19 @@
 import ContactsPage from "@/components/contacts-page";
-import CreateContact from "@/components/modals/create-contact";
-import PageHeader from "@/components/page-header";
-import { Button } from "@/components/ui/button";
 import { fetchContacts } from "@/lib/actions/contact.actions";
+import { Suspense } from "react";
 
-export default async function Page() {
+export async function Page() {
+  return (
+    <Suspense fallback={"Loading..."}>
+      <ContactsPageFetcher />
+    </Suspense>
+  );
+}
+
+export default async function ContactsPageFetcher() {
   const result = await fetchContacts();
   const contacts = result.success ? result.data : [];
+  console.log("refetching contacts");
 
   return <ContactsPage contacts={contacts} />;
 }
