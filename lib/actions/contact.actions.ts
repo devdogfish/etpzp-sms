@@ -31,13 +31,6 @@ export async function createContact(
   _: ActionResponse | null,
   formData: FormData
 ): Promise<ActionResponse> {
-  await sleep(2000);
-
-  console.log("form submitted!");
-  console.log(formData);
-  console.log("");
-  console.log();
-
   const session = await getSession();
 
   const id = parseInt(session.user?.id ? session?.user?.id : "");
@@ -75,7 +68,7 @@ export async function createContact(
       [id, name, validatedPhone, description || null]
     );
 
-    revalidatePath("/contacts", "page");
+    revalidatePath("/contacts");
 
     return { success: true, message: "Contact created successfully!" };
   } catch (error) {
@@ -90,6 +83,41 @@ export async function createContact(
       success: false,
       message,
       inputs: rawData,
+    };
+  }
+}
+
+export async function updateContact(
+  _: ActionResponse | null,
+  formData: FormData
+): Promise<ActionResponse> {
+  console.log("updating contact");
+  return { success: true, message: "Contact created successfully!" };
+}
+
+export async function deleteContact(id: string): Promise<ActionResponse> {
+  const session = await getSession();
+
+  const userId = parseInt(session.user?.id ? session?.user?.id : "");
+  if (userId && isNaN(userId)) {
+    return {
+      success: false,
+      message: "Invalid user id.",
+    };
+  }
+
+  try {
+    await db("DELETE FROM contact WHERE user_id = $1 AND id = $2", [
+      userId,
+      id,
+    ]);
+    revalidatePath("/contacts");
+    return { success: true, message: "Contact deleted successfully!" };
+  } catch (error) {
+    // Check if we are
+    return {
+      success: false,
+      message: "An unknown error occurred. Failed to delete contact.",
     };
   }
 }

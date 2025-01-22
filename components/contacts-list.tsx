@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Contact } from "@/types";
 import { Button } from "./ui/button";
 import { CirclePlus } from "lucide-react";
-import CreateContact from "./modals/create-contact";
+import CreateContact from "./modals/create-contact-modal";
 
 type ContactListProps = {
   contacts: Contact[];
@@ -57,22 +57,4 @@ export default function ContactsList({
       </div>
     </ScrollArea>
   );
-}
-
-function getBadgeVariantFromLabel(
-  label: string
-): ComponentProps<typeof Badge>["variant"] {
-  // if (["success"].includes(label.toLowerCase())) {
-  //   return "positive";
-  // }
-
-  if (["FAILED"].includes(label.toLowerCase())) {
-    return "destructive";
-  }
-
-  if (["SCHEDULED"].includes(label.toLowerCase())) {
-    return "outline";
-  }
-
-  return "secondary";
 }

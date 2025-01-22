@@ -18,8 +18,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Search from "./shared/search";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertTriangle, Calendar, CirclePlus, List } from "lucide-react";
-import CreateContact from "./modals/create-contact";
+import CreateContact from "./modals/create-contact-modal";
 import { Button } from "./ui/button";
+import {
+  ContactModalsProvider,
+  useContactModals,
+} from "@/contexts/use-contact-modals";
 
 export default function ContactsPage({
   contacts,
@@ -40,6 +44,7 @@ export default function ContactsPage({
   const currentPage = Number(searchParams.get("page")) || 1;
   const isMobile = useIsMobile();
   const router = useRouter();
+
   // Update ui based on search term
   const onSearch = () => {
     // setFilteredContacts(searchContacts(contacts, query, currentPage));
@@ -60,23 +65,12 @@ export default function ContactsPage({
     return () => window.removeEventListener("resize", handleResize); // Cleanup
   }, []);
 
-  const onTabChange = (value: string) => {
-    const url = new URL(window.location.href);
-    const params = new URLSearchParams(url.search);
-    if (value) {
-      params.set("category", value);
-    } else {
-      params.delete("category");
-    }
+  useEffect(() => {
+    setFilteredContacts(contacts);
+  }, [contacts]);
 
-    // Update the URL without reloading the page
-    url.search = params.toString();
-    window.history.pushState({}, "", url);
-  };
-
-  const refresh = () => {
-    router.refresh();
-  };
+  const { setModal } = useContactModals();
+  const showCreateModal = () => setModal((prev) => ({ ...prev, create: true }));
   return (
     <>
       <ResizablePanel
@@ -92,15 +86,10 @@ export default function ContactsPage({
       >
         {/** WE WILL HAVE location SUBSTITUTED HERE */}
         <PageHeader title={t("CONTACTS")}>
-          <Button size="sm" onClick={refresh}>
-            Refresh
+          <Button size="sm" onClick={showCreateModal}>
+            <CirclePlus className="w-4 h-4" />
+            New Contact
           </Button>
-          <CreateContact>
-            <Button size="sm">
-              <CirclePlus className="w-4 h-4" />
-              New Contact
-            </Button>
-          </CreateContact>
         </PageHeader>
         <Search
           onSearch={onSearch}
@@ -119,10 +108,7 @@ export default function ContactsPage({
         hasMiddleBar
         className={cn(onMobile && selected === null && "hidden")} // like above we are using reverse logic here. If we are on mobile, and nothing is selected, this component should not be displayed.
       >
-        <ContactDisplay
-          contact={selected}
-          resetContact={() => setSelected(null)}
-        />
+        <ContactDisplay contact={selected} reset={() => setSelected(null)} />
       </ChildrenPanel>
     </>
   );

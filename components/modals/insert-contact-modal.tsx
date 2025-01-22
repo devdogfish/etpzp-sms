@@ -12,7 +12,6 @@ import {
 } from "../ui/dialog";
 import { Button, buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
-import { useContactModal } from "@/contexts/use-contact-modal";
 import { Contact, Recipient } from "@/types";
 import {
   Table,
@@ -25,13 +24,14 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "../ui/checkbox";
 import { useNewMessage } from "@/contexts/use-new-message";
+import { useContactModals } from "@/contexts/use-contact-modals";
 
 export default function InsertContactModal({
   children,
   contacts,
 }: Readonly<{ children: React.ReactNode; contacts: Contact[] }>) {
   const [open, setOpen] = useState(false);
-  const { setModal } = useContactModal();
+  const { setModal } = useContactModals();
   const [selected, setSelected] = useState<Contact[]>([]);
   const { addRecipient } = useNewMessage();
 
@@ -54,6 +54,7 @@ export default function InsertContactModal({
     setOpen(false);
   };
 
+  const showCreateModal = () => setModal((prev) => ({ ...prev, create: true }));
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -127,7 +128,7 @@ export default function InsertContactModal({
                 className="w-min"
                 onClick={() => {
                   setOpen(false);
-                  setModal(true);
+                  showCreateModal();
                 }}
               >
                 Create new contact

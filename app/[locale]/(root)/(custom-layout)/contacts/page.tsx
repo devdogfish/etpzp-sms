@@ -1,4 +1,7 @@
 import ContactsPage from "@/components/contacts-page";
+import CreateContactModal from "@/components/modals/create-contact-modal";
+import EditContactModal from "@/components/modals/edit-contact-modal";
+import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 import { fetchContacts } from "@/lib/actions/contact.actions";
 import { Suspense } from "react";
 
@@ -12,8 +15,12 @@ export async function Page() {
 
 export default async function ContactsPageFetcher() {
   const result = await fetchContacts();
-  const contacts = result.success ? result.data : [];
-  console.log("refetching contacts");
 
-  return <ContactsPage contacts={contacts} />;
+  return (
+    <ContactModalsProvider>
+      <CreateContactModal />
+      <EditContactModal />
+      <ContactsPage contacts={result.success ? result.data : []} />
+    </ContactModalsProvider>
+  );
 }

@@ -5,16 +5,17 @@ import { useTheme } from "next-themes";
 import { SkeletonTheme } from "react-loading-skeleton";
 import { cn } from "@/lib/utils";
 
-type AppLayoutProps = {
+type MainLayoutProps = {
   children: React.ReactNode;
   params: { locale: string };
 };
 
-export default function AppLayout({ children, params }: AppLayoutProps) {
+export default function MainLayout({ children, params }: MainLayoutProps) {
   const { theme } = useTheme();
 
   return (
-    <SkeletonTheme /**baseColor="#202020" highlightColor="#444" */
+    <SkeletonTheme
+      // we are adjusting loading skeleton colors for dark mode - defaults for light mode already look good
       baseColor={theme === "dark" ? "#2a2a2a" : undefined}
       highlightColor={theme === "dark" ? "#3a3a3a" : undefined}
     >

@@ -1,7 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { ThemeColorChanger } from "./settings/ThemeColorChanger";
-import ThemeModeToggle from "./settings/ThemeModeToggle";
+import { ThemeColorChanger, ThemeModeToggle } from "@/components/settings";
 
 const colorClasses = [
   {

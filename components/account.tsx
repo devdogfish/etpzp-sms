@@ -37,7 +37,7 @@ export default function Account({ isCollapsed }: { isCollapsed: boolean }) {
         )}
       >
         <Avatar className="w-9 h-9">
-          <AvatarImage src="https://github.com/devdogfish.png" />
+          <AvatarImage src="https://github.com/devdogfish.png" alt="Your profile picture." />
           <AvatarFallback>D</AvatarFallback>
         </Avatar>
         <div

@@ -16,7 +16,7 @@ import {
 import { Button, buttonVariants } from "../ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "../ui/label";
-import { createContact } from "@/lib/actions/contact.actions";
+import { updateContact } from "@/lib/actions/contact.actions";
 import { ActionResponse } from "@/types/contact";
 import { ContactSchema } from "@/lib/form.schemas";
 import {
@@ -32,43 +32,45 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
-import { useRouter } from "next/navigation";
+import { useContactModals } from "@/contexts/use-contact-modals";
 
 const initialState: ActionResponse = {
   success: false,
   message: "",
 };
 
-export default function CreateContact({
-  children,
-}: Readonly<{ children?: React.ReactNode }>) {
-  const [open, setOpen] = useState(false);
+export default function EditContactModal() {
+  const { modal, setModal } = useContactModals();
   const [serverState, action, pending] = useActionState(
-    createContact,
+    updateContact,
     initialState
   );
-  const router = useRouter();
 
   useEffect(() => {
     if (serverState.success) {
-      setOpen(false);
+      onOpenChange(false);
       toast.success(serverState.message);
       serverState.inputs = undefined;
       serverState.errors = undefined;
       serverState.message = "";
     }
-    router.refresh();
   }, [serverState]);
 
+  useEffect(() => {
+    console.log("loggin from edit modal");
+
+    console.log(modal);
+  }, [modal]);
+
+  const onOpenChange = (value: boolean) => {
+    setModal((prev) => ({ ...prev, edit: value }));
+  };
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children ? children : <Button variant="default">New</Button>}
-      </DialogTrigger>
+    <Dialog open={modal.edit} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create new Contact</DialogTitle>
-          <DialogDescription>Add a new contact to your list.</DialogDescription>
+          <DialogTitle>Edit Contact</DialogTitle>
+          <DialogDescription>Edit a contact in your list.</DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-6">
           <div className="space-y-2">

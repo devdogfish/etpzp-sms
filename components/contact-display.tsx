@@ -1,41 +1,11 @@
 "use client";
 
-import { addDays } from "date-fns/addDays";
-import { addHours } from "date-fns/addHours";
 import { format } from "date-fns/format";
-import { nextSaturday } from "date-fns/nextSaturday";
-import {
-  Archive,
-  ArchiveX,
-  ArrowLeft,
-  Clock,
-  Forward,
-  MoreVertical,
-  Reply,
-  ReplyAll,
-  Trash2,
-} from "lucide-react";
+import { ArrowLeft, Edit, Share, Trash2, X } from "lucide-react";
 
-import {
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
@@ -43,18 +13,38 @@ import {
 } from "@/components/ui/tooltip";
 import { Contact } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
+import { cn, getNameInitials } from "@/lib/utils";
+import { CopyButton } from "./shared/copy-button";
+import { deleteContact } from "@/lib/actions/contact.actions";
+import { toast } from "sonner";
+import { useContactModals } from "@/contexts/use-contact-modals";
 
 export default function ContactDisplay({
   contact,
-  resetContact,
+  reset,
 }: {
   contact: Contact | null;
-  resetContact?: () => void;
+  reset: () => void;
 }) {
   const today = new Date();
   const onMobile = useIsMobile();
+  const { setModal } = useContactModals();
+  const showEditModal = () => setModal((prev) => ({ ...prev, edit: true }));
 
+  const handleDelete = async () => {
+    if (contact) {
+      console.log("Deleting contact with this id ");
+      console.log(contact.id);
+
+      const result = await deleteContact(contact.id);
+      if (result.success) {
+        reset();
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    }
+  };
   return (
     <div className={cn("flex h-full flex-col")}>
       <div className="flex items-center p-2">
@@ -62,7 +52,7 @@ export default function ContactDisplay({
           {onMobile && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={resetContact}>
+                <Button variant="ghost" size="icon" onClick={reset}>
                   <ArrowLeft className="h-4 w-4" />
                   <span className="sr-only">Go back</span>
                 </Button>
@@ -70,7 +60,7 @@ export default function ContactDisplay({
               <TooltipContent>Go back</TooltipContent>
             </Tooltip>
           )}
-          <Tooltip>
+          {/* <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" disabled={!contact}>
                 <Archive className="h-4 w-4" />
@@ -78,8 +68,8 @@ export default function ContactDisplay({
               </Button>
             </TooltipTrigger>
             <TooltipContent>Archive</TooltipContent>
-          </Tooltip>
-          <Tooltip>
+          </Tooltip> */}
+          {/* <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" disabled={!contact}>
                 <ArchiveX className="h-4 w-4" />
@@ -87,108 +77,65 @@ export default function ContactDisplay({
               </Button>
             </TooltipTrigger>
             <TooltipContent>Move to junk</TooltipContent>
+          </Tooltip> */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                disabled={!contact}
+                onClick={handleDelete}
+              >
+                <Trash2 className="h-4 w-4" />
+                <span className="sr-only">Delete contact</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Delete contact</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => console.log("User wants to export a contact")}
+                disabled={!contact}
+              >
+                <Share className="h-4 w-4" />
+                <span className="sr-only">Export</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Export</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!contact}>
-                <Trash2 className="h-4 w-4" />
-                <span className="sr-only">Move to trash</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={showEditModal}
+                disabled={!contact}
+              >
+                <Edit className="h-4 w-4" />
+                <span className="sr-only">Edit</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Move to trash</TooltipContent>
-          </Tooltip>
-          <Separator orientation="vertical" className="mx-1 h-6" />
-          <Tooltip>
-            <Popover>
-              <PopoverTrigger asChild>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" disabled={!contact}>
-                    <Clock className="h-4 w-4" />
-                    <span className="sr-only">Snooze</span>
-                  </Button>
-                </TooltipTrigger>
-              </PopoverTrigger>
-              <PopoverContent className="flex w-[535px] p-0">
-                <div className="flex flex-col gap-2 border-r px-2 py-4">
-                  <div className="px-4 text-sm font-medium">Snooze until</div>
-                  <div className="grid min-w-[250px] gap-1">
-                    <Button
-                      variant="ghost"
-                      className="justify-start font-normal"
-                    >
-                      Later today{" "}
-                      <span className="ml-auto text-muted-foreground">
-                        {format(addHours(today, 4), "E, h:m b")}
-                      </span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="justify-start font-normal"
-                    >
-                      Tomorrow
-                      <span className="ml-auto text-muted-foreground">
-                        {format(addDays(today, 1), "E, h:m b")}
-                      </span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="justify-start font-normal"
-                    >
-                      This weekend
-                      <span className="ml-auto text-muted-foreground">
-                        {format(nextSaturday(today), "E, h:m b")}
-                      </span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="justify-start font-normal"
-                    >
-                      Next week
-                      <span className="ml-auto text-muted-foreground">
-                        {format(addDays(today, 7), "E, h:m b")}
-                      </span>
-                    </Button>
-                  </div>
-                </div>
-                <div className="p-2">
-                  <Calendar />
-                </div>
-              </PopoverContent>
-            </Popover>
-            <TooltipContent>Snooze</TooltipContent>
+            <TooltipContent>Edit</TooltipContent>
           </Tooltip>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!contact}>
-                <Reply className="h-4 w-4" />
-                <span className="sr-only">Reply</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Reply</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!contact}>
-                <ReplyAll className="h-4 w-4" />
-                <span className="sr-only">Reply all</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Reply all</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!contact}>
-                <Forward className="h-4 w-4" />
-                <span className="sr-only">Forward</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Forward</TooltipContent>
-          </Tooltip>
+          {contact && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={reset}>
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Close</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Close</TooltipContent>
+            </Tooltip>
+          )}
         </div>
-        <Separator orientation="vertical" className="mx-2 h-6" />
-        <DropdownMenu>
+        {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" disabled={!contact}>
               <MoreVertical className="h-4 w-4" />
@@ -201,31 +148,19 @@ export default function ContactDisplay({
             <DropdownMenuItem>Add label</DropdownMenuItem>
             <DropdownMenuItem>Mute thread</DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </div>
       <Separator />
+
       {contact ? (
         <div className="flex flex-1 flex-col">
           <div className="flex items-start p-4">
-            <div className="flex items-start gap-4 text-sm">
+            <div className="flex items-center gap-4 text-sm">
               <Avatar>
-                <AvatarImage alt={contact.subject || "No Subject"} />
-                <AvatarFallback>
-                  {contact.subject &&
-                    contact.subject
-                      .split(" ")
-                      .map((chunk) => chunk[0])
-                      .join("")}
-                </AvatarFallback>
+                <AvatarImage alt={contact.name || "Selected contact image"} />
+                <AvatarFallback>{getNameInitials(contact.name)}</AvatarFallback>
               </Avatar>
-              <div className="grid gap-1">
-                <div className="font-semibold">{contact.subject}</div>
-                <div className="line-clamp-1 text-xs">{contact.subject}</div>
-                <div className="line-clamp-1 text-xs">
-                  <span className="font-medium">Reply-To:</span>{" "}
-                  {contact.user_id}
-                </div>
-              </div>
+              <h2>{contact.name}</h2>
             </div>
             {contact.created_at && (
               <div className="ml-auto text-xs text-muted-foreground">
@@ -234,35 +169,21 @@ export default function ContactDisplay({
             )}
           </div>
           <Separator />
-          <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
-            {contact.body}
+          <div className="flex gap-4 justify-between items-center p-4 text-sm">
+            <div>Phone</div>
+            <div>{contact.phone}</div>
+            <div>
+              <CopyButton text={contact.phone} variant="ghost">
+                Copy
+              </CopyButton>
+            </div>
           </div>
-          <Separator className="mt-auto" />
-          <div className="p-4">
-            <form>
-              <div className="grid gap-4">
-                <Textarea
-                  className="p-4"
-                  placeholder={`Reply ${contact.subject}...`}
-                />
-                <div className="flex items-center">
-                  <Label
-                    htmlFor="mute"
-                    className="flex items-center gap-2 text-xs font-normal"
-                  >
-                    <Switch id="mute" aria-label="Mute thread" />
-                    Mute this thread
-                  </Label>
-                  <Button
-                    onClick={(e) => e.preventDefault()}
-                    size="sm"
-                    className="ml-auto"
-                  >
-                    Send
-                  </Button>
-                </div>
-              </div>
-            </form>
+          <Separator />
+          <div className="flex gap-4 justify-between p-4 text-sm">
+            <div>Description</div>
+            <div>
+              {contact.description || "This contact has no description"}
+            </div>
           </div>
         </div>
       ) : (

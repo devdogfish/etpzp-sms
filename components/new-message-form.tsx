@@ -15,8 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
 import RecipientsInput from "./recipients-input";
-import { ContactModalProvider } from "@/contexts/use-contact-modal";
-import CreateContactModal from "./modals/create-contact-modal-context";
+import { ContactModalsProvider } from "@/contexts/use-contact-modals";
+import CreateContactModal from "@/components/modals/create-contact-modal";
 import { Contact, Recipient } from "@/types";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { useRouter } from "next/navigation";
@@ -90,105 +90,106 @@ export default function NewMessageForm({
 
   return (
     <>
-      <ContactModalProvider>
+      <ContactModalsProvider>
         <CreateContactModal />
-        <form onSubmit={handleSubmit} className="h-screen flex flex-col">
-          <PageHeader title={subject ? subject : t("NEW_MESSAGE")}>
-            <Button
-              variant="ghost"
-              className="aspect-1 p-0"
-              onClick={handleFullScreenRedirect}
-              type="button"
-            >
-              {isFullScreen ? (
-                <Minimize2 className="h-4 w-4" />
-              ) : (
-                <Maximize2 className="h-4 w-4" />
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              className="aspect-1 p-0"
-              onClick={() => {
-                console.log("save a draft");
-              }}
-              type="button"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </PageHeader>
-          <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
-            <div className="flex flex-col px-4 mt-2">
-              <div
-                className={cn(
-                  "border-b focus-within:border-black",
-                  serverState.errors?.sender && "border-red-500"
-                )}
-              >
-                <Select name="sender" defaultValue="ETPZP">
-                  {/** It defaults to the first SelectItem */}
-                  <SelectTrigger className="w-full rounded-none border-none shadow-none focus:ring-0 px-5 py-1 h-11">
-                    <SelectValue placeholder="ETPZP" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ETPZP">ETPZP</SelectItem>
-                    <SelectItem value="Test">Test</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <RecipientsInput
-                contacts={contacts}
-                errors={serverState.errors?.recipients}
-              />
-              <Input
-                name="subject"
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setSubject(e.target.value)
-                }
-                placeholder="Message subject (optional)"
-                className={cn(
-                  "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground",
-                  serverState.errors?.subject && "border-red-500"
-                  // TODO: Add client side validation here take the red border away if
-                )}
-              />
-            </div>
-            <div className="px-4 flex-grow mt-[1.25rem] mb-2">
-              <Textarea
-                name="body"
-                className={cn(
-                  "border-none rounded-none h-full p-0 focus-visible:ring-0 shadow-none resize-none placeholder:text-muted-foreground",
-                  serverState.errors?.body &&
-                    "ring-red-500 placeholder:text-red-400"
-                )}
-                placeholder={
-                  serverState.errors?.body
-                    ? serverState.errors?.body[0]
-                    : "Start writing your message"
-                }
-              />
-            </div>
+      </ContactModalsProvider>
 
-            <Separator />
-            <div className="flex px-4 py-2 justify-between">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    type="button"
-                    onClick={() => router.push("/")}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Delete draft</TooltipContent>
-              </Tooltip>
-              <SendButton loading={loading} />
+      <form onSubmit={handleSubmit} className="h-screen flex flex-col">
+        <PageHeader title={subject ? subject : t("NEW_MESSAGE")}>
+          <Button
+            variant="ghost"
+            className="aspect-1 p-0"
+            onClick={handleFullScreenRedirect}
+            type="button"
+          >
+            {isFullScreen ? (
+              <Minimize2 className="h-4 w-4" />
+            ) : (
+              <Maximize2 className="h-4 w-4" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            className="aspect-1 p-0"
+            onClick={() => {
+              console.log("save a draft");
+            }}
+            type="button"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </PageHeader>
+        <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
+          <div className="flex flex-col px-4 mt-2">
+            <div
+              className={cn(
+                "border-b focus-within:border-black",
+                serverState.errors?.sender && "border-red-500"
+              )}
+            >
+              <Select name="sender" defaultValue="ETPZP">
+                {/** It defaults to the first SelectItem */}
+                <SelectTrigger className="w-full rounded-none border-none shadow-none focus:ring-0 px-5 py-1 h-11">
+                  <SelectValue placeholder="ETPZP" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ETPZP">ETPZP</SelectItem>
+                  <SelectItem value="Test">Test</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+            <RecipientsInput
+              contacts={contacts}
+              errors={serverState.errors?.recipients}
+            />
+            <Input
+              name="subject"
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setSubject(e.target.value)
+              }
+              placeholder="Message subject (optional)"
+              className={cn(
+                "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground",
+                serverState.errors?.subject && "border-red-500"
+                // TODO: Add client side validation here take the red border away if
+              )}
+            />
           </div>
-        </form>
-      </ContactModalProvider>
+          <div className="px-4 flex-grow mt-[1.25rem] mb-2">
+            <Textarea
+              name="body"
+              className={cn(
+                "border-none rounded-none h-full p-0 focus-visible:ring-0 shadow-none resize-none placeholder:text-muted-foreground",
+                serverState.errors?.body &&
+                  "ring-red-500 placeholder:text-red-400"
+              )}
+              placeholder={
+                serverState.errors?.body
+                  ? serverState.errors?.body[0]
+                  : "Start writing your message"
+              }
+            />
+          </div>
+
+          <Separator />
+          <div className="flex px-4 py-2 justify-between">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  type="button"
+                  onClick={() => router.push("/")}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Delete draft</TooltipContent>
+            </Tooltip>
+            <SendButton loading={loading} />
+          </div>
+        </div>
+      </form>
       {/* <UnloadListener /> */}
     </>
   );
