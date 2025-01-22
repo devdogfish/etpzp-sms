@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
 import { ActionResponse } from "@/types/action";
-import { Login } from "@/lib/auth.config";
+import { Login } from "@/lib/auth/config";
 import SubmitButton from "./shared/submit-button";
 import { Eye } from "lucide-react";
 

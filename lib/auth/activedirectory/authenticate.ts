@@ -1,6 +1,6 @@
 "use server";
 import ActiveDirectory from "activedirectory2";
-import { activeDirectoryConfig, SessionData } from "@/lib/auth.config";
+import { activeDirectoryConfig, SessionData } from "@/lib/auth/config";
 import userExists from "./user";
 import userInGroup from "./group";
 import fetchUser from "@/lib/db/user";

@@ -67,6 +67,11 @@ export default function ContactsPage({
 
   useEffect(() => {
     setFilteredContacts(contacts);
+    setSelected((prev) => {
+      if (prev !== null)
+        return contacts.find((contact) => contact.id == prev.id) || null;
+      else return null;
+    });
   }, [contacts]);
 
   const { setModal } = useContactModals();
@@ -85,7 +90,7 @@ export default function ContactsPage({
         maxSize={50}
       >
         {/** WE WILL HAVE location SUBSTITUTED HERE */}
-        <PageHeader title={t("CONTACTS")}>
+        <PageHeader title={t("CONTACT")}>
           <Button size="sm" onClick={showCreateModal}>
             <CirclePlus className="w-4 h-4" />
             New Contact
@@ -93,7 +98,7 @@ export default function ContactsPage({
         </PageHeader>
         <Search
           onSearch={onSearch}
-          placeholder={String(t("search") + " " + t("CONTACTS"))}
+          placeholder={String(t("search") + " " + t("CONTACT").toLowerCase())}
           className="pl-8 placeholder:text-muted-foreground border"
         />
         <ContactsList

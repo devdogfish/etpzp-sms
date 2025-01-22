@@ -33,13 +33,14 @@ export async function createContact(
 ): Promise<ActionResponse> {
   const session = await getSession();
 
-  const id = parseInt(session.user?.id ? session?.user?.id : "");
-  if (id && isNaN(id)) {
+  const userId = parseInt(session.user?.id || "");
+  if (userId && isNaN(userId)) {
     return {
       success: false,
       message: "Invalid user id.",
     };
   }
+
   const rawData = {
     name: formData.get("name") as string,
     phone: formData.get("phone") as string,
@@ -65,7 +66,7 @@ export async function createContact(
 
     const result = await db(
       "INSERT INTO contact (user_id, name, phone, description) VALUES ($1, $2, $3, $4) RETURNING *",
-      [id, name, validatedPhone, description || null]
+      [userId, name, validatedPhone, description || null]
     );
 
     revalidatePath("/contacts");
@@ -88,11 +89,65 @@ export async function createContact(
 }
 
 export async function updateContact(
+  id: string,
   _: ActionResponse | null,
   formData: FormData
 ): Promise<ActionResponse> {
-  console.log("updating contact");
-  return { success: true, message: "Contact created successfully!" };
+  const session = await getSession();
+
+  const userId = parseInt(session.user?.id || "");
+  if (userId && isNaN(userId)) {
+    return {
+      success: false,
+      message: "Invalid user id.",
+    };
+  }
+  const rawData = {
+    // id: formData.get("id") as string,
+    name: formData.get("name") as string,
+    phone: formData.get("phone") as string,
+    description: formData.get("description") as string,
+  };
+  const validatedData = ContactSchema.safeParse(rawData);
+  if (!validatedData.success) {
+    return {
+      success: false,
+      message: "Please fix the errors in the form",
+      errors: validatedData.error.flatten().fieldErrors,
+      inputs: rawData,
+    };
+  }
+  try {
+    console.log("Fields validated");
+    console.log(validatedData);
+
+    const { name, phone, description } = validatedData.data;
+    const validatedPhone = formatPhone(phone);
+    if (!validatedPhone)
+      throw new Error("Phone number is unexpectedly invalid!");
+
+    const result = await db(
+      "UPDATE contact SET name = $1, phone = $2, description = $3 WHERE user_id = $4 AND id = $5",
+      [name, validatedPhone, description || null, userId, id]
+    );
+
+    revalidatePath("/contacts");
+
+    return { success: true, message: "Contact created successfully!" };
+  } catch (error) {
+    let message = "";
+    if (error instanceof DatabaseError && error.code === "23505") {
+      // check if it is a duplicate key error by comparing it with the error code
+      message = "Phone number already exists in another contact";
+    } else {
+      message = "An unknown error occurred. Failed to create contact.";
+    }
+    return {
+      success: false,
+      message,
+      inputs: rawData,
+    };
+  }
 }
 
 export async function deleteContact(id: string): Promise<ActionResponse> {

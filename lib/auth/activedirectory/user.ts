@@ -1,5 +1,5 @@
 "use server";
-import ActiveDirectory from "activedirectory2";
+import type ActiveDirectory from "activedirectory2";
 
 // Check if user even exists on the server
 export default async function userExists(

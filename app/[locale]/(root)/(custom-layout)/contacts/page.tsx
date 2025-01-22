@@ -19,7 +19,6 @@ export default async function ContactsPageFetcher() {
   return (
     <ContactModalsProvider>
       <CreateContactModal />
-      <EditContactModal />
       <ContactsPage contacts={result.success ? result.data : []} />
     </ContactModalsProvider>
   );

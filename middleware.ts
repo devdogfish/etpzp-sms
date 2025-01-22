@@ -2,7 +2,7 @@ import { i18nRouter } from "next-i18n-router";
 import { i18nConfig } from "./i18nConfig";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "./lib/auth/sessions";
-import { SessionData } from "./lib/auth.config";
+import { SessionData } from "./lib/auth/config";
 
 export async function middleware(request: NextRequest) {
   // Handle i18n routing

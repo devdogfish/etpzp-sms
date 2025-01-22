@@ -18,6 +18,7 @@ import { CopyButton } from "./shared/copy-button";
 import { deleteContact } from "@/lib/actions/contact.actions";
 import { toast } from "sonner";
 import { useContactModals } from "@/contexts/use-contact-modals";
+import EditContactModal from "./modals/edit-contact-modal";
 
 export default function ContactDisplay({
   contact,
@@ -33,9 +34,6 @@ export default function ContactDisplay({
 
   const handleDelete = async () => {
     if (contact) {
-      console.log("Deleting contact with this id ");
-      console.log(contact.id);
-
       const result = await deleteContact(contact.id);
       if (result.success) {
         reset();
@@ -45,8 +43,12 @@ export default function ContactDisplay({
       }
     }
   };
+  const messageContact = () => {
+    console.log("Trying to message contact", contact.phone);
+  };
   return (
     <div className={cn("flex h-full flex-col")}>
+      {contact && <EditContactModal contact={contact} />}
       <div className="flex items-center p-2">
         <div className="flex items-center gap-2">
           {onMobile && (
@@ -171,7 +173,9 @@ export default function ContactDisplay({
           <Separator />
           <div className="flex gap-4 justify-between items-center p-4 text-sm">
             <div>Phone</div>
-            <div>{contact.phone}</div>
+            <Button variant="link" onClick={messageContact}>
+              {contact.phone}
+            </Button>
             <div>
               <CopyButton text={contact.phone} variant="ghost">
                 Copy

@@ -33,16 +33,17 @@ import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useContactModals } from "@/contexts/use-contact-modals";
+import { Contact } from "@/types";
 
 const initialState: ActionResponse = {
   success: false,
   message: "",
 };
 
-export default function EditContactModal() {
+export default function EditContactModal({ contact }: { contact: Contact }) {
   const { modal, setModal } = useContactModals();
   const [serverState, action, pending] = useActionState(
-    updateContact,
+    updateContact.bind(null, contact.id),
     initialState
   );
 
@@ -56,12 +57,6 @@ export default function EditContactModal() {
     }
   }, [serverState]);
 
-  useEffect(() => {
-    console.log("loggin from edit modal");
-
-    console.log(modal);
-  }, [modal]);
-
   const onOpenChange = (value: boolean) => {
     setModal((prev) => ({ ...prev, edit: value }));
   };
@@ -73,13 +68,14 @@ export default function EditContactModal() {
           <DialogDescription>Edit a contact in your list.</DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-6">
+          <input type="hidden" value={contact.id} />
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
               name="name"
               id="name"
               placeholder="Oliveiro"
-              defaultValue={serverState.inputs?.name}
+              defaultValue={serverState.inputs?.name || contact.name}
               // required
               // minLength={5}
               // maxLength={100}
@@ -99,7 +95,7 @@ export default function EditContactModal() {
               name="phone"
               id="phone"
               placeholder="1234568900"
-              defaultValue={serverState.inputs?.phone}
+              defaultValue={serverState.inputs?.phone || contact.phone}
               // required
               // minLength={5}
               // maxLength={100}
@@ -119,7 +115,9 @@ export default function EditContactModal() {
               name="description"
               id="description"
               placeholder="Oliveiro is a great friend of mine, I met him at the festival of the edge lords."
-              defaultValue={serverState.inputs?.description}
+              defaultValue={
+                serverState.inputs?.description || contact.description
+              }
               // required
               // minLength={5}
               // maxLength={100}

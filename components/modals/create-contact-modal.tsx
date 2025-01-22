@@ -18,7 +18,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "../ui/label";
 import { createContact } from "@/lib/actions/contact.actions";
 import { ActionResponse } from "@/types/contact";
-import { ContactSchema } from "@/lib/form.schemas";
 import {
   Badge,
   CheckCircle2,

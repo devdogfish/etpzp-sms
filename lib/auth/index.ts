@@ -5,7 +5,7 @@ import authenticate, {
 } from "./activedirectory/authenticate";
 import { createSession, getSession } from "./sessions";
 import { LoginSchema } from "@/lib/form.schemas";
-import { Login, SessionData } from "../auth.config";
+import { Login, SessionData } from "./config";
 import { ActionResponse } from "@/types/action";
 import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";

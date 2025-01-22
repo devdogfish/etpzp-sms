@@ -1,5 +1,5 @@
 import LoginForm from "@/components/login-form";
-import { activeDirectoryConfig } from "@/lib/auth.config";
+import { activeDirectoryConfig } from "@/lib/auth/config";
 import ActiveDirectory from "activedirectory2";
 
 export default async function LoginPage() {

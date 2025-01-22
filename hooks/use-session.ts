@@ -1,6 +1,6 @@
 "use client";
 
-import { SessionData } from "@/lib/auth.config";
+import { SessionData } from "@/lib/auth/config";
 import { getSessionOnClient } from "@/lib/auth/sessions";
 import { useState, useEffect } from "react";
 

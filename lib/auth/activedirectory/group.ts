@@ -1,5 +1,5 @@
 "use server";
-import ActiveDirectory from "activedirectory2";
+import type ActiveDirectory from "activedirectory2";
 
 // Check if user is apart of a specific group
 export default async function userInGroup(
