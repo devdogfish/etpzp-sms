@@ -7,7 +7,7 @@ import { useLayout } from "@/contexts/use-layout";
 import PageHeader from "./page-header";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { MessageList } from "./message-list";
+import { MessageList } from "./messages-list";
 
 import { cn, searchMessages } from "@/lib/utils";
 import { MessageDisplay } from "./message-display";
@@ -93,24 +93,24 @@ export default function MessagesPage({
             {!error && location !== "DRAFT" && (
               <TabsList>
                 <TabsTrigger value="all">
-                  {(isMobile && window.innerWidth < 450) ||
-                  (layout && layout[1] < isLarge.breakpoint) ? (
+                  {(isMobile && window.innerWidth < 528) ||
+                  (!isMobile && layout && layout[1] < isLarge.breakpoint) ? (
                     <List className="w-4 h-5" />
                   ) : (
                     t("all")
                   )}
                 </TabsTrigger>
                 <TabsTrigger value="scheduled">
-                  {(isMobile && window.innerWidth < 450) ||
-                  (layout && layout[1] < isLarge.breakpoint) ? (
+                  {(isMobile && window.innerWidth < 528) ||
+                  (!isMobile && layout && layout[1] < isLarge.breakpoint) ? (
                     <Calendar className="w-4 h-5" />
                   ) : (
                     t("scheduled")
                   )}
                 </TabsTrigger>
                 <TabsTrigger value="failed">
-                  {(isMobile && window.innerWidth < 450) ||
-                  (layout && layout[1] < isLarge.breakpoint) ? (
+                  {(isMobile && window.innerWidth < 528) ||
+                  (!isMobile && layout && layout[1] < isLarge.breakpoint) ? (
                     <AlertTriangle className="w-4 h-5" />
                   ) : (
                     t("failed")
