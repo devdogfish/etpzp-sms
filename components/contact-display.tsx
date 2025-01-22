@@ -44,7 +44,7 @@ export default function ContactDisplay({
     }
   };
   const messageContact = () => {
-    console.log("Trying to message contact", contact.phone);
+    console.log("Trying to message contact", contact?.phone);
   };
   return (
     <div className={cn("flex h-full flex-col")}>

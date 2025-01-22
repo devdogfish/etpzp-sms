@@ -6,11 +6,11 @@ import { UserPlus, X } from "lucide-react";
 
 import { Button, buttonVariants } from "./ui/button";
 import { cn, generateUniqueId } from "@/lib/utils";
-import InsertContactModal from "./modals/insert-contact-modal";
 import { Contact } from "@/types";
 
 import { useNewMessage } from "@/contexts/use-new-message";
 import { ActionResult } from "@/types/action";
+import { useContactModals } from "@/contexts/use-contact-modals";
 
 type InputState = {
   value: string;
@@ -32,6 +32,7 @@ export default function RecipientsInput({
   const container = useRef<HTMLDivElement | null>(null);
 
   const { recipients, addRecipient, removeRecipient } = useNewMessage();
+  const { setModal } = useContactModals();
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     setTimeout(() => {
@@ -61,6 +62,7 @@ export default function RecipientsInput({
     // reset input value
     setInput((prevInput) => ({ ...prevInput, value: "" }));
   };
+  const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
   return (
     <div className="flex-1 py-1">
       <div className="max-h-24 overflow-auto" ref={container}>
@@ -135,15 +137,14 @@ export default function RecipientsInput({
             }}
           />
 
-          <InsertContactModal contacts={contacts.success ? contacts.data : []}>
-            <Button
-              className="absolute right-2 bottom-[6px] p-2 aspect-1 z-index-0"
-              variant="ghost"
-              type="button"
-            >
-              <UserPlus className="h-1 w-1" />
-            </Button>
-          </InsertContactModal>
+          <Button
+            className="absolute right-2 bottom-[6px] p-2 aspect-1 z-index-0"
+            variant="ghost"
+            type="button"
+            onClick={showInsertModal}
+          >
+            <UserPlus className="h-1 w-1" />
+          </Button>
         </div>
       </div>
     </div>

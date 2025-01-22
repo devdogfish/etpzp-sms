@@ -19,7 +19,7 @@ export function ContactModalsProvider({
   const [modal, setModal] = useState<StringMap>({
     create: false,
     edit: false,
-    select: false,
+    insert: false,
   });
 
   return (

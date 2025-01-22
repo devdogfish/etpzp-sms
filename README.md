@@ -120,29 +120,26 @@ lib/
 I want to use the same structure for my components.
 
 ## TODO
-
 1. Do a test deployment
 
 ## Message form:
-
+- Add a automatic contact query by name and phone number in with the same hotkeys for inserting it like on outlook.
+- Add search functionality for contacts page. Think more about the design, and add the feature to send to a specific contact by clicking on the number.
 - clear inputs on success
-- other message and contact actions
+- other message actions
+- Implement the other `// TODO` comments
 
 ## Later on
-
-- Find a way to discard local storage safely so that if another user logs in to the machine they can't see the previous person's contacts
-- Work on home page, Work on settings page, think about how I can add a font size setting to configure the font size globally.
+- Find a way to discard local storage safely or just use cookies instead, so that if another user logs in to the machine they can't see the previous person's contacts
+- Work on home page, think about how I can add a font size setting to configure the font size globally.
 
 ## Database
-
 Deleting all tables
-
 ```sql
 DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```
 
 Executing seed file
-
 ```psql
 -- bash:
 \i ~/dev/etpzp-sms/lib/db/migrations/seed.sql

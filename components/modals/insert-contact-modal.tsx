@@ -27,11 +27,11 @@ import { useNewMessage } from "@/contexts/use-new-message";
 import { useContactModals } from "@/contexts/use-contact-modals";
 
 export default function InsertContactModal({
-  children,
   contacts,
-}: Readonly<{ children: React.ReactNode; contacts: Contact[] }>) {
-  const [open, setOpen] = useState(false);
-  const { setModal } = useContactModals();
+}: {
+  contacts: Contact[];
+}) {
+  const { modal, setModal } = useContactModals();
   const [selected, setSelected] = useState<Contact[]>([]);
   const { addRecipient } = useNewMessage();
 
@@ -51,14 +51,16 @@ export default function InsertContactModal({
     // reset the selected table
     setSelected([]);
     // close the modal
-    setOpen(false);
+    setInsertModal(false);
   };
 
   const showCreateModal = () => setModal((prev) => ({ ...prev, create: true }));
+  const setInsertModal = (value: boolean) => {
+    setModal((prev) => ({ ...prev, insert: value }));
+  };
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>{children}</DialogTrigger>
+      <Dialog open={modal.insert} onOpenChange={setInsertModal}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="text-start">Insert Contacts</DialogTitle>
@@ -127,7 +129,7 @@ export default function InsertContactModal({
               <Button
                 className="w-min"
                 onClick={() => {
-                  setOpen(false);
+                  setInsertModal(false);
                   showCreateModal();
                 }}
               >

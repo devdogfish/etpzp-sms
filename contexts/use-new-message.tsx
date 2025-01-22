@@ -44,7 +44,9 @@ export function NewMessageProvider({
         return updated;
       });
     } else {
-      toast.error("You cannot add the same recipient multiple times");
+      toast.error("Duplicate recipients", {
+        description: "You cannot add the same recipient multiple times",
+      });
     }
   };
 

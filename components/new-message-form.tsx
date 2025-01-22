@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { ActionResult } from "@/types/action";
 import { toast } from "sonner";
+import InsertContactModal from "./modals/insert-contact-modal";
 
 const initialState: ActionResponse = {
   success: false,
@@ -89,11 +90,9 @@ export default function NewMessageForm({
   const handleFullScreenRedirect = () => {};
 
   return (
-    <>
-      <ContactModalsProvider>
-        <CreateContactModal />
-      </ContactModalsProvider>
-
+    <ContactModalsProvider>
+      {/* We can only put the modal here, because it carries state */}
+      <InsertContactModal contacts={contacts.data || []} />
       <form onSubmit={handleSubmit} className="h-screen flex flex-col">
         <PageHeader title={subject ? subject : t("NEW_MESSAGE")}>
           <Button
@@ -191,6 +190,6 @@ export default function NewMessageForm({
         </div>
       </form>
       {/* <UnloadListener /> */}
-    </>
+    </ContactModalsProvider>
   );
 }

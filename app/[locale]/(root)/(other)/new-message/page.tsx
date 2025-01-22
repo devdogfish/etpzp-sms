@@ -1,4 +1,5 @@
 import NewMessageForm from "@/components/new-message-form";
+import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 import { NewMessageProvider } from "@/contexts/use-new-message";
 import { fetchContacts } from "@/lib/actions/contact.actions";
 
@@ -7,7 +8,9 @@ export default async function Page({ params }: { params: { locale: string } }) {
   const contacts = await fetchContacts();
   return (
     <NewMessageProvider>
-      <NewMessageForm isFullScreen={true} contacts={contacts} />
+
+        <NewMessageForm isFullScreen={true} contacts={contacts} />
+
     </NewMessageProvider>
   );
 }

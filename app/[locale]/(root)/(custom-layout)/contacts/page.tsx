@@ -1,6 +1,5 @@
 import ContactsPage from "@/components/contacts-page";
 import CreateContactModal from "@/components/modals/create-contact-modal";
-import EditContactModal from "@/components/modals/edit-contact-modal";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 import { fetchContacts } from "@/lib/actions/contact.actions";
 import { Suspense } from "react";
