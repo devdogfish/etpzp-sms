@@ -68,7 +68,6 @@ export default function EditContactModal({ contact }: { contact: Contact }) {
           <DialogDescription>Edit a contact in your list.</DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-6">
-          <input type="hidden" value={contact.id} />
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input

@@ -2,7 +2,6 @@
 
 import { Input } from "@/components/shared/input";
 import { Search as SearchIcon } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type SearchProps = React.InputHTMLAttributes<HTMLInputElement> & {
   onSearch: (term: string) => void;

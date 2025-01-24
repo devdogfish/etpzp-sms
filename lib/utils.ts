@@ -5,7 +5,7 @@ import parsePhoneNumber, {
 import { clsx, type ClassValue } from "clsx";
 import { i18n } from "i18next";
 import { twMerge } from "tailwind-merge";
-import { DBMessage } from "@/types";
+import { Contact, DBMessage } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -119,6 +119,25 @@ export function searchMessages(
   );
 
   return filteredMessages;
+}
+
+export function searchContacts(
+  contacts: Contact[],
+  searchTerm: string,
+  currentPage?: number
+) {
+  // Convert searchTerm to lowercase for case-insensitive comparison
+  const lowerCaseSearchTerm = searchTerm.toLowerCase().trim();
+
+  // Filter contacts based on userId and search term
+  const filteredContacts = contacts.filter(
+    (contact) =>
+      (contact.name &&
+        contact.name.toLowerCase().includes(lowerCaseSearchTerm)) ||
+      contact.phone.toLowerCase().includes(lowerCaseSearchTerm)
+  );
+
+  return filteredContacts;
 }
 
 export function formatPhone(phone: string): string | undefined {

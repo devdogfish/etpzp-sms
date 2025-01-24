@@ -1,29 +1,25 @@
 "use client";
-import { Contact, LocationEnums } from "@/types";
+import { Contact } from "@/types";
 import React, { useEffect, useState } from "react";
 import ChildrenPanel from "./shared/children-panel";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useLayout } from "@/contexts/use-layout";
 import PageHeader from "./page-header";
 import { useTranslation } from "react-i18next";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import ContactsList from "./contacts-list";
 
 import {
   cn,
+  searchContacts,
   // searchContacts
 } from "@/lib/utils";
 import ContactDisplay from "./contact-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Search from "./shared/search";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AlertTriangle, Calendar, CirclePlus, List } from "lucide-react";
-import CreateContact from "./modals/create-contact-modal";
+import { CirclePlus } from "lucide-react";
 import { Button } from "./ui/button";
-import {
-  ContactModalsProvider,
-  useContactModals,
-} from "@/contexts/use-contact-modals";
+import { useContactModals } from "@/contexts/use-contact-modals";
 
 export default function ContactsPage({
   contacts,
@@ -46,13 +42,14 @@ export default function ContactsPage({
   const router = useRouter();
 
   // Update ui based on search term
-  const onSearch = () => {
-    // setFilteredContacts(searchContacts(contacts, query, currentPage));
+  const onSearch = (term: string) => {
+    // CAUTION: when implementing pagination make sure the url is not delayed usually, you would use searchParams which are always up to date, but we are using params.set() which can be one late
+    setFilteredContacts(searchContacts(contacts, term, currentPage));
   };
 
   useEffect(() => {
     // Filter the contacts with URLsearchParams on page load
-    // setFilteredContacts(searchContacts(contacts, query, currentPage));
+    setFilteredContacts(searchContacts(contacts, query, currentPage));
     // We are managing state for when to replace icons with words. The breakpoint be less on big screens while on smaller screens, the icons should show up faster.
     const handleResize = () => {
       const _isLarge = window.matchMedia("(min-width: 1024px)").matches;
@@ -62,16 +59,13 @@ export default function ContactsPage({
     handleResize(); // Check on mount
     window.addEventListener("resize", handleResize); // Check on resize
 
-    return () => window.removeEventListener("resize", handleResize); // Cleanup
-  }, []);
-
-  useEffect(() => {
     setFilteredContacts(contacts);
     setSelected((prev) => {
       if (prev !== null)
         return contacts.find((contact) => contact.id == prev.id) || null;
       else return null;
     });
+    return () => window.removeEventListener("resize", handleResize); // Cleanup
   }, [contacts]);
 
   const { setModal } = useContactModals();
