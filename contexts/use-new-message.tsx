@@ -9,38 +9,41 @@ import { toast } from "sonner";
 
 type MessageContextValues = {
   message: Message;
-  setMessage: React.Dispatch<React.SetStateAction<Message>>;
+  // setMessage: React.Dispatch<React.SetStateAction<Message>>;
   recipients: Recipient[];
   addRecipient: (recipient: Recipient) => void;
   removeRecipient: (recipient: Recipient) => void;
-  getValidatedRecipient: (recipient: Recipient) => void;
+  // getValidatedRecipient: (recipient: Recipient) => void;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
 
 export function NewMessageProvider({
+  fetchedRecipients,
   children,
 }: {
+  fetchedRecipients: any[];
   children: React.ReactNode;
 }) {
-  const [stored, setStored] = useLocalStorage<Message>("new_message", {
+  const [message, setMessage] = useState<Message>({
     id: generateUniqueId(),
     sender: "ETPZP",
     recipients: [],
     subject: "",
     body: "",
-  });
-  const [message, setMessage] = useState<Message>(stored); // stored is guaranteed to be defined
+  }); // stored is guaranteed to be defined
 
   const addRecipient = (recipient: Recipient) => {
     // Check if the recipient already exists in the array. The result is inverted because it returns the opposite from what we want.
-    if (!message.recipients.some((item) => item.id === recipient.id)) {
+    if (
+      !message.recipients.some((item) => item.id === recipient.contactId) &&
+      !message.recipients.some((item) => item.phone === recipient.phone)
+    ) {
       setMessage((prev) => {
         const updated = {
           ...prev,
           recipients: [...prev.recipients, getValidatedRecipient(recipient)],
         };
-        setStored(updated);
         return updated;
       });
     } else {
@@ -56,7 +59,6 @@ export function NewMessageProvider({
         ...prev,
         recipients: prev.recipients.filter((r) => r !== recipient),
       };
-      setStored(updated);
       return updated;
     });
   };
@@ -69,22 +71,20 @@ export function NewMessageProvider({
 
     return {
       ...recipient,
-      error: error,
+      error,
     };
   };
-  useEffect(() => {
-    console.log(message.recipients);
-  }, [message]);
+  // useEffect(() => {
+  //   console.log(message.recipients);
+  // }, [message]);
 
   return (
     <NewMessageContext.Provider
       value={{
         message,
-        setMessage,
         recipients: message.recipients,
         addRecipient,
         removeRecipient,
-        getValidatedRecipient,
       }}
     >
       {children}

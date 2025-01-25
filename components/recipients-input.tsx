@@ -1,22 +1,31 @@
 "use client";
 import { z } from "zod";
 import { Input } from "./shared/input";
-import React, { useState, KeyboardEvent, ChangeEvent, useRef } from "react";
-import { UserPlus, X } from "lucide-react";
+import React, {
+  useState,
+  type KeyboardEvent,
+  ChangeEvent,
+  useRef,
+  useEffect,
+} from "react";
+import { Key, Search, UserPlus, X } from "lucide-react";
 
 import { Button, buttonVariants } from "./ui/button";
-import { cn, generateUniqueId } from "@/lib/utils";
-import { Contact } from "@/types";
+import { cn, generateUniqueId, getNameInitials } from "@/lib/utils";
+import type { Contact } from "@/types";
 
 import { useNewMessage } from "@/contexts/use-new-message";
-import { ActionResult } from "@/types/action";
+import type { ActionResult } from "@/types/action";
 import { useContactModals } from "@/contexts/use-contact-modals";
+import { ScrollArea } from "./ui/scroll-area";
+// import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
 type InputState = {
   value: string;
   isFocused: boolean;
   error?: string;
 };
+
 export default function RecipientsInput({
   contacts,
   errors,
@@ -30,9 +39,26 @@ export default function RecipientsInput({
     error: undefined,
   });
   const container = useRef<HTMLDivElement | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { recipients, addRecipient, removeRecipient } = useNewMessage();
   const { setModal } = useContactModals();
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        container.current &&
+        !container.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     setTimeout(() => {
@@ -64,88 +90,140 @@ export default function RecipientsInput({
   };
   const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
   return (
-    <div className="flex-1 py-1">
+    <div className="flex-1 py-1 relative">
       <div className="max-h-24 overflow-auto" ref={container}>
         <div
           className={cn(
-            "w-full flex flex-wrap items-stretch gap-x-1 py-1 h-full border-b px-5 relative",
+            "w-full flex flex-wrap items-center gap-x-1 py-1 h-full border-b px-5",
             input.isFocused && "border-primary",
             errors && "border-red-500"
-            // TODO: Add client side validation here
           )}
         >
+          {true && (
+            <span className="my-0.5 mr-0.5 px-0 flex items-center text-sm text-muted-foreground">
+              To
+            </span>
+          )}
           {recipients.map((recipient) => (
-            <div key={recipient.id} className="my-auto h-6">
-              <div
-                className={cn(
-                  "px-1.5 flex items-center text-xs border border-primary rounded-xl whitespace-nowrap h-full",
-                  recipient.error?.type === "warning" && "bg-yellow-100",
-                  recipient.error?.type === "error" && "bg-destructive/20"
-                )}
-              >
-                <span>
-                  {recipient.contactName
-                    ? recipient.contactName
-                    : recipient.phone}
-                </span>
-                <Button
-                  variant="none"
-                  className="p-0 h-4 cursor-pointer"
-                  onClick={() => {
-                    removeRecipient(recipient);
-                  }}
-                  type="button"
+            <div
+              key={recipient.id}
+              className="flex items-center h-7" /* Height of the row/container */
+            >
+              <div className="h-6" /* height of the contact chip itself */>
+                <div
+                  className={cn(
+                    "px-1.5 flex items-center text-xs border border-primary rounded-xl whitespace-nowrap h-full",
+                    recipient.error?.type === "warning" && "bg-yellow-100",
+                    recipient.error?.type === "error" && "bg-destructive/20"
+                  )}
                 >
-                  <X className="h-4 w-4" />
-                </Button>
+                  <span>
+                    {recipient.contactName
+                      ? recipient.contactName
+                      : recipient.phone}
+                  </span>
+                  <Button
+                    variant="none"
+                    className="p-0 h-4 cursor-pointer"
+                    onClick={() => {
+                      removeRecipient(recipient);
+                    }}
+                    type="button"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
 
-          {recipients.length === 0 && !input.isFocused && (
-            <span className="my-0.5 px-0 flex items-center text-sm text-muted-foreground">
-              To
-            </span>
-          )}
-          <Input
+          <div
             className={cn(
-              "h-8 my-0.5 px-0 w-min flex-1 ring-0 focus:ring-0 shadow-none placeholder:text-muted-foreground",
-              recipients.length > 0 && "ml-3"
-            )}
-            placeholder={recipients.length > 0 ? "Phone number" : ""}
-            value={input.value}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setInput((prevInput) => ({
-                ...prevInput,
-                value: e.target.value,
-              }))
-            }
-            onKeyDown={handleKeyDown}
-            // focus state
-            onFocus={() =>
-              setInput((prevInput) => ({
-                ...prevInput,
-                isFocused: true,
-              }))
-            }
-            onBlur={() => {
-              setInput((prevInput) => ({
-                ...prevInput,
-                isFocused: false,
-              }));
-              if (input.value.trim()) createRecipient(input.value.trim());
-            }}
-          />
-
-          <Button
-            className="absolute right-2 bottom-[6px] p-2 aspect-1 z-index-0"
-            variant="ghost"
-            type="button"
-            onClick={showInsertModal}
+              "h-8 min-w-[200px] flex-1 py-1 my-0.5 ml-3"
+            )} /* we are taking advantage of the default positioning of absolute elements this common parent div */
           >
-            <UserPlus className="h-1 w-1" />
-          </Button>
+            <Input
+              className={cn(
+                "h-full my-0.5 w-full p-0 ring-0 focus:ring-0 shadow-none placeholder:text-muted-foreground"
+              )}
+              placeholder={
+                recipients.length !== 0 && input.isFocused ? "Phone number" : ""
+              }
+              value={input.value}
+              onChange={(search) => {
+                setInput((prevInput) => ({
+                  ...prevInput,
+                  value: search.target.value,
+                }));
+                setIsDropdownOpen(true);
+              }}
+              onKeyDown={handleKeyDown}
+              onFocus={() => {
+                setInput((prevInput) => ({
+                  ...prevInput,
+                  isFocused: true,
+                }));
+                setIsDropdownOpen(true);
+              }}
+              onBlur={() => {
+                setInput((prevInput) => ({
+                  ...prevInput,
+                  isFocused: false,
+                }));
+                setIsDropdownOpen(false);
+              }}
+            />
+            {isDropdownOpen && (
+              <div className="absolute top-[88%] bg-white shadow rounded-md">
+                <ScrollArea className="w-[300px] h-[330px] ">
+                  <div
+                    className="p-2" /* this is necessary to have a separate container so that the items scroll all the way up to the end of the container */
+                  >
+                    <h3 className="mb-2 px-2 text-sm font-medium">
+                      Suggestions
+                    </h3>
+                    <div className="flex flex-col gap-1">
+                      {contacts.success &&
+                        contacts.data.map((contact) => (
+                          <button
+                            key={contact.id}
+                            className={cn(
+                              "flex items-center w-full gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent"
+                            )}
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              createRecipient(contact.phone);
+                            }}
+                          >
+                            <div className="rounded-full h-12 w-12 border centered">
+                              {getNameInitials(contact.name)}
+                            </div>
+                            <div className="space-y-1">
+                              <div className="font-semibold">
+                                {contact.name}
+                              </div>
+                              <div className="text-xs font-medium">
+                                {contact.phone}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                </ScrollArea>
+              </div>
+            )}
+          </div>
         </div>
+        <Button
+          className="absolute right-2 bottom-[6px] p-2 aspect-1 z-index-0"
+          variant="ghost"
+          type="button"
+          onClick={showInsertModal}
+        >
+          <UserPlus className="h-1 w-1" />
+        </Button>
       </div>
     </div>
   );

@@ -44,17 +44,36 @@ import {
 import { DBMessage } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { deleteMessage, moveMessageTo } from "@/lib/actions/message.actions";
+import { toast } from "sonner";
+import { ActionResponse } from "@/types/action";
 
 export function MessageDisplay({
   message,
-  resetMessage,
+  reset,
 }: {
   message: DBMessage | null;
-  resetMessage?: () => void;
+  reset: () => void;
 }) {
   const today = new Date();
   const onMobile = useIsMobile();
+  const handleTrashButtonClick = async () => {
+    if (message) {
+      let result: ActionResponse<null>;
+      if (message?.location === "SENT") {
+        result = await moveMessageTo("TRASH", message.id);
+      } else {
+        result = await deleteMessage(message.id);
+      }
 
+      if (result.success) {
+        reset();
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    }
+  };
   return (
     <div className={cn("flex h-full flex-col")}>
       <div className="flex items-center p-2">
@@ -62,7 +81,7 @@ export function MessageDisplay({
           {onMobile && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={resetMessage}>
+                <Button variant="ghost" size="icon" onClick={reset}>
                   <ArrowLeft className="h-4 w-4" />
                   <span className="sr-only">Go back</span>
                 </Button>
@@ -90,12 +109,25 @@ export function MessageDisplay({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
+              <Button
+                variant="ghost"
+                size="icon"
+                disabled={!message}
+                onClick={handleTrashButtonClick}
+              >
                 <Trash2 className="h-4 w-4" />
-                <span className="sr-only">Move to trash</span>
+                <span className="sr-only">
+                  {message?.location === "TRASH"
+                    ? "Delete permanently"
+                    : "Move to trash"}
+                </span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Move to trash</TooltipContent>
+            <TooltipContent>
+              {message?.location === "TRASH"
+                ? "Delete permanently"
+                : "Move to trash"}
+            </TooltipContent>
           </Tooltip>
           <Separator orientation="vertical" className="mx-1 h-6" />
           <Tooltip>

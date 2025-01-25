@@ -38,7 +38,7 @@ CREATE TABLE "contact" (
 
 -- Create Recipient Table
 CREATE TABLE recipient (     
-	id SERIAL PRIMARY KEY,     
+	id SERIAL PRIMARY KEY,
 	message_id INTEGER REFERENCES message(id) ON DELETE CASCADE,     
 	contact_id INTEGER REFERENCES contact(id) ON DELETE SET NULL,     
 	phone VARCHAR(15) NOT NULL,        -- Store phone numbers as VARCHAR to accommodate various formats  
