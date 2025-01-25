@@ -112,8 +112,7 @@ export function searchMessages(
   // Filter messages based on userId and search term
   const filteredMessages = messages.filter(
     (message) =>
-      (message.subject &&
-        message.subject.toLowerCase().includes(lowerCaseSearchTerm)) ||
+      message.subject?.toLowerCase().includes(lowerCaseSearchTerm) ||
       message.body.toLowerCase().includes(lowerCaseSearchTerm) ||
       message.status.toLowerCase() === lowerCaseSearchTerm // Assuming status is also part of the search
   );
@@ -130,8 +129,10 @@ export function formatPhone(phone: string): string | undefined {
   }
 }
 
-export function getNameInitials(fullName: string) {
+export function getNameInitials(fullName: string | undefined) {
   // Split the full name into parts
+  if (!fullName) return "X";
+
   const nameParts = fullName.trim().split(/\s+/);
 
   // Get the first letter of the first name

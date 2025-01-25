@@ -22,6 +22,7 @@ export default function PageHeader({ title, children }: PageHeaderProps) {
             variant="ghost"
             size="icon"
             className="md:hidden"
+            type="button"
             onClick={() => setMobileNavPanel(true)}
           >
             <Menu className="h-5 w-5" />

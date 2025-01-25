@@ -12,7 +12,7 @@ import { Key, Search, UserPlus, X } from "lucide-react";
 
 import { Button, buttonVariants } from "./ui/button";
 import { cn, generateUniqueId, getNameInitials } from "@/lib/utils";
-import type { Contact } from "@/types";
+import type { Contact, SuggestedRecipient, Recipient } from "@/types";
 
 import { useNewMessage } from "@/contexts/use-new-message";
 import type { ActionResult } from "@/types/action";
@@ -40,8 +40,15 @@ export default function RecipientsInput({
   });
   const container = useRef<HTMLDivElement | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  const { recipients, addRecipient, removeRecipient } = useNewMessage();
+  let alreadyAdded = false;
+  const {
+    recipients,
+    addRecipient,
+    removeRecipient,
+    // Suggested recipients
+    filteredSuggestedRecipients,
+    filterSuggestedRecipients,
+  } = useNewMessage();
   const { setModal } = useContactModals();
 
   useEffect(() => {
@@ -53,6 +60,20 @@ export default function RecipientsInput({
         setIsDropdownOpen(false);
       }
     };
+
+    if (sessionStorage.getItem("new_message_contact_id")) {
+      const contact = contacts.data?.find(
+        (contact) =>
+          contact.id == sessionStorage.getItem("new_message_contact_id")
+      );
+      console.log("Why am i being added twice"); // and WHY AM I RE-RENDERING
+      console.log(contact);
+
+      if (contact && !alreadyAdded) {
+        addRecipient(contact);
+        alreadyAdded = true;
+      }
+    }
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -72,7 +93,12 @@ export default function RecipientsInput({
       e.stopPropagation();
 
       if (input.value.trim()) {
-        createRecipient(input.value.trim());
+        addRecipient({
+          id: generateUniqueId(),
+          phone: input.value.trim(),
+        });
+        // reset input value
+        setInput((prevInput) => ({ ...prevInput, value: "" }));
       }
     }
 
@@ -80,13 +106,29 @@ export default function RecipientsInput({
       removeRecipient(recipients[recipients.length - 1]); // remove last recipient in the array
     }
   };
-  const createRecipient = (phone: string) => {
+  const createRecipient = ({
+    contact_id,
+    contact_name,
+    phone,
+  }: SuggestedRecipient) => {
     addRecipient({
       id: generateUniqueId(),
       phone,
+      contactId: String(contact_id),
+      contactName: contact_name,
     });
     // reset input value
     setInput((prevInput) => ({ ...prevInput, value: "" }));
+  };
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInput((prevInput) => ({
+      ...prevInput,
+      value,
+    }));
+    setIsDropdownOpen(true);
+
+    filterSuggestedRecipients(value);
   };
   const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
   return (
@@ -144,19 +186,13 @@ export default function RecipientsInput({
           >
             <Input
               className={cn(
-                "h-full my-0.5 w-full p-0 ring-0 focus:ring-0 shadow-none placeholder:text-muted-foreground"
+                "h-full my-0.5 w-full p-0 ring-0 focus:ring-0 shadow-none rounded-none placeholder:text-muted-foreground"
               )}
               placeholder={
                 recipients.length !== 0 && input.isFocused ? "Phone number" : ""
               }
               value={input.value}
-              onChange={(search) => {
-                setInput((prevInput) => ({
-                  ...prevInput,
-                  value: search.target.value,
-                }));
-                setIsDropdownOpen(true);
-              }}
+              onChange={onInputChange}
               onKeyDown={handleKeyDown}
               onFocus={() => {
                 setInput((prevInput) => ({
@@ -183,32 +219,33 @@ export default function RecipientsInput({
                       Suggestions
                     </h3>
                     <div className="flex flex-col gap-1">
-                      {contacts.success &&
-                        contacts.data.map((contact) => (
+                      {filteredSuggestedRecipients.map(
+                        (recipient: SuggestedRecipient) => (
                           <button
-                            key={contact.id}
+                            key={recipient.phone}
                             className={cn(
                               "flex items-center w-full gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent"
                             )}
                             type="button"
                             onMouseDown={(e) => {
                               e.preventDefault();
-                              createRecipient(contact.phone);
+                              createRecipient(recipient);
                             }}
                           >
                             <div className="rounded-full h-12 w-12 border centered">
-                              {getNameInitials(contact.name)}
+                              {getNameInitials(recipient.contact_name)}
                             </div>
                             <div className="space-y-1">
                               <div className="font-semibold">
-                                {contact.name}
+                                {recipient.contact_name || "Not yet contact"}
                               </div>
                               <div className="text-xs font-medium">
-                                {contact.phone}
+                                {recipient.phone}
                               </div>
                             </div>
                           </button>
-                        ))}
+                        )
+                      )}
                     </div>
                   </div>
                 </ScrollArea>

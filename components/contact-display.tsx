@@ -19,6 +19,7 @@ import { deleteContact } from "@/lib/actions/contact.actions";
 import { toast } from "sonner";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import EditContactModal from "./modals/edit-contact-modal";
+import { useRouter } from "next/navigation";
 
 export default function ContactDisplay({
   contact,
@@ -29,6 +30,7 @@ export default function ContactDisplay({
 }) {
   const today = new Date();
   const onMobile = useIsMobile();
+  const router = useRouter();
   const { setModal } = useContactModals();
   const showEditModal = () => setModal((prev) => ({ ...prev, edit: true }));
 
@@ -44,7 +46,8 @@ export default function ContactDisplay({
     }
   };
   const messageContact = () => {
-    console.log("Trying to message contact", contact?.phone);
+    if (contact) sessionStorage.setItem("new_message_contact_id", contact.id);
+    router.push("/new-message");
   };
   return (
     <div className={cn("flex h-full flex-col")}>

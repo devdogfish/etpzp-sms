@@ -48,12 +48,20 @@ export type DBMessage = {
   failure_reason: string | null;
 };
 
+// this is the normal recipient that we use in the new message form.
 export type Recipient = {
   id: string;
   contactId?: string;
   contactName?: string;
   phone: string;
   error?: { type: "error" | "warning"; message: string };
+};
+export type SuggestedRecipient = {
+  recipient_id: number;
+  phone: string;
+  contact_description: string;
+  contact_id: number;
+  contact_name: string;
 };
 
 export type Contact = {
@@ -66,9 +74,11 @@ export type Contact = {
   updated_at: Date;
 };
 
-export type AmountIndicators = {
-  sent: string;
-  drafts: string;
-  trash: string;
-  all: string;
-} | undefined;
+export type AmountIndicators =
+  | {
+      sent: string;
+      drafts: string;
+      trash: string;
+      all: string;
+    }
+  | undefined;

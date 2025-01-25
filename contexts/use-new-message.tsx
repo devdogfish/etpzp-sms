@@ -1,5 +1,5 @@
 "use client";
-import { Contact, Message, Recipient } from "@/types";
+import { Contact, SuggestedRecipient, Message, Recipient } from "@/types";
 import React, { useContext, createContext, useState, useEffect } from "react";
 import { generateUniqueId, validatePhoneNumber } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/use-localstorage";
@@ -14,15 +14,18 @@ type MessageContextValues = {
   addRecipient: (recipient: Recipient) => void;
   removeRecipient: (recipient: Recipient) => void;
   // getValidatedRecipient: (recipient: Recipient) => void;
+
+  filteredSuggestedRecipients: SuggestedRecipient[];
+  filterSuggestedRecipients: (searchTerm: string) => void;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
 
 export function NewMessageProvider({
-  fetchedRecipients,
+  allSuggestedRecipients,
   children,
 }: {
-  fetchedRecipients: any[];
+  allSuggestedRecipients: SuggestedRecipient[];
   children: React.ReactNode;
 }) {
   const [message, setMessage] = useState<Message>({
@@ -32,12 +35,14 @@ export function NewMessageProvider({
     subject: "",
     body: "",
   }); // stored is guaranteed to be defined
+  const [filteredSuggestedRecipients, setFilteredSuggestedRecipients] =
+    useState(allSuggestedRecipients);
 
   const addRecipient = (recipient: Recipient) => {
     // Check if the recipient already exists in the array. The result is inverted because it returns the opposite from what we want.
     if (
-      !message.recipients.some((item) => item.id === recipient.contactId) &&
-      !message.recipients.some((item) => item.phone === recipient.phone)
+      !message.recipients.find((item) => item.id === recipient.contactId || item.id === recipient.id) &&
+      !message.recipients.find((item) => item.phone === recipient.phone)
     ) {
       setMessage((prev) => {
         const updated = {
@@ -74,9 +79,27 @@ export function NewMessageProvider({
       error,
     };
   };
-  // useEffect(() => {
-  //   console.log(message.recipients);
-  // }, [message]);
+
+  const filterSuggestedRecipients = (rawSearchTerm: string) => {
+    const searchTerm = rawSearchTerm.trim();
+    if (searchTerm === "") {
+      // return suggested recipients
+      setFilteredSuggestedRecipients(allSuggestedRecipients);
+    } else {
+      setFilteredSuggestedRecipients(
+        allSuggestedRecipients.filter(
+          (recipient) =>
+            recipient.contact_name?.includes(searchTerm.toLowerCase()) ||
+            recipient.phone.includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+  };
+
+  // DEBUG
+  useEffect(() => {
+    console.log(allSuggestedRecipients);
+  }, [allSuggestedRecipients]);
 
   return (
     <NewMessageContext.Provider
@@ -85,6 +108,8 @@ export function NewMessageProvider({
         recipients: message.recipients,
         addRecipient,
         removeRecipient,
+        filteredSuggestedRecipients,
+        filterSuggestedRecipients,
       }}
     >
       {children}
