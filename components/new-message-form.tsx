@@ -16,7 +16,6 @@ import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
 
 import RecipientsInput from "./recipients-input";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
-import { Contact } from "@/types/contact";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { useRouter } from "next/navigation";
 import {
@@ -31,6 +30,7 @@ import { toast } from "sonner";
 import InsertContactModal from "./modals/insert-contact-modal";
 import InfoContactModal from "./modals/info-contact-modal";
 import { NewRecipient } from "@/types/recipient";
+import { DBContact } from "@/types/contact";
 
 const initialState: ActionResponse = {
   success: false,
@@ -41,7 +41,7 @@ export default function NewMessageForm({
   contacts,
 }: {
   isFullScreen: boolean;
-  contacts: ActionResult<Contact[]>;
+  contacts: ActionResult<DBContact[]>;
 }) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -49,7 +49,6 @@ export default function NewMessageForm({
   const [loading, setLoading] = useState(false);
   const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
-  const [selectedContact, selectContact] = useState<NewRecipient | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -95,16 +94,6 @@ export default function NewMessageForm({
     <ContactModalsProvider>
       {/* We can only put the modal here, because it carries state */}
       <InsertContactModal contacts={contacts.data || []} />
-      {selectedContact && (
-        <InfoContactModal
-          recipient={selectedContact}
-          contact={
-            contacts.data?.find(
-              (contact) => selectedContact?.contactId == contact.id
-            ) || null
-          }
-        />
-      )}
 
       <PageHeader title={subject ? subject : t("NEW_MESSAGE")}>
         <Button
@@ -152,9 +141,8 @@ export default function NewMessageForm({
             </div>
 
             <RecipientsInput
-              contacts={contacts}
+              contacts={contacts.data || []}
               errors={serverState.errors?.recipients}
-              selectContact={selectContact}
             />
 
             <Input

@@ -12,7 +12,6 @@ import {
 } from "../ui/dialog";
 import { Button, buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
-import { Contact, NewRecipient } from "@/types";
 import {
   Table,
   TableBody,
@@ -25,30 +24,25 @@ import {
 import { Checkbox } from "../ui/checkbox";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { useContactModals } from "@/contexts/use-contact-modals";
+import { DBContact } from "@/types/contact";
 
 export default function InsertContactModal({
   contacts,
 }: {
-  contacts: Contact[];
+  contacts: DBContact[];
 }) {
   const { modal, setModal } = useContactModals();
-  const [selected, setSelected] = useState<Contact[]>([]);
+  const [selected, setSelected] = useState<DBContact[]>([]);
   const { addRecipient } = useNewMessage();
 
   const onInsert = () => {
-    selected.forEach((contact: Contact) => {
-      // convert contact -> recipient, because `addRecipient` function expects a recipient.
-      const recipient: NewRecipient = {
-        id: contact.id,
-        contactId: contact.id,
-        contactName: contact.name,
-        phone: contact.phone,
-      };
+    // TODO: refactor both these functions to work for arrays
+    selected.forEach((contact: DBContact) => {
       // pass add each selected contact to the recipients context
-      addRecipient(recipient);
+      addRecipient(contact.phone, contacts);
     });
 
-    // reset the selected table
+    // reset the selected table in this modal
     setSelected([]);
     // close the modal
     setInsertModal(false);

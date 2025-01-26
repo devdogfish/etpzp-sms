@@ -13,7 +13,6 @@ import { Key, Search, UserPlus, X } from "lucide-react";
 
 import { Button, buttonVariants } from "./ui/button";
 import { cn, generateUniqueId, getNameInitials } from "@/lib/utils";
-import type { Contact } from "@/types/contact";
 import type { ProcessedDBContactRecipient as DBRecipient } from "@/types/recipient";
 import { useNewMessage } from "@/contexts/use-new-message";
 import type { ActionResult } from "@/types/action";
@@ -22,6 +21,8 @@ import { ScrollArea } from "./ui/scroll-area";
 import { useSession } from "@/hooks/use-session";
 import { useSearchParams } from "next/navigation";
 import { NewRecipient } from "@/types/recipient";
+import { DBContact } from "@/types/contact";
+import InfoContactModal from "./modals/info-contact-modal";
 // import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
 type InputState = {
@@ -33,11 +34,9 @@ type InputState = {
 export default function RecipientsInput({
   contacts,
   errors,
-  selectContact,
 }: {
-  contacts: ActionResult<Contact[]>;
+  contacts: DBContact[];
   errors?: string[];
-  selectContact: React.Dispatch<SetStateAction<NewRecipient | null>>;
 }) {
   const [input, setInput] = useState<InputState>({
     value: "",
@@ -52,12 +51,13 @@ export default function RecipientsInput({
     addRecipient,
     removeRecipient,
     // Suggested recipients
-    filteredSuggestedRecipients,
-    filterSuggestedRecipients,
+    searchedRecipients,
+    searchRecipients,
     setMessage,
     getValidatedRecipient,
   } = useNewMessage();
   const { setModal } = useContactModals();
+  const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -71,7 +71,7 @@ export default function RecipientsInput({
 
     if (searchParams.get("contactId")) {
       // On the contact page we have a message this contact link where we pass over the contactId
-      const contact = contacts.data?.find(
+      const contact = contacts.find(
         (contact) => contact.id == searchParams.get("contactId")
       );
 
@@ -95,20 +95,19 @@ export default function RecipientsInput({
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     setTimeout(() => {
-      if (container.current)
-        container.current.scrollTop += container.current.scrollHeight; // automatically scroll to the bottom of the recipients when user starts typing
+      if (container.current) {
+        // automatically scroll to the bottom of the recipients container when user starts typing
+        container.current.scrollTop += container.current.scrollHeight;
+      }
     }, 0);
 
     if (e.key === "Enter") {
       // submit the new recipient and store it in state
       e.preventDefault();
       e.stopPropagation();
-
-      if (input.value.trim()) {
-        addRecipient({
-          id: generateUniqueId(),
-          phone: input.value.trim(),
-        });
+      const phone = input.value.trim();
+      if (phone) {
+        addRecipient(phone, contacts);
         // reset input value
         setInput((prevInput) => ({ ...prevInput, value: "" }));
       }
@@ -118,20 +117,7 @@ export default function RecipientsInput({
       removeRecipient(recipients[recipients.length - 1]); // remove last recipient in the array
     }
   };
-  const createRecipient = ({
-    phone,
-    contact_id,
-    contact_name,
-  }: DBRecipient) => {
-    addRecipient({
-      id: generateUniqueId(),
-      phone,
-      contactId: String(contact_id),
-      contactName: contact_name || undefined,
-    });
-    // reset input value
-    setInput((prevInput) => ({ ...prevInput, value: "" }));
-  };
+
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInput((prevInput) => ({
@@ -140,15 +126,17 @@ export default function RecipientsInput({
     }));
     setIsDropdownOpen(true);
 
-    filterSuggestedRecipients(value);
+    searchRecipients(value);
   };
+
   const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
   const showRecipientInfo = (recipient: NewRecipient) => {
-    selectContact(recipient);
+    setMoreInfoOn(recipient);
     setModal((prev) => ({ ...prev, info: true }));
   };
   return (
     <div className="flex-1 py-1 relative">
+      {moreInfoOn && <InfoContactModal recipient={moreInfoOn} />}
       <div className="max-h-24 overflow-auto" ref={container}>
         <div
           className={cn(
@@ -162,7 +150,7 @@ export default function RecipientsInput({
           </span>
           {recipients.map((recipient) => (
             <div
-              key={recipient.id}
+              key={recipient.phone}
               className="flex items-center h-7" /* Height of the row/container */
             >
               <div className="h-6" /* height of the contact chip itself */>
@@ -177,9 +165,7 @@ export default function RecipientsInput({
                     onClick={() => showRecipientInfo(recipient)}
                     className="h-full content-center rounded-l-xl pl-1.5"
                   >
-                    {recipient.contactName
-                      ? recipient.contactName
-                      : recipient.phone}
+                    {recipient.contactName || recipient.phone}
                   </div>
                   <Button
                     variant="none"
@@ -224,17 +210,19 @@ export default function RecipientsInput({
                 setIsDropdownOpen(false);
               }}
             />
-            {isDropdownOpen && (
-              <div className="absolute top-[88%] bg-white border rounded-md">
+            {isDropdownOpen && searchedRecipients.length && (
+              <div className="absolute top-[85%] bg-white border rounded-lg shadow-md">
                 <ScrollArea className="w-[300px] h-[330px] ">
                   <div
                     className="p-2" /* this is necessary to have a separate container so that the items scroll all the way up to the end of the container */
                   >
                     <h3 className="mb-2 px-2 text-sm font-medium">
-                      Suggestions
+                      {input.value.length === 0
+                        ? "Suggestions"
+                        : "Search results"}
                     </h3>
                     <div className="flex flex-col gap-1">
-                      {filteredSuggestedRecipients.map((recipient) => (
+                      {searchedRecipients.map((recipient) => (
                         <button
                           key={recipient.phone}
                           className={cn(
@@ -243,7 +231,13 @@ export default function RecipientsInput({
                           type="button"
                           onMouseDown={(e) => {
                             e.preventDefault();
-                            createRecipient(recipient);
+
+                            addRecipient(recipient.phone, contacts);
+                            // reset input value
+                            setInput((prevInput) => ({
+                              ...prevInput,
+                              value: "",
+                            }));
                           }}
                         >
                           <div className="rounded-full h-12 w-12 border centered">

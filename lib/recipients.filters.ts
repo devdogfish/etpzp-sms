@@ -4,7 +4,7 @@ import {
 } from "@/types/recipient";
 
 export function processRecipients(
-  data: [DBContactRecipient & { last_used: Date }]
+  data: (DBContactRecipient & { last_used: Date })[]
 ): ProcessedDBContactRecipient[] {
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);

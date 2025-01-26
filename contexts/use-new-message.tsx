@@ -2,25 +2,31 @@
 
 import type { Message } from "@/types";
 import type {
+  DBContactRecipient,
   NewRecipient,
   ProcessedDBContactRecipient,
 } from "@/types/recipient";
-import React, { useContext, createContext, useState, useEffect } from "react";
-import { generateUniqueId, validatePhoneNumber } from "@/lib/utils";
+import React, { useContext, createContext, useState } from "react";
+import {
+  convertToRecipient,
+  generateUniqueId,
+  validatePhoneNumber,
+} from "@/lib/utils";
 import { toast } from "sonner";
 import { getTopRecipients } from "@/lib/recipients.filters";
+import { DBContact } from "@/types/contact";
 
 type MessageContextValues = {
   message: Message;
   setMessage: React.Dispatch<React.SetStateAction<Message>>;
 
   recipients: NewRecipient[];
-  addRecipient: (recipient: NewRecipient) => void;
+  addRecipient: (phone: string, contacts: DBContact[]) => void;
   removeRecipient: (recipient: NewRecipient) => void;
   // getValidatedRecipient: (recipient: NewRecipient) => void;
 
-  filteredSuggestedRecipients: ProcessedDBContactRecipient[];
-  filterSuggestedRecipients: (searchTerm: string) => void;
+  searchedRecipients: DBContactRecipient[];
+  searchRecipients: (searchTerm: string) => void;
 
   getValidatedRecipient: (recipient: NewRecipient) => NewRecipient;
 };
@@ -29,9 +35,11 @@ const NewMessageContext = createContext<MessageContextValues | null>(null);
 
 export function NewMessageProvider({
   allSuggestedRecipients,
+  allContacts,
   children,
 }: {
   allSuggestedRecipients: ProcessedDBContactRecipient[];
+  allContacts: DBContact[];
   children: React.ReactNode;
 }) {
   const [message, setMessage] = useState<Message>({
@@ -40,30 +48,46 @@ export function NewMessageProvider({
     recipients: [],
     subject: "",
     body: "",
-  }); // stored is guaranteed to be defined
+  });
 
-  // TODO: return suggested recipients
-  const recommendedRecipients = getTopRecipients(allSuggestedRecipients);
-  console.log(recommendedRecipients);
-  
+  const topRecipients = getTopRecipients(allSuggestedRecipients);
+  const recommendedRecipients = topRecipients.length
+    ? topRecipients
+    : // specify here how many contacts you want in the case of no existing recipients but unused existing contacts.
+      allContacts.slice(0, 4).map(({ id, phone, name, description }) => ({
+        id,
+        phone,
+        contact_id: id,
+        contact_name: name,
+        contact_description: description || null,
+      }));
 
-  const [filteredSuggestedRecipients, setFilteredSuggestedRecipients] =
-    useState(recommendedRecipients);
+  const [searchedRecipients, setSearchedRecipients] = useState(
+    recommendedRecipients
+  );
 
-  const addRecipient = (recipient: NewRecipient) => {
-    // Check if the recipient already exists in the array. The result is inverted because it returns the opposite from what we want.
-    if (
-      !message.recipients.find(
-        (item) => item.id === recipient.contactId || item.id === recipient.id
-      ) &&
-      !message.recipients.find((item) => item.phone === recipient.phone)
-    ) {
+  const addRecipient = (phone: string, contacts: DBContact[]) => {
+    searchRecipients("");
+    // Check if the recipient already exists in the array. We can use either `.some()` or `.find()`
+    if (!message.recipients.some((item) => item.phone === phone)) {
       setMessage((prev) => {
-        const updated = {
+        let newRecipient: NewRecipient;
+
+        const contactDetails = contacts.find(
+          (contact) => contact.phone === phone
+        );
+
+        if (contactDetails) {
+          // Contact found:
+          newRecipient = convertToRecipient(contactDetails);
+        } else {
+          // Contact not found:
+          newRecipient = { phone };
+        }
+        return {
           ...prev,
-          recipients: [...prev.recipients, getValidatedRecipient(recipient)],
+          recipients: [...prev.recipients, getValidatedRecipient(newRecipient)],
         };
-        return updated;
       });
     } else {
       toast.error("Duplicate recipients", {
@@ -94,13 +118,11 @@ export function NewMessageProvider({
     };
   };
 
-  const filterSuggestedRecipients = (rawSearchTerm: string) => {
+  const searchRecipients = (rawSearchTerm: string) => {
     const searchTerm = rawSearchTerm.trim().toLowerCase();
 
-    if (searchTerm === "") {
-      setFilteredSuggestedRecipients(recommendedRecipients);
-    } else {
-      setFilteredSuggestedRecipients(
+    if (searchTerm.length) {
+      setSearchedRecipients(
         allSuggestedRecipients.filter((recipient) => {
           return (
             recipient.contact_name?.toLowerCase().includes(searchTerm) ||
@@ -108,6 +130,8 @@ export function NewMessageProvider({
           );
         })
       );
+    } else {
+      setSearchedRecipients(recommendedRecipients);
     }
   };
 
@@ -119,8 +143,8 @@ export function NewMessageProvider({
         recipients: message.recipients,
         addRecipient,
         removeRecipient,
-        filteredSuggestedRecipients,
-        filterSuggestedRecipients,
+        searchedRecipients,
+        searchRecipients,
         getValidatedRecipient,
       }}
     >

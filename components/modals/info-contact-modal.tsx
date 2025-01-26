@@ -1,26 +1,23 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useActionState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "../ui/dialog";
-import { ActionResponse } from "@/types/contact";
+import { ActionResponse, DBContact } from "@/types/contact";
 
 import { DialogClose } from "@/components/ui/dialog";
 import { cn, getNameInitials } from "@/lib/utils";
 import { useContactModals } from "@/contexts/use-contact-modals";
-import { Contact, NewRecipient } from "@/types";
 import { Separator } from "../ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { CopyButton } from "../shared/copy-button";
 import { Button } from "../ui/button";
+import { NewRecipient } from "@/types/recipient";
 
 const initialState: ActionResponse = {
   success: false,
@@ -29,25 +26,27 @@ const initialState: ActionResponse = {
 
 export default function InfoContactModal({
   recipient,
-  contact,
 }: {
   recipient: NewRecipient;
-  contact: Contact | null;
 }) {
   const { modal, setModal } = useContactModals();
 
-  const onOpenChange = (value: boolean) => {
-    setModal((prev) => ({ ...prev, info: value }));
-  };
-  console.log(contact);
-
   return (
-    <Dialog open={modal.info} onOpenChange={onOpenChange}>
+    <Dialog
+      /* We do need these shits unfortunately */
+      open={modal.info}
+      onOpenChange={(value: boolean) =>
+        setModal((prev) => ({ ...prev, info: value }))
+      }
+    >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{contact ? "Contact" : "NewRecipient"} info</DialogTitle>
+          <DialogTitle>
+            {recipient.contactId ? "Contact" : "Recipient"} info
+          </DialogTitle>
           <DialogDescription>
-            View more info about a {contact ? "contact" : "recipient"} in your
+            View more info about a{" "}
+            {recipient.contactId ? "recipient.contactId" : "recipient"} in your
             list.
           </DialogDescription>
         </DialogHeader>
@@ -57,14 +56,18 @@ export default function InfoContactModal({
               <Avatar>
                 <AvatarImage
                   alt={
-                    contact ? contact.name : "Selected contact profile picture"
+                    recipient.contactName ||
+                    "Selected recipient.contactId profile picture"
                   }
                 />
                 <AvatarFallback>
-                  {getNameInitials(contact?.name)}
+                  {getNameInitials(recipient.contactName)}
                 </AvatarFallback>
               </Avatar>
-              <h2>{contact ? contact.name : "This is not yet a contact"}</h2>
+              <h2>
+                {recipient.contactName ||
+                  "This is not yet a recipient.contactId"}
+              </h2>
             </div>
           </div>
           <Separator />
@@ -78,12 +81,12 @@ export default function InfoContactModal({
             </div>
           </div>
           <Separator />
-          {contact && (
+          {recipient.contactId && (
             <div className="flex gap-4 justify-between p-4 text-sm">
               <div>Description</div>
               <div>
-                {contact.description ||
-                  "This contact doesn't have a description"}
+                {recipient.contactDescription ||
+                  "This recipient.contactId doesn't have a description"}
               </div>
             </div>
           )}

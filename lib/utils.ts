@@ -1,3 +1,4 @@
+import { DBContact } from "./../types/contact";
 import parsePhoneNumber, {
   CountryCode,
   parsePhoneNumberFromString,
@@ -6,6 +7,7 @@ import { clsx, type ClassValue } from "clsx";
 import { i18n } from "i18next";
 import { twMerge } from "tailwind-merge";
 import { DBMessage } from "@/types";
+import { NewRecipient } from "@/types/recipient";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -148,4 +150,15 @@ export function getNameInitials(fullName: string | null | undefined) {
 
   // Return the initials
   return firstInitial + lastInitial;
+}
+
+// Convert contact -> recipient, because `addRecipient` function expects a recipient type of NewRecipient not of contact type.
+export function convertToRecipient(contact: DBContact): NewRecipient {
+  const { id, name, phone, description } = contact;
+  return {
+    phone,
+    contactId: id,
+    contactName: name,
+    contactDescription: description,
+  };
 }

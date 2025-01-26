@@ -2,9 +2,10 @@
 
 import db from "@/lib/db";
 import { MessageSchema } from "../form.schemas";
-import { Message, NewRecipient } from "@/types";
+import { Message } from "@/types";
 import { getSession } from "../auth/sessions";
 import { formatPhone } from "../utils";
+import { NewRecipient } from "@/types/recipient";
 
 export type ActionResponse = {
   success: boolean;

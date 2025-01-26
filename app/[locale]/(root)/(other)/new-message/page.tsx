@@ -6,17 +6,18 @@ import { getTopRecipients, processRecipients } from "@/lib/recipients.filters";
 
 export default async function Page({ params }: { params: { locale: string } }) {
   const { locale } = await params;
-  const contacts = await fetchContacts();
-  const fetchedRecipients = await fetchRecipients();
+  const contactsResult = await fetchContacts();
+  const recipientsResult = await fetchRecipients();
 
-  const processed = processRecipients(fetchedRecipients.data || []);
-  console.log("RAW: ", fetchedRecipients.data);
-  console.log("PROCESSED: ", processed);
-  console.log("TOP 5: ", getTopRecipients(processed));
+  const processedRecipients = processRecipients(recipientsResult.data || []);
+  const contacts = contactsResult.data || [];
 
   return (
-    <NewMessageProvider allSuggestedRecipients={fetchedRecipients.data || []}>
-      <NewMessageForm isFullScreen={true} contacts={contacts} />
+    <NewMessageProvider
+      allSuggestedRecipients={processedRecipients}
+      allContacts={contacts}
+    >
+      <NewMessageForm isFullScreen={true} contacts={contactsResult} />
     </NewMessageProvider>
   );
 }
