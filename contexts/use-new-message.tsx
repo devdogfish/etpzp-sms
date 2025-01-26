@@ -9,7 +9,8 @@ import { toast } from "sonner";
 
 type MessageContextValues = {
   message: Message;
-  // setMessage: React.Dispatch<React.SetStateAction<Message>>;
+  setMessage: React.Dispatch<React.SetStateAction<Message>>;
+
   recipients: Recipient[];
   addRecipient: (recipient: Recipient) => void;
   removeRecipient: (recipient: Recipient) => void;
@@ -17,6 +18,8 @@ type MessageContextValues = {
 
   filteredSuggestedRecipients: SuggestedRecipient[];
   filterSuggestedRecipients: (searchTerm: string) => void;
+
+  getValidatedRecipient: (recipient: Recipient) => Recipient;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
@@ -41,7 +44,9 @@ export function NewMessageProvider({
   const addRecipient = (recipient: Recipient) => {
     // Check if the recipient already exists in the array. The result is inverted because it returns the opposite from what we want.
     if (
-      !message.recipients.find((item) => item.id === recipient.contactId || item.id === recipient.id) &&
+      !message.recipients.find(
+        (item) => item.id === recipient.contactId || item.id === recipient.id
+      ) &&
       !message.recipients.find((item) => item.phone === recipient.phone)
     ) {
       setMessage((prev) => {
@@ -105,11 +110,13 @@ export function NewMessageProvider({
     <NewMessageContext.Provider
       value={{
         message,
+        setMessage,
         recipients: message.recipients,
         addRecipient,
         removeRecipient,
         filteredSuggestedRecipients,
         filterSuggestedRecipients,
+        getValidatedRecipient,
       }}
     >
       {children}

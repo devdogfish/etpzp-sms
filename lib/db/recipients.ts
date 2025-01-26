@@ -1,7 +1,10 @@
+// import { ActionResponse } from '@/types/action';
 "use server";
 
+import { SuggestedRecipient } from "@/types";
 import db from ".";
 import { getSession } from "../auth/sessions";
+import { ActionResponse } from "@/types/contact";
 
 export async function fetchRecipients() {
   const session = await getSession();
@@ -18,7 +21,7 @@ export async function fetchRecipients() {
       `SELECT DISTINCT ON (r.phone)
             r.id AS recipient_id,
             r.phone AS phone,
-            COALESCE(c.name, 'Unknown') AS contact_name,
+            c.name AS contact_name,
             COALESCE(c.id, 0) AS contact_id,
             COALESCE(c.description, '') AS contact_description,
             CASE 

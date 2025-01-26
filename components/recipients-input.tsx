@@ -7,6 +7,7 @@ import React, {
   ChangeEvent,
   useRef,
   useEffect,
+  SetStateAction,
 } from "react";
 import { Key, Search, UserPlus, X } from "lucide-react";
 
@@ -18,6 +19,8 @@ import { useNewMessage } from "@/contexts/use-new-message";
 import type { ActionResult } from "@/types/action";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { ScrollArea } from "./ui/scroll-area";
+import { useSession } from "@/hooks/use-session";
+import { useSearchParams } from "next/navigation";
 // import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
 type InputState = {
@@ -29,9 +32,11 @@ type InputState = {
 export default function RecipientsInput({
   contacts,
   errors,
+  selectContact,
 }: {
   contacts: ActionResult<Contact[]>;
   errors?: string[];
+  selectContact: React.Dispatch<SetStateAction<Recipient | null>>;
 }) {
   const [input, setInput] = useState<InputState>({
     value: "",
@@ -40,7 +45,7 @@ export default function RecipientsInput({
   });
   const container = useRef<HTMLDivElement | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  let alreadyAdded = false;
+  const searchParams = useSearchParams();
   const {
     recipients,
     addRecipient,
@@ -48,6 +53,8 @@ export default function RecipientsInput({
     // Suggested recipients
     filteredSuggestedRecipients,
     filterSuggestedRecipients,
+    setMessage,
+    getValidatedRecipient,
   } = useNewMessage();
   const { setModal } = useContactModals();
 
@@ -61,17 +68,21 @@ export default function RecipientsInput({
       }
     };
 
-    if (sessionStorage.getItem("new_message_contact_id")) {
+    if (searchParams.get("contactId")) {
+      // On the contact page we have a message this contact link where we pass over the contactId
       const contact = contacts.data?.find(
-        (contact) =>
-          contact.id == sessionStorage.getItem("new_message_contact_id")
+        (contact) => contact.id == searchParams.get("contactId")
       );
-      console.log("Why am i being added twice"); // and WHY AM I RE-RENDERING
-      console.log(contact);
 
-      if (contact && !alreadyAdded) {
-        addRecipient(contact);
-        alreadyAdded = true;
+      // It could be an invalid id
+      if (contact) {
+        const recipient = getValidatedRecipient({
+          contactName: contact.name,
+          contactId: contact.id,
+          ...contact,
+        });
+        // Replace all existing contacts instead of pushing the contact
+        setMessage((prev) => ({ ...prev, recipients: [recipient] }));
       }
     }
 
@@ -131,6 +142,10 @@ export default function RecipientsInput({
     filterSuggestedRecipients(value);
   };
   const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
+  const showRecipientInfo = (recipient: Recipient) => {
+    selectContact(recipient);
+    setModal((prev) => ({ ...prev, info: true }));
+  };
   return (
     <div className="flex-1 py-1 relative">
       <div className="max-h-24 overflow-auto" ref={container}>
@@ -154,25 +169,26 @@ export default function RecipientsInput({
               <div className="h-6" /* height of the contact chip itself */>
                 <div
                   className={cn(
-                    "px-1.5 flex items-center text-xs border border-primary rounded-xl whitespace-nowrap h-full",
-                    recipient.error?.type === "warning" && "bg-yellow-100",
-                    recipient.error?.type === "error" && "bg-destructive/20"
+                    "flex items-center text-xs border rounded-xl hover:bg-muted cursor-pointer whitespace-nowrap h-full",
+                    // recipient.error?.type === "warning" && "bg-yellow-100",
+                    recipient.error?.type === "error" && "border-destructive"
                   )}
                 >
-                  <span>
+                  <div
+                    onClick={() => showRecipientInfo(recipient)}
+                    className="h-full content-center rounded-l-xl pl-1.5"
+                  >
                     {recipient.contactName
                       ? recipient.contactName
                       : recipient.phone}
-                  </span>
+                  </div>
                   <Button
                     variant="none"
-                    className="p-0 h-4 cursor-pointer"
-                    onClick={() => {
-                      removeRecipient(recipient);
-                    }}
+                    className="h-full py-0 px-1.5 cursor-pointer closeX rounded-l-none rounded-r-xl"
+                    onClick={() => removeRecipient(recipient)}
                     type="button"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-4 w-4 text-muted-foreground" />
                   </Button>
                 </div>
               </div>
@@ -210,7 +226,7 @@ export default function RecipientsInput({
               }}
             />
             {isDropdownOpen && (
-              <div className="absolute top-[88%] bg-white shadow rounded-md">
+              <div className="absolute top-[88%] bg-white border rounded-md">
                 <ScrollArea className="w-[300px] h-[330px] ">
                   <div
                     className="p-2" /* this is necessary to have a separate container so that the items scroll all the way up to the end of the container */
@@ -237,10 +253,10 @@ export default function RecipientsInput({
                             </div>
                             <div className="space-y-1">
                               <div className="font-semibold">
-                                {recipient.contact_name || "Not yet contact"}
+                                {recipient.contact_name || recipient.phone}
                               </div>
                               <div className="text-xs font-medium">
-                                {recipient.phone}
+                                {recipient.contact_name ? recipient.phone : ""}
                               </div>
                             </div>
                           </button>

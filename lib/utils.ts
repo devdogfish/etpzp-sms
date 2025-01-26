@@ -131,7 +131,7 @@ export function formatPhone(phone: string): string | undefined {
 
 export function getNameInitials(fullName: string | undefined) {
   // Split the full name into parts
-  if (!fullName) return "X";
+  if (!fullName) return "";
 
   const nameParts = fullName.trim().split(/\s+/);
 

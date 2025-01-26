@@ -2,6 +2,8 @@ export type MessageLocation = "sent" | "draft" | "trash";
 export type StatusEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFTED";
 export type LocationEnums = "ALL" | "SENT" | "DRAFT" | "TRASH";
 
+export type StringMap = { [key: string]: boolean };
+
 export type DBUser = {
   id: string;
   name: string;
@@ -61,7 +63,7 @@ export type SuggestedRecipient = {
   phone: string;
   contact_description: string;
   contact_id: number;
-  contact_name: string;
+  contact_name?: string;
 };
 
 export type Contact = {

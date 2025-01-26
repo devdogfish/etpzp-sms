@@ -1,7 +1,8 @@
 "use client";
+
+import { StringMap } from "@/types";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-type StringMap = { [key: string]: boolean };
 type ContactModalContextValues = {
   modal: StringMap;
   setModal: React.Dispatch<React.SetStateAction<StringMap>>;
@@ -20,6 +21,7 @@ export function ContactModalsProvider({
     create: false,
     edit: false,
     insert: false,
+    info: false,
   });
 
   return (

@@ -45,9 +45,10 @@ export default function ContactDisplay({
       }
     }
   };
-  const messageContact = () => {
-    if (contact) sessionStorage.setItem("new_message_contact_id", contact.id);
-    router.push("/new-message");
+  const messageContact = async () => {
+    if (contact?.id) {
+      router.push(`/new-message?contactId=${contact?.id}`);
+    }
   };
   return (
     <div className={cn("flex h-full flex-col")}>

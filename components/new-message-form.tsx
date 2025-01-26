@@ -30,6 +30,7 @@ import {
 import { ActionResult } from "@/types/action";
 import { toast } from "sonner";
 import InsertContactModal from "./modals/insert-contact-modal";
+import InfoContactModal from "./modals/info-contact-modal";
 
 const initialState: ActionResponse = {
   success: false,
@@ -48,6 +49,10 @@ export default function NewMessageForm({
   const [loading, setLoading] = useState(false);
   const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
+  const [selectedContact, selectContact] = useState<Recipient | null>(null);
+  useEffect(() => {
+    console.log(selectedContact);
+  }, [selectedContact]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -93,6 +98,17 @@ export default function NewMessageForm({
     <ContactModalsProvider>
       {/* We can only put the modal here, because it carries state */}
       <InsertContactModal contacts={contacts.data || []} />
+      {selectedContact && (
+        <InfoContactModal
+          recipient={selectedContact}
+          contact={
+            contacts.data?.find(
+              (contact) => selectedContact?.contactId == contact.id
+            ) || null
+          }
+        />
+      )}
+
       <form onSubmit={handleSubmit} className="h-screen flex flex-col">
         <PageHeader title={subject ? subject : t("NEW_MESSAGE")}>
           <Button
@@ -140,6 +156,7 @@ export default function NewMessageForm({
             <RecipientsInput
               contacts={contacts}
               errors={serverState.errors?.recipients}
+              selectContact={selectContact}
             />
             <Input
               name="subject"
