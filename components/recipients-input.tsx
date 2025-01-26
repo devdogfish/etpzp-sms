@@ -1,5 +1,5 @@
 "use client";
-import { z } from "zod";
+
 import { Input } from "./shared/input";
 import React, {
   useState,
@@ -13,14 +13,15 @@ import { Key, Search, UserPlus, X } from "lucide-react";
 
 import { Button, buttonVariants } from "./ui/button";
 import { cn, generateUniqueId, getNameInitials } from "@/lib/utils";
-import type { Contact, SuggestedRecipient, Recipient } from "@/types";
-
+import type { Contact } from "@/types/contact";
+import type { ProcessedDBContactRecipient as DBRecipient } from "@/types/recipient";
 import { useNewMessage } from "@/contexts/use-new-message";
 import type { ActionResult } from "@/types/action";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { ScrollArea } from "./ui/scroll-area";
 import { useSession } from "@/hooks/use-session";
 import { useSearchParams } from "next/navigation";
+import { NewRecipient } from "@/types/recipient";
 // import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
 type InputState = {
@@ -36,7 +37,7 @@ export default function RecipientsInput({
 }: {
   contacts: ActionResult<Contact[]>;
   errors?: string[];
-  selectContact: React.Dispatch<SetStateAction<Recipient | null>>;
+  selectContact: React.Dispatch<SetStateAction<NewRecipient | null>>;
 }) {
   const [input, setInput] = useState<InputState>({
     value: "",
@@ -118,15 +119,15 @@ export default function RecipientsInput({
     }
   };
   const createRecipient = ({
+    phone,
     contact_id,
     contact_name,
-    phone,
-  }: SuggestedRecipient) => {
+  }: DBRecipient) => {
     addRecipient({
       id: generateUniqueId(),
       phone,
       contactId: String(contact_id),
-      contactName: contact_name,
+      contactName: contact_name || undefined,
     });
     // reset input value
     setInput((prevInput) => ({ ...prevInput, value: "" }));
@@ -142,7 +143,7 @@ export default function RecipientsInput({
     filterSuggestedRecipients(value);
   };
   const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
-  const showRecipientInfo = (recipient: Recipient) => {
+  const showRecipientInfo = (recipient: NewRecipient) => {
     selectContact(recipient);
     setModal((prev) => ({ ...prev, info: true }));
   };
@@ -156,11 +157,9 @@ export default function RecipientsInput({
             errors && "border-red-500"
           )}
         >
-          {true && (
-            <span className="my-0.5 mr-0.5 px-0 flex items-center text-sm text-muted-foreground">
-              To
-            </span>
-          )}
+          <span className="my-0.5 mr-0.5 px-0 flex items-center text-sm text-muted-foreground">
+            To
+          </span>
           {recipients.map((recipient) => (
             <div
               key={recipient.id}
@@ -235,33 +234,31 @@ export default function RecipientsInput({
                       Suggestions
                     </h3>
                     <div className="flex flex-col gap-1">
-                      {filteredSuggestedRecipients.map(
-                        (recipient: SuggestedRecipient) => (
-                          <button
-                            key={recipient.phone}
-                            className={cn(
-                              "flex items-center w-full gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent"
-                            )}
-                            type="button"
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              createRecipient(recipient);
-                            }}
-                          >
-                            <div className="rounded-full h-12 w-12 border centered">
-                              {getNameInitials(recipient.contact_name)}
+                      {filteredSuggestedRecipients.map((recipient) => (
+                        <button
+                          key={recipient.phone}
+                          className={cn(
+                            "flex items-center w-full gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent"
+                          )}
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            createRecipient(recipient);
+                          }}
+                        >
+                          <div className="rounded-full h-12 w-12 border centered">
+                            {getNameInitials(recipient.contact_name)}
+                          </div>
+                          <div className="space-y-1">
+                            <div className="font-semibold">
+                              {recipient.contact_name || recipient.phone}
                             </div>
-                            <div className="space-y-1">
-                              <div className="font-semibold">
-                                {recipient.contact_name || recipient.phone}
-                              </div>
-                              <div className="text-xs font-medium">
-                                {recipient.contact_name ? recipient.phone : ""}
-                              </div>
+                            <div className="text-xs font-medium">
+                              {recipient.contact_name ? recipient.phone : ""}
                             </div>
-                          </button>
-                        )
-                      )}
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </ScrollArea>

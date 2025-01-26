@@ -1,25 +1,28 @@
 "use client";
-import { Contact, SuggestedRecipient, Message, Recipient } from "@/types";
+
+import type { Message } from "@/types";
+import type {
+  NewRecipient,
+  ProcessedDBContactRecipient,
+} from "@/types/recipient";
 import React, { useContext, createContext, useState, useEffect } from "react";
 import { generateUniqueId, validatePhoneNumber } from "@/lib/utils";
-import { useLocalStorage } from "@/hooks/use-localstorage";
-import { MessageSchema } from "@/lib/form.schemas";
-import { z } from "zod";
 import { toast } from "sonner";
+import { getTopRecipients } from "@/lib/recipients.filters";
 
 type MessageContextValues = {
   message: Message;
   setMessage: React.Dispatch<React.SetStateAction<Message>>;
 
-  recipients: Recipient[];
-  addRecipient: (recipient: Recipient) => void;
-  removeRecipient: (recipient: Recipient) => void;
-  // getValidatedRecipient: (recipient: Recipient) => void;
+  recipients: NewRecipient[];
+  addRecipient: (recipient: NewRecipient) => void;
+  removeRecipient: (recipient: NewRecipient) => void;
+  // getValidatedRecipient: (recipient: NewRecipient) => void;
 
-  filteredSuggestedRecipients: SuggestedRecipient[];
+  filteredSuggestedRecipients: ProcessedDBContactRecipient[];
   filterSuggestedRecipients: (searchTerm: string) => void;
 
-  getValidatedRecipient: (recipient: Recipient) => Recipient;
+  getValidatedRecipient: (recipient: NewRecipient) => NewRecipient;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
@@ -28,7 +31,7 @@ export function NewMessageProvider({
   allSuggestedRecipients,
   children,
 }: {
-  allSuggestedRecipients: SuggestedRecipient[];
+  allSuggestedRecipients: ProcessedDBContactRecipient[];
   children: React.ReactNode;
 }) {
   const [message, setMessage] = useState<Message>({
@@ -38,10 +41,16 @@ export function NewMessageProvider({
     subject: "",
     body: "",
   }); // stored is guaranteed to be defined
-  const [filteredSuggestedRecipients, setFilteredSuggestedRecipients] =
-    useState(allSuggestedRecipients);
 
-  const addRecipient = (recipient: Recipient) => {
+  // TODO: return suggested recipients
+  const recommendedRecipients = getTopRecipients(allSuggestedRecipients);
+  console.log(recommendedRecipients);
+  
+
+  const [filteredSuggestedRecipients, setFilteredSuggestedRecipients] =
+    useState(recommendedRecipients);
+
+  const addRecipient = (recipient: NewRecipient) => {
     // Check if the recipient already exists in the array. The result is inverted because it returns the opposite from what we want.
     if (
       !message.recipients.find(
@@ -63,7 +72,7 @@ export function NewMessageProvider({
     }
   };
 
-  const removeRecipient = (recipient: Recipient) => {
+  const removeRecipient = (recipient: NewRecipient) => {
     setMessage((prev) => {
       const updated = {
         ...prev,
@@ -73,7 +82,7 @@ export function NewMessageProvider({
     });
   };
 
-  const getValidatedRecipient = (recipient: Recipient): Recipient => {
+  const getValidatedRecipient = (recipient: NewRecipient): NewRecipient => {
     const error = validatePhoneNumber(recipient.phone);
     if (!error) {
       return recipient;
@@ -86,25 +95,21 @@ export function NewMessageProvider({
   };
 
   const filterSuggestedRecipients = (rawSearchTerm: string) => {
-    const searchTerm = rawSearchTerm.trim();
+    const searchTerm = rawSearchTerm.trim().toLowerCase();
+
     if (searchTerm === "") {
-      // return suggested recipients
-      setFilteredSuggestedRecipients(allSuggestedRecipients);
+      setFilteredSuggestedRecipients(recommendedRecipients);
     } else {
       setFilteredSuggestedRecipients(
-        allSuggestedRecipients.filter(
-          (recipient) =>
-            recipient.contact_name?.includes(searchTerm.toLowerCase()) ||
-            recipient.phone.includes(searchTerm.toLowerCase())
-        )
+        allSuggestedRecipients.filter((recipient) => {
+          return (
+            recipient.contact_name?.toLowerCase().includes(searchTerm) ||
+            recipient.phone.toLowerCase().includes(searchTerm)
+          );
+        })
       );
     }
   };
-
-  // DEBUG
-  useEffect(() => {
-    console.log(allSuggestedRecipients);
-  }, [allSuggestedRecipients]);
 
   return (
     <NewMessageContext.Provider

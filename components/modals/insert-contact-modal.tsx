@@ -12,7 +12,7 @@ import {
 } from "../ui/dialog";
 import { Button, buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
-import { Contact, Recipient } from "@/types";
+import { Contact, NewRecipient } from "@/types";
 import {
   Table,
   TableBody,
@@ -38,7 +38,7 @@ export default function InsertContactModal({
   const onInsert = () => {
     selected.forEach((contact: Contact) => {
       // convert contact -> recipient, because `addRecipient` function expects a recipient.
-      const recipient: Recipient = {
+      const recipient: NewRecipient = {
         id: contact.id,
         contactId: contact.id,
         contactName: contact.name,

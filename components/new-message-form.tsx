@@ -16,8 +16,7 @@ import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
 
 import RecipientsInput from "./recipients-input";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
-import CreateContactModal from "@/components/modals/create-contact-modal";
-import { Contact, Recipient } from "@/types";
+import { Contact } from "@/types/contact";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { useRouter } from "next/navigation";
 import {
@@ -31,6 +30,7 @@ import { ActionResult } from "@/types/action";
 import { toast } from "sonner";
 import InsertContactModal from "./modals/insert-contact-modal";
 import InfoContactModal from "./modals/info-contact-modal";
+import { NewRecipient } from "@/types/recipient";
 
 const initialState: ActionResponse = {
   success: false,
@@ -49,10 +49,7 @@ export default function NewMessageForm({
   const [loading, setLoading] = useState(false);
   const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
-  const [selectedContact, selectContact] = useState<Recipient | null>(null);
-  useEffect(() => {
-    console.log(selectedContact);
-  }, [selectedContact]);
+  const [selectedContact, selectContact] = useState<NewRecipient | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -62,7 +59,7 @@ export default function NewMessageForm({
 
     const result = await sendMessage({
       sender: formData.get("sender") as string,
-      recipients: recipients as Recipient[],
+      recipients: recipients as NewRecipient[],
       subject: formData.get("subject") as string,
       body: formData.get("body") as string,
     });
@@ -109,31 +106,31 @@ export default function NewMessageForm({
         />
       )}
 
+      <PageHeader title={subject ? subject : t("NEW_MESSAGE")}>
+        <Button
+          variant="ghost"
+          className="aspect-1 p-0"
+          onClick={handleFullScreenRedirect}
+          type="button"
+        >
+          {isFullScreen ? (
+            <Minimize2 className="h-4 w-4" />
+          ) : (
+            <Maximize2 className="h-4 w-4" />
+          )}
+        </Button>
+        <Button
+          variant="ghost"
+          className="aspect-1 p-0"
+          onClick={() => {
+            console.log("save a draft");
+          }}
+          type="button"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </PageHeader>
       <form onSubmit={handleSubmit} className="h-screen flex flex-col">
-        <PageHeader title={subject ? subject : t("NEW_MESSAGE")}>
-          <Button
-            variant="ghost"
-            className="aspect-1 p-0"
-            onClick={handleFullScreenRedirect}
-            type="button"
-          >
-            {isFullScreen ? (
-              <Minimize2 className="h-4 w-4" />
-            ) : (
-              <Maximize2 className="h-4 w-4" />
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            className="aspect-1 p-0"
-            onClick={() => {
-              console.log("save a draft");
-            }}
-            type="button"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </PageHeader>
         <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
           <div className="flex flex-col px-4 mt-2">
             <div
@@ -153,11 +150,13 @@ export default function NewMessageForm({
                 </SelectContent>
               </Select>
             </div>
+
             <RecipientsInput
               contacts={contacts}
               errors={serverState.errors?.recipients}
               selectContact={selectContact}
             />
+
             <Input
               name="subject"
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -165,9 +164,8 @@ export default function NewMessageForm({
               }
               placeholder="Message subject (optional)"
               className={cn(
-                "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground",
-                serverState.errors?.subject && "border-red-500"
-                // TODO: Add client side validation here take the red border away if
+                "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground"
+                // TODO: Add client side validation here - Make all the invalid recipient have a pulsing animation of the with a red border!! I love this idea!
               )}
             />
           </div>

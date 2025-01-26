@@ -16,7 +16,7 @@ import { ActionResponse } from "@/types/contact";
 import { DialogClose } from "@/components/ui/dialog";
 import { cn, getNameInitials } from "@/lib/utils";
 import { useContactModals } from "@/contexts/use-contact-modals";
-import { Contact, Recipient } from "@/types";
+import { Contact, NewRecipient } from "@/types";
 import { Separator } from "../ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { CopyButton } from "../shared/copy-button";
@@ -31,7 +31,7 @@ export default function InfoContactModal({
   recipient,
   contact,
 }: {
-  recipient: Recipient;
+  recipient: NewRecipient;
   contact: Contact | null;
 }) {
   const { modal, setModal } = useContactModals();
@@ -45,7 +45,7 @@ export default function InfoContactModal({
     <Dialog open={modal.info} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{contact ? "Contact" : "Recipient"} info</DialogTitle>
+          <DialogTitle>{contact ? "Contact" : "NewRecipient"} info</DialogTitle>
           <DialogDescription>
             View more info about a {contact ? "contact" : "recipient"} in your
             list.

@@ -1,3 +1,5 @@
+import { NewRecipient } from "./recipient";
+
 export type MessageLocation = "sent" | "draft" | "trash";
 export type StatusEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFTED";
 export type LocationEnums = "ALL" | "SENT" | "DRAFT" | "TRASH";
@@ -33,7 +35,7 @@ export type Message = {
   // new Message
   id?: string;
   sender: string;
-  recipients: Recipient[];
+  recipients: NewRecipient[];
   subject: string;
   body: string;
 };
@@ -48,32 +50,6 @@ export type DBMessage = {
   location: "SENT" | "DRAFT" | "TRASH"; // not LocationEnums because in the db location can not be `ALL`
   scheduled_time: Date | null;
   failure_reason: string | null;
-};
-
-// this is the normal recipient that we use in the new message form.
-export type Recipient = {
-  id: string;
-  contactId?: string;
-  contactName?: string;
-  phone: string;
-  error?: { type: "error" | "warning"; message: string };
-};
-export type SuggestedRecipient = {
-  recipient_id: number;
-  phone: string;
-  contact_description: string;
-  contact_id: number;
-  contact_name?: string;
-};
-
-export type Contact = {
-  id: string;
-  user_id: string;
-  name: string;
-  phone: string;
-  description?: string;
-  created_at: Date;
-  updated_at: Date;
 };
 
 export type AmountIndicators =

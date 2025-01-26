@@ -36,7 +36,7 @@ CREATE TABLE "contact" (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Create Recipient Table
+-- Create recipient Table
 CREATE TABLE recipient (     
 	id SERIAL PRIMARY KEY,
 	message_id INTEGER REFERENCES message(id) ON DELETE CASCADE,     

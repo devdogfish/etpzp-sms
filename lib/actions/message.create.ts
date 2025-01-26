@@ -2,7 +2,7 @@
 
 import db from "@/lib/db";
 import { MessageSchema } from "../form.schemas";
-import { Message, Recipient } from "@/types";
+import { Message, NewRecipient } from "@/types";
 import { getSession } from "../auth/sessions";
 import { formatPhone } from "../utils";
 
@@ -14,7 +14,7 @@ export type ActionResponse = {
   };
   inputs?: {
     sender: string;
-    recipients: Recipient[];
+    recipients: NewRecipient[];
     subject: string;
     body: string;
   };
@@ -136,13 +136,13 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
 //   location: MessageLocation
 // ) {}
 
-function analyzeRawRecipients(recipients: Recipient[]): {
-  validRecipients: Recipient[];
-  invalidRecipients: Recipient[];
+function analyzeRawRecipients(recipients: NewRecipient[]): {
+  validRecipients: NewRecipient[];
+  invalidRecipients: NewRecipient[];
   recipientErrorMessage: string | null;
 } {
-  const validRecipients: Recipient[] = [];
-  const invalidRecipients: Recipient[] = [];
+  const validRecipients: NewRecipient[] = [];
+  const invalidRecipients: NewRecipient[] = [];
   let recipientErrorMessage = null;
 
   recipients.forEach((recipient) => {

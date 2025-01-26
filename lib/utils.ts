@@ -129,7 +129,7 @@ export function formatPhone(phone: string): string | undefined {
   }
 }
 
-export function getNameInitials(fullName: string | undefined) {
+export function getNameInitials(fullName: string | null | undefined) {
   // Split the full name into parts
   if (!fullName) return "";
 

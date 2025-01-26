@@ -1,12 +1,15 @@
 // import { ActionResponse } from '@/types/action';
 "use server";
 
-import { SuggestedRecipient } from "@/types";
+import { ActionResult, SuccessResult } from "@/types/action";
 import db from ".";
 import { getSession } from "../auth/sessions";
 import { ActionResponse } from "@/types/contact";
+import { DBContactRecipient } from "@/types/recipient";
 
-export async function fetchRecipients() {
+export async function fetchRecipients(): Promise<
+  ActionResult<[DBContactRecipient & { last_used: Date }]>
+> {
   const session = await getSession();
   const userId = parseInt(session.user?.id ? session?.user?.id : "");
   if (userId && isNaN(userId)) {
@@ -18,32 +21,33 @@ export async function fetchRecipients() {
 
   try {
     const result = await db(
-      `SELECT DISTINCT ON (r.phone)
-            r.id AS recipient_id,
-            r.phone AS phone,
-            c.name AS contact_name,
-            COALESCE(c.id, 0) AS contact_id,
-            COALESCE(c.description, '') AS contact_description,
-            CASE 
-                WHEN c.id IS NOT NULL THEN 'contact'
-                ELSE 'message'
-            END AS source
+      `
+        SELECT 
+          r.id,
+          r.phone,
+          m.created_at AS last_used,
+          c.id AS contact_id,
+          c.name AS contact_name,
+          c.description AS contact_description
         FROM 
-            recipient r
+          recipient r
+        JOIN 
+          message m ON r.message_id = m.id
         LEFT JOIN 
-            message m ON r.message_id = m.id
-        LEFT JOIN 
-            contact c ON r.contact_id = c.id
+          contact c ON r.contact_id = c.id
         WHERE 
-            m.user_id = $1 -- For recipients from messages
-            OR c.user_id = $1 -- For recipients from contacts
+          m.user_id = $1
         ORDER BY 
-          r.phone, 
-          CASE WHEN c.id IS NOT NULL THEN 0 ELSE 1 END, -- Prioritize entries with contact info
-      r.id DESC;`, // For consistent results, order by the most recent recipient entry
+          m.created_at DESC
+      `,
       [userId]
     );
-    return { success: true, data: result.rows };
+
+    return {
+      success: true,
+      message: "",
+      data: result.rows as [DBContactRecipient & { last_used: Date }],
+    };
   } catch (error) {
     return {
       success: false,
