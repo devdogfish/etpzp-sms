@@ -1,4 +1,5 @@
 "use client";
+
 import { DBMessage, LocationEnums } from "@/types";
 import React, { useEffect, useState } from "react";
 import ChildrenPanel from "./shared/children-panel";
@@ -89,36 +90,8 @@ export default function MessagesPage({
           onValueChange={onTabChange}
         >
           {/** WE WILL HAVE location SUBSTITUTED HERE */}
-          <PageHeader title={t(location)}>
-            {!error && location !== "DRAFT" && (
-              <TabsList>
-                <TabsTrigger value="all">
-                  {(isMobile && window.innerWidth < 528) ||
-                  (!isMobile && layout && layout[1] < isLarge.breakpoint) ? (
-                    <List className="w-4 h-5" />
-                  ) : (
-                    t("all")
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="scheduled">
-                  {(isMobile && window.innerWidth < 528) ||
-                  (!isMobile && layout && layout[1] < isLarge.breakpoint) ? (
-                    <Calendar className="w-4 h-5" />
-                  ) : (
-                    t("scheduled")
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="failed">
-                  {(isMobile && window.innerWidth < 528) ||
-                  (!isMobile && layout && layout[1] < isLarge.breakpoint) ? (
-                    <AlertTriangle className="w-4 h-5" />
-                  ) : (
-                    t("failed")
-                  )}
-                </TabsTrigger>
-              </TabsList>
-            )}
-          </PageHeader>
+          <PageHeader title={t(location)}/>
+
           <Search
             onSearch={onSearch}
             placeholder={String(t("search") + " " + t(location).toLowerCase())}

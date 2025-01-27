@@ -35,15 +35,7 @@ export default function MessagesPageSkeleton({
         minSize={22}
         maxSize={50}
       >
-        <PageHeader title={t(location)}>
-          {location !== "DRAFT" && (
-            <Skeleton
-              width={200}
-              height={36}
-              style={{ borderRadius: "0.5rem" }}
-            />
-          )}
-        </PageHeader>
+        <PageHeader title={t(location)} />
 
         <div className="rounded-md p-4 h-[68px]">
           <Skeleton className="h-9" style={{ borderRadius: "0.375rem" }} />

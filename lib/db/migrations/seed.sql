@@ -19,7 +19,7 @@ CREATE TABLE "message" (
     subject VARCHAR(255),
     body TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    sent_at TIMESTAMP DEFAULT NOW(), -- can be null if the message is a draft
     status VARCHAR(20) NOT NULL CHECK (status IN ('SENT', 'SCHEDULED', 'FAILED', 'DRAFTED')), 
     location VARCHAR(20) NOT NULL CHECK (location IN ('SENT', 'DRAFT', 'TRASH')),
     scheduled_time TIMESTAMP,
@@ -31,11 +31,12 @@ CREATE TABLE "contact" (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
-    phone VARCHAR(50) UNIQUE NOT NULL,
+    phone VARCHAR(50) NOT NULL,
     description VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    color_id SMALLINT NOT NULL DEFAULT 1
+    color_id SMALLINT NOT NULL DEFAULT 1,
+    UNIQUE (user_id, phone) -- the same phone number may exist between different user, but there cannot be contacts with the same phone number for one user.
 );
 
 -- Create recipient table

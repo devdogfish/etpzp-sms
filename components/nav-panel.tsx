@@ -8,7 +8,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { AlertTriangle, Calendar, Menu } from "lucide-react";
 import {
   CirclePlus,
   MonitorCog,
@@ -207,6 +207,22 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
               href: "/sent",
             },
             {
+              title: t("SCHEDULED"),
+              label:
+                amountIndicators?.drafts == "0" ? "" : amountIndicators?.drafts,
+              icon: Calendar,
+              variant: "ghost",
+              href: "/scheduled",
+            },
+            {
+              title: t("FAILED"),
+              label:
+                amountIndicators?.drafts == "0" ? "" : amountIndicators?.drafts,
+              icon: AlertTriangle,
+              variant: "ghost",
+              href: "/failed",
+            },
+            {
               title: t("DRAFT"),
               label:
                 amountIndicators?.drafts == "0" ? "" : amountIndicators?.drafts,
@@ -231,8 +247,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             },
           ]}
         />
-        <Separator />
-        <NavLinks
+        {/* <NavLinks
           isCollapsed={isCollapsed}
           links={[
             {
@@ -250,7 +265,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             //   href: "/notifications",
             // },
           ]}
-        />
+        /> */}
         <Separator />
         <NavLinks
           isCollapsed={isCollapsed}

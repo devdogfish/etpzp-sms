@@ -7,9 +7,11 @@ export const MessageSchema = z.object({
     message: "Sender can only be called ETPZP or ExampleSMS",
   }),
   // recipients are handled internally for more thorough error messages
-
   subject: z.string(),
-  body: z.string().min(1, "Message can't be empty."),
+  body: z.string().min(1, "The message can't be empty."),
+  sendTime: z.coerce
+    .number({ message: "Send time must be in number format." })
+    .positive({ message: "Send time must be the future." }).optional(),
 });
 
 export const LoginSchema = z.object({

@@ -1,6 +1,6 @@
 import MessagesPageSkeleton from "@/components/messages-page-skeleton";
 import MessagesPage from "@/components/messages-page";
-import { fetchMessagesByLocation } from "@/lib/db/message";
+import { fetchMessagesByStatus } from "@/lib/db/message";
 import { Suspense } from "react";
 
 export default function Page() {
@@ -12,7 +12,7 @@ export default function Page() {
 }
 
 export async function SentMessagesPage() {
-  const messages = await fetchMessagesByLocation("SENT");
+  const messages = await fetchMessagesByStatus("SENT");
 
   return (
     <MessagesPage

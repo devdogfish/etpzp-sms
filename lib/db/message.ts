@@ -1,28 +1,14 @@
 "use server";
 
 import db from ".";
-import { AmountIndicators, DBMessage, LocationEnums } from "@/types";
+import {
+  AmountIndicators,
+  DBMessage,
+  LocationEnums,
+  StatusEnums,
+} from "@/types";
 import { getSession } from "../auth/sessions";
 import { ActionResult } from "@/types/action";
-import { sleep } from "../utils";
-
-export async function fetchAllMessages(): Promise<ActionResult<DBMessage[]>> {
-  const session = await getSession();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("Invalid user id.");
-  try {
-    const result = await db(
-      "SELECT * FROM message WHERE user_id = $1 ORDER BY created_at DESC;",
-      [userId]
-    );
-    return { success: true, message: "", data: result.rows };
-  } catch (error) {
-    return {
-      success: false,
-      message: "An unknown error occurred. Unable to fetch all messages.",
-    };
-  }
-}
 
 export async function fetchMessagesByLocation(
   location: LocationEnums
@@ -35,6 +21,25 @@ export async function fetchMessagesByLocation(
     const result = await db(
       "SELECT * FROM message WHERE user_id = $1 AND location = $2 ORDER BY created_at DESC;",
       [userId, location]
+    );
+
+    return { success: true, message: "", data: result.rows };
+  } catch (error) {
+    return { success: false, message: "An unknown error occurred.", data: [] };
+  }
+}
+
+export async function fetchMessagesByStatus(
+  status: StatusEnums
+): Promise<ActionResult<DBMessage[]>> {
+  console.log(`Fetching messages that are in ${status} status.`);
+  const session = await getSession();
+  try {
+    const userId = session?.user?.id;
+    if (!userId) throw new Error("Invalid user id.");
+    const result = await db(
+      "SELECT * FROM message WHERE user_id = $1 AND status = $2 ORDER BY created_at DESC;",
+      [userId, status]
     );
 
     return { success: true, message: "", data: result.rows };

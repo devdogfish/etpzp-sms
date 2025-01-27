@@ -54,33 +54,46 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
   console.log("Recipients that are about to be FUCK-BOMBED & MOGGED:");
   console.log(validRecipients);
 
+  // Convert the our send time from seconds to milliseconds
+  // JavaScript's Date object uses milliseconds, so we multiply by 1000 to turn send time into ms. as well
+  const scheduledUnixTime =
+    validatedData.data.sendTime !== undefined
+      ? new Date(Date.now() + validatedData.data.sendTime * 1000)
+      : undefined;
+  console.log(`Schedule time reached server: ${validatedData.data.sendTime}`);
+  console.log(`Converted to UNIX Timestamp: ${scheduledUnixTime}`);
+
   // TODO implement scheduling message (maybe store if it is scheduled in a different field than status because once the sendTime is reached the message's status should change from `scheduled` to `sent`)
   try {
-    const payload = {
-      // this shit can only be one full word with no special characters or spaces
-      sender: validatedData.data.sender,
-      message: validatedData.data.body, // this can be string
+    // const payload = {
+    //   // this shit can only be one full word with no special characters or spaces
+    //   sender: validatedData.data.sender,
+    //   message: validatedData.data.body, // this can be string
 
-      recipients: validRecipients.map(({ phone }) => ({
-        msisdn: phone,
-      })),
-      destaddr: "DISPLAY", // flash sms
-    };
+    //   recipients: validRecipients.map(({ phone }) => ({
+    //     msisdn: phone,
+    //   })),
 
-    const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
-      method: "POST",
-      headers: {
-        Authorization: `Token ${process.env.API_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    //   destaddr: "DISPLAY", // Flash SMS
+
+    //   sendTime: scheduledUnixTime, // For scheduled messages
+    // };
+
+    // const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
+    //   method: "POST",
+    //   headers: {
+    //     Authorization: `Token ${process.env.API_TOKEN}`,
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(payload),
+    // });
+    const resp = undefined;
     // DEBUG!!
     console.log(resp);
 
-    if (!resp.ok) {
-      throw new Error("Network response was not ok " + resp?.statusText);
-    }
+    // if (!resp.ok) {
+    //   throw new Error("Network response was not ok " + resp?.statusText);
+    // }
 
     // Using message_id from the message insertion, to create recipient.
     await db(

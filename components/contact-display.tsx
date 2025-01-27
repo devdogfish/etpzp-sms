@@ -11,7 +11,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Contact } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn, getNameInitials } from "@/lib/utils";
 import { CopyButton } from "./shared/copy-button";
@@ -20,15 +19,15 @@ import { toast } from "sonner";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import EditContactModal from "./modals/edit-contact-modal";
 import { useRouter } from "next/navigation";
+import { DBContact } from "@/types/contact";
 
 export default function ContactDisplay({
   contact,
   reset,
 }: {
-  contact: Contact | null;
+  contact: DBContact | null;
   reset: () => void;
 }) {
-  const today = new Date();
   const onMobile = useIsMobile();
   const router = useRouter();
   const { setModal } = useContactModals();
