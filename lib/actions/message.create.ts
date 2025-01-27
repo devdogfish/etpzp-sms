@@ -67,21 +67,20 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
       destaddr: "DISPLAY", // flash sms
     };
 
-    // const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: `Token ${process.env.API_TOKEN}`,
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(payload),
-    // });
-    const resp = null;
+    const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${process.env.API_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
     // DEBUG!!
-    // console.log(resp);
+    console.log(resp);
 
-    // if (!resp.ok) {
-    //   throw new Error("Network response was not ok " + resp?.statusText);
-    // }
+    if (!resp.ok) {
+      throw new Error("Network response was not ok " + resp?.statusText);
+    }
 
     // Using message_id from the message insertion, to create recipient.
     await db(

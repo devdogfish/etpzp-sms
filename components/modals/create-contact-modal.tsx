@@ -38,7 +38,11 @@ const initialState: ActionResponse = {
   message: "",
 };
 
-export default function CreateContactModal() {
+export default function CreateContactModal({
+  defaultPhone,
+}: {
+  defaultPhone?: string;
+}) {
   const { modal, setModal } = useContactModals();
   const [serverState, action, pending] = useActionState(
     createContact,
@@ -56,10 +60,21 @@ export default function CreateContactModal() {
   }, [serverState]);
 
   const onOpenChange = (value: boolean) => {
+    clearInput();
     setModal((prev) => ({ ...prev, create: value }));
   };
+  const clearInput = () => {
+    // This is unfortunately the easiest way to reset this shit
+    serverState.errors = undefined;
+    serverState.message = "";
+    serverState.inputs = {};
+  };
   return (
-    <Dialog open={modal.create} onOpenChange={onOpenChange}>
+    <Dialog
+      /* We do need these shits unfortunately */
+      open={modal.create}
+      onOpenChange={onOpenChange}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create new Contact</DialogTitle>
@@ -92,7 +107,7 @@ export default function CreateContactModal() {
               name="phone"
               id="phone"
               placeholder="1234568900"
-              defaultValue={serverState.inputs?.phone}
+              defaultValue={serverState.inputs?.phone || defaultPhone}
               // required
               // minLength={5}
               // maxLength={100}

@@ -6,7 +6,13 @@ import type {
   NewRecipient,
   ProcessedDBContactRecipient,
 } from "@/types/recipient";
-import React, { useContext, createContext, useState } from "react";
+import React, {
+  useContext,
+  createContext,
+  useState,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import {
   convertToRecipient,
   generateUniqueId,
@@ -29,6 +35,9 @@ type MessageContextValues = {
   searchRecipients: (searchTerm: string) => void;
 
   getValidatedRecipient: (recipient: NewRecipient) => NewRecipient;
+
+  moreInfoOn: NewRecipient | null;
+  setMoreInfoOn: Dispatch<SetStateAction<NewRecipient | null>>;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
@@ -49,6 +58,7 @@ export function NewMessageProvider({
     subject: "",
     body: "",
   });
+  const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
 
   const topRecipients = getTopRecipients(allSuggestedRecipients);
   const recommendedRecipients = topRecipients.length
@@ -146,6 +156,8 @@ export function NewMessageProvider({
         searchedRecipients,
         searchRecipients,
         getValidatedRecipient,
+        moreInfoOn,
+        setMoreInfoOn,
       }}
     >
       {children}

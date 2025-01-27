@@ -185,13 +185,13 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
               variant: "ghost",
               href: "/all",
             },
-            {
-              title: t("NOTIFICATION"),
-              label: "4",
-              icon: AlertCircle,
-              variant: "ghost",
-              href: "/notifications",
-            },
+            // {
+            //   title: t("NOTIFICATION"),
+            //   label: "4",
+            //   icon: AlertCircle,
+            //   variant: "ghost",
+            //   href: "/notifications",
+            // },
           ]}
         />
         <Separator />
@@ -227,7 +227,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             },
           ]}
         />
-        <Separator />
+        {/* <Separator />
         <NavLinks
           isCollapsed={isCollapsed}
           links={[
@@ -244,7 +244,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
               href: "/ui",
             },
           ]}
-        />
+        /> */}
       </ScrollArea>
     </>
   );

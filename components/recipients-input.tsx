@@ -23,6 +23,7 @@ import { useSearchParams } from "next/navigation";
 import { NewRecipient } from "@/types/recipient";
 import { DBContact } from "@/types/contact";
 import InfoContactModal from "./modals/info-contact-modal";
+import CreateContactModal from "./modals/create-contact-modal";
 // import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
 type InputState = {
@@ -55,9 +56,9 @@ export default function RecipientsInput({
     searchRecipients,
     setMessage,
     getValidatedRecipient,
+    setMoreInfoOn,
   } = useNewMessage();
   const { setModal } = useContactModals();
-  const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -132,11 +133,13 @@ export default function RecipientsInput({
   const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
   const showRecipientInfo = (recipient: NewRecipient) => {
     setMoreInfoOn(recipient);
+    console.log(`setMOreinfoOn recipients is now`);
+    console.log(recipient);
+
     setModal((prev) => ({ ...prev, info: true }));
   };
   return (
     <div className="flex-1 py-1 relative">
-      {moreInfoOn && <InfoContactModal recipient={moreInfoOn} />}
       <div className="max-h-24 overflow-auto" ref={container}>
         <div
           className={cn(
@@ -210,7 +213,7 @@ export default function RecipientsInput({
                 setIsDropdownOpen(false);
               }}
             />
-            {isDropdownOpen && searchedRecipients.length && (
+            {isDropdownOpen && searchedRecipients.length !== 0 && (
               <div className="absolute top-[85%] bg-white border rounded-lg shadow-md">
                 <ScrollArea className="w-[300px] h-[330px] ">
                   <div

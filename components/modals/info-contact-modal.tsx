@@ -31,6 +31,12 @@ export default function InfoContactModal({
 }) {
   const { modal, setModal } = useContactModals();
 
+  const showCreateModal = () => {
+    setModal((prev) => ({ ...prev, info: false }));
+    setTimeout(() => {
+      setModal((prev) => ({ ...prev, create: true }));
+    }, 100);
+  };
   return (
     <Dialog
       /* We do need these shits unfortunately */
@@ -45,9 +51,9 @@ export default function InfoContactModal({
             {recipient.contactId ? "Contact" : "Recipient"} info
           </DialogTitle>
           <DialogDescription>
-            View more info about a{" "}
-            {recipient.contactId ? "recipient.contactId" : "recipient"} in your
-            list.
+            View more info about a
+            {recipient.contactId ? " contact" : " recipient"} of the new
+            message.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-1 flex-col">
@@ -56,18 +62,14 @@ export default function InfoContactModal({
               <Avatar>
                 <AvatarImage
                   alt={
-                    recipient.contactName ||
-                    "Selected recipient.contactId profile picture"
+                    recipient.contactName || "Selected contact profile picture"
                   }
                 />
                 <AvatarFallback>
                   {getNameInitials(recipient.contactName)}
                 </AvatarFallback>
               </Avatar>
-              <h2>
-                {recipient.contactName ||
-                  "This is not yet a recipient.contactId"}
-              </h2>
+              <h2>{recipient.contactName || "This is not yet a contact"}</h2>
             </div>
           </div>
           <Separator />
@@ -86,7 +88,7 @@ export default function InfoContactModal({
               <div>Description</div>
               <div>
                 {recipient.contactDescription ||
-                  "This recipient.contactId doesn't have a description"}
+                  "This contact doesn't have a description"}
               </div>
             </div>
           )}
@@ -97,6 +99,11 @@ export default function InfoContactModal({
               Close
             </Button>
           </DialogClose>
+          {!recipient.contactId && (
+            <Button className="" onClick={showCreateModal}>
+              Create
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

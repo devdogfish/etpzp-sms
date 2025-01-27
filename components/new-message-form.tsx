@@ -27,10 +27,13 @@ import {
 } from "@/components/ui/select";
 import { ActionResult } from "@/types/action";
 import { toast } from "sonner";
-import InsertContactModal from "./modals/insert-contact-modal";
-import InfoContactModal from "./modals/info-contact-modal";
 import { NewRecipient } from "@/types/recipient";
 import { DBContact } from "@/types/contact";
+
+// contact manipulation modals
+import InsertContactModal from "./modals/insert-contact-modal";
+import CreateContactModal from "./modals/create-contact-modal";
+import InfoContactModal from "./modals/info-contact-modal";
 
 const initialState: ActionResponse = {
   success: false,
@@ -45,7 +48,7 @@ export default function NewMessageForm({
 }) {
   const { t } = useTranslation();
   const router = useRouter();
-  const { recipients } = useNewMessage();
+  const { recipients, moreInfoOn } = useNewMessage();
   const [loading, setLoading] = useState(false);
   const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
@@ -94,6 +97,10 @@ export default function NewMessageForm({
     <ContactModalsProvider>
       {/* We can only put the modal here, because it carries state */}
       <InsertContactModal contacts={contacts.data || []} />
+      {moreInfoOn && <InfoContactModal recipient={moreInfoOn} />}
+      {moreInfoOn && !moreInfoOn.contactId && (
+        <CreateContactModal defaultPhone={moreInfoOn.phone} />
+      )}
 
       <PageHeader title={subject ? subject : t("NEW_MESSAGE")}>
         <Button
