@@ -3,7 +3,9 @@ import ActiveDirectory from "activedirectory2";
 import { activeDirectoryConfig, SessionData } from "@/lib/auth/config";
 import userExists from "./user";
 import userInGroup from "./group";
-import fetchUser from "@/lib/db/user";
+import fetchUser, { dummyFetchUser } from "@/lib/db/user";
+import db from "@/lib/db";
+import { User } from "@/types";
 
 export default async function authenticate({
   email,
@@ -60,7 +62,7 @@ export async function dummyAuthenticate({
   email: string;
   password: string;
 }): Promise<SessionData> {
-  return {
+  const dummyUser: SessionData = {
     user: {
       id: "1",
       email: "pepe@gmail.com",
@@ -68,10 +70,17 @@ export async function dummyAuthenticate({
       display_name: "Pepe Maximus",
       first_name: "Pepe",
       last_name: "Maximus",
+      color_id: 1,
       role: "ADMIN",
     },
     isAuthenticated: true,
     isAdmin: true,
+  };
+  const userResult = await dummyFetchUser(dummyUser.user as User);
+  return {
+    user: userResult.success ? userResult.data : undefined,
+    isAuthenticated: userResult.success,
+    isAdmin: userResult.success,
   };
 }
 
