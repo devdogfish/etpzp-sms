@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
-import { ChevronDown, Loader2 } from "lucide-react";
+import { ChevronDown, Loader2, Send } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,13 +21,17 @@ export default function ScheduleMessageDropdown({
   const [isOpen, setIsOpen] = useState(false);
   // const { loading } = useFormStatus();
   return (
-    <div className="flex ml-auto">
+    <div className="flex">
       <Button
         type="submit"
         className="rounded-tr-none rounded-br-none border-primary-foreground border-r"
         disabled={loading}
       >
-        {loading ? <Loader2 className="animate-spin" /> : ""}
+        {loading ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          <Send className="w-4 h-4" />
+        )}
         Send
       </Button>
       <DropdownMenu onOpenChange={setIsOpen}>

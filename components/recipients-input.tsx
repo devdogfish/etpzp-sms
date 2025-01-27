@@ -61,15 +61,6 @@ export default function RecipientsInput({
   const { setModal } = useContactModals();
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        container.current &&
-        !container.current.contains(event.target as Node)
-      ) {
-        setIsDropdownOpen(false);
-      }
-    };
-
     if (searchParams.get("contactId")) {
       // On the contact page we have a message this contact link where we pass over the contactId
       const contact = contacts.find(
@@ -87,6 +78,15 @@ export default function RecipientsInput({
         setMessage((prev) => ({ ...prev, recipients: [recipient] }));
       }
     }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        container.current &&
+        !container.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -126,16 +126,12 @@ export default function RecipientsInput({
       value,
     }));
     setIsDropdownOpen(true);
-
     searchRecipients(value);
   };
 
   const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
   const showRecipientInfo = (recipient: NewRecipient) => {
     setMoreInfoOn(recipient);
-    console.log(`setMOreinfoOn recipients is now`);
-    console.log(recipient);
-
     setModal((prev) => ({ ...prev, info: true }));
   };
   return (
@@ -213,6 +209,7 @@ export default function RecipientsInput({
                 setIsDropdownOpen(false);
               }}
             />
+
             {isDropdownOpen && searchedRecipients.length !== 0 && (
               <div className="absolute top-[85%] bg-white border rounded-lg shadow-md">
                 <ScrollArea className="w-[300px] h-[330px] ">

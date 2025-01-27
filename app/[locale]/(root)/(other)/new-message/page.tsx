@@ -17,7 +17,7 @@ export default async function Page({ params }: { params: { locale: string } }) {
       allSuggestedRecipients={processedRecipients}
       allContacts={contacts}
     >
-      <NewMessageForm isFullScreen={true} contacts={contactsResult} />
+      <NewMessageForm contacts={contactsResult} />
     </NewMessageProvider>
   );
 }

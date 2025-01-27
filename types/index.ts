@@ -6,24 +6,13 @@ export type LocationEnums = "ALL" | "SENT" | "DRAFT" | "TRASH";
 
 export type StringMap = { [key: string]: boolean };
 
-export type DBUser = {
-  id: string;
-  name: string;
-  display_name: string;
-  first_name: string;
-  last_name: string;
-
-  email: string;
-  role: "USER" | "ADMIN";
-  created_at: Date;
-  updated_at: Date;
-};
 export type User = {
   id: string;
   name: string;
   display_name: string;
   first_name: string;
   last_name: string;
+  color_id: number;
 
   email: string;
   role: "USER" | "ADMIN";

@@ -35,6 +35,17 @@ import { useLayout } from "@/contexts/use-layout";
 import { ScrollArea } from "./ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePathname, useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { useSession } from "@/hooks/use-session";
+import { logout } from "@/lib/auth";
 
 export default function NavPanel({
   navCollapsedSize,
@@ -92,6 +103,7 @@ export function MobileNavPanel() {
       setMobileNavPanel(false);
     }
   }, []);
+
   return (
     <Sheet
       open={mobileNavPanel}
@@ -113,6 +125,15 @@ export function MobileNavPanel() {
 function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   const { t } = useTranslation();
   const { amountIndicators } = useLayout();
+  const { session, loading } = useSession();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const result = await logout();
+    if (result.success) {
+      router.push("/login");
+    }
+  };
   return (
     <>
       <div
@@ -121,7 +142,43 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
           isCollapsed ? "h-[var(--header-height)]" : "px-2"
         )}
       >
-        <Account isCollapsed={isCollapsed} />
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className={cn(
+              "flex gap-3 items-center justify-start w-full",
+              isCollapsed && "w-9 h-9"
+            )}
+          >
+            <Account
+              size={9}
+              name={session?.user?.display_name}
+              colorId={session?.user?.color_id}
+              loading={loading}
+            />
+            <div
+              className={cn(
+                "flex flex-col items-start",
+                isCollapsed && "hidden"
+              )}
+            >
+              <p className="font-semibold mb-[-3px]">{session?.user?.name}</p>
+              <span className="text-xs">
+                {session?.isAdmin ? "Admin" : "User"}
+              </span>
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="z-[1000]">
+            <DropdownMenuLabel>My account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {/* <DropdownMenuGroup> */}
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem>Report a bug</DropdownMenuItem>
+            {/* </DropdownMenuGroup> */}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <Separator />
       <NavLinks

@@ -8,7 +8,8 @@ CREATE TABLE "user" (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     display_name VARCHAR(50) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL
+    last_name VARCHAR(50) NOT NULL,
+    color_id SMALLINT NOT NULL DEFAULT 1
 );
 
 -- Create message table
@@ -33,7 +34,8 @@ CREATE TABLE "contact" (
     phone VARCHAR(50) UNIQUE NOT NULL,
     description VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    color_id SMALLINT NOT NULL DEFAULT 1
 );
 
 -- Create recipient table

@@ -1,7 +1,8 @@
 // this is the normal recipient that we use in the new message form.
 export type NewRecipient = {
   phone: string;
-  error?: { type: "error" | "warning"; message: string };
+  error?: { type: "error" | "warning"; message?: string };
+  formattedPhone?: string;
 
   // if it is a contact
   contactId?: string;

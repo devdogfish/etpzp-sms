@@ -21,6 +21,9 @@ type LayoutContextType = {
 
   mobileNavPanel: boolean;
   setMobileNavPanel: Dispatch<SetStateAction<boolean>>;
+
+  isFullscreen: boolean;
+  toggleFullscreen: () => void;
 };
 
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
@@ -44,6 +47,8 @@ export function LayoutProvider({
   // as simple state to keep track of whether the mobile nav panel is open
   const [mobileNavPanel, setMobileNavPanel] = useState(false);
 
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const toggleFullscreen = () => setIsFullscreen((prev) => !prev);
   return (
     <LayoutContext.Provider
       value={{
@@ -55,6 +60,8 @@ export function LayoutProvider({
         amountIndicators,
         mobileNavPanel,
         setMobileNavPanel,
+        isFullscreen,
+        toggleFullscreen,
       }}
     >
       {children}

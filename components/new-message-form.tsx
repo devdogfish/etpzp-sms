@@ -10,7 +10,7 @@ import PageHeader from "./page-header";
 import { sendMessage, ActionResponse } from "@/lib/actions/message.create";
 
 // Form
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
 
@@ -34,16 +34,16 @@ import { DBContact } from "@/types/contact";
 import InsertContactModal from "./modals/insert-contact-modal";
 import CreateContactModal from "./modals/create-contact-modal";
 import InfoContactModal from "./modals/info-contact-modal";
+import Link from "next/link";
+import { useLayout } from "@/contexts/use-layout";
 
 const initialState: ActionResponse = {
   success: false,
   message: [],
 };
 export default function NewMessageForm({
-  isFullScreen,
   contacts,
 }: {
-  isFullScreen: boolean;
   contacts: ActionResult<DBContact[]>;
 }) {
   const { t } = useTranslation();
@@ -52,6 +52,7 @@ export default function NewMessageForm({
   const [loading, setLoading] = useState(false);
   const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
+  const { isFullscreen, toggleFullscreen } = useLayout();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -91,8 +92,6 @@ export default function NewMessageForm({
       }, Object.entries(zodErrors).length * inBetweenTime);
     }
   };
-  const handleFullScreenRedirect = () => {};
-
   return (
     <ContactModalsProvider>
       {/* We can only put the modal here, because it carries state */}
@@ -106,25 +105,20 @@ export default function NewMessageForm({
         <Button
           variant="ghost"
           className="aspect-1 p-0"
-          onClick={handleFullScreenRedirect}
-          type="button"
+          onClick={toggleFullscreen}
         >
-          {isFullScreen ? (
+          {isFullscreen ? (
             <Minimize2 className="h-4 w-4" />
           ) : (
             <Maximize2 className="h-4 w-4" />
           )}
         </Button>
-        <Button
-          variant="ghost"
-          className="aspect-1 p-0"
-          onClick={() => {
-            console.log("save a draft");
-          }}
-          type="button"
+        <Link
+          className={cn(buttonVariants({ variant: "ghost" }), "aspect-1 p-0")}
+          href="/sent"
         >
           <X className="h-4 w-4" />
-        </Button>
+        </Link>
       </PageHeader>
       <form onSubmit={handleSubmit} className="h-screen flex flex-col">
         <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
@@ -181,20 +175,17 @@ export default function NewMessageForm({
           </div>
 
           <Separator />
-          <div className="flex px-4 py-2 justify-between">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  type="button"
-                  onClick={() => router.push("/")}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Delete draft</TooltipContent>
-            </Tooltip>
+          <div className="flex px-4 py-2 justify-end gap-2">
+            <Button
+              variant="secondary"
+              type="button"
+              className="w-max"
+              onClick={() => router.push("/")}
+            >
+              <Trash2 className="h-4 w-4" />
+              Discard
+            </Button>
+
             <SendButton loading={loading} />
           </div>
         </div>

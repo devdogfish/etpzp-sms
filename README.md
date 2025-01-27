@@ -120,21 +120,25 @@ lib/
 I want to use the same structure for my components.
 
 ## TODO
-1. ** ** Do a test deployment ** **
+
+1. \*\* ** Do a test deployment ** \*\*
 
 ## Message form:
-- *** Implement same hotkeys for inserting it like on outlook for automatic contact query by name and phone number.
+
+- \*\*\* Implement same hotkeys for inserting it like on outlook for automatic contact query by name and phone number.
 - Delete red borders for error handling, rather make the recipients pulse if they are invalid
 - clear inputs on success
 - other message actions
 - Keep the fucking search recipients popup from disappearing
 
 ## Later on
+
 - Work on home page, think about how I can add a font size setting to configure the font size globally.
 - Implement the other `// TODO` comments
 - Simplify server action types. For data-fetches we don't need to return a error message returned from the server
 
 ## Database
+
 Deleting all tables
 
 ```sql
@@ -142,10 +146,11 @@ DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```
 
 Executing seed file
+
 ```psql
 -- bash:
 \i ~/dev/etpzp-sms/lib/db/migrations/seed.sql
 
 -- psql shell (windows):
-\i /Users/Utilizador/dev/etpzp-sms/lib/db/migrations/message.seed.1.sql
+\i /Users/Utilizador/dev/etpzp-sms/lib/db/migrations/seed.sql
 ```

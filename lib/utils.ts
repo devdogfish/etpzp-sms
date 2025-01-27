@@ -6,9 +6,8 @@ import parsePhoneNumber, {
 import { clsx, type ClassValue } from "clsx";
 import { i18n } from "i18next";
 import { twMerge } from "tailwind-merge";
-import { DBMessage } from "@/types";
 import { NewRecipient } from "@/types/recipient";
-import { Contact, DBMessage } from "@/types";
+import { DBMessage } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -30,24 +29,6 @@ export function normalizePath(path: string, i18nData: i18n) {
   return "/" + segments.join("/");
 }
 
-function getTime() {
-  const options: Intl.DateTimeFormatOptions = {
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-    hourCycle: "h23",
-    timeZone: "UTC",
-  };
-
-  const date = new Date();
-  return new Intl.DateTimeFormat("en-US", options).format(date);
-}
-
-export function isNumericString(str: string): boolean {
-  const num = parseInt(str, 10);
-  return !isNaN(num) && num.toString() === str;
-}
-
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -60,48 +41,35 @@ export function generateUniqueId() {
   });
 }
 
-export function validatePhoneNumber(
-  input: string
-): { type: "error" | "warning"; message: string } | undefined {
+export function validatePhoneNumber(input: string): {
+  type: "error" | "warning" | undefined;
+  message: string | undefined;
+  formattedPhone: string | undefined;
+} {
   const countryCode: CountryCode = "PT";
 
-  try {
-    const phoneNumber = parsePhoneNumber(input, countryCode);
+  const phoneNumber = parsePhoneNumber(input, countryCode);
+  const formattedPhone = phoneNumber?.formatInternational();
 
-    if (phoneNumber?.isValid()) {
-      if (phoneNumber.country === countryCode) {
-        return;
-      } else {
-        return {
-          type: "warning",
-          message:
-            "Warning: The phone number is valid but not from the specified country.",
-        };
-      }
+  let type: "error" | "warning";
+  let message: string;
+  if (phoneNumber?.isValid()) {
+    if (phoneNumber.country === countryCode) {
+      return { type: undefined, message: undefined, formattedPhone: undefined };
     } else {
-      return {
-        type: "error",
-        message: "The phone number is invalid.",
-      };
+      type = "warning";
+      message =
+        "Warning: The phone number is valid but not from the specified country.";
     }
-  } catch (error) {
-    return {
-      type: "error",
-      message: "The phone number is invalid.",
-    };
+  } else {
+    type = "error";
+    message = "The phone number is invalid.";
   }
-}
-
-export function formatSimpleDate(date: Date) {
-  return date.toLocaleString("pt-pt");
-
-  // without the seconds (`DD/MM/YYYY, HH:mm`)
-  return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1)
-    .toString()
-    .padStart(2, "0")}/${date.getFullYear()}, ${date
-    .getHours()
-    .toString()
-    .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+  return {
+    type,
+    message,
+    formattedPhone,
+  };
 }
 
 export function searchMessages(
@@ -124,7 +92,7 @@ export function searchMessages(
 }
 
 export function searchContacts(
-  contacts: Contact[],
+  contacts: DBContact[],
   searchTerm: string,
   currentPage?: number
 ) {

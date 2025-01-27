@@ -12,6 +12,7 @@ import React, {
   useState,
   Dispatch,
   SetStateAction,
+  useEffect,
 } from "react";
 import {
   convertToRecipient,
@@ -117,16 +118,23 @@ export function NewMessageProvider({
   };
 
   const getValidatedRecipient = (recipient: NewRecipient): NewRecipient => {
-    const error = validatePhoneNumber(recipient.phone);
-    if (!error) {
+    const { type, message, formattedPhone } = validatePhoneNumber(
+      recipient.phone
+    );
+    if (!type) {
       return recipient;
     }
 
     return {
       ...recipient,
-      error,
+      error: { type, message },
+      formattedPhone,
     };
   };
+
+  useEffect(() => {
+    console.log(message.recipients);
+  }, [message.recipients]);
 
   const searchRecipients = (rawSearchTerm: string) => {
     const searchTerm = rawSearchTerm.trim().toLowerCase();

@@ -1,63 +1,27 @@
 "use client";
 
-import { logout } from "@/lib/auth";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { useSession } from "@/hooks/use-session";
+import { cn, getNameInitials } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
-export default function Account({ isCollapsed }: { isCollapsed: boolean }) {
-  const { session, loading } = useSession();
+export default function Account({
+  size,
+  name,
+  colorId,
+  loading,
+}: {
+  size: number;
+  colorId: number | undefined;
+  name: string | undefined;
+  loading?: boolean;
+}) {
   const router = useRouter();
-  // console.log(session);
 
-  const handleLogout = async () => {
-    const result = await logout();
-    if (result.success) {
-      router.push("/login");
-    }
-  };
-
-  if (loading) return <h2>Loading</h2>;
+  if (loading) return <h2 className="text-sm">Loading...</h2>;
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className={cn(
-          "flex gap-3 items-center justify-start w-full",
-          isCollapsed && "w-9 h-9"
-        )}
-      >
-        <Avatar className="w-9 h-9">
-          <AvatarImage src="https://github.com/devdogfish.png" alt="Your profile picture." />
-          <AvatarFallback>D</AvatarFallback>
-        </Avatar>
-        <div
-          className={cn("flex flex-col items-start", isCollapsed && "hidden")}
-        >
-          <p className="font-semibold mb-[-3px]">{session?.user?.name}</p>
-          <span className="text-xs">{session?.isAdmin ? "Admin" : "User"}</span>
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="z-[1000]">
-        <DropdownMenuLabel>My account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {/* <DropdownMenuGroup> */}
-        <DropdownMenuItem>Profile</DropdownMenuItem>
-        <DropdownMenuItem>Settings</DropdownMenuItem>
-        <DropdownMenuItem>Report a bug</DropdownMenuItem>
-        {/* </DropdownMenuGroup> */}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div
+      className={`w-${size} h-${size} rounded-full content-center bg-chart-${colorId}`}
+    >
+      <p className="text-sm">{getNameInitials(name)}</p>
+    </div>
   );
 }
