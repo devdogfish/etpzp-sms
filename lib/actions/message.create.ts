@@ -1,9 +1,11 @@
 "use server";
+
 import db from "@/lib/db";
 import { MessageSchema } from "../form.schemas";
-import { Message, Recipient } from "@/types";
+import { Message } from "@/types";
 import { getSession } from "../auth/sessions";
 import { formatPhone } from "../utils";
+import { NewRecipient } from "@/types/recipient";
 
 export type ActionResponse = {
   success: boolean;
@@ -13,7 +15,7 @@ export type ActionResponse = {
   };
   inputs?: {
     sender: string;
-    recipients: Recipient[];
+    recipients: NewRecipient[];
     subject: string;
     body: string;
   };
@@ -65,19 +67,21 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
       destaddr: "DISPLAY", // flash sms
     };
 
-    const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
-      method: "POST",
-      headers: {
-        Authorization: `Token ${process.env.API_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-    console.log(resp);
+    // const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
+    //   method: "POST",
+    //   headers: {
+    //     Authorization: `Token ${process.env.API_TOKEN}`,
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(payload),
+    // });
+    const resp = null;
+    // DEBUG!!
+    // console.log(resp);
 
-    if (!resp.ok) {
-      throw new Error("Network response was not ok " + resp.statusText);
-    }
+    // if (!resp.ok) {
+    //   throw new Error("Network response was not ok " + resp?.statusText);
+    // }
 
     // Using message_id from the message insertion, to create recipient.
     await db(
@@ -99,13 +103,13 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
         userId,
         validatedData.data.subject,
         validatedData.data.body,
-        resp.ok ? "SENT" : "FAILED", // status here
+        resp?.ok ? "SENT" : "FAILED", // status here
         "SENT", // By default freshly sent messages are saved to Sent page
-        resp.statusText || null,
+        resp?.statusText || null,
 
         // recipient parameters:
-        validRecipients.forEach((recipient) => recipient.contactId || null), // contact_id array
-        validRecipients.forEach((recipient) => recipient.phone), // phone number array
+        validRecipients.map((recipient) => recipient.contactId || null), // contact_id array
+        validRecipients.map((recipient) => recipient.phone), // phone number array
       ]
     );
     console.log("------\n\n");
@@ -133,13 +137,13 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
 //   location: MessageLocation
 // ) {}
 
-function analyzeRawRecipients(recipients: Recipient[]): {
-  validRecipients: Recipient[];
-  invalidRecipients: Recipient[];
+function analyzeRawRecipients(recipients: NewRecipient[]): {
+  validRecipients: NewRecipient[];
+  invalidRecipients: NewRecipient[];
   recipientErrorMessage: string | null;
 } {
-  const validRecipients: Recipient[] = [];
-  const invalidRecipients: Recipient[] = [];
+  const validRecipients: NewRecipient[] = [];
+  const invalidRecipients: NewRecipient[] = [];
   let recipientErrorMessage = null;
 
   recipients.forEach((recipient) => {

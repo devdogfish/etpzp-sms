@@ -1,5 +1,5 @@
 "use client";
-import { Contact } from "@/types";
+
 import React, { useEffect, useState } from "react";
 import ChildrenPanel from "./shared/children-panel";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
@@ -20,16 +20,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { CirclePlus } from "lucide-react";
 import { Button } from "./ui/button";
 import { useContactModals } from "@/contexts/use-contact-modals";
+import { DBContact } from "@/types/contact";
 
 export default function ContactsPage({
   contacts,
 }: Readonly<{
-  contacts: Contact[];
+  contacts: DBContact[];
 }>) {
   const { layout, fallbackLayout } = useLayout();
   const { t, i18n } = useTranslation(["Common Words"]);
   const [filteredContacts, setFilteredContacts] = useState(contacts);
-  const [selected, setSelected] = useState<Contact | null>(null);
+  const [selected, setSelected] = useState<DBContact | null>(null);
   const [isLarge, setIsLarge] = useState({
     bool: window.matchMedia("(min-width: 1024px)").matches,
     breakpoint: window.matchMedia("(min-width: 1024px)").matches ? 29 : 44,
@@ -41,10 +42,9 @@ export default function ContactsPage({
   const isMobile = useIsMobile();
   const router = useRouter();
 
-  // Update ui based on search term
-  const onSearch = (term: string) => {
-    // CAUTION: when implementing pagination make sure the url is not delayed usually, you would use searchParams which are always up to date, but we are using params.set() which can be one late
-    setFilteredContacts(searchContacts(contacts, term, currentPage));
+  // TODO: Update ui based on search term
+  const onSearch = () => {
+    // setFilteredContacts(searchContacts(contacts, query, currentPage));
   };
 
   useEffect(() => {
@@ -87,7 +87,7 @@ export default function ContactsPage({
         <PageHeader title={t("CONTACT")}>
           <Button size="sm" onClick={showCreateModal}>
             <CirclePlus className="w-4 h-4" />
-            New Contact
+            New contact
           </Button>
         </PageHeader>
         <Search

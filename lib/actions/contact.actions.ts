@@ -3,15 +3,14 @@
 import db from "../db";
 import { z } from "zod";
 import { ContactSchema } from "../form.schemas";
-import { ActionResponse, Contact } from "@/types/contact";
+import { ActionResponse, DBContact } from "@/types/contact";
 import { getSession } from "../auth/sessions";
-import { notFound, redirect } from "next/navigation";
 import { formatPhone, sleep } from "../utils";
 import { revalidatePath } from "next/cache";
 import { DatabaseError } from "pg";
 import { ActionResult } from "@/types/action";
 
-export async function fetchContacts(): Promise<ActionResult<Contact[]>> {
+export async function fetchContacts(): Promise<ActionResult<DBContact[]>> {
   const session = await getSession();
   const userId = parseInt(session.user?.id || "");
   if (userId && isNaN(userId)) {

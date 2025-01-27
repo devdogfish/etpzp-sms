@@ -34,7 +34,7 @@ export default function ContactsList({
               )}
               onClick={() => setSelected(contact)}
             >
-              <div className="rounded-full h-12 w-12 border centered ">
+              <div className="rounded-full h-12 w-12 border centered">
                 {getNameInitials(contact.name)}
               </div>
               <div className="space-y-1">
@@ -46,12 +46,7 @@ export default function ContactsList({
         ) : (
           <div className="space-y-3 p-8 text-center text-muted-foreground">
             <p>You don't have any contacts yet</p>
-            <CreateContact>
-              <Button size="sm">
-                <CirclePlus className="w-4 h-4" />
-                Create
-              </Button>
-            </CreateContact>
+            <CreateContact />
           </div>
         )}
       </div>

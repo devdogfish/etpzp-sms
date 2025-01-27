@@ -1,6 +1,10 @@
+import { NewRecipient } from "./recipient";
+
 export type MessageLocation = "sent" | "draft" | "trash";
 export type StatusEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFTED";
 export type LocationEnums = "ALL" | "SENT" | "DRAFT" | "TRASH";
+
+export type StringMap = { [key: string]: boolean };
 
 export type DBUser = {
   id: string;
@@ -31,7 +35,7 @@ export type Message = {
   // new Message
   id?: string;
   sender: string;
-  recipients: Recipient[];
+  recipients: NewRecipient[];
   subject: string;
   body: string;
 };
@@ -48,27 +52,11 @@ export type DBMessage = {
   failure_reason: string | null;
 };
 
-export type Recipient = {
-  id: string;
-  contactId?: string;
-  contactName?: string;
-  phone: string;
-  error?: { type: "error" | "warning"; message: string };
-};
-
-export type Contact = {
-  id: string;
-  user_id: string;
-  name: string;
-  phone: string;
-  description?: string;
-  created_at: Date;
-  updated_at: Date;
-};
-
-export type AmountIndicators = {
-  sent: string;
-  drafts: string;
-  trash: string;
-  all: string;
-} | undefined;
+export type AmountIndicators =
+  | {
+      sent: string;
+      drafts: string;
+      trash: string;
+      all: string;
+    }
+  | undefined;

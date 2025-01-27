@@ -1,47 +1,93 @@
 "use client";
-import { Contact, Message, Recipient } from "@/types";
-import React, { useContext, createContext, useState, useEffect } from "react";
-import { generateUniqueId, validatePhoneNumber } from "@/lib/utils";
-import { useLocalStorage } from "@/hooks/use-localstorage";
-import { MessageSchema } from "@/lib/form.schemas";
-import { z } from "zod";
+
+import type { Message } from "@/types";
+import type {
+  DBContactRecipient,
+  NewRecipient,
+  ProcessedDBContactRecipient,
+} from "@/types/recipient";
+import React, { useContext, createContext, useState } from "react";
+import {
+  convertToRecipient,
+  generateUniqueId,
+  validatePhoneNumber,
+} from "@/lib/utils";
 import { toast } from "sonner";
+import { getTopRecipients } from "@/lib/recipients.filters";
+import { DBContact } from "@/types/contact";
 
 type MessageContextValues = {
   message: Message;
   setMessage: React.Dispatch<React.SetStateAction<Message>>;
-  recipients: Recipient[];
-  addRecipient: (recipient: Recipient) => void;
-  removeRecipient: (recipient: Recipient) => void;
-  getValidatedRecipient: (recipient: Recipient) => void;
+
+  recipients: NewRecipient[];
+  addRecipient: (phone: string, contacts: DBContact[]) => void;
+  removeRecipient: (recipient: NewRecipient) => void;
+  // getValidatedRecipient: (recipient: NewRecipient) => void;
+
+  searchedRecipients: DBContactRecipient[];
+  searchRecipients: (searchTerm: string) => void;
+
+  getValidatedRecipient: (recipient: NewRecipient) => NewRecipient;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
 
 export function NewMessageProvider({
+  allSuggestedRecipients,
+  allContacts,
   children,
 }: {
+  allSuggestedRecipients: ProcessedDBContactRecipient[];
+  allContacts: DBContact[];
   children: React.ReactNode;
 }) {
-  const [stored, setStored] = useLocalStorage<Message>("new_message", {
+  const [message, setMessage] = useState<Message>({
     id: generateUniqueId(),
     sender: "ETPZP",
     recipients: [],
     subject: "",
     body: "",
   });
-  const [message, setMessage] = useState<Message>(stored); // stored is guaranteed to be defined
 
-  const addRecipient = (recipient: Recipient) => {
-    // Check if the recipient already exists in the array. The result is inverted because it returns the opposite from what we want.
-    if (!message.recipients.some((item) => item.id === recipient.id)) {
+  const topRecipients = getTopRecipients(allSuggestedRecipients);
+  const recommendedRecipients = topRecipients.length
+    ? topRecipients
+    : // specify here how many contacts you want in the case of no existing recipients but unused existing contacts.
+      allContacts.slice(0, 4).map(({ id, phone, name, description }) => ({
+        id,
+        phone,
+        contact_id: id,
+        contact_name: name,
+        contact_description: description || null,
+      }));
+
+  const [searchedRecipients, setSearchedRecipients] = useState(
+    recommendedRecipients
+  );
+
+  const addRecipient = (phone: string, contacts: DBContact[]) => {
+    searchRecipients("");
+    // Check if the recipient already exists in the array. We can use either `.some()` or `.find()`
+    if (!message.recipients.some((item) => item.phone === phone)) {
       setMessage((prev) => {
-        const updated = {
+        let newRecipient: NewRecipient;
+
+        const contactDetails = contacts.find(
+          (contact) => contact.phone === phone
+        );
+
+        if (contactDetails) {
+          // Contact found:
+          newRecipient = convertToRecipient(contactDetails);
+        } else {
+          // Contact not found:
+          newRecipient = { phone };
+        }
+        return {
           ...prev,
-          recipients: [...prev.recipients, getValidatedRecipient(recipient)],
+          recipients: [...prev.recipients, getValidatedRecipient(newRecipient)],
         };
-        setStored(updated);
-        return updated;
       });
     } else {
       toast.error("Duplicate recipients", {
@@ -50,18 +96,17 @@ export function NewMessageProvider({
     }
   };
 
-  const removeRecipient = (recipient: Recipient) => {
+  const removeRecipient = (recipient: NewRecipient) => {
     setMessage((prev) => {
       const updated = {
         ...prev,
         recipients: prev.recipients.filter((r) => r !== recipient),
       };
-      setStored(updated);
       return updated;
     });
   };
 
-  const getValidatedRecipient = (recipient: Recipient): Recipient => {
+  const getValidatedRecipient = (recipient: NewRecipient): NewRecipient => {
     const error = validatePhoneNumber(recipient.phone);
     if (!error) {
       return recipient;
@@ -69,12 +114,26 @@ export function NewMessageProvider({
 
     return {
       ...recipient,
-      error: error,
+      error,
     };
   };
-  useEffect(() => {
-    console.log(message.recipients);
-  }, [message]);
+
+  const searchRecipients = (rawSearchTerm: string) => {
+    const searchTerm = rawSearchTerm.trim().toLowerCase();
+
+    if (searchTerm.length) {
+      setSearchedRecipients(
+        allSuggestedRecipients.filter((recipient) => {
+          return (
+            recipient.contact_name?.toLowerCase().includes(searchTerm) ||
+            recipient.phone.toLowerCase().includes(searchTerm)
+          );
+        })
+      );
+    } else {
+      setSearchedRecipients(recommendedRecipients);
+    }
+  };
 
   return (
     <NewMessageContext.Provider
@@ -84,6 +143,8 @@ export function NewMessageProvider({
         recipients: message.recipients,
         addRecipient,
         removeRecipient,
+        searchedRecipients,
+        searchRecipients,
         getValidatedRecipient,
       }}
     >

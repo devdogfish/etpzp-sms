@@ -56,7 +56,7 @@ export default function MessagesPage({
     window.addEventListener("resize", handleResize); // Check on resize
 
     return () => window.removeEventListener("resize", handleResize); // Cleanup
-  }, []);
+  }, [messages]);
 
   const onTabChange = (value: string) => {
     const url = new URL(window.location.href);
@@ -158,10 +158,7 @@ export default function MessagesPage({
         hasMiddleBar
         className={cn(onMobile && selected === null && "hidden")} // like above we are using reverse logic here. If we are on mobile, and nothing is selected, this component should not be displayed.
       >
-        <MessageDisplay
-          message={selected}
-          resetMessage={() => setSelected(null)}
-        />
+        <MessageDisplay message={selected} reset={() => setSelected(null)} />
       </ChildrenPanel>
     </>
   );

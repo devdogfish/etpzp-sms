@@ -1,4 +1,5 @@
 "use server";
+
 import db from ".";
 import { AmountIndicators, DBMessage, LocationEnums } from "@/types";
 import { getSession } from "../auth/sessions";
@@ -7,9 +8,9 @@ import { sleep } from "../utils";
 
 export async function fetchAllMessages(): Promise<ActionResult<DBMessage[]>> {
   const session = await getSession();
+  const userId = session?.user?.id;
+  if (!userId) throw new Error("Invalid user id.");
   try {
-    const userId = session?.user?.id;
-    if (!userId) throw new Error("Invalid user id.");
     const result = await db(
       "SELECT * FROM message WHERE user_id = $1 ORDER BY created_at DESC;",
       [userId]

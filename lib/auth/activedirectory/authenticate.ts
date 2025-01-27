@@ -52,6 +52,7 @@ export default async function authenticate({
     ],
   };
 }
+
 export async function dummyAuthenticate({
   email,
   password,
@@ -59,15 +60,6 @@ export async function dummyAuthenticate({
   email: string;
   password: string;
 }): Promise<SessionData> {
-  // if (
-  //   email !== process.env.AD_EMAIL ||
-  //   password !== process.env.AD_PASSWORD
-  // ) {
-  //   return {
-  //     isAuthenticated: false,
-  //     isAdmin: false,
-  //   };
-  // }
   return {
     user: {
       id: "1",

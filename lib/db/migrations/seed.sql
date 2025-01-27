@@ -1,4 +1,4 @@
--- Create User Table
+-- Create user table
 CREATE TABLE "user" (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE "user" (
     last_name VARCHAR(50) NOT NULL
 );
 
--- Create Message Table
+-- Create message table
 CREATE TABLE "message" (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
@@ -25,7 +25,7 @@ CREATE TABLE "message" (
     failure_reason VARCHAR(255)
 );
 
--- Create Contacts Table
+-- Create contacts table
 CREATE TABLE "contact" (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
@@ -36,9 +36,9 @@ CREATE TABLE "contact" (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Create Recipient Table
+-- Create recipient table
 CREATE TABLE recipient (     
-	id SERIAL PRIMARY KEY,     
+	id SERIAL PRIMARY KEY,
 	message_id INTEGER REFERENCES message(id) ON DELETE CASCADE,     
 	contact_id INTEGER REFERENCES contact(id) ON DELETE SET NULL,     
 	phone VARCHAR(15) NOT NULL,        -- Store phone numbers as VARCHAR to accommodate various formats  

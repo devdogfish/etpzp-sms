@@ -1,3 +1,4 @@
+"use server";
 const url = "https://gatewayapi.com/rest/mtsms";
 const body = {
   sender: "ExampleSMS",

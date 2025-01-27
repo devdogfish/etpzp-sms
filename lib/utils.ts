@@ -1,3 +1,4 @@
+import { DBContact } from "./../types/contact";
 import parsePhoneNumber, {
   CountryCode,
   parsePhoneNumberFromString,
@@ -5,6 +6,8 @@ import parsePhoneNumber, {
 import { clsx, type ClassValue } from "clsx";
 import { i18n } from "i18next";
 import { twMerge } from "tailwind-merge";
+import { DBMessage } from "@/types";
+import { NewRecipient } from "@/types/recipient";
 import { Contact, DBMessage } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
@@ -112,8 +115,7 @@ export function searchMessages(
   // Filter messages based on userId and search term
   const filteredMessages = messages.filter(
     (message) =>
-      (message.subject &&
-        message.subject.toLowerCase().includes(lowerCaseSearchTerm)) ||
+      message.subject?.toLowerCase().includes(lowerCaseSearchTerm) ||
       message.body.toLowerCase().includes(lowerCaseSearchTerm) ||
       message.status.toLowerCase() === lowerCaseSearchTerm // Assuming status is also part of the search
   );
@@ -149,8 +151,10 @@ export function formatPhone(phone: string): string | undefined {
   }
 }
 
-export function getNameInitials(fullName: string) {
+export function getNameInitials(fullName: string | null | undefined) {
   // Split the full name into parts
+  if (!fullName) return "";
+
   const nameParts = fullName.trim().split(/\s+/);
 
   // Get the first letter of the first name
@@ -166,4 +170,15 @@ export function getNameInitials(fullName: string) {
 
   // Return the initials
   return firstInitial + lastInitial;
+}
+
+// Convert contact -> recipient, because `addRecipient` function expects a recipient type of NewRecipient not of contact type.
+export function convertToRecipient(contact: DBContact): NewRecipient {
+  const { id, name, phone, description } = contact;
+  return {
+    phone,
+    contactId: id,
+    contactName: name,
+    contactDescription: description,
+  };
 }
