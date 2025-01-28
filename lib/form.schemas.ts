@@ -9,9 +9,9 @@ export const MessageSchema = z.object({
   // recipients are handled internally for more thorough error messages
   subject: z.string(),
   body: z.string().min(1, "The message can't be empty."),
-  sendTime: z.coerce
+  sendDelay: z.coerce
     .number({ message: "Send time must be in number format." })
-    .positive({ message: "Send time must be the future." }).optional(),
+    .optional(),
 });
 
 export const LoginSchema = z.object({

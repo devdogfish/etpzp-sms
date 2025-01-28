@@ -27,6 +27,7 @@ export type Message = {
   recipients: NewRecipient[];
   subject: string;
   body: string;
+  sendDelay: number;
 };
 export type DBMessage = {
   id: string;

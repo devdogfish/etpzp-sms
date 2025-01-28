@@ -57,13 +57,14 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
   // Convert the our send time from seconds to milliseconds
   // JavaScript's Date object uses milliseconds, so we multiply by 1000 to turn send time into ms. as well
   const scheduledUnixTime =
-    validatedData.data.sendTime !== undefined
-      ? new Date(Date.now() + validatedData.data.sendTime * 1000)
+    validatedData.data.sendDelay !== undefined &&
+    validatedData.data.sendDelay > 0
+      ? new Date(Date.now() + validatedData.data.sendDelay * 1000)
       : undefined;
-  console.log(`Schedule time reached server: ${validatedData.data.sendTime}`);
+  console.log(`Schedule time reached server: ${validatedData.data.sendDelay}`);
   console.log(`Converted to UNIX Timestamp: ${scheduledUnixTime}`);
 
-  // TODO implement scheduling message (maybe store if it is scheduled in a different field than status because once the sendTime is reached the message's status should change from `scheduled` to `sent`)
+  // TODO implement scheduling message (maybe store if it is scheduled in a different field than status because once the sendDelay is reached the message's status should change from `scheduled` to `sent`)
   try {
     // const payload = {
     //   // this shit can only be one full word with no special characters or spaces
@@ -89,7 +90,11 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
     // });
     const resp = undefined;
     // DEBUG!!
-    console.log(resp);
+
+    console.log("delay time");
+
+    console.log(validatedData.data.sendDelay);
+    console.log(typeof validatedData.data.sendDelay);
 
     // if (!resp.ok) {
     //   throw new Error("Network response was not ok " + resp?.statusText);
@@ -115,7 +120,7 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
         userId,
         validatedData.data.subject,
         validatedData.data.body,
-        resp?.ok ? "SENT" : "FAILED", // status here
+        resp?.ok ? (scheduledUnixTime ? "SCHEDULED" : "SENT") : "FAILED", // status here
         "SENT", // By default freshly sent messages are saved to Sent page
         resp?.statusText || null,
 

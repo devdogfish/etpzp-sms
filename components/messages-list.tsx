@@ -76,7 +76,7 @@ export function MessageList({
                     Failed
                   </Badge>
                 )}
-                {/* {item.sendTime && (
+                {/* {item.sendDelay && (
                 <Badge variant={getBadgeVariantFromLabel("SCHEDULED")}>
                   Scheduled
                 </Badge>

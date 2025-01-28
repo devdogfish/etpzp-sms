@@ -1,4 +1,5 @@
 "use client";
+
 import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
 import { Maximize2, Minimize2, Trash2, X } from "lucide-react";
@@ -12,7 +13,13 @@ import { sendMessage, ActionResponse } from "@/lib/actions/message.create";
 // Form
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import RecipientsInput from "./recipients-input";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
@@ -46,6 +53,7 @@ export default function NewMessageForm({
 }: {
   contacts: ActionResult<DBContact[]>;
 }) {
+  const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation();
   const router = useRouter();
   const { recipients, moreInfoOn } = useNewMessage();
@@ -53,6 +61,7 @@ export default function NewMessageForm({
   const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
   const { isFullscreen, toggleFullscreen } = useLayout();
+  const [scheduledTime, setScheduledTime] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,9 +74,10 @@ export default function NewMessageForm({
       recipients: recipients as NewRecipient[],
       subject: formData.get("subject") as string,
       body: formData.get("body") as string,
+      sendDelay: scheduledTime as number,
     });
 
-    console.log(`result on client`);
+    console.log(`Server action result on client`);
     console.log(result);
 
     setLoading(false);
@@ -84,7 +94,6 @@ export default function NewMessageForm({
           setTimeout(() => {
             toast.error(input, { description: errorArray.join(", ") });
             waitTime += index * inBetweenTime;
-            console.log(index, waitTime);
           }, index * inBetweenTime) // Increase delay by 50ms for each error
       );
       setTimeout(() => {
@@ -92,6 +101,7 @@ export default function NewMessageForm({
       }, Object.entries(zodErrors).length * inBetweenTime);
     }
   };
+
   return (
     <ContactModalsProvider>
       {/* We can only put the modal here, because it carries state */}
@@ -120,7 +130,11 @@ export default function NewMessageForm({
           <X className="h-4 w-4" />
         </Link>
       </PageHeader>
-      <form onSubmit={handleSubmit} className="h-screen flex flex-col">
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        className="h-screen flex flex-col"
+      >
         <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
           <div className="flex flex-col px-4 mt-2">
             <div
@@ -186,7 +200,17 @@ export default function NewMessageForm({
               Discard
             </Button>
 
-            <SendButton loading={loading} />
+            <SendButton
+              loading={loading}
+              setScheduledTime={setScheduledTime}
+              submit={() => {
+                if (formRef.current) {
+                  // IMPORTANT - we call .requestSubmit() instead of .submit() here so that handleSubmit() gets called
+                  // .submit() submits the form using default behavior with form submission, while .requestSubmit() submits the form as if a submit got clicked
+                  formRef.current.requestSubmit();
+                }
+              }}
+            />
           </div>
         </div>
       </form>
