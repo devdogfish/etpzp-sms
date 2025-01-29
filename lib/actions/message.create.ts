@@ -51,34 +51,14 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
     };
   }
 
-  console.log("Recipients that are about to be FUCK-BOMBED & MOGGED:");
-  console.log(validRecipients);
-
+  console.log(validatedData.data.sendDelay);
+  
   // Convert the our send time from seconds to milliseconds
   // JavaScript's Date object uses milliseconds, so we multiply by 1000 to turn send time into ms. as well
-  const scheduledTime =
-    validatedData.data.sendDelay !== undefined &&
-    validatedData.data.sendDelay > 0
-      ? new Date(Date.now() + validatedData.data.sendDelay * 1000)
-      : undefined;
-  console.log(`Schedule time reached server: ${validatedData.data.sendDelay}`);
-  console.log(`Converted to UNIX Timestamp: ${scheduledTime?.getTime()}`);
-
-  const currentTime = new Date();
-  const timezoneOffset = currentTime.getTimezoneOffset() * 60 * 1000; // convert minutes to milliseconds
-  const newDateMs = validatedData.data.sendDelay
-    ? new Date(
-        (Date.now() + validatedData.data.sendDelay * 1000 + timezoneOffset) /
-          1000 /
-          1000 /
-          1000
-      )
-    : undefined;
-  const newTimestamp = newDateMs?.getTime();
-
-  console.log(`Current time: ${currentTime}`);
-  console.log(`New date: ${newDateMs}`);
-  console.log(`New timestamp: ${newTimestamp}`);
+  let scheduledUnixSeconds: number | undefined = undefined;
+  if (validatedData.data.sendDelay && validatedData.data.sendDelay > 0) {
+    scheduledUnixSeconds = Date.now() / 1000 + validatedData.data.sendDelay;
+  }
 
   // TODO implement scheduling message (maybe store if it is scheduled in a different field than status because once the sendDelay is reached the message's status should change from `scheduled` to `sent`)
   try {
@@ -93,10 +73,8 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
 
       destaddr: "DISPLAY", // Flash SMS
 
-      // sendTime: scheduledTime?.getTime(), // Extract the Unix timestamp for scheduled messages
-      // sendTime: scheduledTime ? scheduledTime?.getTime() / 1000 : undefined, // Extract the Unix timestamp for scheduled messages
-      sendTime: 1738324848, // Extract the Unix timestamp for scheduled messages
-      //1738324868486
+      // sendtime has to be like this, the API is case-sensitive
+      sendtime: scheduledUnixSeconds, // Extract the UNIX timestamp for scheduled messages
     };
 
     const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
@@ -107,33 +85,26 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
       },
       body: JSON.stringify(payload),
     });
-    // const resp = undefined;
-    // DEBUG!!
-
-    console.log("delay time");
-
-    console.log(scheduledTime ? scheduledTime?.getTime() / 1000 : undefined);
-    console.log(typeof scheduledTime?.getTime());
 
     if (!resp.ok) {
-      console.log(resp);
+      console.log(JSON.stringify(await resp.json()));
 
-      throw new Error("Error during API fetch: " + resp?.statusText);
+      throw new Error("Network response was not ok " + resp?.statusText);
     }
 
     // Using message_id from the message insertion, to create recipient.
     await db(
       `
       WITH insert_message AS (
-        INSERT INTO message (user_id, subject, body, status, location, failure_reason, sent_at) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7) 
+        INSERT INTO message (user_id, subject, body, status, location, failure_reason) 
+        VALUES ($1, $2, $3, $4, $5, $6) 
         RETURNING id
       )
       INSERT INTO recipient (message_id, contact_id, phone)
       SELECT 
         insert_message.id, 
-        unnest($8::int[]) as contact_id,
-        unnest($9::text[]) as phone
+        unnest($7::int[]) as contact_id,
+        unnest($8::text[]) as phone
       FROM insert_message;
       `,
       [
@@ -141,10 +112,9 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
         userId,
         validatedData.data.subject,
         validatedData.data.body,
-        resp?.ok ? (scheduledTime ? "SCHEDULED" : "SENT") : "FAILED", // status here
+        resp?.ok ? (scheduledUnixSeconds ? "SCHEDULED" : "SENT") : "FAILED", // status here
         "SENT", // By default freshly sent messages are saved to Sent page
         resp?.statusText || null,
-        scheduledTime ? scheduledTime.toISOString() : null,
 
         // recipient parameters:
         validRecipients.map((recipient) => recipient.contactId || null), // contact_id array
@@ -155,7 +125,14 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
 
     return {
       success: true,
-      message: ["Success!", "Your message has been sent successfully."],
+      message: [
+        "Success!",
+        scheduledUnixSeconds
+          ? `Your message is scheduled to be sent on ${new Date(
+              scheduledUnixSeconds
+            )}`
+          : "Your message has been sent successfully.",
+      ],
       inputs: data,
     };
   } catch (error) {

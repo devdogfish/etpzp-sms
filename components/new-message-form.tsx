@@ -202,12 +202,14 @@ export default function NewMessageForm({
 
             <SendButton
               loading={loading}
-              setScheduledTime={setScheduledTime}
-              submit={() => {
+              submit={(secondsFromNow: number) => {
                 if (formRef.current) {
                   // IMPORTANT - we call .requestSubmit() instead of .submit() here so that handleSubmit() gets called
                   // .submit() submits the form using default behavior with form submission, while .requestSubmit() submits the form as if a submit got clicked
+                  setScheduledTime(secondsFromNow)
+                  console.log(`Message will be sent in ${secondsFromNow} seconds!`);
                   formRef.current.requestSubmit();
+                  
                 }
               }}
             />

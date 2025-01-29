@@ -1,7 +1,7 @@
 "use client";
 
 import { SetStateAction, useState } from "react";
-import { Button } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 import { ChevronDown, Clock, Loader2, Send } from "lucide-react";
 import {
   DropdownMenu,
@@ -12,57 +12,71 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+  DialogHeader,
+} from "./ui/dialog";
 import { addDays, addHours, format, nextSaturday } from "date-fns";
 import { Calendar } from "./ui/calendar";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { DialogClose } from "@radix-ui/react-dialog";
 
+type DateState = {
+  date: Date;
+  hour: string;
+  minute: string;
+};
 export default function ScheduleMessageDropdown({
   loading,
-  setScheduledTime,
   submit,
 }: {
   loading: boolean;
-  setScheduledTime: React.Dispatch<SetStateAction<number>>;
-  submit: () => void;
+  submit: (seconds: number) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedHour, setSelectedHour] = useState<string>("12");
-  const [selectedMinute, setSelectedMinute] = useState<string>("00");
-  const [isDialogOpen, setIsDialogOpen] = useState(true);
-  const today = new Date();
-
-  const handlePresetDate = (date: Date) => {
-    setSelectedDate(date);
-    setSelectedHour(format(date, "HH"));
-    setSelectedMinute(format(date, "mm"));
-  };
+  const [dialog, setDialog] = useState(true);
+  const [dropdown, setDropdown] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<DateState>({
+    date: new Date(),
+    hour: format(Date.now(), "HH"),
+    minute: format(Date.now(), "mm"),
+  });
 
   const handleSchedule = () => {
-    if (selectedDate) {
-      const scheduledDate = new Date(selectedDate);
-      scheduledDate.setHours(Number.parseInt(selectedHour, 10));
-      scheduledDate.setMinutes(Number.parseInt(selectedMinute, 10));
+    console.log("handleSchedule called");
 
+    if (selectedDate) {
+      console.log("SELECTED DATE:", selectedDate);
+
+      const scheduledDate = selectedDate.date;
+      scheduledDate.setHours(Number.parseInt(selectedDate.hour, 10));
+      scheduledDate.setMinutes(Number.parseInt(selectedDate.minute, 10));
       const secondsFromNow = Math.floor(
         (scheduledDate.getTime() - new Date().getTime()) / 1000
       );
 
       // Send secondsFromNow to the server
-      console.log("Seconds from now:", secondsFromNow);
+      console.log(
+        `Message will be sent in ${Math.floor(secondsFromNow / 60)} minutes`
+      );
 
       // Close the dialog
-      setIsDialogOpen(false);
-      setScheduledTime(secondsFromNow);
-
+      setDialog(false);
+      submit(secondsFromNow);
+    } else {
+      console.log(
+        "selectedDate is undefined. Can't schedule message on client"
+      );
     }
-    submit();
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog open={dialog} onOpenChange={setDialog}>
       <div className="flex">
         <Button
           type="submit"
@@ -76,7 +90,7 @@ export default function ScheduleMessageDropdown({
           )}
           Send
         </Button>
-        <DropdownMenu onOpenChange={setIsOpen}>
+        <DropdownMenu onOpenChange={setDropdown}>
           <DropdownMenuTrigger
             className={cn("flex gap-3 items-center justify-start w-full")}
             asChild
@@ -89,7 +103,7 @@ export default function ScheduleMessageDropdown({
               <ChevronDown
                 className={cn(
                   "h-4 w-4 transition-transform",
-                  isOpen && "rotate-180"
+                  dropdown && "rotate-180"
                 )}
               />
             </Button>
@@ -104,96 +118,77 @@ export default function ScheduleMessageDropdown({
             <DropdownMenuSeparator />
             <DropdownMenuItem>Tomorrow morning</DropdownMenuItem>
             <DropdownMenuItem>Tomorrow afternoon</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setIsDialogOpen(true)}>
+            <DropdownMenuItem onSelect={() => setDialog(true)}>
               <Clock className="h-4 w-4 mr-2" />
               <span>Custom date</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <DialogContent className="flex p-4 min-w-max">
-        <div className="flex flex-col gap-2 border-r px-2 ">
-          <div className="px-4 text-sm font-medium">Select a date</div>
-          <div className="grid min-w-[250px] gap-1">
-            <Button
-              variant="ghost"
-              className="justify-start font-normal"
-              onClick={() => handlePresetDate(addHours(today, 4))}
-            >
-              Later today{" "}
-              <span className="ml-auto text-muted-foreground">
-                {format(addHours(today, 4), "E, h:mm a")}
-              </span>
-            </Button>
-            <Button
-              variant="ghost"
-              className="justify-start font-normal"
-              onClick={() => handlePresetDate(addDays(today, 1))}
-            >
-              Tomorrow
-              <span className="ml-auto text-muted-foreground">
-                {format(addDays(today, 1), "E, h:mm a")}
-              </span>
-            </Button>
-            <Button
-              variant="ghost"
-              className="justify-start font-normal"
-              onClick={() => handlePresetDate(nextSaturday(today))}
-            >
-              This weekend
-              <span className="ml-auto text-muted-foreground">
-                {format(nextSaturday(today), "E, h:mm a")}
-              </span>
-            </Button>
-            <Button
-              variant="ghost"
-              className="justify-start font-normal"
-              onClick={() => handlePresetDate(addDays(today, 7))}
-            >
-              Next week
-              <span className="ml-auto text-muted-foreground">
-                {format(addDays(today, 7), "E, h:mm a")}
-              </span>
-            </Button>
-          </div>
-        </div>
-        <div className="p-2 flex flex-col gap-4">
+      <DialogContent className="p-6 min-w-max">
+        <DialogHeader>
+          <DialogTitle>Pick date and time</DialogTitle>
+          <DialogDescription>View more info about a message.</DialogDescription>
+        </DialogHeader>
+        <div
+          className="p-0 flex gap-4 h-[325px]" /** This is the exact maximum height of the calendar */
+        >
           <Calendar
             mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
+            selected={selectedDate.date}
+            onSelect={(date: Date | undefined) => {
+              if (date) {
+                setSelectedDate((prev) => ({ ...prev, date }));
+              }
+            }}
             className="rounded-md border"
           />
-          <div className="flex gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="hour">Hour</Label>
-              <Input
-                id="hour"
-                type="number"
-                min="0"
-                max="23"
-                value={selectedHour}
-                onChange={(e) => setSelectedHour(e.target.value)}
-                className="w-20"
-              />
+          <div className="flex flex-col justify-between w-full">
+            <div /**className="flex flex-col h-full justify-center" */>
+              <div className="flex flex-col gap-2 mb-3">
+                <Label htmlFor="hour">Hour</Label>
+                <Input
+                  id="hour"
+                  type="number"
+                  min="0"
+                  max="23"
+                  value={selectedDate.hour}
+                  onChange={(e) =>
+                    setSelectedDate((prev) => ({
+                      ...prev,
+                      hour: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-2 mb-3">
+                <Label htmlFor="minute">Minute</Label>
+                <Input
+                  id="minute"
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={selectedDate.minute}
+                  onChange={(e) =>
+                    setSelectedDate((prev) => ({
+                      ...prev,
+                      minute: e.target.value,
+                    }))
+                  }
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="minute">Minute</Label>
-              <Input
-                id="minute"
-                type="number"
-                min="0"
-                max="59"
-                value={selectedMinute}
-                onChange={(e) => setSelectedMinute(e.target.value)}
-                className="w-20"
-              />
+            <div className="flex gap-2 justify-end">
+              <DialogClose
+                className={cn(buttonVariants({ variant: "outline" }), "")}
+              >
+                Close
+              </DialogClose>
+              <Button onClick={handleSchedule}>Schedule</Button>
             </div>
           </div>
-          <Button onClick={handleSchedule}>Schedule</Button>
         </div>
       </DialogContent>
-      <DialogTitle className="sr-only">Schedule your message</DialogTitle>
     </Dialog>
   );
 }

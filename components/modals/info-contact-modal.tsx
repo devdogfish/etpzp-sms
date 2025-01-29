@@ -8,7 +8,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "../ui/dialog";
-import { ActionResponse, DBContact } from "@/types/contact";
 
 import { DialogClose } from "@/components/ui/dialog";
 import { cn, getNameInitials } from "@/lib/utils";
@@ -19,10 +18,6 @@ import { CopyButton } from "../shared/copy-button";
 import { Button } from "../ui/button";
 import { NewRecipient } from "@/types/recipient";
 
-const initialState: ActionResponse = {
-  success: false,
-  message: "",
-};
 
 export default function InfoContactModal({
   recipient,
