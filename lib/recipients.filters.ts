@@ -31,7 +31,7 @@ export function processRecipients(
   return Object.values(processedData);
 }
 
-export function getTopRecipients(
+export function calcTopRecipients(
   recipients: ProcessedDBContactRecipient[],
   limit = 5
 ): ProcessedDBContactRecipient[] {

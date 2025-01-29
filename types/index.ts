@@ -4,7 +4,7 @@ export type MessageLocation = "sent" | "draft" | "trash";
 export type StatusEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFTED";
 export type LocationEnums = "ALL" | "SENT" | "DRAFT" | "TRASH";
 
-export type StringMap = { [key: string]: boolean };
+export type StringBoolMap = { [key: string]: boolean };
 
 export type User = {
   id: string;

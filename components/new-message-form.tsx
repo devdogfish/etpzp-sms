@@ -3,7 +3,6 @@
 import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
 import { Maximize2, Minimize2, Trash2, X } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import SendButton from "./send-button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -32,7 +31,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ActionResult } from "@/types/action";
 import { toast } from "sonner";
 import { NewRecipient } from "@/types/recipient";
 import { DBContact } from "@/types/contact";
@@ -50,8 +48,10 @@ const initialState: ActionResponse = {
 };
 export default function NewMessageForm({
   contacts,
+  error,
 }: {
-  contacts: ActionResult<DBContact[]>;
+  contacts: DBContact[];
+  error: string;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation();
@@ -105,7 +105,7 @@ export default function NewMessageForm({
   return (
     <ContactModalsProvider>
       {/* We can only put the modal here, because it carries state */}
-      <InsertContactModal contacts={contacts.data || []} />
+      <InsertContactModal contacts={contacts} />
       {moreInfoOn && <InfoContactModal recipient={moreInfoOn} />}
       {moreInfoOn && !moreInfoOn.contactId && (
         <CreateContactModal defaultPhone={moreInfoOn.phone} />
@@ -156,8 +156,8 @@ export default function NewMessageForm({
             </div>
 
             <RecipientsInput
-              contacts={contacts.data || []}
-              errors={serverState.errors?.recipients}
+              contacts={contacts}
+              error={!!serverState.errors?.recipients}
             />
 
             <Input
@@ -206,10 +206,11 @@ export default function NewMessageForm({
                 if (formRef.current) {
                   // IMPORTANT - we call .requestSubmit() instead of .submit() here so that handleSubmit() gets called
                   // .submit() submits the form using default behavior with form submission, while .requestSubmit() submits the form as if a submit got clicked
-                  setScheduledTime(secondsFromNow)
-                  console.log(`Message will be sent in ${secondsFromNow} seconds!`);
+                  setScheduledTime(secondsFromNow);
+                  console.log(
+                    `Message will be sent in ${secondsFromNow} seconds!`
+                  );
                   formRef.current.requestSubmit();
-                  
                 }
               }}
             />

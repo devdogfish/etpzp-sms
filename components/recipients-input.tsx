@@ -7,15 +7,12 @@ import React, {
   ChangeEvent,
   useRef,
   useEffect,
-  SetStateAction,
 } from "react";
 import { Key, Search, UserPlus, X } from "lucide-react";
 
 import { Button, buttonVariants } from "./ui/button";
 import { cn, generateUniqueId, getNameInitials } from "@/lib/utils";
-import type { ProcessedDBContactRecipient as DBRecipient } from "@/types/recipient";
 import { useNewMessage } from "@/contexts/use-new-message";
-import type { ActionResult } from "@/types/action";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { ScrollArea } from "./ui/scroll-area";
 import { useSession } from "@/hooks/use-session";
@@ -34,10 +31,10 @@ type InputState = {
 
 export default function RecipientsInput({
   contacts,
-  errors,
+  error,
 }: {
   contacts: DBContact[];
-  errors?: string[];
+  error?: boolean
 }) {
   const [input, setInput] = useState<InputState>({
     value: "",
@@ -59,6 +56,7 @@ export default function RecipientsInput({
     setMoreInfoOn,
   } = useNewMessage();
   const { setModal } = useContactModals();
+  const [activeError, setActiveError] = useState<boolean>(false);
 
   useEffect(() => {
     if (searchParams.get("contactId")) {
@@ -129,19 +127,31 @@ export default function RecipientsInput({
     searchRecipients(value);
   };
 
+  useEffect(() => {
+    if (error) {
+      setActiveError(error);
+      const noErrorRecipientFound = recipients.find(
+        (recipient) => recipient.formattedPhone !== undefined
+      );
+      if (noErrorRecipientFound) setActiveError(false);
+      console.log("looking for recipient without errors");
+      console.log(noErrorRecipientFound);
+    }
+  }, [recipients, error]);
+
   const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
   const showRecipientInfo = (recipient: NewRecipient) => {
     setMoreInfoOn(recipient);
     setModal((prev) => ({ ...prev, info: true }));
   };
   return (
-    <div className="flex-1 py-1 relative">
+    <div className="flex-1 py-1 relative z--[1000]">
       <div className="max-h-24 overflow-auto" ref={container}>
         <div
           className={cn(
-            "w-full flex flex-wrap items-center gap-x-1 py-1 h-full border-b px-5",
+            "w-full flex flex-wrap items-center gap-x-1 py-1 h-full border-b px-5 z-50",
             input.isFocused && "border-primary",
-            errors && "border-red-500"
+            activeError && "border-red-500"
           )}
         >
           <span className="my-0.5 mr-0.5 px-0 flex items-center text-sm text-muted-foreground">
@@ -155,9 +165,8 @@ export default function RecipientsInput({
               <div className="h-6" /* height of the contact chip itself */>
                 <div
                   className={cn(
-                    "flex items-center text-xs border rounded-xl hover:bg-muted cursor-pointer whitespace-nowrap h-full",
-                    // recipient.error?.type === "warning" && "bg-yellow-100",
-                    recipient.error?.type === "error" && "border-destructive"
+                    "bg-background flex items-center text-xs border rounded-xl hover:bg-muted cursor-pointer whitespace-nowrap h-full hover:shadow-none",
+                    activeError && "error-border-pulse"
                   )}
                 >
                   <div

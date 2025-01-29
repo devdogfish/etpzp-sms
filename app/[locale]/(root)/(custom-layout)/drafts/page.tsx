@@ -2,6 +2,7 @@ import MessagesPageSkeleton from "@/components/messages-page-skeleton";
 import MessagesPage from "@/components/messages-page";
 import { fetchMessagesByStatus } from "@/lib/db/message";
 import { Suspense } from "react";
+import { fetchError } from "@/lib/db";
 
 export default function Page() {
   return (
@@ -16,8 +17,8 @@ export async function DraftsMessagesPage() {
 
   return (
     <MessagesPage
-      messages={messages.data || []}
-      error={!messages.success ? messages.message : undefined}
+      messages={messages || []}
+      error={fetchError("drafts", !messages)}
       location="DRAFT"
     />
   );

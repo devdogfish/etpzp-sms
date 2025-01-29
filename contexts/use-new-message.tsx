@@ -20,7 +20,7 @@ import {
   validatePhoneNumber,
 } from "@/lib/utils";
 import { toast } from "sonner";
-import { getTopRecipients } from "@/lib/recipients.filters";
+import { calcTopRecipients } from "@/lib/recipients.filters";
 import { DBContact } from "@/types/contact";
 
 type MessageContextValues = {
@@ -58,10 +58,11 @@ export function NewMessageProvider({
     recipients: [],
     subject: "",
     body: "",
+    sendDelay: 0,
   });
   const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
 
-  const topRecipients = getTopRecipients(allSuggestedRecipients);
+  const topRecipients = calcTopRecipients(allSuggestedRecipients);
   const recommendedRecipients = topRecipients.length
     ? topRecipients
     : // specify here how many contacts you want in the case of no existing recipients but unused existing contacts.

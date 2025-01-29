@@ -39,6 +39,7 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
     return {
       success: false,
       message: ["Invalid Recipients", recipientErrorMessage],
+      errors: { recipients: [recipientErrorMessage] },
     };
   }
   // 2. Validate field types
@@ -52,7 +53,7 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
   }
 
   console.log(validatedData.data.sendDelay);
-  
+
   // Convert the our send time from seconds to milliseconds
   // JavaScript's Date object uses milliseconds, so we multiply by 1000 to turn send time into ms. as well
   let scheduledUnixSeconds: number | undefined = undefined;
@@ -96,15 +97,15 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
     await db(
       `
       WITH insert_message AS (
-        INSERT INTO message (user_id, subject, body, status, location, failure_reason) 
-        VALUES ($1, $2, $3, $4, $5, $6) 
+        INSERT INTO message (user_id, subject, body, status, location, failure_reason, sent_at) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7) 
         RETURNING id
       )
       INSERT INTO recipient (message_id, contact_id, phone)
       SELECT 
         insert_message.id, 
-        unnest($7::int[]) as contact_id,
-        unnest($8::text[]) as phone
+        unnest($8::int[]) as contact_id,
+        unnest($9::text[]) as phone
       FROM insert_message;
       `,
       [
@@ -115,6 +116,9 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
         resp?.ok ? (scheduledUnixSeconds ? "SCHEDULED" : "SENT") : "FAILED", // status here
         "SENT", // By default freshly sent messages are saved to Sent page
         resp?.statusText || null,
+        scheduledUnixSeconds
+          ? new Date(scheduledUnixSeconds)
+          : new Date(Date.now()),
 
         // recipient parameters:
         validRecipients.map((recipient) => recipient.contactId || null), // contact_id array

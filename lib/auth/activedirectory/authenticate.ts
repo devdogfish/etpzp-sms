@@ -3,7 +3,7 @@ import ActiveDirectory from "activedirectory2";
 import { activeDirectoryConfig, SessionData } from "@/lib/auth/config";
 import userExists from "./user";
 import userInGroup from "./group";
-import fetchUser, { dummyFetchUser } from "@/lib/db/user";
+import fetchUser, { dummyFetchUser } from "@/lib/actions/user.actions";
 import db from "@/lib/db";
 import { User } from "@/types";
 

@@ -2,6 +2,7 @@ import MessagesPageSkeleton from "@/components/messages-page-skeleton";
 import MessagesPage from "@/components/messages-page";
 import { fetchMessagesByLocation } from "@/lib/db/message";
 import { Suspense } from "react";
+import { fetchError } from "@/lib/db";
 
 export default function Page() {
   return (
@@ -16,8 +17,8 @@ export async function TrashMessagesPage() {
 
   return (
     <MessagesPage
-      messages={messages.data || []}
-      error={!messages.success ? messages.message : undefined}
+      messages={messages || []}
+      error={fetchError("messages in trash", !messages)}
       location="TRASH"
     />
   );

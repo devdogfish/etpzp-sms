@@ -1,7 +1,6 @@
-import { StringMap, User } from "@/types";
-import db from ".";
+import { User } from "@/types";
+import db from "../db";
 import ActiveDirectory from "activedirectory2";
-import { SessionData } from "../auth/config";
 
 // These are guaranteed properties when you find the user using A.D.
 type userResult = {
@@ -12,6 +11,7 @@ type userResult = {
 
   cn: string; // full name
 };
+
 type ActionResponse<T> = {
   success: boolean;
   message?: string;

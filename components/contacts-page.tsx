@@ -24,8 +24,10 @@ import { DBContact } from "@/types/contact";
 
 export default function ContactsPage({
   contacts,
+  error,
 }: Readonly<{
   contacts: DBContact[];
+  error: string;
 }>) {
   const { layout, fallbackLayout } = useLayout();
   const { t, i18n } = useTranslation(["Common Words"]);

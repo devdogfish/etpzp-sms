@@ -8,53 +8,52 @@ import {
   StatusEnums,
 } from "@/types";
 import { getSession } from "../auth/sessions";
-import { ActionResult } from "@/types/action";
 
 export async function fetchMessagesByLocation(
   location: LocationEnums
-): Promise<ActionResult<DBMessage[]>> {
-  console.log(`Fetching messages that are in ${location}.`);
+): Promise<DBMessage[] | undefined> {
   const session = await getSession();
+  const userId = session?.user?.id;
+
+  console.log(`Fetching messages that are in ${location}.`);
   try {
-    const userId = session?.user?.id;
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(
       "SELECT * FROM message WHERE user_id = $1 AND location = $2 ORDER BY created_at DESC;",
       [userId, location]
     );
 
-    return { success: true, message: "", data: result.rows };
-  } catch (error) {
-    return { success: false, message: "An unknown error occurred.", data: [] };
-  }
+    return result.rows;
+  } catch (error) {}
 }
 
 export async function fetchMessagesByStatus(
   status: StatusEnums
-): Promise<ActionResult<DBMessage[]>> {
-  console.log(`Fetching messages that are in ${status} status.`);
+): Promise<DBMessage[] | undefined> {
   const session = await getSession();
+  const userId = session?.user?.id;
+
+  console.log(`Fetching messages that are in ${status} status.`);
   try {
-    const userId = session?.user?.id;
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(
       "SELECT * FROM message WHERE user_id = $1 AND status = $2 ORDER BY created_at DESC;",
       [userId, status]
     );
 
-    return { success: true, message: "", data: result.rows };
-  } catch (error) {
-    return { success: false, message: "An unknown error occurred.", data: [] };
-  }
+    return result.rows;
+  } catch (error) {}
 }
 
-export async function fetchAmountIndicators(): Promise<
-  AmountIndicators | undefined
-> {
+export async function fetchAmountIndicators(): Promise<AmountIndicators> {
   const session = await getSession();
+  const userId = session?.user?.id;
+
+  console.log("FETCHING AMOUNT INDICATORS");
+
   try {
-    const userId = session?.user?.id;
     if (!userId) throw new Error("Invalid user id.");
+
     const allMessages = db("SELECT COUNT(*) FROM message WHERE user_id = $1;", [
       userId,
     ]);

@@ -1,11 +1,11 @@
 "use client";
 
-import { StringMap } from "@/types";
+import { StringBoolMap } from "@/types";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type ContactModalContextValues = {
-  modal: StringMap;
-  setModal: React.Dispatch<React.SetStateAction<StringMap>>;
+  modal: StringBoolMap;
+  setModal: React.Dispatch<React.SetStateAction<StringBoolMap>>;
 };
 
 const ContactModalsContext = createContext<ContactModalContextValues | null>(
@@ -17,7 +17,7 @@ export function ContactModalsProvider({
 }: {
   children: Readonly<React.ReactNode>;
 }) {
-  const [modal, setModal] = useState<StringMap>({
+  const [modal, setModal] = useState<StringBoolMap>({
     create: false,
     edit: false,
     insert: false,
