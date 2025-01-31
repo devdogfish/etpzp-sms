@@ -7,7 +7,6 @@ import { createSession, getSession } from "./sessions";
 import { LoginSchema } from "@/lib/form.schemas";
 import { Login, SessionData } from "./config";
 import { ActionResponse } from "@/types/action";
-import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 
 // This function is for actually authenticating the user and fetching all the users data
@@ -35,7 +34,7 @@ export async function login(
   console.log("STARTING AUTHENTICATION");
   console.log(email, password);
 
-  const user: SessionData /**& { errors: string[] } */ = await dummyAuthenticate({
+  const user: SessionData /**& { errors: string[] } */ = await authenticate({
     email,
     password,
   });

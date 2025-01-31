@@ -21,8 +21,7 @@ CREATE TABLE "message" (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     sent_at TIMESTAMP DEFAULT NOW(), -- can be null if the message is a draft
     status VARCHAR(20) NOT NULL CHECK (status IN ('SENT', 'SCHEDULED', 'FAILED', 'DRAFTED')), 
-    location VARCHAR(20) NOT NULL CHECK (location IN ('SENT', 'DRAFT', 'TRASH')),
-    scheduled_time TIMESTAMP,
+    in_trash BOOLEAN NOT NULL DEFAULT false,
     failure_reason VARCHAR(255)
 );
 

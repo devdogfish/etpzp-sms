@@ -1,6 +1,6 @@
 "use client";
 
-import { DBMessage, LocationEnums } from "@/types";
+import { DBMessage, CategoryEnums } from "@/types";
 import React, { useEffect, useState } from "react";
 import ChildrenPanel from "./shared/children-panel";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
@@ -20,11 +20,11 @@ import { AlertTriangle, Calendar, List } from "lucide-react";
 export default function MessagesPage({
   messages,
   error,
-  location,
+  category,
 }: Readonly<{
   messages: DBMessage[];
   error?: string;
-  location: LocationEnums;
+  category: CategoryEnums;
 }>) {
   const { layout, fallbackLayout } = useLayout();
   const { t, i18n } = useTranslation(["Common Words"]);
@@ -59,19 +59,6 @@ export default function MessagesPage({
     return () => window.removeEventListener("resize", handleResize); // Cleanup
   }, [messages]);
 
-  const onTabChange = (value: string) => {
-    const url = new URL(window.location.href);
-    const params = new URLSearchParams(url.search);
-    if (value) {
-      params.set("category", value);
-    } else {
-      params.delete("category");
-    }
-
-    // Update the URL without reloading the page
-    url.search = params.toString();
-    window.history.pushState({}, "", url);
-  };
   return (
     <>
       <ResizablePanel
@@ -85,19 +72,17 @@ export default function MessagesPage({
         minSize={22}
         maxSize={50}
       >
+        <PageHeader title={t(category)} />
         <Tabs
           defaultValue={searchParams.get("category")?.toString() || "all"}
-          onValueChange={onTabChange}
+          onValueChange={() => {}}
         >
           {/** WE WILL HAVE location SUBSTITUTED HERE */}
-          <PageHeader title={t(location)}/>
-
           <Search
             onSearch={onSearch}
-            placeholder={String(t("search") + " " + t(location).toLowerCase())}
+            placeholder={String(t("search") + " " + t(category).toLowerCase())}
             className="pl-8 placeholder:text-muted-foreground border"
           />
-
           {error && <p>{error}</p>}
           <TabsContent value="all">
             <MessageList

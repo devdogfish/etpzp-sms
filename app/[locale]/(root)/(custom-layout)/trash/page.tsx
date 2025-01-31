@@ -1,19 +1,19 @@
 import MessagesPageSkeleton from "@/components/messages-page-skeleton";
 import MessagesPage from "@/components/messages-page";
-import { fetchMessagesByLocation } from "@/lib/db/message";
 import { Suspense } from "react";
 import { fetchError } from "@/lib/db";
+import { fetchTrashedMessages } from "@/lib/db/message";
 
 export default function Page() {
   return (
-    <Suspense fallback={<MessagesPageSkeleton location="TRASH" />}>
+    <Suspense fallback={<MessagesPageSkeleton category="TRASH" />}>
       <TrashMessagesPage />
     </Suspense>
   );
 }
 
 export async function TrashMessagesPage() {
-  const messages = await fetchMessagesByLocation("TRASH");
+  const messages = await fetchTrashedMessages();
 
   return (
     <MessagesPage

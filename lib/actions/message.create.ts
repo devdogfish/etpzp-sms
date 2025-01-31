@@ -153,8 +153,7 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
 }
 
 // export async function saveMessageTo(
-//   values: z.infer<typeof MessageSchema>,
-//   location: MessageLocation
+//   values: z.infer<typeof MessageSchema>
 // ) {}
 
 function analyzeRawRecipients(recipients: NewRecipient[]): {

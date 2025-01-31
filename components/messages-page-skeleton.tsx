@@ -1,5 +1,5 @@
 "use client";
-import React, { ChangeEvent, useCallback, useState } from "react";
+import React from "react";
 import ChildrenPanel from "./shared/children-panel";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useLayout } from "@/contexts/use-layout";
@@ -11,12 +11,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import PageHeader from "./page-header";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { LocationEnums } from "@/types";
+import { CategoryEnums } from "@/types";
 
 export default function MessagesPageSkeleton({
-  location,
+  category,
 }: {
-  location: LocationEnums;
+  category: CategoryEnums;
 }) {
   const { layout, fallbackLayout } = useLayout();
   const { t, i18n } = useTranslation(["Common Words"]);
@@ -35,7 +35,7 @@ export default function MessagesPageSkeleton({
         minSize={22}
         maxSize={50}
       >
-        <PageHeader title={t(location)} />
+        <PageHeader title={t(category)} />
 
         <div className="rounded-md p-4 h-[68px]">
           <Skeleton className="h-9" style={{ borderRadius: "0.375rem" }} />

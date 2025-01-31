@@ -4,13 +4,13 @@ import db from ".";
 import {
   AmountIndicators,
   DBMessage,
-  LocationEnums,
+  CategoryEnums,
   StatusEnums,
 } from "@/types";
 import { getSession } from "../auth/sessions";
 
 export async function fetchMessagesByLocation(
-  location: LocationEnums
+  location: CategoryEnums
 ): Promise<DBMessage[] | undefined> {
   const session = await getSession();
   const userId = session?.user?.id;
@@ -45,46 +45,42 @@ export async function fetchMessagesByStatus(
   } catch (error) {}
 }
 
+export async function fetchTrashedMessages(): Promise<DBMessage[] | undefined> {
+  const session = await getSession();
+  const userId = session?.user?.id;
+
+  console.log("fetching trashed messages");
+  try {
+    if (!userId) throw new Error("Invalid user id.");
+    const result = await db(
+      "SELECT * FROM message WHERE user_id = $1 AND in_trash = true ORDER BY created_at DESC;",
+      [userId]
+    );
+
+    return result.rows;
+  } catch (error) {}
+}
+
 export async function fetchAmountIndicators(): Promise<AmountIndicators> {
   const session = await getSession();
   const userId = session?.user?.id;
 
   console.log("FETCHING AMOUNT INDICATORS");
-
   try {
     if (!userId) throw new Error("Invalid user id.");
 
-    const allMessages = db("SELECT COUNT(*) FROM message WHERE user_id = $1;", [
+    const sentResult = await db("SELECT * FROM message WHERE user_id = $1;", [
       userId,
     ]);
-    const sentResult = db(
-      "SELECT COUNT(*) FROM message WHERE user_id = $1 AND location = $2;",
-      [userId, "SENT"]
-    );
-    const draftsResult = db(
-      "SELECT COUNT(*) FROM message WHERE user_id = $1 AND location = $2;",
-      [userId, "DRAFT"]
-    );
-    const trashResult = db(
-      "SELECT COUNT(*) FROM message WHERE user_id = $1 AND location = $2;",
-      [userId, "TRASH"]
-    );
-    // const notifications = db(
-    //   "SELECT COUNT(*) FROM message WHERE user_id = $1 AND location $2;",
-    //   [userId, "DRAFT"]
-    // );
-    const [sent, drafts, trash, all] = await Promise.all([
-      sentResult,
-      draftsResult,
-      trashResult,
-      allMessages,
-      // notifications,
-    ]);
+    console.log("fetched all messages to sort using js");
+    console.log(sentResult.rows);
+
     return {
-      sent: sent.rows[0].count,
-      drafts: drafts.rows[0].count,
-      trash: trash.rows[0].count,
-      all: all.rows[0].count,
+      sent: 1,
+      scheduled: 6,
+      failed: 1,
+      drafted: 0,
+      trashed: 1,
     };
   } catch (error) {}
 }

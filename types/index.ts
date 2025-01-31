@@ -1,8 +1,7 @@
 import { NewRecipient } from "./recipient";
 
-export type MessageLocation = "sent" | "draft" | "trash";
 export type StatusEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFTED";
-export type LocationEnums = "ALL" | "SENT" | "DRAFT" | "TRASH";
+export type CategoryEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFT" | "TRASH";
 
 export type StringBoolMap = { [key: string]: boolean };
 
@@ -35,18 +34,18 @@ export type DBMessage = {
   subject: string | null;
   body: string;
   created_at: Date;
-  updated_at: Date;
+  sent_at: Date;
   status: StatusEnums;
-  location: "SENT" | "DRAFT" | "TRASH"; // not LocationEnums because in the db location can not be `ALL`
-  scheduled_time: Date | null;
+  in_trash: boolean;
   failure_reason: string | null;
 };
 
 export type AmountIndicators =
   | {
-      sent: string;
-      drafts: string;
-      trash: string;
-      all: string;
+      sent: number;
+      scheduled: number;
+      failed: number;
+      drafted: number;
+      trashed: number;
     }
   | undefined;
