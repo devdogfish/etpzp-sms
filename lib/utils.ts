@@ -93,9 +93,10 @@ export function searchMessages(
 
 export function searchContacts(
   contacts: DBContact[],
-  searchTerm: string,
+  searchTerm: string | null,
   currentPage?: number
 ) {
+  if (!searchTerm) return contacts;
   // Convert searchTerm to lowercase for case-insensitive comparison
   const lowerCaseSearchTerm = searchTerm.toLowerCase().trim();
 

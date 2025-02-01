@@ -200,8 +200,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
           links={[
             {
               title: t("SENT"),
-              label:
-                amountIndicators?.sent == "0" ? "" : amountIndicators?.sent,
+              label: amountIndicators?.sent == 0 ? "" : amountIndicators?.sent.toString(),
               icon: MailCheck,
               variant: "ghost",
               href: "/sent",
@@ -209,7 +208,9 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             {
               title: t("SCHEDULED"),
               label:
-                amountIndicators?.drafts == "0" ? "" : amountIndicators?.drafts,
+                amountIndicators?.scheduled == 0
+                  ? ""
+                  : amountIndicators?.scheduled.toString(),
               icon: Calendar,
               variant: "ghost",
               href: "/scheduled",
@@ -217,7 +218,9 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             {
               title: t("FAILED"),
               label:
-                amountIndicators?.drafts == "0" ? "" : amountIndicators?.drafts,
+                amountIndicators?.failed == 0
+                  ? ""
+                  : amountIndicators?.failed.toString(),
               icon: AlertTriangle,
               variant: "ghost",
               href: "/failed",
@@ -225,7 +228,9 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             {
               title: t("DRAFT"),
               label:
-                amountIndicators?.drafts == "0" ? "" : amountIndicators?.drafts,
+                amountIndicators?.drafted == 0
+                  ? ""
+                  : amountIndicators?.drafted.toString(),
               icon: FileText,
               variant: "ghost",
               href: "/drafts",
@@ -240,7 +245,9 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             {
               title: t("TRASH"),
               label:
-                amountIndicators?.trash == "0" ? "" : amountIndicators?.trash,
+                amountIndicators?.trashed == 0
+                  ? ""
+                  : amountIndicators?.trashed.toString(),
               icon: Trash2,
               variant: "ghost",
               href: "/trash",
@@ -252,7 +259,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
           links={[
             {
               title: t("ALL"),
-              label: amountIndicators?.all == "0" ? "" : amountIndicators?.all,
+              label: amountIndicators?.all == 0 ? "" : amountIndicators?.all,
               icon: Mails,
               variant: "ghost",
               href: "/all",

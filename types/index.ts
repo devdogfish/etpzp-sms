@@ -1,4 +1,4 @@
-import { NewRecipient } from "./recipient";
+import { DBRecipient, NewRecipient } from "./recipient";
 
 export type StatusEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFTED";
 export type CategoryEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFT" | "TRASH";
@@ -28,6 +28,7 @@ export type Message = {
   body: string;
   sendDelay: number;
 };
+
 export type DBMessage = {
   id: string;
   user_id: string;
@@ -38,6 +39,7 @@ export type DBMessage = {
   status: StatusEnums;
   in_trash: boolean;
   failure_reason: string | null;
+  recipients: DBRecipient[];
 };
 
 export type AmountIndicators =

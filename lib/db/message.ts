@@ -9,37 +9,28 @@ import {
 } from "@/types";
 import { getSession } from "../auth/sessions";
 
-export async function fetchMessagesByLocation(
-  location: CategoryEnums
-): Promise<DBMessage[] | undefined> {
-  const session = await getSession();
-  const userId = session?.user?.id;
-
-  console.log(`Fetching messages that are in ${location}.`);
-  try {
-    if (!userId) throw new Error("Invalid user id.");
-    const result = await db(
-      "SELECT * FROM message WHERE user_id = $1 AND location = $2 ORDER BY created_at DESC;",
-      [userId, location]
-    );
-
-    return result.rows;
-  } catch (error) {}
-}
-
 export async function fetchMessagesByStatus(
   status: StatusEnums
 ): Promise<DBMessage[] | undefined> {
   const session = await getSession();
   const userId = session?.user?.id;
 
-  console.log(`Fetching messages that are in ${status} status.`);
+  console.log(`Fetching messages that are in ${status} status...`);
   try {
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(
-      "SELECT * FROM message WHERE user_id = $1 AND status = $2 ORDER BY created_at DESC;",
+      `
+      SELECT m.*, 
+             json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) AS recipients
+      FROM message m
+      LEFT JOIN recipient r ON m.id = r.message_id
+      WHERE m.user_id = $1 AND m.status = $2
+      GROUP BY m.id
+      ORDER BY m.created_at DESC;
+    `,
       [userId, status]
     );
+    console.log(result.rows);
 
     return result.rows;
   } catch (error) {}
@@ -49,11 +40,19 @@ export async function fetchTrashedMessages(): Promise<DBMessage[] | undefined> {
   const session = await getSession();
   const userId = session?.user?.id;
 
-  console.log("fetching trashed messages");
+  console.log("Fetching trashed messages...");
   try {
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(
-      "SELECT * FROM message WHERE user_id = $1 AND in_trash = true ORDER BY created_at DESC;",
+      `
+      SELECT m.*, 
+             json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) AS recipients
+      FROM message m
+      LEFT JOIN recipient r ON m.id = r.message_id
+      WHERE m.user_id = $1 AND m.in_trash = true
+      GROUP BY m.id
+      ORDER BY m.created_at DESC;
+    `,
       [userId]
     );
 
@@ -68,19 +67,44 @@ export async function fetchAmountIndicators(): Promise<AmountIndicators> {
   console.log("FETCHING AMOUNT INDICATORS");
   try {
     if (!userId) throw new Error("Invalid user id.");
+    const sentResult = await db(
+      `
+        SELECT
+          COUNT(CASE WHEN status = 'SENT' THEN 1 END) AS sent,
+          COUNT(CASE WHEN status = 'SCHEDULED' THEN 1 END) AS scheduled,
+          COUNT(CASE WHEN status = 'FAILED' THEN 1 END) AS failed,
+          COUNT(CASE WHEN status = 'DRAFTED' THEN 1 END) AS drafted,
+          COUNT(CASE WHEN in_trash = true THEN 1 END) AS trashed
+        FROM message
+        WHERE user_id = $1;
+      `,
+      [userId]
+    );
 
-    const sentResult = await db("SELECT * FROM message WHERE user_id = $1;", [
-      userId,
-    ]);
-    console.log("fetched all messages to sort using js");
-    console.log(sentResult.rows);
+    return sentResult.rows[0];
+  } catch (error) {}
+}
 
-    return {
-      sent: 1,
-      scheduled: 6,
-      failed: 1,
-      drafted: 0,
-      trashed: 1,
-    };
+export async function fetchDraft(id: string): Promise<DBMessage | undefined> {
+  const session = await getSession();
+  const userId = session?.user?.id;
+
+  console.log("FETCHING AMOUNT INDICATORS");
+  try {
+    if (!userId) throw new Error("Invalid user id.");
+    const sentResult = await db(
+      `
+      SELECT m.*, 
+             json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) AS recipients
+      FROM message m
+      LEFT JOIN recipient r ON m.id = r.message_id
+      WHERE m.user_id = $1 AND m.id = $2 AND m.status = 'DRAFTED'
+      GROUP BY m.id
+      ORDER BY m.created_at DESC;
+    `,
+      [userId, id]
+    );
+
+    return sentResult.rows[0];
   } catch (error) {}
 }

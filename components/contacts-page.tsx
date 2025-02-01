@@ -33,33 +33,19 @@ export default function ContactsPage({
   const { t, i18n } = useTranslation(["Common Words"]);
   const [filteredContacts, setFilteredContacts] = useState(contacts);
   const [selected, setSelected] = useState<DBContact | null>(null);
-  const [isLarge, setIsLarge] = useState({
-    bool: window.matchMedia("(min-width: 1024px)").matches,
-    breakpoint: window.matchMedia("(min-width: 1024px)").matches ? 29 : 44,
-  });
+
   const onMobile = useIsMobile();
   const searchParams = useSearchParams();
-  const query = searchParams.get("query") || "";
-  const currentPage = Number(searchParams.get("page")) || 1;
+
   const isMobile = useIsMobile();
   const router = useRouter();
 
-  // TODO: Update ui based on search term
   const onSearch = () => {
-    // setFilteredContacts(searchContacts(contacts, query, currentPage));
+    setFilteredContacts(searchContacts(contacts, searchParams.get("query")));
   };
 
   useEffect(() => {
-    // Filter the contacts with URLsearchParams on page load
-    setFilteredContacts(searchContacts(contacts, query, currentPage));
-    // We are managing state for when to replace icons with words. The breakpoint be less on big screens while on smaller screens, the icons should show up faster.
-    const handleResize = () => {
-      const _isLarge = window.matchMedia("(min-width: 1024px)").matches;
-      setIsLarge({ bool: _isLarge, breakpoint: _isLarge ? 33 : 49 });
-    };
-
-    handleResize(); // Check on mount
-    window.addEventListener("resize", handleResize); // Check on resize
+    setFilteredContacts(searchContacts(contacts, searchParams.get("query")));
 
     setFilteredContacts(contacts);
     setSelected((prev) => {
@@ -67,7 +53,6 @@ export default function ContactsPage({
         return contacts.find((contact) => contact.id == prev.id) || null;
       else return null;
     });
-    return () => window.removeEventListener("resize", handleResize); // Cleanup
   }, [contacts]);
 
   const { setModal } = useContactModals();

@@ -10,7 +10,7 @@ export const MessageSchema = z.object({
   subject: z.string(),
   body: z.string().min(1, "The message can't be empty."),
   sendDelay: z.coerce
-    .number({ message: "Send time must be in number format." })
+    .number({ message: "Invalid schedule date" })
     .optional(),
 });
 

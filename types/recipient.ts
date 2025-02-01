@@ -24,3 +24,9 @@ export type DBContactRecipient = {
 export type ProcessedDBContactRecipient = DBContactRecipient & {
   usage_count: number;
 };
+
+export type DBRecipient = {
+  id: number;
+  contact_id: number;
+  phone: string;
+};

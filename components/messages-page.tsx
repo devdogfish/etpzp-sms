@@ -7,7 +7,7 @@ import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useLayout } from "@/contexts/use-layout";
 import PageHeader from "./page-header";
 import { useTranslation } from "react-i18next";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Tabs, TabsContent } from "./ui/tabs";
 import { MessageList } from "./messages-list";
 
 import { cn, searchMessages } from "@/lib/utils";
@@ -15,7 +15,6 @@ import { MessageDisplay } from "./message-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Search from "./shared/search";
 import { useSearchParams } from "next/navigation";
-import { AlertTriangle, Calendar, List } from "lucide-react";
 
 export default function MessagesPage({
   messages,
@@ -38,7 +37,7 @@ export default function MessagesPage({
   const searchParams = useSearchParams();
   const query = searchParams.get("query") || "";
   const currentPage = Number(searchParams.get("page")) || 1;
-  const isMobile = useIsMobile();
+
   // Update ui based on search term
   const onSearch = () => {
     setFilteredMessages(searchMessages(messages, query, currentPage));

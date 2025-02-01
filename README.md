@@ -124,21 +124,10 @@ I want to use the same structure for my components.
 1. \*\* ** Do a test deployment ** \*\*
 
 ## Message form:
-
 - \*\*\* Implement same hotkeys for inserting it like on outlook for automatic contact query by name and phone number.
-- Delete red borders for error handling, rather make the recipients pulse if they are invalid
-- clear inputs on success
 - other message actions
-- Keep the fucking search recipients popup from disappearing
-
-## Later on
-
-- Work on home page, think about how I can add a font size setting to configure the font size globally.
-- Implement the other `// TODO` comments
-- Simplify server action types. For data-fetches we don't need to return a error message returned from the server
 
 ## Database
-
 Deleting all tables
 
 ```sql

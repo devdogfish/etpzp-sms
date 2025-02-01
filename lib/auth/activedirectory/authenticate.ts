@@ -14,7 +14,7 @@ export default async function authenticate({
   email: string;
   password: string;
 }): Promise<SessionData & { errors: string[] }> {
-  const ad = new ActiveDirectory(activeDirectoryConfig); // TODO: check if I can import this from auth.config, instead of initializing it 3 times in this file
+  const ad = new ActiveDirectory(activeDirectoryConfig);
 
   // 1. Check if user exists on in the active directory server
   const exists = await userExists(ad, email, password);
@@ -42,7 +42,6 @@ export default async function authenticate({
   // console.log("DB SYNC ResULT");
   // console.log(userResult);
 
-  // TODO fetch the db here to get more info about the user like userId and profile picture as well as user settings maybe
   return {
     user: userResult.success ? userResult.data : undefined,
     isAuthenticated: hasAppPermission.success,

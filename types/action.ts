@@ -10,3 +10,9 @@ export type ActionResponse<T> = {
     [K in keyof T]?: string;
   };
 };
+
+export type ActionDataResponse<T> = {
+  success: boolean;
+  message: string;
+  data?: T
+}

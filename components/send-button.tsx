@@ -39,7 +39,7 @@ export default function ScheduleMessageDropdown({
   loading: boolean;
   submit: (seconds: number) => void;
 }) {
-  const [dialog, setDialog] = useState(true);
+  const [dialog, setDialog] = useState(false);
   const [dropdown, setDropdown] = useState(false);
   const [selectedDate, setSelectedDate] = useState<DateState>({
     date: new Date(),
@@ -155,7 +155,10 @@ export default function ScheduleMessageDropdown({
                   value={selectedDate.hour}
                   onChange={(e) =>
                     setSelectedDate((prev) => ({
-                      ...prev,
+                      minute: prev.minute,
+                      date: new Date(
+                        prev.date.setHours(Number(e.target.value))
+                      ),
                       hour: e.target.value,
                     }))
                   }
@@ -171,7 +174,10 @@ export default function ScheduleMessageDropdown({
                   value={selectedDate.minute}
                   onChange={(e) =>
                     setSelectedDate((prev) => ({
-                      ...prev,
+                      hour: prev.hour,
+                      date: new Date(
+                        prev.date.setMinutes(Number(e.target.value))
+                      ),
                       minute: e.target.value,
                     }))
                   }
@@ -184,7 +190,12 @@ export default function ScheduleMessageDropdown({
               >
                 Close
               </DialogClose>
-              <Button onClick={handleSchedule}>Schedule</Button>
+              <Button onClick={handleSchedule}>
+                Schedule for{" "}
+                {selectedDate.date.getHours() +
+                  ":" +
+                  selectedDate.date.getMinutes()}
+              </Button>
             </div>
           </div>
         </div>

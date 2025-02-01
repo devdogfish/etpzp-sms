@@ -16,6 +16,7 @@ import React, {
   ChangeEvent,
   useActionState,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -23,7 +24,7 @@ import React, {
 import RecipientsInput from "./recipients-input";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 import { useNewMessage } from "@/contexts/use-new-message";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -41,33 +42,40 @@ import CreateContactModal from "./modals/create-contact-modal";
 import InfoContactModal from "./modals/info-contact-modal";
 import Link from "next/link";
 import { useLayout } from "@/contexts/use-layout";
+import { DBMessage } from "@/types";
 
 const initialState: ActionResponse = {
   success: false,
   message: [],
 };
-export default function NewMessageForm({
+
+const NewMessageForm = React.memo(function ({
   contacts,
   error,
+  draft,
 }: {
   contacts: DBContact[];
   error: string;
+  draft?: DBMessage;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation();
   const router = useRouter();
-  const { recipients, moreInfoOn } = useNewMessage();
+  const { recipients, moreInfoOn, setMessage, addRecipient } = useNewMessage();
   const [loading, setLoading] = useState(false);
   const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
   const { isFullscreen, toggleFullscreen } = useLayout();
-  const [scheduledTime, setScheduledTime] = useState(0);
+  let scheduledTime = 0;
+  const _searchParams = useSearchParams();
+  const searchParams = {
+    body: _searchParams.get("body") || undefined,
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    console.log("submitting form with these recipients:", recipients);
 
     const result = await sendMessage({
       sender: formData.get("sender") as string,
@@ -77,14 +85,14 @@ export default function NewMessageForm({
       sendDelay: scheduledTime as number,
     });
 
-    console.log(`Server action result on client`);
-    console.log(result);
-
     setLoading(false);
     setServerState(result);
 
     if (result.success) {
       toast.success(result.message[0], { description: result.message[1] });
+      // reset the form
+      formRef.current?.reset();
+      setMessage((prev) => ({ ...prev, recipients: [] }));
     } else {
       const zodErrors = result.errors || {};
       let waitTime = 0;
@@ -101,6 +109,9 @@ export default function NewMessageForm({
       }, Object.entries(zodErrors).length * inBetweenTime);
     }
   };
+
+  console.log(draft ? `Draft reach message form ${draft}` : "not reached");
+  console.log(draft);
 
   return (
     <ContactModalsProvider>
@@ -143,7 +154,7 @@ export default function NewMessageForm({
                 serverState.errors?.sender && "border-red-500"
               )}
             >
-              <Select name="sender" defaultValue="ETPZP">
+              <Select name="sender" defaultValue={"ETPZP"}>
                 {/** It defaults to the first SelectItem */}
                 <SelectTrigger className="w-full rounded-none border-none shadow-none focus:ring-0 px-5 py-1 h-11">
                   <SelectValue placeholder="ETPZP" />
@@ -157,6 +168,7 @@ export default function NewMessageForm({
 
             <RecipientsInput
               contacts={contacts}
+              defaultRecipients={draft?.recipients}
               error={!!serverState.errors?.recipients}
             />
 
@@ -168,8 +180,8 @@ export default function NewMessageForm({
               placeholder="Message subject (optional)"
               className={cn(
                 "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground"
-                // TODO: Add client side validation here - Make all the invalid recipient have a pulsing animation of the with a red border!! I love this idea!
               )}
+              defaultValue={draft?.subject || undefined}
             />
           </div>
           <div className="px-4 flex-grow mt-[1.25rem] mb-2">
@@ -185,6 +197,7 @@ export default function NewMessageForm({
                   ? serverState.errors?.body[0]
                   : "Start writing your message"
               }
+              defaultValue={draft?.body || searchParams.body}
             />
           </div>
 
@@ -206,7 +219,7 @@ export default function NewMessageForm({
                 if (formRef.current) {
                   // IMPORTANT - we call .requestSubmit() instead of .submit() here so that handleSubmit() gets called
                   // .submit() submits the form using default behavior with form submission, while .requestSubmit() submits the form as if a submit got clicked
-                  setScheduledTime(secondsFromNow);
+                  scheduledTime = secondsFromNow;
                   console.log(
                     `Message will be sent in ${secondsFromNow} seconds!`
                   );
@@ -220,4 +233,5 @@ export default function NewMessageForm({
       {/* <UnloadListener /> */}
     </ContactModalsProvider>
   );
-}
+});
+export default NewMessageForm;

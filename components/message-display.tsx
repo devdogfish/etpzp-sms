@@ -44,9 +44,14 @@ import {
 import { DBMessage } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { deleteMessage, moveMessageTo } from "@/lib/actions/message.actions";
+import {
+  createDraft,
+  deleteMessage,
+  moveTrash,
+} from "@/lib/actions/message.actions";
 import { toast } from "sonner";
 import { ActionResponse } from "@/types/action";
+import { useRouter } from "next/navigation";
 
 export function MessageDisplay({
   message,
@@ -56,12 +61,13 @@ export function MessageDisplay({
   reset: () => void;
 }) {
   const today = new Date();
+  const router = useRouter();
   const onMobile = useIsMobile();
   const handleTrashButtonClick = async () => {
     if (message) {
       let result: ActionResponse<null>;
-      if (message?.location === "SENT") {
-        result = await moveMessageTo("TRASH", message.id);
+      if (message.status === "SENT") {
+        result = await moveTrash(message.id);
       } else {
         result = await deleteMessage(message.id);
       }
@@ -71,6 +77,14 @@ export function MessageDisplay({
         toast.success(result.message);
       } else {
         toast.error(result.message);
+      }
+    }
+  };
+  const replyAll = async () => {
+    if (message) {
+      const newDraft = await createDraft(message.recipients);
+      if (newDraft.data) {
+        router.push(`/new-message?draft=${newDraft.data}`);
       }
     }
   };
@@ -117,16 +131,12 @@ export function MessageDisplay({
               >
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">
-                  {message?.location === "TRASH"
-                    ? "Delete permanently"
-                    : "Move to trash"}
+                  {message?.in_trash ? "Delete permanently" : "Move to trash"}
                 </span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              {message?.location === "TRASH"
-                ? "Delete permanently"
-                : "Move to trash"}
+              {message?.in_trash ? "Delete permanently" : "Move to trash"}
             </TooltipContent>
           </Tooltip>
           {/* <Separator orientation="vertical" className="mx-1 h-6" /> */}
@@ -143,7 +153,12 @@ export function MessageDisplay({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={replyAll}
+                disabled={!message}
+              >
                 <ReplyAll className="h-4 w-4" />
                 <span className="sr-only">Reply all</span>
               </Button>

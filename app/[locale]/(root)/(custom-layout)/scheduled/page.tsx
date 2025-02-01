@@ -6,7 +6,7 @@ import { fetchError } from "@/lib/db";
 
 export default function Page() {
   return (
-    <Suspense fallback={<MessagesPageSkeleton location="SCHEDULED" />}>
+    <Suspense fallback={<MessagesPageSkeleton category="SCHEDULED" />}>
       <DraftsMessagesPage />
     </Suspense>
   );
@@ -19,7 +19,7 @@ export async function DraftsMessagesPage() {
     <MessagesPage
       messages={messages || []}
       error={fetchError("scheduled messages", !messages)}
-      location="SCHEDULED"
+      category="SCHEDULED"
     />
   );
 }

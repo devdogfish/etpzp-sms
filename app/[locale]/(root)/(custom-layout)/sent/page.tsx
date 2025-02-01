@@ -6,7 +6,7 @@ import { fetchError } from "@/lib/db";
 
 export default function Page() {
   return (
-    <Suspense fallback={<MessagesPageSkeleton location="SENT" />}>
+    <Suspense fallback={<MessagesPageSkeleton category="SENT" />}>
       <SentMessagesPage />
     </Suspense>
   );
@@ -19,7 +19,7 @@ export async function SentMessagesPage() {
     <MessagesPage
       messages={messages || []}
       error={fetchError("sent messages", !messages)}
-      location="SENT"
+      category="SENT"
     />
   );
 }

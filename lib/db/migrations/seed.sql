@@ -19,7 +19,7 @@ CREATE TABLE "message" (
     subject VARCHAR(255),
     body TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    sent_at TIMESTAMP DEFAULT NOW(), -- can be null if the message is a draft
+    sent_at TIMESTAMP, -- can be null if the message is a draft
     status VARCHAR(20) NOT NULL CHECK (status IN ('SENT', 'SCHEDULED', 'FAILED', 'DRAFTED')), 
     in_trash BOOLEAN NOT NULL DEFAULT false,
     failure_reason VARCHAR(255)

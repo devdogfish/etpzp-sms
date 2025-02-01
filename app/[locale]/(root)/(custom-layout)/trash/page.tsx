@@ -19,7 +19,7 @@ export async function TrashMessagesPage() {
     <MessagesPage
       messages={messages || []}
       error={fetchError("messages in trash", !messages)}
-      location="TRASH"
+      category="TRASH"
     />
   );
 }

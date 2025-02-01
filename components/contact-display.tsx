@@ -45,8 +45,8 @@ export default function ContactDisplay({
     }
   };
   const messageContact = async () => {
-    if (contact?.id) {
-      router.push(`/new-message?contactId=${contact?.id}`);
+    if (contact) {
+      router.push(`/new-message?contactId=${contact.id}`);
     }
   };
   return (

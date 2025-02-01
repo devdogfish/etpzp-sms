@@ -7,6 +7,7 @@ import React, {
   ChangeEvent,
   useRef,
   useEffect,
+  useLayoutEffect,
 } from "react";
 import { Key, Search, UserPlus, X } from "lucide-react";
 
@@ -17,7 +18,7 @@ import { useContactModals } from "@/contexts/use-contact-modals";
 import { ScrollArea } from "./ui/scroll-area";
 import { useSession } from "@/hooks/use-session";
 import { useSearchParams } from "next/navigation";
-import { NewRecipient } from "@/types/recipient";
+import { DBRecipient, NewRecipient } from "@/types/recipient";
 import { DBContact } from "@/types/contact";
 import InfoContactModal from "./modals/info-contact-modal";
 import CreateContactModal from "./modals/create-contact-modal";
@@ -29,12 +30,15 @@ type InputState = {
   error?: string;
 };
 
+React.memo(RecipientsInput);
 export default function RecipientsInput({
   contacts,
   error,
+  defaultRecipients,
 }: {
   contacts: DBContact[];
-  error?: boolean
+  error?: boolean;
+  defaultRecipients?: DBRecipient[];
 }) {
   const [input, setInput] = useState<InputState>({
     value: "",
@@ -57,14 +61,20 @@ export default function RecipientsInput({
   } = useNewMessage();
   const { setModal } = useContactModals();
   const [activeError, setActiveError] = useState<boolean>(false);
+  let loaded = false;
 
   useEffect(() => {
+    if (loaded === false) {
+      defaultRecipients?.map(({ phone }) => addRecipient(phone, contacts));
+
+      loaded = true;
+    }
+
     if (searchParams.get("contactId")) {
       // On the contact page we have a message this contact link where we pass over the contactId
       const contact = contacts.find(
         (contact) => contact.id == searchParams.get("contactId")
       );
-
       // It could be an invalid id
       if (contact) {
         const recipient = getValidatedRecipient({
@@ -76,7 +86,6 @@ export default function RecipientsInput({
         setMessage((prev) => ({ ...prev, recipients: [recipient] }));
       }
     }
-
     const handleClickOutside = (event: MouseEvent) => {
       if (
         container.current &&

@@ -36,7 +36,6 @@ export default function InsertContactModal({
   const { addRecipient } = useNewMessage();
 
   const onInsert = () => {
-    // TODO: refactor both these functions to work for arrays
     selected.forEach((contact: DBContact) => {
       // pass add each selected contact to the recipients context
       addRecipient(contact.phone, contacts);

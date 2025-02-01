@@ -66,6 +66,12 @@ export default async function RootLayout({
       namespaces={i18nNamespaces}
     >
       <html lang={locale} dir={dir(locale)} suppressHydrationWarning>
+        <head>
+          <script
+            crossOrigin="anonymous"
+            src="//unpkg.com/react-scan/dist/auto.global.js"
+          />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen`}
         >
