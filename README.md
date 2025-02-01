@@ -123,10 +123,6 @@ I want to use the same structure for my components.
 
 1. \*\* ** Do a test deployment ** \*\*
 
-## Message form:
-- \*\*\* Implement same hotkeys for inserting it like on outlook for automatic contact query by name and phone number.
-- other message actions
-
 ## Database
 Deleting all tables
 
