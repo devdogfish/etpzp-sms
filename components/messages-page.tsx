@@ -7,7 +7,6 @@ import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useLayout } from "@/contexts/use-layout";
 import PageHeader from "./page-header";
 import { useTranslation } from "react-i18next";
-import { Tabs, TabsContent } from "./ui/tabs";
 import { MessageList } from "./messages-list";
 
 import { cn, searchMessages } from "@/lib/utils";
@@ -72,50 +71,34 @@ export default function MessagesPage({
         maxSize={50}
       >
         <PageHeader title={t(category)} />
-        <Tabs
-          defaultValue={searchParams.get("category")?.toString() || "all"}
-          onValueChange={() => {}}
-        >
-          {/** WE WILL HAVE location SUBSTITUTED HERE */}
-          <Search
-            onSearch={onSearch}
-            placeholder={String(t("search") + " " + t(category).toLowerCase())}
-            className="pl-8 placeholder:text-muted-foreground border"
+        <Search
+          onSearch={onSearch}
+          placeholder={String(t("search") + " " + t(category).toLowerCase())}
+          className="pl-8 placeholder:text-muted-foreground border"
+        />
+
+        {filteredMessages.length > 0 ? (
+          <MessageList
+            messages={filteredMessages}
+            selectedMessageId={selected?.id || null}
+            setSelected={setSelected}
           />
-          {error && <p>{error}</p>}
-          <TabsContent value="all">
-            <MessageList
-              messages={filteredMessages}
-              selectedMessageId={selected?.id || null}
-              setSelected={setSelected}
-            />
-          </TabsContent>
-          <TabsContent value="scheduled">
-            <MessageList
-              messages={filteredMessages.filter(
-                ({ status }) => status === "SCHEDULED"
-              )}
-              selectedMessageId={selected?.id || null}
-              setSelected={setSelected}
-            />
-          </TabsContent>
-          <TabsContent value="failed">
-            <MessageList
-              messages={filteredMessages.filter(
-                ({ status }) => status === "FAILED"
-              )}
-              selectedMessageId={selected?.id || null}
-              setSelected={setSelected}
-            />
-          </TabsContent>
-        </Tabs>
+        ) : (
+          <div className="p-8 text-center text-muted-foreground">
+            {error ? error : "No messages found"}
+          </div>
+        )}
       </ResizablePanel>
       <ResizableHandle withHandle className={cn(onMobile && "hidden")} />
       <ChildrenPanel
         hasMiddleBar
         className={cn(onMobile && selected === null && "hidden")} // like above we are using reverse logic here. If we are on mobile, and nothing is selected, this component should not be displayed.
       >
-        <MessageDisplay message={selected} reset={() => setSelected(null)} />
+        <MessageDisplay
+          message={selected}
+          reset={() => setSelected(null)}
+          category={category}
+        />
       </ChildrenPanel>
     </>
   );

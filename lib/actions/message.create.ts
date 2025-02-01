@@ -113,7 +113,7 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
     await db(
       `
       WITH insert_message AS (
-        INSERT INTO message (user_id, subject, body, status, failure_reason, sent_at) 
+        INSERT INTO message (user_id, subject, body, status, failure_reason, send_time) 
         VALUES ($1, $2, $3, $4, $5, $6) 
         RETURNING id
       )

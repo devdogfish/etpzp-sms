@@ -2,7 +2,7 @@
 // this is for useActionState() forms
 export type ActionResponse<T> = {
   success: boolean;
-  message: string;
+  message: string[];
   errors?: {
     [K in keyof T]?: string[];
   };
@@ -13,6 +13,6 @@ export type ActionResponse<T> = {
 
 export type ActionDataResponse<T> = {
   success: boolean;
-  message: string;
+  message: string[];
   data?: T
 }

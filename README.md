@@ -122,20 +122,36 @@ I want to use the same structure for my components.
 ## TODO
 
 1. \*\* ** Do a test deployment ** \*\*
+2. Figure out invalid NextConfig and make sure the translation works properly. Default
+
+- Ability to cancel scheduled SMSs
+- Color setting for user's profile background as well as display name
+- Update chart colors to look nice
+
+## Final touches
+- Translate the entire app
+- Use global colors (not hardcoded colors) everywhere so that the all different theme settings look nice
+- Revalidate `/` and recipients when adding a new contact on the new-message page
+- Automatic drafting using `use-debounce` with a 2s cooldown on change of any fields with a saved or not state
+
+## If there is extra time (after deployment in school)
+- Save user preferences in DB and retrieve that to set the browser storage every once in a while.
+- Admin Dashboard with statistics
 
 ## Database
 Deleting all tables
 
+#### Deleting all tables
 ```sql
 DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```
 
-Executing seed file
-
+#### Seed files
+On UNIX Operating system
 ```psql
--- bash:
 \i ~/dev/etpzp-sms/lib/db/migrations/seed.sql
-
--- psql shell (windows):
+```
+On Windows psql shell
+```psql
 \i /Users/Utilizador/dev/etpzp-sms/lib/db/migrations/seed.sql
 ```

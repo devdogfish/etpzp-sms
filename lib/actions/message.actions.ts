@@ -4,69 +4,74 @@ import { ActionDataResponse, ActionResponse } from "@/types/action";
 import { getSession } from "../auth/sessions";
 import db from "../db";
 import { revalidatePath } from "next/cache";
-import { DBRecipient, NewRecipient } from "@/types/recipient";
+import { DBRecipient } from "@/types/recipient";
 
-export async function moveTrash(id: string): Promise<ActionResponse<null>> {
+export async function toggleTrash(
+  id: string,
+  inTrash: boolean
+): Promise<ActionResponse<null>> {
   const session = await getSession();
-  const userId = parseInt(session.user?.id ? session?.user?.id : "");
-  if (userId && isNaN(userId)) {
-    return {
-      success: false,
-      message: "Invalid user id.",
-    };
-  }
+  const userId = session?.user?.id;
 
   try {
+    if (!userId) throw new Error("Invalid user id.");
     await db(
-      "UPDATE message SET location = $1 WHERE user_id = $2 AND id = $3",
-      [location, userId, id]
+      "UPDATE message SET in_trash = $1 WHERE user_id = $2 AND id = $3 RETURNING *",
+      [inTrash, userId, id]
     );
 
     revalidatePath("/sent");
-    revalidatePath("/all");
-    return { success: true, message: "Message moved to trash successfully!" };
+    revalidatePath("/failed");
+
+    return {
+      success: true,
+      message: [
+        `Message ${inTrash ? "moved to trash" : "restored"} successfully!`,
+      ],
+    };
   } catch (error) {
-    // Check if we are
     return {
       success: false,
-      message: "An unknown error occurred. Failed to move message to trash.",
+      message: [
+        `An unknown error occurred. Failed to ${
+          inTrash ? "move message to trash" : "restore message"
+        }.`,
+      ],
     };
   }
 }
 
 export async function deleteMessage(id: string): Promise<ActionResponse<null>> {
   const session = await getSession();
-
-  const userId = parseInt(session.user?.id ? session?.user?.id : "");
-  if (userId && isNaN(userId)) {
-    return {
-      success: false,
-      message: "Invalid user id.",
-    };
-  }
+  const userId = session?.user?.id;
 
   try {
-    await db("DELETE FROM message WHERE user_id = $1 AND id = $2", [
-      userId,
-      id,
-    ]);
+    if (!userId) throw new Error("Invalid user id.");
+    const result = await db(
+      "DELETE FROM message WHERE user_id = $1 AND id = $2",
+      [userId, id]
+    );
+
+    console.log(result);
 
     revalidatePath("/trash");
-    return { success: true, message: "Message deleted successfully!" };
+    return { success: true, message: ["Message deleted successfully!"] };
   } catch (error) {
     // Check if we are
     return {
       success: false,
-      message: "An unknown error occurred. Failed to delete message.",
+      message: ["An unknown error occurred. Failed to delete message."],
     };
   }
 }
 
-export async function createDraft(recipients: DBRecipient[]):Promise<ActionDataResponse<string >> {
+export async function createDraft(
+  recipients: DBRecipient[]
+): Promise<ActionDataResponse<string>> {
   const session = await getSession();
   const userId = session?.user?.id;
 
-  console.log(`Creating draft...`);
+  console.log("Creating draft...");
   try {
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(
@@ -97,14 +102,14 @@ export async function createDraft(recipients: DBRecipient[]):Promise<ActionDataR
 
     return {
       success: true,
-      message: "Message deleted successfully!",
+      message: ["Draft saved successfully!"],
       data: result.rows[0].id.toString(),
     };
   } catch (error) {
     // Check if we are
     return {
       success: false,
-      message: "An unknown error occurred. Failed to delete message.",
+      message: ["An unknown error occurred. Failed to save draft."],
     };
   }
 }

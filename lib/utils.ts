@@ -8,6 +8,8 @@ import { i18n } from "i18next";
 import { twMerge } from "tailwind-merge";
 import { NewRecipient } from "@/types/recipient";
 import { DBMessage } from "@/types";
+import { ActionResponse } from "@/types/action";
+import { toast } from "sonner";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -150,4 +152,16 @@ export function convertToRecipient(contact: DBContact): NewRecipient {
     contactName: name,
     contactDescription: description,
   };
+}
+
+export function toastActionResult(result: ActionResponse<any>) {
+  if (!Array.isArray(result.message) || !result.message)
+    throw new Error("Toast message must be an array of strings.");
+
+  // thankfully, this doesn't throw an error
+  if (result.success) {
+    toast.success(result.message[0], { description: result.message[1] });
+  } else {
+    toast.error(result.message[0], { description: result.message[1] });
+  }
 }

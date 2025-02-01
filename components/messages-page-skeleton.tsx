@@ -52,7 +52,7 @@ export default function MessagesPageSkeleton({
         hasMiddleBar
         className={cn(onMobile && selected === null && "hidden")} // like above we are using reverse logic here. If we are on mobile, and nothing is selected, this component should not be displayed.
       >
-        <MessageDisplay message={null} reset={() => {}} />
+        <MessageDisplay message={null} reset={() => {}} category={category} />
       </ChildrenPanel>
     </>
   );

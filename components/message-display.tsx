@@ -1,11 +1,9 @@
 "use client";
 
-import { addDays } from "date-fns/addDays";
-import { addHours } from "date-fns/addHours";
 import { format } from "date-fns/format";
-import { nextSaturday } from "date-fns/nextSaturday";
 import {
   Archive,
+  ArchiveRestore,
   ArchiveX,
   ArrowLeft,
   Clock,
@@ -14,40 +12,25 @@ import {
   Reply,
   ReplyAll,
   Trash2,
+  X,
 } from "lucide-react";
 
-import {
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { DBMessage } from "@/types";
+import { CategoryEnums, DBMessage } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
+import { cn, toastActionResult } from "@/lib/utils";
 import {
   createDraft,
   deleteMessage,
-  moveTrash,
+  toggleTrash,
 } from "@/lib/actions/message.actions";
 import { toast } from "sonner";
 import { ActionResponse } from "@/types/action";
@@ -55,9 +38,11 @@ import { useRouter } from "next/navigation";
 
 export function MessageDisplay({
   message,
+  category,
   reset,
 }: {
   message: DBMessage | null;
+  category?: CategoryEnums;
   reset: () => void;
 }) {
   const today = new Date();
@@ -66,10 +51,10 @@ export function MessageDisplay({
   const handleTrashButtonClick = async () => {
     if (message) {
       let result: ActionResponse<null>;
-      if (message.status === "SENT") {
-        result = await moveTrash(message.id);
-      } else {
+      if (message.in_trash) {
         result = await deleteMessage(message.id);
+      } else {
+        result = await toggleTrash(message.id, true);
       }
 
       if (result.success) {
@@ -88,6 +73,15 @@ export function MessageDisplay({
       }
     }
   };
+  const putBack = async () => {
+    if (message) {
+      const result = await toggleTrash(message.id, false);
+      if (result.success) {
+        reset();
+      }
+      toastActionResult(result);
+    }
+  };
   return (
     <div className={cn("flex h-full flex-col")}>
       <div className="flex items-center p-2">
@@ -103,24 +97,8 @@ export function MessageDisplay({
               <TooltipContent>Go back</TooltipContent>
             </Tooltip>
           )}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
-                <Archive className="h-4 w-4" />
-                <span className="sr-only">Archive</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Archive</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
-                <ArchiveX className="h-4 w-4" />
-                <span className="sr-only">Move to junk</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Move to junk</TooltipContent>
-          </Tooltip>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -139,18 +117,22 @@ export function MessageDisplay({
               {message?.in_trash ? "Delete permanently" : "Move to trash"}
             </TooltipContent>
           </Tooltip>
-          {/* <Separator orientation="vertical" className="mx-1 h-6" /> */}
-        </div>
-        <div className="ml-auto flex items-center gap-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
-                <Reply className="h-4 w-4" />
-                <span className="sr-only">Reply</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Reply</TooltipContent>
-          </Tooltip>
+          {category === "TRASH" && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={!message}
+                  onClick={putBack}
+                >
+                  <ArchiveRestore className="w-4 h-4" />
+                  <span className="sr-only">Restore</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Restore</TooltipContent>
+            </Tooltip>
+          )}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -167,29 +149,19 @@ export function MessageDisplay({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!message}>
-                <Forward className="h-4 w-4" />
-                <span className="sr-only">Forward</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={reset}
+                disabled={!message}
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Forward</TooltipContent>
+            <TooltipContent>Close</TooltipContent>
           </Tooltip>
         </div>
-        <Separator orientation="vertical" className="mx-2 h-6" />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" disabled={!message}>
-              <MoreVertical className="h-4 w-4" />
-              <span className="sr-only">More</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>Mark as unread</DropdownMenuItem>
-            <DropdownMenuItem>Star thread</DropdownMenuItem>
-            <DropdownMenuItem>Add label</DropdownMenuItem>
-            <DropdownMenuItem>Mute thread</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
       <Separator />
       {message ? (
@@ -224,33 +196,6 @@ export function MessageDisplay({
           <Separator />
           <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
             {message.body}
-          </div>
-          <Separator className="mt-auto" />
-          <div className="p-4">
-            <form>
-              <div className="grid gap-4">
-                <Textarea
-                  className="p-4"
-                  placeholder={`Reply ${message.subject}...`}
-                />
-                <div className="flex items-center">
-                  <Label
-                    htmlFor="mute"
-                    className="flex items-center gap-2 text-xs font-normal"
-                  >
-                    <Switch id="mute" aria-label="Mute thread" />
-                    Mute this thread
-                  </Label>
-                  <Button
-                    onClick={(e) => e.preventDefault()}
-                    size="sm"
-                    className="ml-auto"
-                  >
-                    Send
-                  </Button>
-                </div>
-              </div>
-            </form>
           </div>
         </div>
       ) : (

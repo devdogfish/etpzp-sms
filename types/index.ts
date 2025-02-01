@@ -35,7 +35,7 @@ export type DBMessage = {
   subject: string | null;
   body: string;
   created_at: Date;
-  sent_at: Date;
+  send_time: Date;
   status: StatusEnums;
   in_trash: boolean;
   failure_reason: string | null;
