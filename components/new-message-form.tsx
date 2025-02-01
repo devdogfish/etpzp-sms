@@ -12,14 +12,7 @@ import { sendMessage, ActionResponse } from "@/lib/actions/message.create";
 // Form
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React, {
-  ChangeEvent,
-  useActionState,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import RecipientsInput from "./recipients-input";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
@@ -61,7 +54,7 @@ const NewMessageForm = React.memo(function ({
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation();
   const router = useRouter();
-  const { recipients, moreInfoOn, setMessage, addRecipient } = useNewMessage();
+  const { recipients, moreInfoOn, setMessage } = useNewMessage();
   const [loading, setLoading] = useState(false);
   const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
@@ -109,9 +102,6 @@ const NewMessageForm = React.memo(function ({
       }, Object.entries(zodErrors).length * inBetweenTime);
     }
   };
-
-  console.log(draft ? `Draft reach message form ${draft}` : "not reached");
-  console.log(draft);
 
   return (
     <ContactModalsProvider>

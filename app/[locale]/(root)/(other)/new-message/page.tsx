@@ -3,7 +3,7 @@ import { NewMessageProvider } from "@/contexts/use-new-message";
 import { fetchContacts } from "@/lib/db/contact";
 import { fetchError } from "@/lib/db";
 import { fetchRecipients } from "@/lib/db/recipients";
-import { calcTopRecipients, processRecipients } from "@/lib/recipients.filters";
+import { getProcessedRecipients } from "@/lib/recipients.filters";
 import { fetchDraft } from "@/lib/db/message";
 import { Suspense } from "react";
 
@@ -26,16 +26,20 @@ export async function PageFetcher({
 }) {
   const contacts = await fetchContacts();
   const recipientsResult = await fetchRecipients();
+  const { alphabetical, mostUsed } = getProcessedRecipients(
+    recipientsResult || []
+  );
 
   const draft = searchParams.draft
     ? await fetchDraft(searchParams.draft)
     : undefined;
 
-  if (!draft) console.log("Draft doesn't exist!");
-
   return (
     <NewMessageProvider
-      allSuggestedRecipients={processRecipients(recipientsResult || [])}
+      suggestedRecipients={{
+        alphabetical,
+        mostUsed,
+      }}
       allContacts={contacts || []}
     >
       <NewMessageForm

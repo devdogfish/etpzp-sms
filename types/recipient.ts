@@ -21,10 +21,7 @@ export type DBContactRecipient = {
   contact_description: string | null;
 };
 
-export type ProcessedDBContactRecipient = DBContactRecipient & {
-  usage_count: number;
-};
-
+// No joins - normal query directly from the DB
 export type DBRecipient = {
   id: number;
   contact_id: number;

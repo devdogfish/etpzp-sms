@@ -3,11 +3,10 @@
 import { Input } from "./shared/input";
 import React, {
   useState,
-  type KeyboardEvent,
-  ChangeEvent,
   useRef,
   useEffect,
-  useLayoutEffect,
+  type KeyboardEvent,
+  type ChangeEvent,
 } from "react";
 import { Key, Search, UserPlus, X } from "lucide-react";
 
@@ -16,13 +15,9 @@ import { cn, generateUniqueId, getNameInitials } from "@/lib/utils";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { ScrollArea } from "./ui/scroll-area";
-import { useSession } from "@/hooks/use-session";
 import { useSearchParams } from "next/navigation";
 import { DBRecipient, NewRecipient } from "@/types/recipient";
 import { DBContact } from "@/types/contact";
-import InfoContactModal from "./modals/info-contact-modal";
-import CreateContactModal from "./modals/create-contact-modal";
-// import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
 type InputState = {
   value: string;
@@ -58,9 +53,12 @@ export default function RecipientsInput({
     setMessage,
     getValidatedRecipient,
     setMoreInfoOn,
+    selectedPhone,
+    updateSelectedPhone,
   } = useNewMessage();
   const { setModal } = useContactModals();
   const [activeError, setActiveError] = useState<boolean>(false);
+
   let loaded = false;
 
   useEffect(() => {
@@ -82,23 +80,10 @@ export default function RecipientsInput({
           contactId: contact.id,
           ...contact,
         });
-        // Replace all existing contacts instead of pushing the contact
+        // Replace all existing contacts instead of pushing the contact, because of component re-renders
         setMessage((prev) => ({ ...prev, recipients: [recipient] }));
       }
     }
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        container.current &&
-        !container.current.contains(event.target as Node)
-      ) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, []);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -109,19 +94,22 @@ export default function RecipientsInput({
       }
     }, 0);
 
-    if (e.key === "Enter") {
-      // submit the new recipient and store it in state
+    const trimmedInput = input.value.trim();
+    if (e.key === "Enter" || e.key === "Tab") {
       e.preventDefault();
       e.stopPropagation();
-      const phone = input.value.trim();
-      if (phone) {
-        addRecipient(phone, contacts);
+      if (selectedPhone) {
+        addRecipient(selectedPhone, contacts);
+      } else if (trimmedInput !== "") {
+        addRecipient(trimmedInput, contacts);
         // reset input value
         setInput((prevInput) => ({ ...prevInput, value: "" }));
       }
+    } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      updateSelectedPhone(e.key);
     }
 
-    if (e.key === "Backspace" && input.value === "" && recipients.length) {
+    if (e.key === "Backspace" && trimmedInput === "" && recipients.length) {
       removeRecipient(recipients[recipients.length - 1]); // remove last recipient in the array
     }
   };
@@ -244,7 +232,9 @@ export default function RecipientsInput({
                         <button
                           key={recipient.phone}
                           className={cn(
-                            "flex items-center w-full gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent"
+                            "flex items-center w-full gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
+                            selectedPhone === recipient.phone &&
+                              "border-secondary-foreground"
                           )}
                           type="button"
                           onMouseDown={(e) => {

@@ -1,11 +1,8 @@
-import {
-  DBContactRecipient,
-  ProcessedDBContactRecipient,
-} from "@/types/recipient";
+import { DBContactRecipient } from "@/types/recipient";
 
-export function processRecipients(
+export function getProcessedRecipients(
   data: (DBContactRecipient & { last_used: Date })[]
-): ProcessedDBContactRecipient[] {
+): Record<string, DBContactRecipient[]> {
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
@@ -28,15 +25,9 @@ export function processRecipients(
     return acc;
   }, {} as Record<string, DBContactRecipient & { usage_count: number }>);
 
-  return Object.values(processedData);
-}
-
-export function calcTopRecipients(
-  recipients: ProcessedDBContactRecipient[],
-  limit = 5
-): ProcessedDBContactRecipient[] {
-  return recipients
-    .sort((a, b) => {
+  return {
+    alphabetical: Object.values(processedData),
+    mostUsed: Object.values(processedData).sort((a, b) => {
       // Sort by usage count (descending)
       if (b.usage_count !== a.usage_count) {
         return b.usage_count - a.usage_count;
@@ -49,33 +40,7 @@ export function calcTopRecipients(
       return (a.contact_name || a.phone).localeCompare(
         b.contact_name || b.phone
       );
-    })
-    .slice(0, limit);
+    }),
+  };
 }
 
-// OLD ALGORITHM
-// // Simple algorithm for recommending the top most used recipients based on quality (if has contact) and quantity (how often sent to)
-// export function recommendRecipients(
-//   recipients: SuggestedRecipient[],
-//   limit = 5
-// ): SuggestedRecipient[] {
-//   // Calculate the maximum usage count for normalization
-//   const maxUsage = Math.max(...recipients.map((r) => r.usageCount));
-
-//   // Score each recipient
-//   const scoredRecipients = recipients.map((recipient) => {
-//     // Normalize usage count (0-1 range)
-//     const quantityScore = recipient.usageCount / maxUsage;
-
-//     // Quality score: 1 if contact name exists, 0 otherwise
-//     const qualityScore = recipient.contact_name ? 1 : 0;
-
-//     // Combined score (equal weight to quantity and quality)
-//     const score = (quantityScore + qualityScore) / 2;
-
-//     return { ...recipient, score };
-//   });
-
-//   // Sort by score (descending) and take the top 'limit' results
-//   return scoredRecipients.sort((a, b) => b.score - a.score).slice(0, limit);
-// }

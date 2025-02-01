@@ -155,9 +155,9 @@ export function ThemeModeToggle() {
               </div>
             </div>
           </div>
-          <span className="block w-full p-2 text-center font-normal">
+          <label className="block w-full p-2 text-center font-normal text-sm">
             Light {theme === "light" && "(active)"}
-          </span>
+          </label>
         </div>
 
         <div onClick={() => setTheme("dark")}>
@@ -177,9 +177,9 @@ export function ThemeModeToggle() {
               </div>
             </div>
           </div>
-          <span className="block w-full p-2 text-center font-normal">
+          <label className="block w-full p-2 text-center font-normal text-sm">
             Dark {theme === "dark" && "(active)"}
-          </span>
+          </label>
         </div>
       </div>
     </div>

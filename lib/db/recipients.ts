@@ -5,7 +5,7 @@ import { getSession } from "../auth/sessions";
 import { DBContactRecipient } from "@/types/recipient";
 
 export async function fetchRecipients(): Promise<
-  [DBContactRecipient & { last_used: Date }] | undefined
+  (DBContactRecipient & { last_used: Date })[] | undefined
 > {
   const session = await getSession();
   const userId = session?.user?.id;
