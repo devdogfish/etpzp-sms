@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useActionState } from "react";
 import {
@@ -17,25 +16,19 @@ import { Button, buttonVariants } from "../ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "../ui/label";
 import { createContact } from "@/lib/actions/contact.actions";
-import { ActionResponse } from "@/types/contact";
-import {
-  Badge,
-  CheckCircle2,
-  CircleAlert,
-  FileWarning,
-  Loader2,
-  Server,
-} from "lucide-react";
+import { CircleAlert, Loader2 } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useContactModals } from "@/contexts/use-contact-modals";
+import { ActionResponse } from "@/types/action";
+import { ContactSchema } from "@/lib/form.schemas";
 
-const initialState: ActionResponse = {
+const initialState: ActionResponse<z.infer<typeof ContactSchema>> = {
   success: false,
-  message: "",
+  message: [""],
 };
 
 export default function CreateContactModal({
@@ -52,10 +45,12 @@ export default function CreateContactModal({
   useEffect(() => {
     if (serverState.success) {
       onOpenChange(false);
-      toast.success(serverState.message);
+      toast.success(serverState.message[0], {
+        description: serverState.message[1],
+      });
       serverState.inputs = undefined;
       serverState.errors = undefined;
-      serverState.message = "";
+      serverState.message = [""];
     }
   }, [serverState]);
 
@@ -66,7 +61,7 @@ export default function CreateContactModal({
   const clearInput = () => {
     // This is unfortunately the easiest way to reset this shit
     serverState.errors = undefined;
-    serverState.message = "";
+    serverState.message = [""];
     serverState.inputs = {};
   };
   return (

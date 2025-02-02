@@ -18,7 +18,6 @@ import { CopyButton } from "../shared/copy-button";
 import { Button } from "../ui/button";
 import { NewRecipient } from "@/types/recipient";
 
-
 export default function InfoContactModal({
   recipient,
 }: {
@@ -70,12 +69,9 @@ export default function InfoContactModal({
           <Separator />
           <div className="flex gap-4 justify-between items-center p-4 text-sm">
             <div>Phone</div>
-            <div>{recipient.phone}</div>
-            <div>
-              <CopyButton text={recipient.phone} variant="ghost">
-                Copy
-              </CopyButton>
-            </div>
+            <CopyButton text={recipient.phone} variant="none">
+              {recipient.phone}
+            </CopyButton>
           </div>
           <Separator />
           {recipient.contactId && (

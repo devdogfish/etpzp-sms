@@ -6,22 +6,12 @@ import { Message } from "@/types";
 import { getSession } from "../auth/sessions";
 import { formatPhone } from "../utils";
 import { NewRecipient } from "@/types/recipient";
+import { SuccessResponse } from "./testing/default-response";
+import { ActionResponse } from "@/types/action";
 
-export type ActionResponse = {
-  success: boolean;
-  message: string[];
-  errors?: {
-    [K in keyof Message]?: string[];
-  };
-  inputs?: {
-    sender: string;
-    recipients: NewRecipient[];
-    subject: string;
-    body: string;
-  };
-};
-
-export async function sendMessage(data: Message): Promise<ActionResponse> {
+export async function sendMessage(
+  data: Message
+): Promise<ActionResponse<Message>> {
   // 1. Check authentication
   const { isAuthenticated, user } = await getSession();
   const userId = user?.id;
@@ -61,6 +51,8 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
   let scheduledUnixSeconds: number | undefined = undefined;
   if (validatedData.data.sendDelay && validatedData.data.sendDelay > 0) {
     scheduledUnixSeconds = Date.now() / 1000 + validatedData.data.sendDelay;
+    console.log("UNIX EPOCH SECONDS CALCULATED: ", scheduledUnixSeconds);
+    
   }
 
   try {
@@ -89,9 +81,12 @@ export async function sendMessage(data: Message): Promise<ActionResponse> {
       },
       body: JSON.stringify(payload),
     });
+    // const resp = SuccessResponse;
+    console.log("Success response");
+    console.log(resp);
 
     if (!resp.ok) {
-      console.log(JSON.stringify(await resp.json()));
+      // console.log(JSON.stringify(await resp.json()));
 
       throw new Error("Network response was not ok " + resp?.statusText);
     }

@@ -2,23 +2,25 @@
 
 import db from "../db";
 import { ContactSchema } from "../form.schemas";
-import { ActionResponse, DBContact } from "@/types/contact";
+import { DBContact } from "@/types/contact";
 import { getSession } from "../auth/sessions";
 import { formatPhone, sleep } from "../utils";
 import { revalidatePath } from "next/cache";
 import { DatabaseError } from "pg";
+import { ActionResponse } from "@/types/action";
+import { z } from "zod";
 
 export async function createContact(
-  _: ActionResponse | null,
+  _: ActionResponse<z.infer<typeof ContactSchema>> | null,
   formData: FormData
-): Promise<ActionResponse> {
+): Promise<ActionResponse<z.infer<typeof ContactSchema>>> {
   const session = await getSession();
 
   const userId = parseInt(session.user?.id || "");
   if (userId && isNaN(userId)) {
     return {
       success: false,
-      message: "Invalid user id.",
+      message: ["Invalid user id."],
     };
   }
 
@@ -31,7 +33,7 @@ export async function createContact(
   if (!validatedData.success) {
     return {
       success: false,
-      message: "Please fix the errors in the form",
+      message: ["Please fix the errors in the form"],
       errors: validatedData.error.flatten().fieldErrors,
       inputs: rawData,
     };
@@ -52,7 +54,7 @@ export async function createContact(
 
     revalidatePath("/contacts");
 
-    return { success: true, message: "Contact created successfully!" };
+    return { success: true, message: ["Contact created successfully!"] };
   } catch (error) {
     let message = "";
     if (error instanceof DatabaseError && error.code === "23505") {
@@ -63,7 +65,7 @@ export async function createContact(
     }
     return {
       success: false,
-      message,
+      message: [message],
       inputs: rawData,
     };
   }
@@ -71,16 +73,16 @@ export async function createContact(
 
 export async function updateContact(
   id: string,
-  _: ActionResponse | null,
+  _: ActionResponse<DBContact> | null,
   formData: FormData
-): Promise<ActionResponse> {
+): Promise<ActionResponse<z.infer<typeof ContactSchema>>> {
   const session = await getSession();
 
   const userId = parseInt(session.user?.id || "");
   if (userId && isNaN(userId)) {
     return {
       success: false,
-      message: "Invalid user id.",
+      message: ["Invalid user id."],
     };
   }
   const rawData = {
@@ -92,7 +94,7 @@ export async function updateContact(
   if (!validatedData.success) {
     return {
       success: false,
-      message: "Please fix the errors in the form",
+      message: ["Please fix the errors in the form"],
       errors: validatedData.error.flatten().fieldErrors,
       inputs: rawData,
     };
@@ -113,7 +115,7 @@ export async function updateContact(
 
     revalidatePath("/contacts");
 
-    return { success: true, message: "Contact updated successfully!" };
+    return { success: true, message: ["Contact updated successfully!"] };
   } catch (error) {
     let message;
     if (error instanceof DatabaseError && error.code === "23505") {
@@ -124,20 +126,22 @@ export async function updateContact(
     }
     return {
       success: false,
-      message,
+      message: [message],
       inputs: rawData,
     };
   }
 }
 
-export async function deleteContact(id: string): Promise<ActionResponse> {
+export async function deleteContact(
+  id: string
+): Promise<ActionResponse<undefined>> {
   const session = await getSession();
 
   const userId = parseInt(session.user?.id ? session?.user?.id : "");
   if (userId && isNaN(userId)) {
     return {
       success: false,
-      message: "Invalid user id.",
+      message: ["Invalid user id."],
     };
   }
 
@@ -147,12 +151,12 @@ export async function deleteContact(id: string): Promise<ActionResponse> {
       id,
     ]);
     revalidatePath("/contacts");
-    return { success: true, message: "Contact deleted successfully!" };
+    return { success: true, message: ["Contact deleted successfully!"] };
   } catch (error) {
     // Check if we are
     return {
       success: false,
-      message: "An unknown error occurred. Failed to delete contact.",
+      message: ["An unknown error occurred. Failed to delete contact."],
     };
   }
 }

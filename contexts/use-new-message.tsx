@@ -7,7 +7,6 @@ import {
   useContext,
   useCallback,
   useMemo,
-  useEffect,
 } from "react";
 import { toast } from "sonner";
 import type { Message } from "@/types";
@@ -45,6 +44,7 @@ const NewMessageContext = createContext<MessageContextValues | null>(null);
 
 type ProviderProps = {
   suggestedRecipients: {
+    all: DBContactRecipient[];
     alphabetical: DBContactRecipient[];
     mostUsed: DBContactRecipient[];
   };
@@ -75,13 +75,11 @@ export function NewMessageProvider({
   >([]);
 
   // Memoized values
-  const recommendedRecipients = useMemo(() => {
-    const recommendedAmount = 5;
-    const topRecipients = suggestedRecipients.mostUsed.slice(
-      0,
-      recommendedAmount
-    );
-    const remainingCount = recommendedAmount - topRecipients.length;
+  const recommendedRecipients: DBContactRecipient[] = useMemo(() => {
+    // adjust this to your liking
+    const amount = 5;
+    const topRecipients = suggestedRecipients.mostUsed.slice(0, amount);
+    const remainingCount = amount - topRecipients.length;
 
     if (remainingCount <= 0) return topRecipients;
 
@@ -146,10 +144,23 @@ export function NewMessageProvider({
         };
       });
 
-      searchRecipients("");
-      setSelectedPhone(undefined);
+      // Immediately update searchedRecipients
+      setSearchedRecipients((prevSearched) =>
+        getUniques(prevSearched.filter((r) => r.phone !== phone))
+      );
+
+      // Update selectedPhone to the next available recipient
+      setSelectedPhone((prevSelected) => {
+        if (prevSelected === phone) {
+          const nextRecipient = searchedRecipients.find(
+            (r) => r.phone !== phone
+          );
+          return nextRecipient ? nextRecipient.phone : undefined;
+        }
+        return prevSelected;
+      });
     },
-    [message.recipients, getValidatedRecipient]
+    [message.recipients, getValidatedRecipient, searchedRecipients, getUniques]
   );
 
   const removeRecipient = useCallback((recipient: NewRecipient) => {
@@ -157,34 +168,29 @@ export function NewMessageProvider({
       ...prev,
       recipients: prev.recipients.filter((r) => r !== recipient),
     }));
+    searchRecipients("");
   }, []);
 
   // Search and suggestion functions
-  const searchRecipients = useCallback(
-    (rawSearchTerm: string) => {
-      const searchTerm = rawSearchTerm.trim().toLowerCase();
+  const searchRecipients = (rawSearchTerm: string) => {
+    const searchTerm = rawSearchTerm.trim().toLowerCase();
 
-      if (searchTerm.length) {
-        const filteredRecipients = suggestedRecipients.alphabetical.filter(
+    if (searchTerm.length && suggestedRecipients.all.length) {
+      const filteredRecipients = getUniques(
+        suggestedRecipients.all.filter(
           (recipient) =>
             (recipient.contact_name?.toLowerCase().includes(searchTerm) ||
               recipient.phone.toLowerCase().includes(searchTerm)) &&
             !message.recipients.some((r) => r.phone === recipient.phone)
-        );
-        setSearchedRecipients(filteredRecipients);
-        setSelectedPhone(filteredRecipients[0]?.phone);
-      } else {
-        setSearchedRecipients(getUniques(recommendedRecipients));
-        setSelectedPhone(recommendedRecipients[0]?.phone);
-      }
-    },
-    [
-      suggestedRecipients.alphabetical,
-      message.recipients,
-      getUniques,
-      recommendedRecipients,
-    ]
-  );
+        )
+      );
+      setSearchedRecipients(filteredRecipients);
+      setSelectedPhone(filteredRecipients[0]?.phone);
+    } else {
+      setSearchedRecipients(getUniques(recommendedRecipients));
+      setSelectedPhone(recommendedRecipients[0]?.phone);
+    }
+  };
 
   // UI update functions
   const updateSelectedPhone = useCallback(
@@ -203,16 +209,6 @@ export function NewMessageProvider({
     },
     [searchedRecipients]
   );
-
-  // Effects
-  useEffect(() => {
-    // Initialize searchedRecipients with recommended recipients
-    setSearchedRecipients(getUniques(recommendedRecipients));
-  }, [recommendedRecipients, getUniques]);
-
-  useEffect(() => {
-    console.log(message.recipients);
-  }, [message.recipients]);
 
   // Context value
   const contextValue = useMemo(
@@ -242,7 +238,6 @@ export function NewMessageProvider({
       updateSelectedPhone,
     ]
   );
-
   return (
     <NewMessageContext.Provider value={contextValue}>
       {children}

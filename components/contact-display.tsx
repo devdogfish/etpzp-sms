@@ -65,24 +65,7 @@ export default function ContactDisplay({
               <TooltipContent>Go back</TooltipContent>
             </Tooltip>
           )}
-          {/* <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!contact}>
-                <Archive className="h-4 w-4" />
-                <span className="sr-only">Archive</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Archive</TooltipContent>
-          </Tooltip> */}
-          {/* <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={!contact}>
-                <ArchiveX className="h-4 w-4" />
-                <span className="sr-only">Move to junk</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Move to junk</TooltipContent>
-          </Tooltip> */}
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -140,20 +123,6 @@ export default function ContactDisplay({
             </Tooltip>
           )}
         </div>
-        {/* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" disabled={!contact}>
-              <MoreVertical className="h-4 w-4" />
-              <span className="sr-only">More</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>Mark as unread</DropdownMenuItem>
-            <DropdownMenuItem>Star thread</DropdownMenuItem>
-            <DropdownMenuItem>Add label</DropdownMenuItem>
-            <DropdownMenuItem>Mute thread</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu> */}
       </div>
       <Separator />
 
@@ -176,14 +145,11 @@ export default function ContactDisplay({
           <Separator />
           <div className="flex gap-4 justify-between items-center p-4 text-sm">
             <div>Phone</div>
-            <Button variant="link" onClick={messageContact}>
-              {contact.phone}
-            </Button>
-            <div>
-              <CopyButton text={contact.phone} variant="ghost">
-                Copy
-              </CopyButton>
-            </div>
+            <CopyButton text={contact.phone} variant="none">
+              <Button variant="link" onClick={messageContact}>
+                {contact.phone}
+              </Button>
+            </CopyButton>
           </div>
           <Separator />
           <div className="flex gap-4 justify-between p-4 text-sm">

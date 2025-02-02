@@ -7,7 +7,7 @@ import SendButton from "./send-button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import PageHeader from "./page-header";
-import { sendMessage, ActionResponse } from "@/lib/actions/message.create";
+import { sendMessage } from "@/lib/actions/message.create";
 
 // Form
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -35,9 +35,10 @@ import CreateContactModal from "./modals/create-contact-modal";
 import InfoContactModal from "./modals/info-contact-modal";
 import Link from "next/link";
 import { useLayout } from "@/contexts/use-layout";
-import { DBMessage } from "@/types";
+import type { DBMessage, Message } from "@/types";
+import { ActionResponse } from "@/types/action";
 
-const initialState: ActionResponse = {
+const initialState: ActionResponse<Message> = {
   success: false,
   message: [],
 };
@@ -59,6 +60,7 @@ const NewMessageForm = React.memo(function ({
   const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
   const { isFullscreen, toggleFullscreen } = useLayout();
+  const [focused, setFocused] = useState([false, false, false, false]);
   let scheduledTime = 0;
   const _searchParams = useSearchParams();
   const searchParams = {
@@ -107,6 +109,8 @@ const NewMessageForm = React.memo(function ({
     <ContactModalsProvider>
       {/* We can only put the modal here, because it carries state */}
       <InsertContactModal contacts={contacts} />
+      <CreateContactModal />
+
       {moreInfoOn && <InfoContactModal recipient={moreInfoOn} />}
       {moreInfoOn && !moreInfoOn.contactId && (
         <CreateContactModal defaultPhone={moreInfoOn.phone} />
@@ -169,7 +173,7 @@ const NewMessageForm = React.memo(function ({
               }
               placeholder="Message subject (optional)"
               className={cn(
-                "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground"
+                "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground border-b border-b-border"
               )}
               defaultValue={draft?.subject || undefined}
             />

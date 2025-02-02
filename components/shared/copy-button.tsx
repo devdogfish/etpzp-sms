@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface CopyButtonProps {
   children?: React.ReactNode;
@@ -30,15 +31,18 @@ export function CopyButton({
       timerRef.current = setTimeout(() => setCopied(false), 2000);
     }
   };
-
   return (
     <Button
       variant={variant}
       size={size}
-      className={className}
+      className={cn(className, "flex items-center")}
       onClick={handleCopy}
     >
-      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}{" "}
+      {copied ? (
+        <Check style={{ width: ".8rem", height: ".8rem" }} />
+      ) : (
+        <Copy style={{ width: ".8rem", height: ".8rem" }} />
+      )}{" "}
       <span>{children}</span>
     </Button>
   );

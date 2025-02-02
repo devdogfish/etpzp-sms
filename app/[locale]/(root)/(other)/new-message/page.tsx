@@ -6,6 +6,7 @@ import { fetchRecipients } from "@/lib/db/recipients";
 import { getProcessedRecipients } from "@/lib/recipients.filters";
 import { fetchDraft } from "@/lib/db/message";
 import { Suspense } from "react";
+import { DBContactRecipient } from "@/types/recipient";
 
 export default async function Page({
   searchParams,
@@ -37,6 +38,26 @@ export async function PageFetcher({
   return (
     <NewMessageProvider
       suggestedRecipients={{
+        all: contacts?.length
+          ? [
+              // All existing recipients..
+              ...alphabetical,
+              // plus the contacts that have never been used inside a message..
+              ...contacts
+                .filter(
+                  (contact) =>
+                    !alphabetical.some((a) => a.phone === contact.phone)
+                )
+                // converted the DBContactRecipient type.
+                .map((contact) => ({
+                  id: contact.id,
+                  phone: contact.phone,
+                  contact_id: contact.id,
+                  contact_name: contact.name,
+                  contact_description: contact.description || null,
+                })),
+            ]
+          : alphabetical,
         alphabetical,
         mostUsed,
       }}

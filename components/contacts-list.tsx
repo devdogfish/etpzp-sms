@@ -1,19 +1,14 @@
 "use client";
-import { ComponentProps, useEffect } from "react";
-import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 
 import { cn, getNameInitials } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Contact } from "@/types";
-import { Button } from "./ui/button";
-import { CirclePlus } from "lucide-react";
 import CreateContact from "./modals/create-contact-modal";
+import { DBContact } from "@/types/contact";
 
 type ContactListProps = {
-  contacts: Contact[];
+  contacts: DBContact[];
   selectedContactId: string | null;
-  setSelected: (contact: Contact) => void;
+  setSelected: (contact: DBContact) => void;
 };
 
 export default function ContactsList({

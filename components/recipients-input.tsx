@@ -62,27 +62,28 @@ export default function RecipientsInput({
   let loaded = false;
 
   useEffect(() => {
-    if (loaded === false) {
-      defaultRecipients?.map(({ phone }) => addRecipient(phone, contacts));
+    if (!loaded) {
+      const addInitialRecipients = () => {
+        // Add default recipients
+        for (const { phone } of defaultRecipients || []) {
+          addRecipient(phone, contacts);
+        }
 
+        // Add recipient from URL if present
+        const contactId = searchParams.get("contactId");
+        if (contactId) {
+          const contact = contacts.find((contact) => contact.id == contactId);
+          if (contact) {
+            addRecipient(contact.phone, contacts);
+          }
+        }
+
+        // Update searched recipients after adding all initial recipients
+        searchRecipients("");
+      };
+
+      addInitialRecipients();
       loaded = true;
-    }
-
-    if (searchParams.get("contactId")) {
-      // On the contact page we have a message this contact link where we pass over the contactId
-      const contact = contacts.find(
-        (contact) => contact.id == searchParams.get("contactId")
-      );
-      // It could be an invalid id
-      if (contact) {
-        const recipient = getValidatedRecipient({
-          contactName: contact.name,
-          contactId: contact.id,
-          ...contact,
-        });
-        // Replace all existing contacts instead of pushing the contact, because of component re-renders
-        setMessage((prev) => ({ ...prev, recipients: [recipient] }));
-      }
     }
   }, []);
 
@@ -206,6 +207,7 @@ export default function RecipientsInput({
                   isFocused: true,
                 }));
                 setIsDropdownOpen(true);
+                searchRecipients(input.value);
               }}
               onBlur={() => {
                 setInput((prevInput) => ({
@@ -217,8 +219,8 @@ export default function RecipientsInput({
             />
 
             {isDropdownOpen && searchedRecipients.length !== 0 && (
-              <div className="absolute top-[85%] bg-white border rounded-lg shadow-md">
-                <ScrollArea className="w-[300px] h-[330px] ">
+              <div className="absolute top-[85%] bg-background border rounded-lg">
+                <ScrollArea className="w-[300px] h-[330px]">
                   <div
                     className="p-2" /* this is necessary to have a separate container so that the items scroll all the way up to the end of the container */
                   >
@@ -232,9 +234,9 @@ export default function RecipientsInput({
                         <button
                           key={recipient.phone}
                           className={cn(
-                            "flex items-center w-full gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
+                            "flex items-center w-full gap-2 rounded-lg border-2 p-3 text-left text-sm transition-all hover:bg-accent",
                             selectedPhone === recipient.phone &&
-                              "border-secondary-foreground"
+                              "border-foreground"
                           )}
                           type="button"
                           onMouseDown={(e) => {
@@ -248,7 +250,7 @@ export default function RecipientsInput({
                             }));
                           }}
                         >
-                          <div className="rounded-full h-12 w-12 border centered">
+                          <div className="rounded-full h-12 w-12 border border-muted-foreground centered">
                             {getNameInitials(recipient.contact_name)}
                           </div>
                           <div className="space-y-1">
