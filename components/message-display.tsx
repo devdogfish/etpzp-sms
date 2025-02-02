@@ -28,8 +28,8 @@ import { CategoryEnums, DBMessage } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn, toastActionResult } from "@/lib/utils";
 import {
-  createDraft,
   deleteMessage,
+  saveDraft,
   toggleTrash,
 } from "@/lib/actions/message.actions";
 import { toast } from "sonner";
@@ -67,9 +67,9 @@ export function MessageDisplay({
   };
   const replyAll = async () => {
     if (message) {
-      const newDraft = await createDraft(message.recipients);
-      if (newDraft.data) {
-        router.push(`/new-message?draft=${newDraft.data}`);
+      const newDraft = await saveDraft(undefined, message);
+      if (newDraft.draftId) {
+        router.push(`/new-message?draft=${newDraft.draftId}`);
       }
     }
   };

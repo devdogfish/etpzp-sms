@@ -122,11 +122,11 @@ I want to use the same structure for my components.
 ## TODO
 
 1. \*\* ** Do a test deployment ** \*\*
-2. Figure out invalid NextConfig and make sure the translation works properly. Default
+2. Figure out invalid NextConfig and make sure the translation works properly.
 
 - Ability to cancel scheduled SMSs
 - Color setting for user's profile background as well as display name
-- Update chart colors to look nice
+- Update chart colors to look nice - get a nice color combination from a color generator
 
 ## Final touches
 - Translate the entire app

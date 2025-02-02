@@ -14,5 +14,5 @@ export type ActionResponse<T> = {
 export type ActionDataResponse<T> = {
   success: boolean;
   message: string[];
-  data?: T
+  draftId?: T
 }

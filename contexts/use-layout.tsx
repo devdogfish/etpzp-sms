@@ -23,7 +23,7 @@ type LayoutContextType = {
   setMobileNavPanel: Dispatch<SetStateAction<boolean>>;
 
   isFullscreen: boolean;
-  toggleFullscreen: () => void;
+  setIsFullscreen: Dispatch<SetStateAction<boolean>>;
 };
 
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
@@ -48,7 +48,6 @@ export function LayoutProvider({
   const [mobileNavPanel, setMobileNavPanel] = useState(false);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const toggleFullscreen = () => setIsFullscreen((prev) => !prev);
   return (
     <LayoutContext.Provider
       value={{
@@ -61,7 +60,7 @@ export function LayoutProvider({
         mobileNavPanel,
         setMobileNavPanel,
         isFullscreen,
-        toggleFullscreen,
+        setIsFullscreen,
       }}
     >
       {children}

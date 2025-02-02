@@ -30,6 +30,30 @@ export async function fetchMessagesByStatus(
   } catch (error) {}
 }
 
+export async function fetchSent(): Promise<DBMessage[] | undefined> {
+  const session = await getSession();
+  const userId = session?.user?.id;
+
+  console.log(`Fetching sent messages...`);
+  try {
+    if (!userId) throw new Error("Invalid user id.");
+    const result = await db(
+      `
+        SELECT m.*, 
+              json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) AS recipients
+        FROM message m
+        LEFT JOIN recipient r ON m.id = r.message_id
+        WHERE m.user_id = $1 AND m.send_time < NOW() AND m.in_trash = false
+        GROUP BY m.id
+        ORDER BY m.created_at DESC;
+      `,
+      [userId]
+    );
+
+    return result.rows;
+  } catch (error) {}
+}
+
 export async function fetchTrashedMessages(): Promise<DBMessage[] | undefined> {
   const session = await getSession();
   const userId = session?.user?.id;
@@ -54,7 +78,7 @@ export async function fetchTrashedMessages(): Promise<DBMessage[] | undefined> {
   } catch (error) {}
 }
 
-export async function fetchCurrentScheduled(): Promise<
+export async function fetchCurrentlyScheduled(): Promise<
   DBMessage[] | undefined
 > {
   const session = await getSession();
@@ -111,7 +135,7 @@ export async function fetchAmountIndicators(): Promise<AmountIndicators> {
     const sentResult = await db(
       `
         SELECT
-          COUNT(CASE WHEN status = 'SENT' AND in_trash = false THEN 1 END) AS sent,
+          COUNT(CASE WHEN send_time < NOW() AND in_trash = false THEN 1 END) AS sent,
           COUNT(CASE WHEN status = 'SCHEDULED' AND in_trash = false AND send_time > NOW() THEN 1 END) AS scheduled,
           COUNT(CASE WHEN status = 'FAILED' AND in_trash = false THEN 1 END) AS failed,
           COUNT(CASE WHEN status = 'DRAFTED' AND in_trash = false THEN 1 END) AS drafted,
@@ -119,7 +143,7 @@ export async function fetchAmountIndicators(): Promise<AmountIndicators> {
         FROM message
         WHERE user_id = $1;
       `,
-      [userId]
+      [1]
     );
 
     return sentResult.rows[0];

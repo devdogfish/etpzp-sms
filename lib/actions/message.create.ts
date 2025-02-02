@@ -52,7 +52,6 @@ export async function sendMessage(
   if (validatedData.data.sendDelay && validatedData.data.sendDelay > 0) {
     scheduledUnixSeconds = Date.now() / 1000 + validatedData.data.sendDelay;
     console.log("UNIX EPOCH SECONDS CALCULATED: ", scheduledUnixSeconds);
-    
   }
 
   try {
@@ -160,10 +159,6 @@ export async function sendMessage(
     };
   }
 }
-
-// export async function saveMessageTo(
-//   values: z.infer<typeof MessageSchema>
-// ) {}
 
 function analyzeRawRecipients(recipients: NewRecipient[]): {
   validRecipients: NewRecipient[];

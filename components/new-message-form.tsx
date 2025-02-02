@@ -4,7 +4,7 @@ import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
 import { Maximize2, Minimize2, Trash2, X } from "lucide-react";
 import SendButton from "./send-button";
-import { cn } from "@/lib/utils";
+import { cn, toastActionResult } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import PageHeader from "./page-header";
 import { sendMessage } from "@/lib/actions/message.create";
@@ -12,7 +12,13 @@ import { sendMessage } from "@/lib/actions/message.create";
 // Form
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import RecipientsInput from "./recipients-input";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
@@ -33,15 +39,26 @@ import { DBContact } from "@/types/contact";
 import InsertContactModal from "./modals/insert-contact-modal";
 import CreateContactModal from "./modals/create-contact-modal";
 import InfoContactModal from "./modals/info-contact-modal";
-import Link from "next/link";
 import { useLayout } from "@/contexts/use-layout";
 import type { DBMessage, Message } from "@/types";
 import { ActionResponse } from "@/types/action";
+import { saveDraft } from "@/lib/actions/message.actions";
 
 const initialState: ActionResponse<Message> = {
   success: false,
   message: [],
 };
+
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
 
 const NewMessageForm = React.memo(function ({
   contacts,
@@ -55,16 +72,49 @@ const NewMessageForm = React.memo(function ({
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation();
   const router = useRouter();
-  const { recipients, moreInfoOn, setMessage } = useNewMessage();
+  const { recipients, moreInfoOn, setMessage, message } = useNewMessage();
   const [loading, setLoading] = useState(false);
   const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
-  const { isFullscreen, toggleFullscreen } = useLayout();
+  const { isFullscreen, setIsFullscreen } = useLayout();
+  const draftIdRef = useRef(draft?.id);
+
+  // focused state for all 4 inputs in the form to handle their hovering states when this gets refactored
   const [focused, setFocused] = useState([false, false, false, false]);
+
   let scheduledTime = 0;
-  const _searchParams = useSearchParams();
-  const searchParams = {
-    body: _searchParams.get("body") || undefined,
+  const searchParams = useSearchParams();
+
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    console.log("use effect being called");
+    
+    const debouncedSave = debounce(async () => {
+      setIsSaving(true);
+      const result = await saveDraft(draftIdRef.current, message);
+      toastActionResult(result);
+      setIsSaving(false);
+      if (result.success) {
+        draftIdRef.current = result.draftId;
+      }
+    }, 2000);
+
+    if (!isSaving) {
+      debouncedSave();
+    }
+
+    return () => {
+      clearTimeout(debouncedSave as unknown as number);
+    };
+  }, [message, isSaving]);
+
+  // When the controlled inputs value changes, we update the state
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setMessage((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -120,7 +170,7 @@ const NewMessageForm = React.memo(function ({
         <Button
           variant="ghost"
           className="aspect-1 p-0"
-          onClick={toggleFullscreen}
+          onClick={() => setIsFullscreen(!isFullscreen)}
         >
           {isFullscreen ? (
             <Minimize2 className="h-4 w-4" />
@@ -128,12 +178,16 @@ const NewMessageForm = React.memo(function ({
             <Maximize2 className="h-4 w-4" />
           )}
         </Button>
-        <Link
+        <Button
+          variant="ghost"
           className={cn(buttonVariants({ variant: "ghost" }), "aspect-1 p-0")}
-          href="/sent"
+          onClick={() => {
+            setIsFullscreen(false);
+            router.push("/sent");
+          }}
         >
           <X className="h-4 w-4" />
-        </Link>
+        </Button>
       </PageHeader>
       <form
         ref={formRef}
@@ -168,14 +222,13 @@ const NewMessageForm = React.memo(function ({
 
             <Input
               name="subject"
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setSubject(e.target.value)
-              }
               placeholder="Message subject (optional)"
               className={cn(
                 "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground border-b border-b-border"
               )}
               defaultValue={draft?.subject || undefined}
+              onChange={handleInputChange}
+              value={message.subject}
             />
           </div>
           <div className="px-4 flex-grow mt-[1.25rem] mb-2">
@@ -191,7 +244,11 @@ const NewMessageForm = React.memo(function ({
                   ? serverState.errors?.body[0]
                   : "Start writing your message"
               }
-              defaultValue={draft?.body || searchParams.body}
+              onChange={handleInputChange}
+              value={message.body}
+              defaultValue={
+                draft?.body || (searchParams.get("body") as string) || undefined
+              }
             />
           </div>
 
@@ -228,4 +285,5 @@ const NewMessageForm = React.memo(function ({
     </ContactModalsProvider>
   );
 });
+
 export default NewMessageForm;

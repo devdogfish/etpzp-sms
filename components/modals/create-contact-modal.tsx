@@ -28,7 +28,7 @@ import { ContactSchema } from "@/lib/form.schemas";
 
 const initialState: ActionResponse<z.infer<typeof ContactSchema>> = {
   success: false,
-  message: [""],
+  message: [],
 };
 
 export default function CreateContactModal({
@@ -138,7 +138,7 @@ export default function CreateContactModal({
             )}
           </div>
 
-          {serverState?.message && (
+          {serverState.message.length > 0 && (
             <Alert variant={serverState.success ? "default" : "destructive"}>
               {!serverState.success && <CircleAlert className="w-4 h-4" />}
               <AlertDescription className="relative top-1">

@@ -1,6 +1,6 @@
 import MessagesPageSkeleton from "@/components/messages-page-skeleton";
 import MessagesPage from "@/components/messages-page";
-import { fetchCurrentScheduled } from "@/lib/db/message";
+import { fetchCurrentlyScheduled } from "@/lib/db/message";
 import { Suspense } from "react";
 import { fetchError } from "@/lib/db";
 
@@ -13,7 +13,7 @@ export default function Page() {
 }
 
 export async function DraftsMessagesPage() {
-  const messages = await fetchCurrentScheduled();
+  const messages = await fetchCurrentlyScheduled();
 
   return (
     <MessagesPage

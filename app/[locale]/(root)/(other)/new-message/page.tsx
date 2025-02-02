@@ -6,7 +6,6 @@ import { fetchRecipients } from "@/lib/db/recipients";
 import { getProcessedRecipients } from "@/lib/recipients.filters";
 import { fetchDraft } from "@/lib/db/message";
 import { Suspense } from "react";
-import { DBContactRecipient } from "@/types/recipient";
 
 export default async function Page({
   searchParams,
@@ -15,7 +14,7 @@ export default async function Page({
 }) {
   return (
     <Suspense fallback={"...Loading"}>
-      <PageFetcher searchParams={searchParams} />
+      <PageFetcher searchParams={await searchParams} />
     </Suspense>
   );
 }
