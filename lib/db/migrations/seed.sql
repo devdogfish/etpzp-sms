@@ -16,7 +16,7 @@ CREATE TABLE "user" (
 CREATE TABLE "message" (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
-    sender VARCHAR(255) DEFAULT "ETPZP",
+    sender VARCHAR(255),
     subject VARCHAR(255),
     body TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),

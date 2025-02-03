@@ -17,7 +17,7 @@ import { Button, buttonVariants } from "../ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "../ui/label";
 import { updateContact } from "@/lib/actions/contact.actions";
-import { ActionResponse, DBContact } from "@/types/contact";
+import { DBContact } from "@/types/contact";
 import { ContactSchema } from "@/lib/form.schemas";
 import {
   Badge,
@@ -33,10 +33,11 @@ import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useContactModals } from "@/contexts/use-contact-modals";
+import { ActionResponse } from "@/types/action";
 
-const initialState: ActionResponse = {
+const initialState: ActionResponse<undefined> = {
   success: false,
-  message: "",
+  message: [],
 };
 
 export default function EditContactModal({ contact }: { contact: DBContact }) {
@@ -52,7 +53,7 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
       toast.success(serverState.message);
       serverState.inputs = undefined;
       serverState.errors = undefined;
-      serverState.message = "";
+      serverState.message = [];
     }
   }, [serverState]);
 

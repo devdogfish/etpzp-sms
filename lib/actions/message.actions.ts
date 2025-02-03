@@ -80,40 +80,42 @@ export async function saveDraft(
       console.log("Update existing draft with these values:");
       console.log(data);
 
+      // delete old recipients to then update them with our new ones
+      const deleteRecipients = db(
+        "DELETE FROM recipient WHERE message_id = $1",
+        [draftId]
+      );
+
       // Update existing draft
-      // TODO check if this is valid syntax
-      draft = await db(
-        // `SELECT * FROM message WHERE user_id = $1 AND id = $2`,
+      draft = db(
         `
-          WITH update_message AS (
-            UPDATE message
-            SET subject = $3,
-                body = $4
-            WHERE user_id = $1 AND id = $2
+          WITH insert_message AS (
+            UPDATE message SET subject = $3, body = $4, sender = $5 WHERE id = $2 AND user_id = $1
             RETURNING id
           ),
-          delete_old_recipients AS (
-            DELETE FROM recipient
-            WHERE message_id = $2
-          ),
           insert_recipients AS (
-          INSERT INTO recipient (message_id, contact_id, phone)
-            SELECT
-              $2,
-              unnest($5::int[]) as contact_id,
-              unnest($6::text[]) as phone
+            INSERT INTO recipient (message_id, contact_id, phone)
+            SELECT 
+              insert_message.id, 
+              unnest($6::int[]) as contact_id,
+              unnest($7::text[]) as phone
+            FROM insert_message
           )
-          SELECT id FROM update_message
+          SELECT id FROM insert_message
         `,
         [
           userId,
           draftId,
           data.subject,
           data.body,
+          data.sender,
+
+          // Recipients / contacts
           data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
           data.recipients.map((recipient) => recipient.phone),
         ]
       );
+      await Promise.all([deleteRecipients, draft]);
     } else {
       console.log("Create new draft");
 
@@ -121,24 +123,27 @@ export async function saveDraft(
       draft = await db(
         `
           WITH insert_message AS (
-            INSERT INTO message (user_id, body, status) 
-            VALUES ($1, $2, $3) 
+            INSERT INTO message (user_id, subject, body, sender, status) 
+            VALUES ($1, $2, $3, $4, $5) 
             RETURNING id
           ),
           insert_recipients AS (
             INSERT INTO recipient (message_id, contact_id, phone)
             SELECT 
               insert_message.id, 
-              unnest($4::int[]) as contact_id,
-              unnest($5::text[]) as phone
+              unnest($6::int[]) as contact_id,
+              unnest($7::text[]) as phone
             FROM insert_message
           )
           SELECT id FROM insert_message
         `,
         [
           userId,
-          "",
+          data.subject,
+          data.body,
+          data.sender,
           "DRAFTED",
+          // Recipients
           data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
           data.recipients.map((recipient) => recipient.phone),
         ]

@@ -132,7 +132,11 @@ const NewMessageForm = React.memo(function ({
         draftIdRef.current = result.draftId;
         toastActionResult(result);
       };
-      console.log("Calling draft save action");
+      console.log(
+        "Calling draft save action with these args: ",
+        draftIdRef.current,
+        message
+      );
 
       save();
     } else console.log("component isn't mounted yet");

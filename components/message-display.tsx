@@ -65,6 +65,7 @@ export function MessageDisplay({
       }
     }
   };
+
   const replyAll = async () => {
     if (message) {
       const newDraft = await saveDraft(undefined, {
@@ -77,11 +78,18 @@ export function MessageDisplay({
           contactId: r.contact_id?.toString(),
         })),
       });
+      console.log(
+        "created new draft with id ",
+        newDraft.draftId,
+        " to then redirect to edit it on the new message page"
+      );
+
       if (newDraft.draftId) {
         router.push(`/new-message?draft=${newDraft.draftId}`);
       } else console.log("An error occurred");
     }
   };
+
   const putBack = async () => {
     if (message) {
       const result = await toggleTrash(message.id, false);
