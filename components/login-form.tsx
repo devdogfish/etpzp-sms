@@ -22,7 +22,7 @@ import { Eye } from "lucide-react";
 
 const initialState: ActionResponse<Login> = {
   success: false,
-  message: "",
+  message: [],
 };
 export default function LoginForm() {
   const [passInputType, setPassInputType] = useState("password");
@@ -97,7 +97,7 @@ export default function LoginForm() {
           </div>
           {!serverState.success && (
             <p className="text-sm text-destructive text-center">
-              {serverState.message}
+              {serverState.message[0]}
             </p>
           )}
           <SubmitButton className="w-full">Login</SubmitButton>

@@ -67,10 +67,19 @@ export function MessageDisplay({
   };
   const replyAll = async () => {
     if (message) {
-      const newDraft = await saveDraft(undefined, message);
+      const newDraft = await saveDraft(undefined, {
+        sender: message.sender,
+        subject: message.subject || undefined,
+        body: message.body,
+        // convert DBRecipient to NewRecipient
+        recipients: message.recipients.map((r) => ({
+          phone: r.phone,
+          contactId: r.contact_id?.toString(),
+        })),
+      });
       if (newDraft.draftId) {
         router.push(`/new-message?draft=${newDraft.draftId}`);
-      }
+      } else console.log("An error occurred");
     }
   };
   const putBack = async () => {

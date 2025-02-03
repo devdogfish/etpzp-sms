@@ -68,7 +68,7 @@ export async function deleteMessage(id: string): Promise<ActionResponse<null>> {
 
 export async function saveDraft(
   draftId: string | undefined,
-  data: Message | DBMessage
+  data: Message
 ): Promise<ActionDataResponse<string>> {
   const session = await getSession();
   const userId = session?.user?.id;
@@ -77,15 +77,46 @@ export async function saveDraft(
     if (!userId) throw new Error("Invalid user id.");
     let draft;
     if (draftId) {
+      console.log("Update existing draft with these values:");
+      console.log(data);
+
       // Update existing draft
       // TODO check if this is valid syntax
       draft = await db(
+        // `SELECT * FROM message WHERE user_id = $1 AND id = $2`,
         `
-          UPDATE message SET body = $3 WHERE user_id = $1 AND id = $2;
+          WITH update_message AS (
+            UPDATE message
+            SET subject = $3,
+                body = $4
+            WHERE user_id = $1 AND id = $2
+            RETURNING id
+          ),
+          delete_old_recipients AS (
+            DELETE FROM recipient
+            WHERE message_id = $2
+          ),
+          insert_recipients AS (
+          INSERT INTO recipient (message_id, contact_id, phone)
+            SELECT
+              $2,
+              unnest($5::int[]) as contact_id,
+              unnest($6::text[]) as phone
+          )
+          SELECT id FROM update_message
         `,
-        [userId, draftId, data.body]
+        [
+          userId,
+          draftId,
+          data.subject,
+          data.body,
+          data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
+          data.recipients.map((recipient) => recipient.phone),
+        ]
       );
     } else {
+      console.log("Create new draft");
+
       // Create new draft
       draft = await db(
         `
@@ -118,7 +149,7 @@ export async function saveDraft(
     return {
       success: true,
       message: ["Draft saved successfully"],
-      draftId: draft.rows[0].id,
+      draftId: draftId || draft.rows[0].id,
     };
   } catch (error) {
     return {

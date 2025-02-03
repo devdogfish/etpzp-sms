@@ -24,6 +24,6 @@ export type DBContactRecipient = {
 // No joins - normal query directly from the DB
 export type DBRecipient = {
   id: number;
-  contact_id: number;
+  contact_id?: string;
   phone: string;
 };

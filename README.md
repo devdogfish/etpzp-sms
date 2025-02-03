@@ -129,29 +129,40 @@ I want to use the same structure for my components.
 - Update chart colors to look nice - get a nice color combination from a color generator
 
 ## Final touches
+
 - Translate the entire app
 - Use global colors (not hardcoded colors) everywhere so that the all different theme settings look nice
 - Revalidate `/` and recipients when adding a new contact on the new-message page
 - Automatic drafting using `use-debounce` with a 2s cooldown on change of any fields with a saved or not state
+- On drafts page, delete the draft immediately instead of moving them to in_trash
+- Figure out how I can re-use the saveDraft function for respond all button in the messageDisplay
+- I am getting an error when trying to save a draft every second time
 
 ## If there is extra time (after deployment in school)
+
 - Save user preferences in DB and retrieve that to set the browser storage every once in a while.
 - Admin Dashboard with statistics
 
 ## Database
+
 Deleting all tables
 
 #### Deleting all tables
+
 ```sql
 DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```
 
 #### Seed files
+
 On UNIX Operating system
+
 ```psql
 \i ~/dev/etpzp-sms/lib/db/migrations/seed.sql
 ```
+
 On Windows psql shell
+
 ```psql
 \i /Users/Utilizador/dev/etpzp-sms/lib/db/migrations/seed.sql
 ```

@@ -43,22 +43,13 @@ import { useLayout } from "@/contexts/use-layout";
 import type { DBMessage, Message } from "@/types";
 import { ActionResponse } from "@/types/action";
 import { saveDraft } from "@/lib/actions/message.actions";
+import useDebounce from "@/hooks/use-debounce";
+import useIsMounted from "@/hooks/use-mounted";
 
 const initialState: ActionResponse<Message> = {
   success: false,
   message: [],
 };
-
-function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
-  return (...args: Parameters<T>) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-}
 
 const NewMessageForm = React.memo(function ({
   contacts,
@@ -81,33 +72,10 @@ const NewMessageForm = React.memo(function ({
 
   // focused state for all 4 inputs in the form to handle their hovering states when this gets refactored
   const [focused, setFocused] = useState([false, false, false, false]);
+  const isMounted = useIsMounted();
 
   let scheduledTime = 0;
   const searchParams = useSearchParams();
-
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    console.log("use effect being called");
-    
-    const debouncedSave = debounce(async () => {
-      setIsSaving(true);
-      const result = await saveDraft(draftIdRef.current, message);
-      toastActionResult(result);
-      setIsSaving(false);
-      if (result.success) {
-        draftIdRef.current = result.draftId;
-      }
-    }, 2000);
-
-    if (!isSaving) {
-      debouncedSave();
-    }
-
-    return () => {
-      clearTimeout(debouncedSave as unknown as number);
-    };
-  }, [message, isSaving]);
 
   // When the controlled inputs value changes, we update the state
   const handleInputChange = (
@@ -123,7 +91,7 @@ const NewMessageForm = React.memo(function ({
     const formData = new FormData(e.currentTarget);
 
     const result = await sendMessage({
-      sender: formData.get("sender") as string,
+      sender: formData.get("sender") as "ETPZP" | "ExampleSMS" | "Test",
       recipients: recipients as NewRecipient[],
       subject: formData.get("subject") as string,
       body: formData.get("body") as string,
@@ -155,6 +123,20 @@ const NewMessageForm = React.memo(function ({
     }
   };
 
+  const debouncedSaveDraft = useDebounce(message, 2000);
+
+  useEffect(() => {
+    if (isMounted) {
+      const save = async () => {
+        const result = await saveDraft(draftIdRef.current, message);
+        draftIdRef.current = result.draftId;
+        toastActionResult(result);
+      };
+      console.log("Calling draft save action");
+
+      save();
+    } else console.log("component isn't mounted yet");
+  }, [debouncedSaveDraft]);
   return (
     <ContactModalsProvider>
       {/* We can only put the modal here, because it carries state */}

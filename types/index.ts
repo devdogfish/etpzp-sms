@@ -1,4 +1,6 @@
+import { z } from "zod";
 import { DBRecipient, NewRecipient } from "./recipient";
+import { MessageSchema } from "@/lib/form.schemas";
 
 export type StatusEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFTED";
 export type CategoryEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFT" | "TRASH";
@@ -19,26 +21,31 @@ export type User = {
   updated_at?: Date;
 };
 
-export type Message = {
-  // new Message
-  id?: string;
-  sender: string;
+export type Message = z.infer<typeof MessageSchema> & {
   recipients: NewRecipient[];
-  subject: string;
-  body: string;
-  sendDelay: number;
 };
+// {
+//   // new Message
+//   id?: string;
+//   sender: string;
+//   recipients: NewRecipient[];
+//   subject: string;
+//   body: string;
+//   sendDelay?: number;
+// };
 
 export type DBMessage = {
+  // TODO: check if database null values come back undefined or as value `null` actually
   id: string;
   user_id: string;
-  subject: string | null;
+  sender?: string;
+  subject?: string | null;
   body: string;
   created_at: Date;
-  send_time: Date;
+  send_time?: Date;
   status: StatusEnums;
   in_trash: boolean;
-  failure_reason: string | null;
+  failure_reason?: string | null;
   recipients: DBRecipient[];
 };
 

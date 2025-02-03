@@ -23,7 +23,7 @@ export async function login(
   if (!validatedData.success) {
     return {
       success: false,
-      message: "Invalid value types. Try again",
+      message: ["Error", "Please fix the errors in the form"],
       inputs: { email, password },
       errors: validatedData.error.flatten().fieldErrors,
     };
@@ -34,7 +34,7 @@ export async function login(
   console.log("STARTING AUTHENTICATION");
   console.log(email, password);
 
-  const user: SessionData /**& { errors: string[] } */ = await dummyAuthenticate({
+  const user: SessionData /**& { errors: string[] } */ = await authenticate({
     email,
     password,
   });
@@ -44,7 +44,7 @@ export async function login(
 
     return {
       success: false,
-      message: "Wrong credentials! Try again",
+      message: ["Wrong credentials! Try again"],
       inputs: { email, password },
     };
   }

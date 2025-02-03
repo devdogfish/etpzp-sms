@@ -72,15 +72,15 @@ export async function sendMessage(
       sendtime: scheduledUnixSeconds, // Extract the UNIX timestamp for scheduled messages
     };
 
-    const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
-      method: "POST",
-      headers: {
-        Authorization: `Token ${process.env.API_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-    // const resp = SuccessResponse;
+    // const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
+    //   method: "POST",
+    //   headers: {
+    //     Authorization: `Token ${process.env.API_TOKEN}`,
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(payload),
+    // });
+    const resp = SuccessResponse;
     console.log("Success response");
     console.log(resp);
 
