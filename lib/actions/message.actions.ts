@@ -76,6 +76,11 @@ export async function saveDraft(
   try {
     if (!userId) throw new Error("Invalid user id.");
     let draft;
+    console.log(
+      data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
+      data.recipients.map((recipient) => recipient.phone)
+    );
+
     if (draftId) {
       const [_, draftQuery] = await Promise.all([
         // delete old recipients to then update them with our new ones
@@ -89,7 +94,7 @@ export async function saveDraft(
             ),
             insert_recipients AS (
               INSERT INTO recipient (message_id, contact_id, phone)
-              SELECT 
+              SELECT
                 insert_message.id, 
                 unnest($6::int[]) as contact_id,
                 unnest($7::text[]) as phone

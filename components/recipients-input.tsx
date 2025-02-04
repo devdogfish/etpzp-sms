@@ -30,7 +30,6 @@ React.memo(RecipientsInput);
 export default function RecipientsInput({
   contacts,
   error,
-  defaultRecipients,
 }: {
   contacts: DBContact[];
   error?: boolean;
@@ -60,16 +59,11 @@ export default function RecipientsInput({
   const { setModal } = useContactModals();
   const [activeError, setActiveError] = useState<boolean>(false);
 
-  const isMounted = useIsMounted()
+  const isMounted = useIsMounted();
 
   useEffect(() => {
     if (isMounted) {
       const addInitialRecipients = () => {
-        // Add default recipients
-        for (const { phone } of defaultRecipients || []) {
-          addRecipient(phone, contacts);
-        }
-
         // Add recipient from URL if present
         const contactId = searchParams.get("contactId");
         if (contactId) {

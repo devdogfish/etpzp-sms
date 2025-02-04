@@ -7,6 +7,7 @@ import { getProcessedRecipients } from "@/lib/recipients.filters";
 import { fetchDraft } from "@/lib/db/message";
 import { Suspense } from "react";
 import { NewRecipient } from "@/types/recipient";
+import { validatePhoneNumber } from "@/lib/utils";
 
 export default async function Page({
   searchParams,
@@ -35,6 +36,9 @@ export async function PageFetcher({
     ? await fetchDraft(searchParams.draft)
     : undefined;
 
+  console.log("Draft fetched here rcipients");
+  console.log(draft?.recipients);
+
   return (
     <NewMessageProvider
       suggestedRecipients={{
@@ -62,17 +66,17 @@ export async function PageFetcher({
         mostUsed,
       }}
       allContacts={contacts || []}
-      // TODO: add safe conversion of full type here (fetch contact fields from the database directly I think is easiest)
+      // TODO: Check if this is all correct, also Maybe for single contacts pushing to the contactId it would be better to create a draft with that
       defaultMessage={{
         body: draft?.body || "",
         subject: draft?.subject || undefined,
         sender: draft?.sender,
-        recipients: draft?.recipients.length
-          ? (draft?.recipients.map((r) => ({
-              phone: r.phone,
-              contactId: r.contact_id,
-            })) as NewRecipient[])
-          : [],
+        recipients:
+          draft?.recipients.map((r) => ({
+            ...r,
+            error: validatePhoneNumber(r.phone),
+            formattedPhone: validatePhoneNumber(r.phone).formattedPhone,
+          })) || [],
       }}
     >
       <NewMessageForm

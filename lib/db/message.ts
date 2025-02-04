@@ -3,6 +3,7 @@
 import db from ".";
 import { AmountIndicators, DBMessage, StatusEnums } from "@/types";
 import { getSession } from "../auth/sessions";
+import { NewRecipient } from "@/types/recipient";
 
 export async function fetchMessagesByStatus(
   status: StatusEnums
@@ -104,7 +105,9 @@ export async function fetchCurrentlyScheduled(): Promise<
   } catch (error) {}
 }
 
-export async function fetchDraft(id: string): Promise<DBMessage | undefined> {
+export async function fetchDraft(
+  id: string
+): Promise<(DBMessage & { recipients: NewRecipient[] }) | undefined> {
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -116,10 +119,18 @@ export async function fetchDraft(id: string): Promise<DBMessage | undefined> {
       `
         -- Select the message fields, along with an array of recipients
         SELECT m.*, 
-               COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
+              COALESCE(json_agg(json_build_object(
+                  'phone', r.phone,
+                  'error', NULL,  -- Assuming no error handling is needed here
+                  'contactId', c.id,
+                  'contactName', c.name,
+                  'contactDescription', c.description
+              )) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
         FROM message m
         -- Left join the recipient table to get all recipients for the message
         LEFT JOIN recipient r ON m.id = r.message_id
+        -- Left join the contact table to get contact details
+        LEFT JOIN contact c ON r.contact_id = c.id
         WHERE m.user_id = $1 AND m.id = $2 AND m.status = 'DRAFTED'
         -- Group the results by message id and order by creation time
         GROUP BY m.id
@@ -131,6 +142,7 @@ export async function fetchDraft(id: string): Promise<DBMessage | undefined> {
     return sentResult.rows[0];
   } catch (error) {}
 }
+
 export async function fetchAmountIndicators(): Promise<AmountIndicators> {
   const session = await getSession();
   const userId = session?.user?.id;
@@ -148,7 +160,7 @@ export async function fetchAmountIndicators(): Promise<AmountIndicators> {
         FROM message
         WHERE user_id = $1;
       `,
-      [1]
+      [userId]
     );
 
     return sentResult.rows[0];

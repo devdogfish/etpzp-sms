@@ -134,7 +134,7 @@ const NewMessageForm = React.memo(function ({
   useEffect(() => {
     setDraftId(draft?.id);
     if (isMounted) {
-      console.log("saving draft with followign values");
+      console.log("saving draft with following values");
       console.log(message);
 
       const save = async () => {
@@ -218,7 +218,6 @@ const NewMessageForm = React.memo(function ({
 
             <RecipientsInput
               contacts={contacts}
-              defaultRecipients={draft?.recipients}
               error={!!serverState.errors?.recipients}
             />
 
