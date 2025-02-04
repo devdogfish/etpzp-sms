@@ -77,45 +77,40 @@ export async function saveDraft(
     if (!userId) throw new Error("Invalid user id.");
     let draft;
     if (draftId) {
-      console.log("Update existing draft with these values:");
-      console.log(data);
+      const [_, draftQuery] = await Promise.all([
+        // delete old recipients to then update them with our new ones
+        db(`DELETE FROM recipient WHERE message_id = $1`, [draftId]),
+        // Update existing draft
+        db(
+          `
+            WITH insert_message AS (
+              UPDATE message SET subject = $3, body = $4, sender = $5 WHERE id = $2 AND user_id = $1
+              RETURNING *
+            ),
+            insert_recipients AS (
+              INSERT INTO recipient (message_id, contact_id, phone)
+              SELECT 
+                insert_message.id, 
+                unnest($6::int[]) as contact_id,
+                unnest($7::text[]) as phone
+              FROM insert_message
+            )
+            SELECT * FROM insert_message
+          `,
+          [
+            userId,
+            draftId,
+            data.subject,
+            data.body,
+            data.sender,
 
-      // delete old recipients to then update them with our new ones
-      const deleteRecipients = db(
-        "DELETE FROM recipient WHERE message_id = $1",
-        [draftId]
-      );
-
-      // Update existing draft
-      draft = db(
-        `
-          WITH insert_message AS (
-            UPDATE message SET subject = $3, body = $4, sender = $5 WHERE id = $2 AND user_id = $1
-            RETURNING id
-          ),
-          insert_recipients AS (
-            INSERT INTO recipient (message_id, contact_id, phone)
-            SELECT 
-              insert_message.id, 
-              unnest($6::int[]) as contact_id,
-              unnest($7::text[]) as phone
-            FROM insert_message
-          )
-          SELECT id FROM insert_message
-        `,
-        [
-          userId,
-          draftId,
-          data.subject,
-          data.body,
-          data.sender,
-
-          // Recipients / contacts
-          data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
-          data.recipients.map((recipient) => recipient.phone),
-        ]
-      );
-      await Promise.all([deleteRecipients, draft]);
+            // Recipients / contacts
+            data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
+            data.recipients.map((recipient) => recipient.phone),
+          ]
+        ),
+      ]);
+      draft = draftQuery;
     } else {
       console.log("Create new draft");
 

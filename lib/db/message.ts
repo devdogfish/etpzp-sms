@@ -16,7 +16,7 @@ export async function fetchMessagesByStatus(
     const result = await db(
       `
         SELECT m.*, 
-              json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) AS recipients
+              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.status = $2 AND m.in_trash = false
@@ -40,7 +40,7 @@ export async function fetchSent(): Promise<DBMessage[] | undefined> {
     const result = await db(
       `
         SELECT m.*, 
-              json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) AS recipients
+              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.send_time < NOW() AND m.in_trash = false
@@ -64,7 +64,7 @@ export async function fetchTrashedMessages(): Promise<DBMessage[] | undefined> {
     const result = await db(
       `
         SELECT m.*, 
-              json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) AS recipients
+              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.in_trash = true
@@ -90,7 +90,7 @@ export async function fetchCurrentlyScheduled(): Promise<
     const sentResult = await db(
       `
         SELECT m.*, 
-              json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) AS recipients
+              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.status = 'SCHEDULED' AND m.send_time > NOW()
@@ -108,15 +108,20 @@ export async function fetchDraft(id: string): Promise<DBMessage | undefined> {
   const session = await getSession();
   const userId = session?.user?.id;
 
+  if (!id) throw new Error("ID passed to fetchDraft was invalid!!!");
+
   try {
     if (!userId) throw new Error("Invalid user id.");
     const sentResult = await db(
       `
+        -- Select the message fields, along with an array of recipients
         SELECT m.*, 
-              json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) AS recipients
+               COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
         FROM message m
+        -- Left join the recipient table to get all recipients for the message
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.id = $2 AND m.status = 'DRAFTED'
+        -- Group the results by message id and order by creation time
         GROUP BY m.id
         ORDER BY m.created_at DESC;
       `,

@@ -6,6 +6,7 @@ import { fetchRecipients } from "@/lib/db/recipients";
 import { getProcessedRecipients } from "@/lib/recipients.filters";
 import { fetchDraft } from "@/lib/db/message";
 import { Suspense } from "react";
+import { NewRecipient } from "@/types/recipient";
 
 export default async function Page({
   searchParams,
@@ -61,6 +62,18 @@ export async function PageFetcher({
         mostUsed,
       }}
       allContacts={contacts || []}
+      // TODO: add safe conversion of full type here (fetch contact fields from the database directly I think is easiest)
+      defaultMessage={{
+        body: draft?.body || "",
+        subject: draft?.subject || undefined,
+        sender: draft?.sender,
+        recipients: draft?.recipients.length
+          ? (draft?.recipients.map((r) => ({
+              phone: r.phone,
+              contactId: r.contact_id,
+            })) as NewRecipient[])
+          : [],
+      }}
     >
       <NewMessageForm
         contacts={contacts || []}

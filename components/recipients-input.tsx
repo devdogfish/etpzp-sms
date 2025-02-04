@@ -18,6 +18,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { useSearchParams } from "next/navigation";
 import { DBRecipient, NewRecipient } from "@/types/recipient";
 import { DBContact } from "@/types/contact";
+import useIsMounted from "@/hooks/use-mounted";
 
 type InputState = {
   value: string;
@@ -59,10 +60,10 @@ export default function RecipientsInput({
   const { setModal } = useContactModals();
   const [activeError, setActiveError] = useState<boolean>(false);
 
-  let loaded = false;
+  const isMounted = useIsMounted()
 
   useEffect(() => {
-    if (!loaded) {
+    if (isMounted) {
       const addInitialRecipients = () => {
         // Add default recipients
         for (const { phone } of defaultRecipients || []) {
@@ -83,9 +84,8 @@ export default function RecipientsInput({
       };
 
       addInitialRecipients();
-      loaded = true;
     }
-  }, []);
+  }, [isMounted]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     setTimeout(() => {
@@ -142,6 +142,7 @@ export default function RecipientsInput({
     setMoreInfoOn(recipient);
     setModal((prev) => ({ ...prev, info: true }));
   };
+
   return (
     <div className="flex-1 py-1 relative z--[1000]">
       <div className="max-h-24 overflow-auto" ref={container}>

@@ -63,12 +63,12 @@ const NewMessageForm = React.memo(function ({
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation();
   const router = useRouter();
-  const { recipients, moreInfoOn, setMessage, message } = useNewMessage();
+  const { recipients, moreInfoOn, setMessage, message, draftId, setDraftId } =
+    useNewMessage();
   const [loading, setLoading] = useState(false);
   const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
   const { isFullscreen, setIsFullscreen } = useLayout();
-  const draftIdRef = useRef(draft?.id);
 
   // focused state for all 4 inputs in the form to handle their hovering states when this gets refactored
   const [focused, setFocused] = useState([false, false, false, false]);
@@ -126,15 +126,25 @@ const NewMessageForm = React.memo(function ({
   const debouncedSaveDraft = useDebounce(message, 2000);
 
   useEffect(() => {
+    if (isMounted && draft) {
+      const { body, subject, sender, recipients } = draft;
+      setMessage({ body, subject: subject || undefined, sender, recipients });
+    }
+  }, []);
+  useEffect(() => {
+    setDraftId(draft?.id);
     if (isMounted) {
+      console.log("saving draft with followign values");
+      console.log(message);
+
       const save = async () => {
-        const result = await saveDraft(draftIdRef.current, message);
-        draftIdRef.current = result.draftId;
+        const result = await saveDraft(draftId, message);
+        setDraftId(result.draftId);
         toastActionResult(result);
       };
       console.log(
         "Calling draft save action with these args: ",
-        draftIdRef.current,
+        draftId,
         message
       );
 
@@ -188,7 +198,13 @@ const NewMessageForm = React.memo(function ({
                 serverState.errors?.sender && "border-red-500"
               )}
             >
-              <Select name="sender" defaultValue={"ETPZP"}>
+              <Select
+                name="sender"
+                defaultValue={draft?.sender || "ETPZP"}
+                onValueChange={(value) => {
+                  setMessage((prev) => ({ ...prev, sender: value }));
+                }}
+              >
                 {/** It defaults to the first SelectItem */}
                 <SelectTrigger className="w-full rounded-none border-none shadow-none focus:ring-0 px-5 py-1 h-11">
                   <SelectValue placeholder="ETPZP" />
@@ -212,9 +228,8 @@ const NewMessageForm = React.memo(function ({
               className={cn(
                 "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground border-b border-b-border"
               )}
-              defaultValue={draft?.subject || undefined}
               onChange={handleInputChange}
-              value={message.subject}
+              defaultValue={draft?.subject || undefined}
             />
           </div>
           <div className="px-4 flex-grow mt-[1.25rem] mb-2">
@@ -231,7 +246,6 @@ const NewMessageForm = React.memo(function ({
                   : "Start writing your message"
               }
               onChange={handleInputChange}
-              value={message.body}
               defaultValue={
                 draft?.body || (searchParams.get("body") as string) || undefined
               }

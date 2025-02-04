@@ -7,6 +7,7 @@ import {
   useContext,
   useCallback,
   useMemo,
+  useEffect,
 } from "react";
 import { toast } from "sonner";
 import type { Message } from "@/types";
@@ -38,6 +39,10 @@ type MessageContextValues = {
   setMoreInfoOn: React.Dispatch<React.SetStateAction<NewRecipient | null>>;
   selectedPhone: string | undefined;
   updateSelectedPhone: (direction: "ArrowDown" | "ArrowUp") => void;
+
+  // Current message id (saved as draft until it is sent)
+  draftId: string | undefined;
+  setDraftId: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
@@ -50,22 +55,28 @@ type ProviderProps = {
   };
   allContacts: DBContact[];
   children: React.ReactNode;
+
+  defaultMessage: Message;
 };
 
 export function NewMessageProvider({
   suggestedRecipients,
   allContacts,
   children,
+  defaultMessage,
 }: ProviderProps) {
   // Message state
-  const [message, setMessage] = useState<Message>({
-    id: generateUniqueId(),
-    sender: "ETPZP",
-    recipients: [],
-    subject: "",
-    body: "",
-    sendDelay: 0,
-  });
+  const [message, setMessage] = useState<Message>(
+    defaultMessage || {
+      sender: "ETPZP",
+      recipients: [],
+      subject: "",
+      body: "",
+      sendDelay: 0,
+    }
+  );
+  // draft id saved here, so that it is persisted on revalidation.
+  const [draftId, setDraftId] = useState<string>();
 
   // UI state
   const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
@@ -210,6 +221,10 @@ export function NewMessageProvider({
     [searchedRecipients]
   );
 
+  useEffect(() => {
+    console.log(`draftId changed ${draftId}`);
+  }, [draftId]);
+
   // Context value
   const contextValue = useMemo(
     () => ({
@@ -225,6 +240,8 @@ export function NewMessageProvider({
       setMoreInfoOn,
       selectedPhone,
       updateSelectedPhone,
+      draftId,
+      setDraftId,
     }),
     [
       message,
@@ -236,6 +253,8 @@ export function NewMessageProvider({
       moreInfoOn,
       selectedPhone,
       updateSelectedPhone,
+      draftId,
+      setDraftId,
     ]
   );
   return (

@@ -7,6 +7,7 @@ import {
   ArchiveX,
   ArrowLeft,
   Clock,
+  Edit,
   Forward,
   MoreVertical,
   Reply,
@@ -51,7 +52,8 @@ export function MessageDisplay({
   const handleTrashButtonClick = async () => {
     if (message) {
       let result: ActionResponse<null>;
-      if (message.in_trash) {
+      // Drafts should also be discarded (deleted) immediately
+      if (message.in_trash || message.status === "DRAFTED") {
         result = await deleteMessage(message.id);
       } else {
         result = await toggleTrash(message.id, true);
@@ -86,7 +88,7 @@ export function MessageDisplay({
 
       if (newDraft.draftId) {
         router.push(`/new-message?draft=${newDraft.draftId}`);
-      } else console.log("An error occurred");
+      } else toast.error("An error occurred");
     }
   };
 
@@ -116,6 +118,7 @@ export function MessageDisplay({
           )}
         </div>
         <div className="ml-auto flex items-center gap-2">
+          {/* Move message to trash or delete it */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -134,6 +137,8 @@ export function MessageDisplay({
               {message?.in_trash ? "Delete permanently" : "Move to trash"}
             </TooltipContent>
           </Tooltip>
+
+          {/* Put back / restore trashed message */}
           {category === "TRASH" && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -150,20 +155,48 @@ export function MessageDisplay({
               <TooltipContent>Restore</TooltipContent>
             </Tooltip>
           )}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={replyAll}
-                disabled={!message}
-              >
-                <ReplyAll className="h-4 w-4" />
-                <span className="sr-only">Reply all</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Reply all</TooltipContent>
-          </Tooltip>
+
+          {/* Reply to all recipients in the message */}
+          {category !== "DRAFT" && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={replyAll}
+                  disabled={!message}
+                >
+                  <ReplyAll className="h-4 w-4" />
+                  <span className="sr-only">Reply all</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Reply all</TooltipContent>
+            </Tooltip>
+          )}
+
+          {/* Reply to all recipients in the message */}
+          {category === "DRAFT" && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() =>
+                    message
+                      ? router.push(`/new-message?draft=${message.id}`)
+                      : ""
+                  }
+                  disabled={!message}
+                >
+                  <Edit className="h-4 w-4" />
+                  <span className="sr-only">Continue draft</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Continue draft</TooltipContent>
+            </Tooltip>
+          )}
+
+          {/* Deselect the selected message */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -212,6 +245,15 @@ export function MessageDisplay({
           </div>
           <Separator />
           <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
+            <h2>
+              This message has an id of <strong>{message.id}</strong>
+            </h2>
+            <h2>
+              This message has {message.recipients.length} recipients:{" "}
+              {message.recipients.map((r) => (
+                <div key={r.phone}>{JSON.stringify(r)}</div>
+              ))}
+            </h2>
             {message.body}
           </div>
         </div>
