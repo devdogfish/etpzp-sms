@@ -7,7 +7,7 @@ const body = {
   destaddr: "DISPLAY", // flash sms
 };
 const headers = {
-  Authorization: `Token ${process.env.API_TOKEN}`,
+  Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
   "Content-Type": "application/json",
 };
 

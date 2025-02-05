@@ -27,7 +27,7 @@ export const ContactSchema = z.object({
   name: z.string().min(2).max(50),
   phone: z
     .string()
-    .max(15, { message: "Email must be less than 15 characters long." })
+    .max(50, { message: "Email must be less than 50 characters long." })
     .refine(
       // this returns a boolean telling zod whether the phone data is valid or not
       (input: string) => {

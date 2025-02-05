@@ -77,7 +77,7 @@ export default function CreateContactFromRecipientModal({
 
   const onOpenChange = (value: boolean) => {
     clearServerState();
-    setModal((prev) => ({ ...prev, create: value }));
+    setModal((prev) => ({ ...prev, createFromRecipient: value }));
   };
 
   // This is unfortunately the easiest way to reset this shit
@@ -89,7 +89,7 @@ export default function CreateContactFromRecipientModal({
   return (
     <Dialog
       /* We do need these shits unfortunately */
-      open={modal.create}
+      open={modal.createFromRecipient}
       onOpenChange={onOpenChange}
     >
       <DialogContent>

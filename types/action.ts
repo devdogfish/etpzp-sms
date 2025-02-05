@@ -1,3 +1,4 @@
+import { DBMessage } from ".";
 // this is for useActionState() forms
 export type ActionResponse<T> = {
   success: boolean;
@@ -14,4 +15,10 @@ export type DraftActionResponse<T> = {
   success: boolean;
   message: string[];
   draftId?: T;
+};
+
+export type DataActionResponse<T> = {
+  success: boolean;
+  message: string[];
+  data: T;
 };

@@ -50,15 +50,13 @@ export async function createContact(
       throw new Error("Phone number is unexpectedly invalid!");
 
     const result = await db(
-      "INSERT INTO contact (user_id, name, phone, description) VALUES ($1, $2, $3, $4) RETURNING *",
+      `INSERT INTO contact (user_id, name, phone, description) VALUES ($1, $2, $3, $4) RETURNING *`,
       [userId, name, validatedPhone, description || null]
     );
     console.log(result.rows[0]);
 
     // this is messing everything up
     // revalidatePath("/");
-
-    console.log(result);
 
     return {
       success: true,

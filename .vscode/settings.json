@@ -4,11 +4,15 @@
     "Administradores",
     "destaddr",
     "etpzp",
+    "GATEWAYAPI",
     "Maximus",
     "msisdn",
+    "mtsms",
     "Oliveiro",
+    "psql",
     "sendtime",
     "sonner",
+    "Utilizador",
     "Utilizadores"
   ]
 }

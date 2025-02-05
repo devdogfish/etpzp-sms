@@ -17,7 +17,7 @@ export async function fetchMessagesByStatus(
     const result = await db(
       `
         SELECT m.*, 
-              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
+              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone) ORDER BY r.index) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.status = $2 AND m.in_trash = false
@@ -41,7 +41,7 @@ export async function fetchSent(): Promise<DBMessage[] | undefined> {
     const result = await db(
       `
         SELECT m.*, 
-              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
+              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone) ORDER BY r.index) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.send_time < NOW() AND m.in_trash = false
@@ -50,6 +50,7 @@ export async function fetchSent(): Promise<DBMessage[] | undefined> {
       `,
       [userId]
     );
+    console.log(result.rows);
 
     return result.rows;
   } catch (error) {}
@@ -65,7 +66,7 @@ export async function fetchTrashedMessages(): Promise<DBMessage[] | undefined> {
     const result = await db(
       `
         SELECT m.*, 
-              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
+              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone) ORDER BY r.index) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.in_trash = true
@@ -75,6 +76,7 @@ export async function fetchTrashedMessages(): Promise<DBMessage[] | undefined> {
       [userId]
     );
 
+    console.log(result.rows);
     return result.rows;
   } catch (error) {}
 }
@@ -88,10 +90,10 @@ export async function fetchCurrentlyScheduled(): Promise<
   console.log("Fetching currently scheduled");
   try {
     if (!userId) throw new Error("Invalid user id.");
-    const sentResult = await db(
+    const result = await db(
       `
         SELECT m.*, 
-              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone)) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
+              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone) ORDER BY r.index) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.status = 'SCHEDULED' AND m.send_time > NOW()
@@ -101,7 +103,8 @@ export async function fetchCurrentlyScheduled(): Promise<
       [userId]
     );
 
-    return sentResult.rows;
+    console.log(result.rows);
+    return result.rows;
   } catch (error) {}
 }
 
@@ -115,7 +118,7 @@ export async function fetchDraft(
 
   try {
     if (!userId) throw new Error("Invalid user id.");
-    const sentResult = await db(
+    const result = await db(
       `
         -- Select the message fields, along with an array of recipients
         SELECT m.*, 
@@ -125,7 +128,7 @@ export async function fetchDraft(
                   'contactId', c.id,
                   'contactName', c.name,
                   'contactDescription', c.description
-              )) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
+              ) ORDER BY r.index) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
         FROM message m
         -- Left join the recipient table to get all recipients for the message
         LEFT JOIN recipient r ON m.id = r.message_id
@@ -139,7 +142,8 @@ export async function fetchDraft(
       [userId, id]
     );
 
-    return sentResult.rows[0];
+    console.log(result.rows);
+    return result.rows[0];
   } catch (error) {}
 }
 

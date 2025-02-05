@@ -21,6 +21,7 @@ CREATE TABLE "message" (
     body TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     send_time TIMESTAMP, -- can be null if the message is a draft
+    sms_reference_id BIGINT, -- can be null if the message is not scheduled, failed, or a draft
     status VARCHAR(20) NOT NULL CHECK (status IN ('SENT', 'SCHEDULED', 'FAILED', 'DRAFTED')), 
     in_trash BOOLEAN NOT NULL DEFAULT false,
     failure_reason VARCHAR(255)
@@ -31,7 +32,7 @@ CREATE TABLE "contact" (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
-    phone VARCHAR(15) NOT NULL,
+    phone VARCHAR(50) NOT NULL,
     description VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -44,8 +45,8 @@ CREATE TABLE recipient (
 	id SERIAL PRIMARY KEY,
 	message_id INTEGER REFERENCES message(id) ON DELETE CASCADE,     
 	contact_id INTEGER REFERENCES contact(id) ON DELETE SET NULL,     
-	phone VARCHAR(15) NOT NULL,        -- Store phone numbers as VARCHAR to accommodate various formats  
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+	phone VARCHAR(50) NOT NULL,        -- Store phone numbers as VARCHAR to accommodate various formats  
+    index SMALLINT NOT NULL,           -- This is the used for persisting the order of the recipients of a message
 	UNIQUE (message_id, contact_id),   -- Ensure a contact can only be added once per message. This is not an actual field in the table, but it will make sure that there are no recipients with duplicate links
 	UNIQUE (message_id, phone)         -- Ensure a phone number can only be added once per message. This is not an actual field in the table, but it will make sure that there are no recipients with duplicate links
 );

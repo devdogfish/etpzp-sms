@@ -30,7 +30,8 @@ export async function fetchRecipients(): Promise<
         WHERE 
           m.user_id = $1
         ORDER BY 
-          m.created_at DESC
+          r.index,
+          m.created_at DESC;
       `,
       [userId]
     );

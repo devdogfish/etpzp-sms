@@ -45,6 +45,7 @@ import { saveDraft } from "@/lib/actions/message.actions";
 import useDebounce from "@/hooks/use-debounce";
 import useIsMounted from "@/hooks/use-mounted";
 import CreateContactFromRecipientModal from "./modals/create-contact-from-recipient-modal";
+import CreateContactModal from "./modals/create-contact-modal";
 
 const initialState: ActionResponse<Message> = {
   success: false,
@@ -156,6 +157,7 @@ const NewMessageForm = React.memo(function ({
     <ContactModalsProvider>
       {/* We can only put the modal here, because it carries state */}
       <InsertContactModal contacts={contacts} />
+      <CreateContactModal />
 
       {moreInfoOn && <InfoContactModal recipient={moreInfoOn} />}
       {moreInfoOn && !moreInfoOn.contactId && (

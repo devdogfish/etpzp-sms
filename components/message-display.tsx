@@ -9,6 +9,7 @@ import {
   Clock,
   Edit,
   Forward,
+  MessageCircleX,
   MoreVertical,
   Reply,
   ReplyAll,
@@ -29,6 +30,7 @@ import { CategoryEnums, DBMessage } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn, toastActionResult } from "@/lib/utils";
 import {
+  cancelCurrentlyScheduled,
   deleteMessage,
   saveDraft,
   toggleTrash,
@@ -97,6 +99,25 @@ export function MessageDisplay({
       toastActionResult(result);
     }
   };
+
+  const cancelSend = async () => {
+    if (message) {
+      const smsReferenceId = parseInt(message.sms_reference_id);
+      console.log("message's sms_referencId");
+      console.log(message.sms_reference_id);
+      console.log(`type: ${typeof message.sms_reference_id}`);
+
+      if (smsReferenceId && !isNaN(smsReferenceId)) {
+        const result = await cancelCurrentlyScheduled(smsReferenceId);
+        if (result?.success) {
+          reset();
+        }
+        toastActionResult(result);
+      } else {
+        toast.error("Message id not found.");
+      }
+    }
+  };
   return (
     <div className={cn("flex h-full flex-col")}>
       <div className="flex items-center p-2">
@@ -132,6 +153,24 @@ export function MessageDisplay({
               {message?.in_trash ? "Delete permanently" : "Move to trash"}
             </TooltipContent>
           </Tooltip>
+
+          {/* Cancel the sending of a scheduled message */}
+          {category === "SCHEDULED" && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={!message}
+                  onClick={cancelSend}
+                >
+                  <MessageCircleX className="w-4 h-4" />
+                  <span className="sr-only">Cancel scheduled message</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Cancel scheduled message</TooltipContent>
+            </Tooltip>
+          )}
 
           {/* Put back / restore trashed message */}
           {category === "TRASH" && (

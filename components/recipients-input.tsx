@@ -16,7 +16,7 @@ import { useNewMessage } from "@/contexts/use-new-message";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { ScrollArea } from "./ui/scroll-area";
 import { useSearchParams } from "next/navigation";
-import { DBRecipient, NewRecipient } from "@/types/recipient";
+import { NewRecipient } from "@/types/recipient";
 import { DBContact } from "@/types/contact";
 import useIsMounted from "@/hooks/use-mounted";
 
@@ -33,7 +33,6 @@ export default function RecipientsInput({
 }: {
   contacts: DBContact[];
   error?: boolean;
-  defaultRecipients?: DBRecipient[];
 }) {
   const [input, setInput] = useState<InputState>({
     value: "",

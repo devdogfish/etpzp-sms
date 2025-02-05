@@ -72,27 +72,36 @@ export async function sendMessage(
       sendtime: scheduledUnixSeconds, // Extract the UNIX timestamp for scheduled messages
     };
 
-    // const resp = await fetch("https://gatewayapi.com/rest/mtsms", {
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: `Token ${process.env.API_TOKEN}`,
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(payload),
-    // });
-    const resp = SuccessResponse;
-    console.log("Success response");
-    console.log(resp);
+    const networkResponse = await fetch(
+      `${process.env.GATEWAYAPI_URL}/rest/mtsms`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    // const networkResponse = SuccessResponse;
+    console.log("Response");
+    console.log(networkResponse);
 
-    if (!resp.ok) {
-      // console.log(JSON.stringify(await resp.json()));
+    if (!networkResponse.ok) {
+      console.log(JSON.stringify(await networkResponse.json()));
 
-      throw new Error("Network response was not ok " + resp?.statusText);
+      throw new Error(
+        "Network response was not ok " + networkResponse?.statusText
+      );
     }
 
     console.log(
       `Message is being saved with ${
-        resp?.ok ? (scheduledUnixSeconds ? "SCHEDULED" : "SENT") : "FAILED"
+        networkResponse?.ok
+          ? scheduledUnixSeconds
+            ? "SCHEDULED"
+            : "SENT"
+          : "FAILED"
       } status.`
     );
     console.log(
@@ -103,19 +112,26 @@ export async function sendMessage(
       }`
     );
 
+    const response = await networkResponse.json();
+    console.log("NetworkResponse.json()");
+    console.log(response);
+
+    console.log("SAVING REFERENCE_ID", response.ids[0] || null);
+
     // Using message_id from the message insertion, to create recipient.
     await db(
       `
       WITH insert_message AS (
-        INSERT INTO message (user_id, subject, body, status, failure_reason, send_time) 
-        VALUES ($1, $2, $3, $4, $5, $6) 
+        INSERT INTO message (user_id, subject, body, status, failure_reason, send_time, sms_reference_id) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7) 
         RETURNING id
       )
-      INSERT INTO recipient (message_id, contact_id, phone)
+      INSERT INTO recipient (message_id, contact_id, phone, index)
       SELECT 
         insert_message.id, 
-        unnest($7::int[]) as contact_id,
-        unnest($8::text[]) as phone
+        unnest($8::int[]) as contact_id,
+        unnest($9::text[]) as phone,
+        unnest($10::int[]) as index
       FROM insert_message;
       `,
       [
@@ -123,15 +139,21 @@ export async function sendMessage(
         userId,
         validatedData.data.subject,
         validatedData.data.body,
-        resp?.ok ? (scheduledUnixSeconds ? "SCHEDULED" : "SENT") : "FAILED", // status here
-        resp?.statusText || null,
+        networkResponse?.ok
+          ? scheduledUnixSeconds
+            ? "SCHEDULED"
+            : "SENT"
+          : "FAILED", // status here
+        networkResponse?.statusText || null,
         scheduledUnixSeconds
           ? new Date(scheduledUnixSeconds * 1000)
           : new Date(Date.now()),
+        response.ids[0] || null,
 
         // recipient parameters:
         validRecipients.map((recipient) => recipient.contactId || null), // contact_id array
         validRecipients.map((recipient) => recipient.phone), // phone number array
+        validRecipients.map((_, index) => index), // for the ordering of the recipient
       ]
     );
     console.log("------\n\n");
@@ -148,8 +170,6 @@ export async function sendMessage(
       ],
     };
   } catch (error) {
-    console.error(error);
-
     return {
       success: false,
       message: [

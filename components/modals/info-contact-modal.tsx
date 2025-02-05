@@ -25,10 +25,10 @@ export default function InfoContactModal({
 }) {
   const { modal, setModal } = useContactModals();
 
-  const showCreateModal = () => {
+  const showCreateFromRecipientModal = () => {
     setModal((prev) => ({ ...prev, info: false }));
     setTimeout(() => {
-      setModal((prev) => ({ ...prev, create: true }));
+      setModal((prev) => ({ ...prev, createFromRecipient: true }));
     }, 100);
   };
   return (
@@ -91,7 +91,7 @@ export default function InfoContactModal({
             </Button>
           </DialogClose>
           {!recipient.contactId && (
-            <Button className="" onClick={showCreateModal}>
+            <Button className="" onClick={showCreateFromRecipientModal}>
               Create
             </Button>
           )}

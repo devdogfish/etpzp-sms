@@ -120,63 +120,43 @@ lib/
 I want to use the same structure for my components.
 
 ## TODO
+
 1. \*\* ** Do a test deployment ** \*\*
 2. Figure out invalid NextConfig and make sure the translation works properly.
 
-- Ability to cancel scheduled SMSs
 - Color setting for user's profile background as well as display name
 - Update chart colors to look nice - get a nice color combination from a color generator
 - Update the message display to look nicer and actually display stuff in the correct manner
-- Make sure you don't pass in undefined values into the database, you should always convert them to `null` instead
-- Add full validation to the draft (should I even do this 😭, I don't even know if it's necessary)
-- Add correct ordering to recipients (right now when I refresh it's contacts first, then recipients)
 
-## Final touches
-- Translate the entire app
-- Use global colors (not hardcoded colors) everywhere so that the all different theme settings look nice
-
-I have a bit of a problem:
-When I create a new contact from a recipient on the /new-message page:
-
-1. We create a new contact on the server side, which we then return to the client
-2. We then replace the old recipient in the recipients array with the newly create contact optimistically.
-3. After updating the message context, we wait for the draft to update
-
-When a draft is saved I do the following things:
-
-1. Delete all recipients for that draft
-2. Reinsert the old new ones
-   The problem with this is that when one of the new recipients causes an error, no recipients are inserted at all. I need to somehow figure out a way to filter out the new ones from the old ones so that I can just insert hte new ones without overlap.
-
-## Save todos in case this happens later
-- Revalidate `/` and recipients when adding a new contact on the new-message page
-- Figure out how I can re-use the saveDraft function for respond all button in the messageDisplay
-- On drafts page, delete the draft immediately instead of moving them to in_trash
-- I am getting an error when trying to save a draft every second time
-- Automatic drafting using `use-debounce` with a 2s cooldown on change of any fields with a saved or not state
-- when creating a contact on /new-message it revalidates everything, including the state of the saved draft. We need to somehow keep the state somewhere where it won't get overridden.
+- Sometimes this happens: Database query error error: duplicate key value violates unique constrain
+  t "recipient_message_id_phone_key"
 
 ## If there is extra time (after deployment in school)
+
 - Save user preferences in DB and retrieve that to set the browser storage every once in a while.
 - Admin Dashboard with statistics
+- Make sure you don't pass in undefined values into the database, you should always convert them to `null` instead
 
 ## Database
+
 Deleting all tables
 
 #### Deleting all tables
+
 ```sql
 DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```
 
 #### Seed files
+
 On UNIX Operating system
 
 ```psql
-\i ~/dev/etpzp-sms/lib/db/migrations/seed.sql
+\i ~/dev/etpzp-sms/lib/db/seeds/seed.sql
 ```
 
 On Windows psql shell
 
 ```psql
-\i /Users/Utilizador/dev/etpzp-sms/lib/db/migrations/seed.sql
+\i /Users/Utilizador/dev/etpzp-sms/lib/db/seeds/seed.sql
 ```

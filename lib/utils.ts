@@ -160,11 +160,7 @@ export function toastActionResult(result: ActionResponse<any>) {
 
   // thankfully, this doesn't throw an error
   if (result.success) {
-    if (result.message.length > 1) {
-      toast.success(result.message[0], { description: result.message[1] });
-    } else {
-      toast.success(result.message[0]);
-    }
+    toast.success(result.message[0], { description: result.message[1] });
   } else {
     toast.error(result.message[0], { description: result.message[1] });
   }

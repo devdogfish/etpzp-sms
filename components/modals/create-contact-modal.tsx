@@ -44,11 +44,8 @@ export default function CreateContactModal({
 
   useEffect(() => {
     if (serverState.success) {
-      onOpenChange(false);
       toastActionResult(serverState);
-      serverState.inputs = undefined;
-      serverState.errors = undefined;
-      serverState.message = [""];
+      onOpenChange(false);
     }
   }, [serverState]);
 
@@ -59,7 +56,7 @@ export default function CreateContactModal({
   const clearInput = () => {
     // This is unfortunately the easiest way to reset this shit
     serverState.errors = undefined;
-    serverState.message = [""];
+    serverState.message = [];
     serverState.inputs = {};
   };
   return (

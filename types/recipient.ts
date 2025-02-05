@@ -26,5 +26,4 @@ export type DBRecipient = {
   id: number;
   contact_id?: string;
   phone: string;
-  created_at: Date;
 };

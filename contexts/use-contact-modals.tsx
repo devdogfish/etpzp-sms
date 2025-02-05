@@ -22,6 +22,7 @@ export function ContactModalsProvider({
     edit: false,
     insert: false,
     info: false,
+    createFromRecipient: false,
   });
 
   return (

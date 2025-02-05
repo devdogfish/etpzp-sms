@@ -1,10 +1,13 @@
 "use server";
 
-import { DraftActionResponse, ActionResponse } from "@/types/action";
+import {
+  DraftActionResponse,
+  ActionResponse,
+  DataActionResponse,
+} from "@/types/action";
 import { getSession } from "../auth/sessions";
 import db from "../db";
 import { revalidatePath } from "next/cache";
-import { DBRecipient } from "@/types/recipient";
 import { DBMessage, Message } from "@/types";
 
 export async function toggleTrash(
@@ -66,6 +69,63 @@ export async function deleteMessage(id: string): Promise<ActionResponse<null>> {
   }
 }
 
+export async function cancelCurrentlyScheduled(
+  sms_reference_id: number
+): Promise<DataActionResponse<DBMessage | undefined>> {
+  const session = await getSession();
+  const userId = session?.user?.id;
+
+  try {
+    if (!userId) throw new Error("Invalid user id.");
+
+    const networkResponse = await fetch(
+      `${process.env.GATEWAYAPI_URL}/rest/mtsms/${sms_reference_id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log(networkResponse);
+
+    console.log(await networkResponse.json());
+
+    if (!networkResponse.ok) {
+      console.log(JSON.stringify(await networkResponse.json()));
+
+      throw new Error(
+        "Network response was not ok " + networkResponse?.statusText
+      );
+    }
+
+    const result = await db(
+      `
+      UPDATE message 
+      SET status = 'FAILED', failure_reason = 'The scheduled message was canceled by the user.' 
+      WHERE user_id = $1 AND sms_reference_id = $2
+      `,
+      [userId, sms_reference_id]
+    );
+    return {
+      success: true,
+      message: ["Cancel successful", "Message was moved to failed"],
+      data: result.rows[0],
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: [
+        "Unknown Error",
+        "Something went wrong. Make sure the message you are trying to cancel is valid.",
+      ],
+      data: undefined,
+    };
+  }
+}
+
 export async function saveDraft(
   draftId: string | undefined,
   data: Message
@@ -93,11 +153,12 @@ export async function saveDraft(
               RETURNING *
             ),
             insert_recipients AS (
-              INSERT INTO recipient (message_id, contact_id, phone)
+              INSERT INTO recipient (message_id, contact_id, phone, index)
               SELECT
                 insert_message.id, 
                 unnest($6::int[]) as contact_id,
-                unnest($7::text[]) as phone
+                unnest($7::text[]) as phone,
+                unnest($8::int[]) as index
               FROM insert_message
             )
             SELECT * FROM insert_message
@@ -111,7 +172,8 @@ export async function saveDraft(
 
             // Recipients / contacts
             data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
-            data.recipients.map((recipient) => recipient.phone),
+            data.recipients.map((recipient) => recipient.phone), // phone number array
+            data.recipients.map((_, index) => index), // for the ordering of the recipient
           ]
         ),
       ]);
@@ -128,11 +190,12 @@ export async function saveDraft(
             RETURNING id
           ),
           insert_recipients AS (
-            INSERT INTO recipient (message_id, contact_id, phone)
+            INSERT INTO recipient (message_id, contact_id, phone, index)
             SELECT 
               insert_message.id, 
               unnest($6::int[]) as contact_id,
-              unnest($7::text[]) as phone
+              unnest($7::text[]) as phone,
+              unnest($8::int[]) as index
             FROM insert_message
           )
           SELECT id FROM insert_message
@@ -146,7 +209,8 @@ export async function saveDraft(
 
           // Recipients / contacts
           data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
-          data.recipients.map((recipient) => recipient.phone),
+          data.recipients.map((recipient) => recipient.phone), // phone number array
+          data.recipients.map((_, index) => index), // for the ordering of the recipient
         ]
       );
     }

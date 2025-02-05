@@ -46,6 +46,7 @@ export type DBMessage = {
   in_trash: boolean;
   failure_reason?: string | null;
   recipients: DBRecipient[];
+  sms_reference_id: string;
 };
 
 export type AmountIndicators =
