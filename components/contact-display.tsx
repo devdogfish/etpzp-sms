@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn, getNameInitials } from "@/lib/utils";
+import { cn, getNameInitials, toastActionResult } from "@/lib/utils";
 import { CopyButton } from "./shared/copy-button";
 import { deleteContact } from "@/lib/actions/contact.actions";
 import { toast } from "sonner";
@@ -20,6 +20,7 @@ import { useContactModals } from "@/contexts/use-contact-modals";
 import EditContactModal from "./modals/edit-contact-modal";
 import { useRouter } from "next/navigation";
 import { DBContact } from "@/types/contact";
+import { saveDraft } from "@/lib/actions/message.actions";
 
 export default function ContactDisplay({
   contact,
@@ -36,17 +37,27 @@ export default function ContactDisplay({
   const handleDelete = async () => {
     if (contact) {
       const result = await deleteContact(contact.id);
-      if (result.success) {
-        reset();
-        toast.success(result.message);
-      } else {
-        toast.error(result.message);
-      }
+      toastActionResult(result);
+      reset();
     }
   };
   const messageContact = async () => {
     if (contact) {
-      router.push(`/new-message?contactId=${contact.id}`);
+      const newDraft = await saveDraft(undefined, {
+        body: "",
+        recipients: [
+          {
+            phone: contact.phone,
+            contactId: contact.id.toString(),
+          },
+        ],
+      });
+
+      if (newDraft.success && newDraft.draftId) {
+        router.push(`/new-message?draft=${newDraft.draftId}`);
+      } else {
+        toastActionResult(newDraft);
+      }
     }
   };
   return (
@@ -145,11 +156,12 @@ export default function ContactDisplay({
           <Separator />
           <div className="flex gap-4 justify-between items-center p-4 text-sm">
             <div>Phone</div>
-            <CopyButton text={contact.phone} variant="none">
-              <Button variant="link" onClick={messageContact}>
+            <div className="flex">
+              <CopyButton text={contact.phone} variant="none" />
+              <Button variant="link" className="p-0" onClick={messageContact}>
                 {contact.phone}
               </Button>
-            </CopyButton>
+            </div>
           </div>
           <Separator />
           <div className="flex gap-4 justify-between p-4 text-sm">

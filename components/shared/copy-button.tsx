@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, MouseEvent } from "react";
 import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ interface CopyButtonProps {
   children?: React.ReactNode;
   text: string;
   className?: string;
-  variant?: "outline" | "none" | "ghost";
+  variant?: "outline" | "none" | "ghost" | "link";
   size?: "sm" | "lg";
 }
 
@@ -23,7 +23,7 @@ export function CopyButton({
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleCopy = () => {
+  const handleCopy = (e: MouseEvent<HTMLButtonElement>) => {
     if (!copied) {
       navigator.clipboard.writeText(text);
       setCopied(true);

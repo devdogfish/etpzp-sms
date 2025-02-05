@@ -27,7 +27,7 @@ type MessageContextValues = {
   // Recipient management
   recipients: NewRecipient[];
   addRecipient: (phone: string, contacts: DBContact[]) => void;
-  removeRecipient: (recipient: NewRecipient) => void;
+  removeRecipient: (recipient: NewRecipient, replaceWithRecipient?: NewRecipient) => void;
   getValidatedRecipient: (recipient: NewRecipient) => NewRecipient;
 
   // Recipient search and suggestions
@@ -174,13 +174,18 @@ export function NewMessageProvider({
     [message.recipients, getValidatedRecipient, searchedRecipients, getUniques]
   );
 
-  const removeRecipient = useCallback((recipient: NewRecipient) => {
-    setMessage((prev) => ({
-      ...prev,
-      recipients: prev.recipients.filter((r) => r !== recipient),
-    }));
-    searchRecipients("");
-  }, []);
+  const removeRecipient = useCallback(
+    (recipient: NewRecipient, replaceWithRecipient?: NewRecipient) => {
+      setMessage((prev) => ({
+        ...prev,
+        recipients: prev.recipients
+          .map((r) => (r === recipient ? replaceWithRecipient : r))
+          .filter((r) => r !== undefined), // Filter out undefined values
+      }));
+      searchRecipients("");
+    },
+    []
+  );
 
   // Search and suggestion functions
   const searchRecipients = (rawSearchTerm: string) => {
@@ -221,9 +226,10 @@ export function NewMessageProvider({
     [searchedRecipients]
   );
 
-  useEffect(() => {
-    console.log(`draftId changed ${draftId}`);
-  }, [draftId]);
+  // DEBUG
+  // useEffect(() => {
+  //   console.log(`draftId changed ${draftId}`);
+  // }, [draftId]);
 
   // Context value
   const contextValue = useMemo(

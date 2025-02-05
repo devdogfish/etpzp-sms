@@ -24,7 +24,7 @@ export default async function Page({
 export async function PageFetcher({
   searchParams,
 }: {
-  searchParams: { draft: string };
+  searchParams: { draft: string | undefined };
 }) {
   const contacts = await fetchContacts();
   const recipientsResult = await fetchRecipients();
@@ -35,9 +35,6 @@ export async function PageFetcher({
   const draft = searchParams.draft
     ? await fetchDraft(searchParams.draft)
     : undefined;
-
-  console.log("Draft fetched here rcipients");
-  console.log(draft?.recipients);
 
   return (
     <NewMessageProvider
@@ -66,7 +63,6 @@ export async function PageFetcher({
         mostUsed,
       }}
       allContacts={contacts || []}
-      // TODO: Check if this is all correct, also Maybe for single contacts pushing to the contactId it would be better to create a draft with that
       defaultMessage={{
         body: draft?.body || "",
         subject: draft?.subject || undefined,

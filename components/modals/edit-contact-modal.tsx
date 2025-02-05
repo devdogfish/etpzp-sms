@@ -28,7 +28,7 @@ import {
   Server,
 } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { cn, toastActionResult } from "@/lib/utils";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
@@ -50,7 +50,7 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
   useEffect(() => {
     if (serverState.success) {
       onOpenChange(false);
-      toast.success(serverState.message);
+      toastActionResult(serverState);
       serverState.inputs = undefined;
       serverState.errors = undefined;
       serverState.message = [];

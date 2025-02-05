@@ -1,4 +1,3 @@
-
 // this is for useActionState() forms
 export type ActionResponse<T> = {
   success: boolean;
@@ -11,8 +10,8 @@ export type ActionResponse<T> = {
   };
 };
 
-export type ActionDataResponse<T> = {
+export type DraftActionResponse<T> = {
   success: boolean;
   message: string[];
-  draftId?: T
-}
+  draftId?: T;
+};

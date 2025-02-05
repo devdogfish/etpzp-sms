@@ -9,11 +9,12 @@ import { revalidatePath } from "next/cache";
 import { DatabaseError } from "pg";
 import { ActionResponse } from "@/types/action";
 import { z } from "zod";
+import { CreateContactActionResponse } from "@/components/modals/create-contact-from-recipient-modal";
 
 export async function createContact(
-  _: ActionResponse<z.infer<typeof ContactSchema>> | null,
+  _: CreateContactActionResponse<z.infer<typeof ContactSchema>> | null,
   formData: FormData
-): Promise<ActionResponse<z.infer<typeof ContactSchema>>> {
+): Promise<CreateContactActionResponse<z.infer<typeof ContactSchema>>> {
   const session = await getSession();
 
   const userId = parseInt(session.user?.id || "");
@@ -38,6 +39,7 @@ export async function createContact(
       inputs: rawData,
     };
   }
+
   try {
     console.log("Fields validated");
     console.log(validatedData);
@@ -51,10 +53,18 @@ export async function createContact(
       "INSERT INTO contact (user_id, name, phone, description) VALUES ($1, $2, $3, $4) RETURNING *",
       [userId, name, validatedPhone, description || null]
     );
+    console.log(result.rows[0]);
 
-    revalidatePath("/contacts");
+    // this is messing everything up
+    // revalidatePath("/");
 
-    return { success: true, message: ["Contact created successfully!"] };
+    console.log(result);
+
+    return {
+      success: true,
+      message: ["Contact created successfully!"],
+      data: result.rows[0],
+    };
   } catch (error) {
     let message = "";
     if (error instanceof DatabaseError && error.code === "23505") {
@@ -63,6 +73,8 @@ export async function createContact(
     } else {
       message = "An unknown error occurred. Failed to create contact.";
     }
+    console.log("END CATCH BLOCK", message);
+
     return {
       success: false,
       message: [message],

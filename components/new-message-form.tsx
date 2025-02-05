@@ -37,7 +37,6 @@ import { DBContact } from "@/types/contact";
 
 // contact manipulation modals
 import InsertContactModal from "./modals/insert-contact-modal";
-import CreateContactModal from "./modals/create-contact-modal";
 import InfoContactModal from "./modals/info-contact-modal";
 import { useLayout } from "@/contexts/use-layout";
 import type { DBMessage, Message } from "@/types";
@@ -45,6 +44,7 @@ import { ActionResponse } from "@/types/action";
 import { saveDraft } from "@/lib/actions/message.actions";
 import useDebounce from "@/hooks/use-debounce";
 import useIsMounted from "@/hooks/use-mounted";
+import CreateContactFromRecipientModal from "./modals/create-contact-from-recipient-modal";
 
 const initialState: ActionResponse<Message> = {
   success: false,
@@ -66,7 +66,6 @@ const NewMessageForm = React.memo(function ({
   const { recipients, moreInfoOn, setMessage, message, draftId, setDraftId } =
     useNewMessage();
   const [loading, setLoading] = useState(false);
-  const [subject, setSubject] = useState("");
   const [serverState, setServerState] = useState(initialState);
   const { isFullscreen, setIsFullscreen } = useLayout();
 
@@ -102,7 +101,7 @@ const NewMessageForm = React.memo(function ({
     setServerState(result);
 
     if (result.success) {
-      toast.success(result.message[0], { description: result.message[1] });
+      toastActionResult(result);
       // reset the form
       formRef.current?.reset();
       setMessage((prev) => ({ ...prev, recipients: [] }));
@@ -131,38 +130,39 @@ const NewMessageForm = React.memo(function ({
       setMessage({ body, subject: subject || undefined, sender, recipients });
     }
   }, []);
-  useEffect(() => {
-    setDraftId(draft?.id);
-    if (isMounted) {
-      console.log("saving draft with following values");
-      console.log(message);
 
-      const save = async () => {
-        const result = await saveDraft(draftId, message);
-        setDraftId(result.draftId);
-        toastActionResult(result);
-      };
+  useEffect(() => {
+    // Set draftId at the top to ensure we use the latest value in the save function.
+    setDraftId(draft?.id);
+
+    if (isMounted) {
+      // DEBUG
       console.log(
         "Calling draft save action with these args: ",
         draftId,
         message
       );
 
+      const save = async () => {
+        const result = await saveDraft(draftId, message);
+        setDraftId(result.draftId);
+        toastActionResult(result);
+      };
+
       save();
-    } else console.log("component isn't mounted yet");
+    }
   }, [debouncedSaveDraft]);
   return (
     <ContactModalsProvider>
       {/* We can only put the modal here, because it carries state */}
       <InsertContactModal contacts={contacts} />
-      <CreateContactModal />
 
       {moreInfoOn && <InfoContactModal recipient={moreInfoOn} />}
       {moreInfoOn && !moreInfoOn.contactId && (
-        <CreateContactModal defaultPhone={moreInfoOn.phone} />
+        <CreateContactFromRecipientModal recipient={moreInfoOn} />
       )}
 
-      <PageHeader title={subject ? subject : t("NEW_MESSAGE")}>
+      <PageHeader title={message.subject ? message.subject : t("NEW_MESSAGE")}>
         <Button
           variant="ghost"
           className="aspect-1 p-0"

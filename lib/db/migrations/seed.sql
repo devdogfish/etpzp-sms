@@ -31,7 +31,7 @@ CREATE TABLE "contact" (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
-    phone VARCHAR(50) NOT NULL,
+    phone VARCHAR(15) NOT NULL,
     description VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -45,6 +45,7 @@ CREATE TABLE recipient (
 	message_id INTEGER REFERENCES message(id) ON DELETE CASCADE,     
 	contact_id INTEGER REFERENCES contact(id) ON DELETE SET NULL,     
 	phone VARCHAR(15) NOT NULL,        -- Store phone numbers as VARCHAR to accommodate various formats  
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 	UNIQUE (message_id, contact_id),   -- Ensure a contact can only be added once per message. This is not an actual field in the table, but it will make sure that there are no recipients with duplicate links
 	UNIQUE (message_id, phone)         -- Ensure a phone number can only be added once per message. This is not an actual field in the table, but it will make sure that there are no recipients with duplicate links
 );

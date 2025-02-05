@@ -1,6 +1,6 @@
 "use server";
 
-import { ActionDataResponse, ActionResponse } from "@/types/action";
+import { DraftActionResponse, ActionResponse } from "@/types/action";
 import { getSession } from "../auth/sessions";
 import db from "../db";
 import { revalidatePath } from "next/cache";
@@ -69,7 +69,7 @@ export async function deleteMessage(id: string): Promise<ActionResponse<null>> {
 export async function saveDraft(
   draftId: string | undefined,
   data: Message
-): Promise<ActionDataResponse<string>> {
+): Promise<DraftActionResponse<string>> {
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -143,7 +143,8 @@ export async function saveDraft(
           data.body,
           data.sender,
           "DRAFTED",
-          // Recipients
+
+          // Recipients / contacts
           data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
           data.recipients.map((recipient) => recipient.phone),
         ]

@@ -35,7 +35,6 @@ export type Message = z.infer<typeof MessageSchema> & {
 // };
 
 export type DBMessage = {
-  // TODO: check if database null values come back undefined or as value `null` actually
   id: string;
   user_id: string;
   sender?: string;

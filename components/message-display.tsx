@@ -59,12 +59,8 @@ export function MessageDisplay({
         result = await toggleTrash(message.id, true);
       }
 
-      if (result.success) {
-        reset();
-        toast.success(result.message);
-      } else {
-        toast.error(result.message);
-      }
+      toastActionResult(result);
+      reset();
     }
   };
 
@@ -116,8 +112,7 @@ export function MessageDisplay({
               <TooltipContent>Go back</TooltipContent>
             </Tooltip>
           )}
-        </div>
-        <div className="ml-auto flex items-center gap-2">
+
           {/* Move message to trash or delete it */}
           <Tooltip>
             <TooltipTrigger asChild>
@@ -195,8 +190,9 @@ export function MessageDisplay({
               <TooltipContent>Continue draft</TooltipContent>
             </Tooltip>
           )}
-
-          {/* Deselect the selected message */}
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          {/* Close (deselect) the selected message */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button

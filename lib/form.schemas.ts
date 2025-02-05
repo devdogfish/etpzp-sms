@@ -25,18 +25,21 @@ export const LoginSchema = z.object({
 export const ContactSchema = z.object({
   // id: z.string(),
   name: z.string().min(2).max(50),
-  phone: z.string().refine(
-    // this returns a boolean telling zod whether the phone data is valid or not
-    (input: string) => {
-      const parsedPhone = parsePhoneNumberFromString(input);
-      console.log("logging new contact from Schema file:");
-      console.log(parsedPhone);
+  phone: z
+    .string()
+    .max(15, { message: "Email must be less than 15 characters long." })
+    .refine(
+      // this returns a boolean telling zod whether the phone data is valid or not
+      (input: string) => {
+        const parsedPhone = parsePhoneNumberFromString(input);
+        console.log("logging new contact from Schema file:");
+        console.log(parsedPhone);
 
-      return (parsedPhone && parsedPhone.isValid()) || false;
-    },
-    {
-      message: "Invalid phone number.",
-    }
-  ),
+        return (parsedPhone && parsedPhone.isValid()) || false;
+      },
+      {
+        message: "Invalid phone number.",
+      }
+    ),
   description: z.string().max(255).optional(),
 });

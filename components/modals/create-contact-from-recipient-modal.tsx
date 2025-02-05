@@ -18,48 +18,72 @@ import { Label } from "../ui/label";
 import { createContact } from "@/lib/actions/contact.actions";
 import { CircleAlert, Loader2 } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
-import { cn, toastActionResult } from "@/lib/utils";
+import { cn, convertToRecipient, toastActionResult } from "@/lib/utils";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { ActionResponse } from "@/types/action";
 import { ContactSchema } from "@/lib/form.schemas";
+import { useNewMessage } from "@/contexts/use-new-message";
+import { NewRecipient } from "@/types/recipient";
+import { DBContact } from "@/types/contact";
+import useIsMounted from "@/hooks/use-mounted";
 
-const initialState: ActionResponse<z.infer<typeof ContactSchema>> = {
-  success: false,
-  message: [],
+export type CreateContactActionResponse<T> = {
+  success: boolean;
+  message: string[];
+  data?: DBContact;
+  errors?: {
+    [K in keyof T]?: string[];
+  };
+  inputs?: {
+    [K in keyof T]?: string;
+  };
 };
+const initialState: CreateContactActionResponse<z.infer<typeof ContactSchema>> =
+  {
+    success: false,
+    message: [],
+  };
 
-export default function CreateContactModal({
-  defaultPhone,
+export default function CreateContactFromRecipientModal({
+  recipient,
 }: {
-  defaultPhone?: string;
+  recipient?: NewRecipient;
 }) {
   const { modal, setModal } = useContactModals();
   const [serverState, action, pending] = useActionState(
     createContact,
     initialState
   );
-
+  const { removeRecipient, getValidatedRecipient } = useNewMessage();
+  const isMounted = useIsMounted();
   useEffect(() => {
-    if (serverState.success) {
-      onOpenChange(false);
+    if (isMounted) {
       toastActionResult(serverState);
-      serverState.inputs = undefined;
-      serverState.errors = undefined;
-      serverState.message = [""];
+
+      if (serverState.success) {
+        onOpenChange(false);
+
+        if (recipient && serverState.data) {
+          // Replacing original recipient with newly created contact
+          const newRecipient = convertToRecipient(serverState.data);
+          removeRecipient(recipient, getValidatedRecipient(newRecipient));
+        }
+      }
     }
   }, [serverState]);
 
   const onOpenChange = (value: boolean) => {
-    clearInput();
+    clearServerState();
     setModal((prev) => ({ ...prev, create: value }));
   };
-  const clearInput = () => {
-    // This is unfortunately the easiest way to reset this shit
+
+  // This is unfortunately the easiest way to reset this shit
+  const clearServerState = () => {
     serverState.errors = undefined;
-    serverState.message = [""];
+    serverState.message = [];
     serverState.inputs = {};
   };
   return (
@@ -100,7 +124,7 @@ export default function CreateContactModal({
               name="phone"
               id="phone"
               placeholder="1234568900"
-              defaultValue={serverState.inputs?.phone || defaultPhone}
+              defaultValue={serverState.inputs?.phone || recipient?.phone}
               // required
               // minLength={5}
               // maxLength={100}
