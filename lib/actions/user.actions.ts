@@ -132,7 +132,7 @@ export async function dummyFetchUser(
   }
 }
 
-export async function updateSettings() {
+export async function updateSetting() {
   console.log("hello");
   return { success: true, message: ["Success test"] };
 }

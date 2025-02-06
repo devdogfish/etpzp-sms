@@ -16,8 +16,14 @@ import { useTheme } from "next-themes";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { Input } from "./ui/input";
+import { RenderInputArgs } from "@/components/settings-item";
 
-export function LanguageChanger() {
+export function LanguageChanger({
+  value,
+  onChange,
+  onBlur,
+  id,
+}: RenderInputArgs) {
   const pathname = usePathname();
   const router = useRouter();
   const { t, i18n } = useTranslation(["Navigation"]);
@@ -42,73 +48,68 @@ export function LanguageChanger() {
     }
 
     router.refresh();
+    onChange(newLocale);
+    onBlur();
   };
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-        Language
-      </label>
-      <div className="relative w-max">
-        <Select defaultValue={currentLocale} onValueChange={handleChange}>
-          <SelectTrigger
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "w-[200px] appearance-none font-normal justify-between"
-            )}
-          >
-            <SelectValue placeholder="Select Language" />
-          </SelectTrigger>
-          <SelectContent className="light:bg-white">
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="pt">Portuguese</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <p className="text-[0.8rem] text-muted-foreground">
-        Set the font you want to use in the app.
-      </p>
-    </div>
+    <Select
+      defaultValue={currentLocale}
+      // When make this controlled by passing in value. But this breaks the app, so I don't know what's going wrong
+      // value={value}
+      onValueChange={handleChange}
+    >
+      <SelectTrigger
+        id={id}
+        className={cn(
+          buttonVariants({ variant: "outline" }),
+          "w-[200px] appearance-none font-normal justify-between"
+        )}
+      >
+        <SelectValue placeholder="Select Language" />
+      </SelectTrigger>
+      <SelectContent className="light:bg-white">
+        <SelectItem value="en">English</SelectItem>
+        <SelectItem value="pt">Portuguese</SelectItem>
+      </SelectContent>
+    </Select>
   );
 }
 
-const availableThemeColors = [
-  { name: "Zinc", light: "bg-zinc-900", dark: "bg-zinc-700" },
-  { name: "Rose", light: "bg-rose-600", dark: "bg-rose-700" },
-  { name: "Blue", light: "bg-blue-600", dark: "bg-blue-700" },
-  { name: "Green", light: "bg-green-600", dark: "bg-green-500" },
-  { name: "Orange", light: "bg-orange-500", dark: "bg-orange-700" },
-];
-export function ThemeColorChanger() {
+export function ThemeColorChanger({
+  value,
+  onChange,
+  onBlur,
+  id,
+}: RenderInputArgs) {
   const { themeColor, setThemeColor } = useThemeContext();
   const { theme } = useTheme();
 
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-        Theme color
-      </label>
-      <div className="relative w-max">
-        <Select
-          onValueChange={(newColor) => setThemeColor(newColor as ThemeColors)}
-          defaultValue={themeColor}
-        >
-          <SelectTrigger
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "flex gap-2 ring-offset-transparent focus:ring-transparent"
-            )}
-          >
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {createSelectItems(availableThemeColors, theme)}
-          </SelectContent>
-        </Select>
-      </div>
-      <p className="text-[0.8rem] text-muted-foreground">
-        Set the theme color you want to see in the app.
-      </p>
-    </div>
+    <Select
+      onValueChange={(newColor) => setThemeColor(newColor as ThemeColors)}
+      defaultValue={themeColor}
+    >
+      <SelectTrigger
+        className={cn(
+          buttonVariants({ variant: "outline" }),
+          "w-[200px] appearance-none font-normal justify-between"
+        )}
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {createSelectItems(
+          [
+            { name: "Zinc", light: "bg-zinc-900", dark: "bg-zinc-700" },
+            { name: "Rose", light: "bg-rose-600", dark: "bg-rose-700" },
+            { name: "Blue", light: "bg-blue-600", dark: "bg-blue-700" },
+            { name: "Green", light: "bg-green-600", dark: "bg-green-500" },
+            { name: "Orange", light: "bg-orange-500", dark: "bg-orange-700" },
+          ],
+          theme
+        )}
+      </SelectContent>
+    </Select>
   );
 }
 
@@ -116,126 +117,55 @@ export function ThemeModeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-        Theme
-      </label>
-      <p className="text-[0.8rem] text-muted-foreground">
-        Select the theme for the app.
-      </p>
-      <div className="grid max-w-md grid-cols-2 gap-8 pt-2">
-        <div onClick={() => setTheme("light")}>
-          <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
-            <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
-              <div className="space-y-2 rounded-md bg-white p-2 shadow-sm">
-                <div className="h-2 w-[80px] rounded-lg bg-[#ecedef]" />
-                <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-              </div>
-              <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
-                <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
-                <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-              </div>
-              <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
-                <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
-                <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-              </div>
+    <div className="grid max-w-md grid-cols-2 gap-8 pt-2">
+      <div onClick={() => setTheme("light")}>
+        <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
+          <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
+            <div className="space-y-2 rounded-md bg-white p-2 shadow-sm">
+              <div className="h-2 w-[80px] rounded-lg bg-[#ecedef]" />
+              <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
+            </div>
+            <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
+              <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
+              <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
+            </div>
+            <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
+              <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
+              <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
             </div>
           </div>
-          <label className="block w-full p-2 text-center font-normal text-sm">
-            Light {theme === "light" && "(active)"}
-          </label>
         </div>
+        <label className="block w-full p-2 text-center font-normal text-sm">
+          Light {theme === "light" && "(active)"}
+        </label>
+      </div>
 
-        <div onClick={() => setTheme("dark")}>
-          <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
-            <div className="space-y-2 rounded-sm bg-slate-950 p-2">
-              <div className="space-y-2 rounded-md bg-slate-800 p-2 shadow-sm">
-                <div className="h-2 w-[80px] rounded-lg bg-slate-400" />
-                <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
-              </div>
-              <div className="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-sm">
-                <div className="h-4 w-4 rounded-full bg-slate-400" />
-                <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
-              </div>
-              <div className="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-sm">
-                <div className="h-4 w-4 rounded-full bg-slate-400" />
-                <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
-              </div>
+      <div onClick={() => setTheme("dark")}>
+        <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
+          <div className="space-y-2 rounded-sm bg-slate-950 p-2">
+            <div className="space-y-2 rounded-md bg-slate-800 p-2 shadow-sm">
+              <div className="h-2 w-[80px] rounded-lg bg-slate-400" />
+              <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
+            </div>
+            <div className="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-sm">
+              <div className="h-4 w-4 rounded-full bg-slate-400" />
+              <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
+            </div>
+            <div className="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-sm">
+              <div className="h-4 w-4 rounded-full bg-slate-400" />
+              <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
             </div>
           </div>
-          <label className="block w-full p-2 text-center font-normal text-sm">
-            Dark {theme === "dark" && "(active)"}
-          </label>
         </div>
+        <label className="block w-full p-2 text-center font-normal text-sm">
+          Dark {theme === "dark" && "(active)"}
+        </label>
       </div>
     </div>
   );
 }
 
-const availableProfileColors = [
-  { name: "1", light: "bg-chart-1", dark: "bg-chart-1" },
-  { name: "2", light: "bg-chart-2", dark: "bg-chart-2" },
-  { name: "3", light: "bg-chart-3", dark: "bg-chart-2" },
-  { name: "4", light: "bg-chart-4", dark: "bg-chart-2" },
-  { name: "5", light: "bg-chart-5", dark: "bg-chart-2" },
-];
-export function ProfileSettings() {
-  // const { themeColor, setThemeColor } = useThemeContext();
-  
-  const { theme } = useTheme();
-  const { session, loading } = useSession();
-  console.log(session);
-
-  return (
-    <div>
-      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-        Theme color
-      </label>
-      <div className="relative w-max">
-        {loading ? (
-          <div>Loading...</div>
-        ) : (
-          <Select
-            // onValueChange={(newColor) => {}}
-            defaultValue={String(session?.user?.color_id)}
-          >
-            <SelectTrigger
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "flex gap-2 ring-offset-transparent focus:ring-transparent"
-              )}
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {createSelectItems(availableProfileColors, theme)}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
-      <p className="text-[0.8rem] text-muted-foreground">
-        Set the profile color you want to see in the app.
-      </p>
-
-      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-        Display Name
-      </label>
-      <div className="relative w-max">
-        {loading ? (
-          <div>Loading...</div>
-        ) : (
-          <Input name="displayName" defaultValue={""} />
-        )}
-      </div>
-      <p className="text-[0.8rem] text-muted-foreground">
-        Enter a display name for your profile
-      </p>
-
-    </div>
-  );
-}
-
-const createSelectItems = (data: any[], theme: string | undefined) => {
+export const createSelectItems = (data: any[], theme: string | undefined) => {
   return data.map(({ name, light, dark }) => (
     <SelectItem key={name} value={name}>
       <div className="flex gap-2">

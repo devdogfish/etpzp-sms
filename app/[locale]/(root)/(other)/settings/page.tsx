@@ -1,62 +1,134 @@
 "use client";
-import initTranslations from "@/app/[locale]/i18n";
+
 import { PageHeader, SectionHeader } from "@/components/header";
 import {
   LanguageChanger,
   ThemeModeToggle,
   ThemeColorChanger,
-  ProfileSettings,
+  createSelectItems,
 } from "@/components/settings";
-import { Button } from "@/components/ui/button";
-import { updateSettings } from "@/lib/actions/user.actions";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SettingsSchema } from "@/lib/form.schemas";
 import { ActionResponse } from "@/types/action";
-import { useActionState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
+import SettingItem from "../../../../../components/settings-item";
+import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
 
 const initialState: ActionResponse<z.infer<typeof SettingsSchema>> = {
   success: false,
   message: [],
 };
+
 export default function Settings() {
   const { t } = useTranslation(["Navigation"]);
 
-  const [serverState, action] = useActionState(updateSettings, initialState);
-  // async function updateUser(formData: FormData) {
-  //   "use server";
-  //   console.log("updating user settings..");
-  //   console.log(formData);
-  // }
+  // maybe include some simple hooks here so we don't these external components
+  const { theme } = useTheme();
   return (
     <>
       <PageHeader title={t("SETTING")} />
-      <form className="p-4 space-y-12 h-[calc(100vh-52px)] overflow-y-scroll" action={action}>
+      <div className="py-4 px-4 space-y-12 h-[calc(100vh-52px)] overflow-y-scroll">
         <SectionHeader
           title="Language"
           subtitle="Select your preferred language for a personalized experience"
         >
-          <LanguageChanger />
+          <SettingItem
+            name="customSetting"
+            label="Language"
+            description="Set the font you want to use in the app."
+            renderInput={({ value, onChange, onBlur, id }) => (
+              <LanguageChanger
+                id={id}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
+            )}
+          />
         </SectionHeader>
 
         <SectionHeader
           title="Appearance"
           subtitle="Customize the look and feel of your app"
         >
-          <ThemeColorChanger />
-          <ThemeModeToggle />
+          <SettingItem
+            name="themeColor" // this might need to be the exact database field
+            label="Theme color"
+            description="Set the font you want to use in the app."
+            renderInput={({ value, onChange, onBlur, id, initialValue }) => (
+              <ThemeColorChanger
+                id={id}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
+            )}
+          />
+          <SettingItem
+            name="themeModeToggle" // this might need to be the exact database field
+            label="Theme"
+            description="Select the theme for the app."
+            renderInput={({ value, onChange, onBlur, id, initialValue }) => (
+              <ThemeModeToggle
+              // id={id}
+              // value={value}
+              // onChange={onChange}
+              // onBlur={onBlur}
+              />
+            )}
+          />
         </SectionHeader>
 
         <SectionHeader
           title="Profile"
           subtitle="Manage your personal information"
         >
-          {/* <form action={updateUser} className="space-y-5"> */}
-          <ProfileSettings />
-          <Button type="submit">Submit</Button>
-          {/* </form> */}
+          <SettingItem
+            name="themeModeToggle" // this might need to be the exact database field
+            label="Profile color"
+            description="Set the profile color you want to see in the app."
+            renderInput={({ value, onChange, onBlur, id, initialValue }) => (
+              <Select onValueChange={onChange} defaultValue={""}>
+                <SelectTrigger
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "w-[200px] appearance-none font-normal justify-between"
+                  )}
+                  // defaultValue={"1"}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {createSelectItems(
+                    [
+                      { name: "1", light: "bg-chart-1", dark: "bg-chart-1" },
+                      { name: "2", light: "bg-chart-2", dark: "bg-chart-2" },
+                      { name: "3", light: "bg-chart-3", dark: "bg-chart-2" },
+                      { name: "4", light: "bg-chart-4", dark: "bg-chart-2" },
+                      { name: "5", light: "bg-chart-5", dark: "bg-chart-2" },
+                    ],
+                    theme
+                  )}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          <SettingItem
+            name="themeModeToggle" // this might need to be the exact database field
+            label="Display Name"
+            description="Enter a display name for your profile."
+          />
         </SectionHeader>
-      </form>
+      </div>
     </>
   );
 }
