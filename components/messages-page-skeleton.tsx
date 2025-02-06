@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { MessageDisplay } from "./message-display";
 import { useIsMobile } from "@/hooks/use-mobile";
-import PageHeader from "./page-header";
+import { PageHeader } from "./header";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { CategoryEnums } from "@/types";

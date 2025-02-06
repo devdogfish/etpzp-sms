@@ -1,3 +1,5 @@
+"use server";
+
 import { User } from "@/types";
 import db from "../db";
 import ActiveDirectory from "activedirectory2";
@@ -128,4 +130,9 @@ export async function dummyFetchUser(
       message: "Failed to create or fetch user.",
     };
   }
+}
+
+export async function updateSettings() {
+  console.log("hello");
+  return { success: true, message: ["Success test"] };
 }

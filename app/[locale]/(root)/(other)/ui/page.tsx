@@ -1,5 +1,5 @@
 import initTranslations from "@/app/[locale]/i18n";
-import PageHeader from "@/components/page-header";
+import { PageHeader } from "@/components/header";
 import { Button } from "@/components/ui/button";
 
 export default async function Page({ params }: { params: { locale: string } }) {

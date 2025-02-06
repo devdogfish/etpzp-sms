@@ -1,6 +1,6 @@
 "use client";
 import ChildrenPanel from "@/components/shared/children-panel";
-import PageHeader from "@/components/page-header";
+import { PageHeader } from "@/components/header";
 import { useLayout } from "@/contexts/use-layout";
 
 export default function HomePage() {

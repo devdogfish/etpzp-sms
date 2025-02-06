@@ -9,11 +9,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useThemeContext } from "@/contexts/theme-data-provider";
+import { useSession } from "@/hooks/use-session";
 import { i18nConfig } from "@/i18nConfig";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { Input } from "./ui/input";
 
 export function LanguageChanger() {
   const pathname = usePathname();
@@ -80,24 +82,6 @@ export function ThemeColorChanger() {
   const { themeColor, setThemeColor } = useThemeContext();
   const { theme } = useTheme();
 
-  const createSelectItems = () => {
-    return availableThemeColors.map(({ name, light, dark }) => (
-      <SelectItem key={name} value={name}>
-        <div className="flex gap-2">
-          <div
-            className={cn(
-              "w-[20px]",
-              "h-[20px]",
-              "rounded-full",
-              theme === "light" ? light : dark
-            )}
-          ></div>
-          <div className="text-sm">{name}</div>
-        </div>
-      </SelectItem>
-    ));
-  };
-
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -116,7 +100,9 @@ export function ThemeColorChanger() {
           >
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>{createSelectItems()}</SelectContent>
+          <SelectContent>
+            {createSelectItems(availableThemeColors, theme)}
+          </SelectContent>
         </Select>
       </div>
       <p className="text-[0.8rem] text-muted-foreground">
@@ -185,3 +171,84 @@ export function ThemeModeToggle() {
     </div>
   );
 }
+
+const availableProfileColors = [
+  { name: "1", light: "bg-chart-1", dark: "bg-chart-1" },
+  { name: "2", light: "bg-chart-2", dark: "bg-chart-2" },
+  { name: "3", light: "bg-chart-3", dark: "bg-chart-2" },
+  { name: "4", light: "bg-chart-4", dark: "bg-chart-2" },
+  { name: "5", light: "bg-chart-5", dark: "bg-chart-2" },
+];
+export function ProfileSettings() {
+  // const { themeColor, setThemeColor } = useThemeContext();
+  
+  const { theme } = useTheme();
+  const { session, loading } = useSession();
+  console.log(session);
+
+  return (
+    <div>
+      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+        Theme color
+      </label>
+      <div className="relative w-max">
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <Select
+            // onValueChange={(newColor) => {}}
+            defaultValue={String(session?.user?.color_id)}
+          >
+            <SelectTrigger
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "flex gap-2 ring-offset-transparent focus:ring-transparent"
+              )}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {createSelectItems(availableProfileColors, theme)}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+      <p className="text-[0.8rem] text-muted-foreground">
+        Set the profile color you want to see in the app.
+      </p>
+
+      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+        Display Name
+      </label>
+      <div className="relative w-max">
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <Input name="displayName" defaultValue={""} />
+        )}
+      </div>
+      <p className="text-[0.8rem] text-muted-foreground">
+        Enter a display name for your profile
+      </p>
+
+    </div>
+  );
+}
+
+const createSelectItems = (data: any[], theme: string | undefined) => {
+  return data.map(({ name, light, dark }) => (
+    <SelectItem key={name} value={name}>
+      <div className="flex gap-2">
+        <div
+          className={cn(
+            "w-[20px]",
+            "h-[20px]",
+            "rounded-full",
+            theme === "light" ? light : dark
+          )}
+        ></div>
+        <div className="text-sm">{name}</div>
+      </div>
+    </SelectItem>
+  ));
+};

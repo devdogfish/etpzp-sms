@@ -123,11 +123,16 @@ main {
   flex-direction: column; */
 }
 
-h2,
 h2 {
-  @apply font-bold text-xl;
+  @apply text-xl font-bold;
 }
-h6,
+h3 {
+  @apply text-lg font-medium;
+}
+p.subtitle {
+  @apply text-sm text-muted-foreground;
+}
+
 h6 {
   font-size: 1.15em;
   line-height: 1.5;
@@ -152,7 +157,6 @@ h6 {
 .closeX:hover * {
   color: var(--secondaryForeground);
 }
-
 
 .error-border-pulse {
   animation: pulse 1000ms infinite;

@@ -11,7 +11,7 @@ type PageHeaderProps = {
   children?: React.ReactNode;
 };
 
-export default function PageHeader({ title, children }: PageHeaderProps) {
+export function PageHeader({ title, children }: PageHeaderProps) {
   const onMobile = useIsMobile();
   const { setMobileNavPanel } = useLayout();
   return (
@@ -34,5 +34,27 @@ export default function PageHeader({ title, children }: PageHeaderProps) {
       </div>
       <Separator />
     </>
+  );
+}
+
+type SectionHeaderProps = {
+  title: string;
+  subtitle: string;
+  children?: React.ReactNode;
+};
+export function SectionHeader({
+  title,
+  subtitle,
+  children,
+}: SectionHeaderProps) {
+  const onMobile = useIsMobile();
+  const { setMobileNavPanel } = useLayout();
+  return (
+    <div>
+      <h3 className="mr-auto">{title}</h3>
+      <p className="subtitle">{subtitle}</p>
+      <Separator className="mt-5 mb-3 lg:max-w-2xl" />
+      <div className="space-y-5 px-5">{children}</div>
+    </div>
   );
 }

@@ -43,3 +43,11 @@ export const ContactSchema = z.object({
     ),
   description: z.string().max(255).optional(),
 });
+
+export const SettingsSchema = z.object({
+  locale: z.string(),
+  primaryColor: z.string(),
+  themeMode: z.string(),
+  profileColor: z.string(),
+  displayName: z.string()
+});

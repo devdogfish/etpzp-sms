@@ -6,7 +6,7 @@ import { Maximize2, Minimize2, Trash2, X } from "lucide-react";
 import SendButton from "./send-button";
 import { cn, toastActionResult } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import PageHeader from "./page-header";
+import { PageHeader } from "./header";
 import { sendMessage } from "@/lib/actions/message.create";
 
 // Form
