@@ -9,6 +9,8 @@ import React, {
   FormEvent,
   InputHTMLAttributes,
 } from "react";
+import { SettingName } from "@/types";
+import { ActionResponse } from "@/types/action";
 
 export type RenderInputArgs = {
   value: string;
@@ -34,6 +36,10 @@ type SettingItemProps = InputHTMLAttributes<HTMLInputElement> & {
   onUpdate?: (newValue: string) => void;
 };
 
+const initialState: ActionResponse<{ name: SettingName; value: string }> = {
+  success: false,
+  message: [],
+};
 export function SettingItem({
   name,
   initialValue = "",
@@ -58,7 +64,7 @@ export function SettingItem({
     startTransition(async () => {
       try {
         // await updateSetting(formData);
-        await updateSetting();
+        await updateSetting(formData);
         setError(null);
         if (onUpdate) onUpdate(value);
       } catch (err: any) {

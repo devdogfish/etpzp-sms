@@ -44,10 +44,63 @@ export const ContactSchema = z.object({
   description: z.string().max(255).optional(),
 });
 
-export const SettingsSchema = z.object({
-  locale: z.string(),
-  primaryColor: z.string(),
-  themeMode: z.string(),
-  profileColor: z.string(),
-  displayName: z.string()
-});
+export const validSettingNames = [
+  "lang",
+  "profile_color_id",
+  "display_name",
+  "dark_mode",
+  "primary_color_id",
+];
+// Create a schema that handles each setting separately
+export const updateSettingSchema = z.discriminatedUnion("name", [
+  // For the language setting (“lang”) we expect a 2‑character string (ISO 639‑1 code)
+  z.object({
+    name: z.literal("lang"),
+    value: z
+      .string()
+      .min(2, "Language code must be exactly 2 characters")
+      .max(2, "Language code must be exactly 2 characters"),
+  }),
+  // For profile_color_id, convert the incoming string to a number and require an integer.
+  z.object({
+    name: z.literal("profile_color_id"),
+    value: z.preprocess(
+      (val) => Number(val),
+      z
+        .number({
+          invalid_type_error: "Profile color id must be a number",
+        })
+        .int("Profile color id must be an integer")
+    ),
+  }),
+  // For primary_color_id, use similar logic as profile_color_id.
+  z.object({
+    name: z.literal("primary_color_id"),
+    value: z.preprocess(
+      (val) => Number(val),
+      z
+        .number({
+          invalid_type_error: "Primary color id must be a number",
+        })
+        .int("Primary color id must be an integer")
+    ),
+  }),
+  // For display_name, require a non-empty string with a max length of 50 characters.
+  z.object({
+    name: z.literal("display_name"),
+    value: z
+      .string()
+      .nonempty("Display name cannot be empty")
+      .max(50, "Display name cannot exceed 50 characters"),
+  }),
+  // For dark_mode, convert the string "true"/"false" to a boolean.
+  z.object({
+    name: z.literal("dark_mode"),
+    value: z.preprocess((val) => {
+      // Convert strings "true" and "false" to actual booleans.
+      if (val === "true") return true;
+      if (val === "false") return false;
+      return val;
+    }, z.boolean({ invalid_type_error: "Dark mode must be a boolean value" })),
+  }),
+]);

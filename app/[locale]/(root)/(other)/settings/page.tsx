@@ -15,18 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SettingsSchema } from "@/lib/form.schemas";
-import { ActionResponse } from "@/types/action";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
 import SettingItem from "../../../../../components/settings-item";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-
-const initialState: ActionResponse<z.infer<typeof SettingsSchema>> = {
-  success: false,
-  message: [],
-};
 
 export default function Settings() {
   const { t } = useTranslation(["Navigation"]);
@@ -42,7 +34,7 @@ export default function Settings() {
           subtitle="Select your preferred language for a personalized experience"
         >
           <SettingItem
-            name="customSetting"
+            name="lang"
             label="Language"
             description="Set the font you want to use in the app."
             renderInput={({ value, onChange, onBlur, id }) => (
@@ -57,43 +49,11 @@ export default function Settings() {
         </SectionHeader>
 
         <SectionHeader
-          title="Appearance"
-          subtitle="Customize the look and feel of your app"
-        >
-          <SettingItem
-            name="themeColor" // this might need to be the exact database field
-            label="Theme color"
-            description="Set the font you want to use in the app."
-            renderInput={({ value, onChange, onBlur, id, initialValue }) => (
-              <ThemeColorChanger
-                id={id}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-              />
-            )}
-          />
-          <SettingItem
-            name="themeModeToggle" // this might need to be the exact database field
-            label="Theme"
-            description="Select the theme for the app."
-            renderInput={({ value, onChange, onBlur, id, initialValue }) => (
-              <ThemeModeToggle
-              // id={id}
-              // value={value}
-              // onChange={onChange}
-              // onBlur={onBlur}
-              />
-            )}
-          />
-        </SectionHeader>
-
-        <SectionHeader
           title="Profile"
           subtitle="Manage your personal information"
         >
           <SettingItem
-            name="themeModeToggle" // this might need to be the exact database field
+            name="profile_color_id" // this might need to be the exact database field
             label="Profile color"
             description="Set the profile color you want to see in the app."
             renderInput={({ value, onChange, onBlur, id, initialValue }) => (
@@ -123,9 +83,41 @@ export default function Settings() {
             )}
           />
           <SettingItem
-            name="themeModeToggle" // this might need to be the exact database field
+            name="display_name" // this might need to be the exact database field
             label="Display Name"
             description="Enter a display name for your profile."
+          />
+        </SectionHeader>
+
+        <SectionHeader
+          title="Appearance"
+          subtitle="Customize the look and feel of your app"
+        >
+          <SettingItem
+            name="theme_color_id" // this might need to be the exact database field
+            label="Theme color"
+            description="Set the font you want to use in the app."
+            renderInput={({ value, onChange, onBlur, id, initialValue }) => (
+              <ThemeColorChanger
+                id={id}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
+            )}
+          />
+          <SettingItem
+            name="dark_mode"
+            label="Theme"
+            description="Select the theme for the app."
+            renderInput={({ value, onChange, onBlur, id, initialValue }) => (
+              <ThemeModeToggle
+              // id={id}
+              // value={value}
+              // onChange={onChange}
+              // onBlur={onBlur}
+              />
+            )}
           />
         </SectionHeader>
       </div>

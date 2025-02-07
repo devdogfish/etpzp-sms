@@ -6,10 +6,17 @@ CREATE TABLE "user" (
     role VARCHAR(20) CHECK (role IN ('USER', 'ADMIN')) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    display_name VARCHAR(50) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
-    color_id SMALLINT NOT NULL DEFAULT 1
+
+    -- User Settings
+    lang VARCHAR(2), -- ISO 639-1 language code
+    
+    profile_color_id SMALLINT NOT NULL DEFAULT 1,
+    display_name VARCHAR(50) NOT NULL,
+
+    dark_mode BOOLEAN NOT NULL DEFAULT false,
+    primary_color_id SMALLINT NOT NULL DEFAULT 1
 );
 
 -- Create message table

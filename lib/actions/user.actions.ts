@@ -1,8 +1,10 @@
 "use server";
 
-import { User } from "@/types";
+import { SettingName, User } from "@/types";
 import db from "../db";
 import ActiveDirectory from "activedirectory2";
+import { z } from "zod";
+import { updateSettingSchema, validSettingNames } from "../form.schemas";
 
 // These are guaranteed properties when you find the user using A.D.
 type userResult = {
@@ -132,7 +134,51 @@ export async function dummyFetchUser(
   }
 }
 
-export async function updateSetting() {
-  console.log("hello");
-  return { success: true, message: ["Success test"] };
+export async function updateSettingO1(formData: FormData) {
+  // Extract raw data from the form
+  const rawData = {
+    name: formData.get("name") as SettingName,
+    value: formData.get("value") as string,
+  };
+
+  const isValidName = validSettingNames.includes(rawData.name);
+
+  if (!isValidName) {
+    return {
+      success: false,
+      message: ["Please fix the errors in the form"],
+      errors: { [rawData.name]: ["Invalid setting value"] },
+      inputs: rawData,
+    };
+  }
+  try {
+    console.log(`Updating database ${rawData.name} setting`);
+    // Try to validate and parse the raw data.
+    const parsedData = updateSettingSchema.parse(rawData);
+
+    // If validation passed, you can proceed to update the database accordingly.
+    console.log(
+      `Updating database ${parsedData.name} with value:`,
+      parsedData.value
+    );
+
+    // (Insert your database update logic here.)
+    return { success: true, message: ["Successfully updated setting"] };
+  } catch (error) {
+    // If the error is produced by zod, extract and send back the error details.
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        message: ["Please fix the errors in the form"],
+        errors: error.flatten().fieldErrors,
+        inputs: rawData,
+      };
+    }
+
+    // For any other kind of error, return a generic error message.
+    return {
+      success: false,
+      message: [`Something went wrong while updating ${rawData.name}.`],
+    };
+  }
 }
