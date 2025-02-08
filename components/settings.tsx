@@ -17,9 +17,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { Input } from "./ui/input";
 import { RenderInputArgs } from "@/components/settings-item";
+import { useState } from "react";
 
 export function LanguageChanger({
-  value,
+  // value,
   onChange,
   onBlur,
   id,
@@ -37,7 +38,6 @@ export function LanguageChanger({
     const expires = date.toUTCString();
     document.cookie = `NEXT_LOCALE=${newLocale};expires=${expires};path=/`;
 
-    // redirect to the new locale path
     if (
       currentLocale === i18nConfig.defaultLocale &&
       !i18nConfig.prefixDefault
@@ -49,14 +49,16 @@ export function LanguageChanger({
 
     router.refresh();
     onChange(newLocale);
-    onBlur();
+    setTimeout(() => {
+      onBlur(undefined, newLocale);
+    }, 200);
   };
   return (
     <Select
       defaultValue={currentLocale}
       // When make this controlled by passing in value. But this breaks the app, so I don't know what's going wrong
       // value={value}
-      onValueChange={handleChange}
+      onValueChange={(newValue) => handleChange(newValue)}
     >
       <SelectTrigger
         id={id}

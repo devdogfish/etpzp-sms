@@ -19,15 +19,80 @@ import { useTranslation } from "react-i18next";
 import SettingItem from "../../../../../components/settings-item";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { useSession } from "@/hooks/use-session";
+// import Cookies from "js-cookie";
 
+// Define a type for the cookies record
+type Cookies = Record<string, string>;
+
+// A helper function to parse the cookie string into an object
+function parseCookies(cookieString: string): Cookies {
+  return cookieString.split(";").reduce((cookies: Cookies, cookie) => {
+    const [rawName, ...rawValueParts] = cookie.split("=");
+    const name = rawName.trim();
+    // In case the value itself contains '=' characters, join them back together
+    const value = rawValueParts.join("=").trim();
+    if (name) {
+      cookies[name] = value;
+    }
+    return cookies;
+  }, {});
+}
 export default function Settings() {
   const { t } = useTranslation(["Navigation"]);
-
-  // maybe include some simple hooks here so we don't these external components
   const { theme } = useTheme();
+
+  const { session, loading } = useSession();
   return (
     <>
-      <PageHeader title={t("SETTING")} />
+      <PageHeader title={t("SETTING")}>
+        <Button
+          onClick={() => {
+            const cookies: Cookies = parseCookies(document.cookie);
+
+            // const rawValue = JSON.parse(
+            //   decodeURIComponent(cookies["my-settings"])
+            // );
+            // console.log("loggin cookie");
+
+            // console.log(rawValue);
+
+
+
+            function getComplexObjectFromCookie(cookieName: string) {
+              const nameEQ = `${cookieName}=`;
+              const cookies = document.cookie.split(';');
+              for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(nameEQ)) {
+                  const cookieValue = cookie.substring(nameEQ.length);
+                  try {
+                    // Decode and parse the JSON string into an object
+                    return JSON.parse(decodeURIComponent(cookieValue));
+                  } catch (error) {
+                    console.error('Error parsing cookie:', error);
+                    return null;
+                  }
+                }
+              }
+              return null;
+            }
+            
+            // Usage example:
+            const userData = getComplexObjectFromCookie('my-settings');
+            console.log(userData);
+          }}
+        >
+          log session
+        </Button>
+        <Button
+          onClick={() =>
+            (document.cookie = `my-settings=${"my-settings-value"};expires=${10000};path=/`)
+          }
+        >
+          create Cookie
+        </Button>
+      </PageHeader>
       <div className="py-4 px-4 space-y-12 h-[calc(100vh-52px)] overflow-y-scroll">
         <SectionHeader
           title="Language"
@@ -57,13 +122,17 @@ export default function Settings() {
             label="Profile color"
             description="Set the profile color you want to see in the app."
             renderInput={({ value, onChange, onBlur, id, initialValue }) => (
-              <Select onValueChange={onChange} defaultValue={""}>
+              <Select
+                onValueChange={(value) => {
+                  onChange(value);
+                }}
+                defaultValue={""}
+              >
                 <SelectTrigger
                   className={cn(
                     buttonVariants({ variant: "outline" }),
                     "w-[200px] appearance-none font-normal justify-between"
                   )}
-                  // defaultValue={"1"}
                 >
                   <SelectValue />
                 </SelectTrigger>

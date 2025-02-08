@@ -3,25 +3,20 @@
 import { Input } from "@/components/ui/input";
 import { updateSetting } from "@/lib/actions/user.actions";
 import { cn } from "@/lib/utils";
-import React, {
+import type React from "react";
+import {
   useState,
   useTransition,
-  FormEvent,
-  InputHTMLAttributes,
+  type FormEvent,
+  type InputHTMLAttributes,
+  useEffect,
 } from "react";
-import { SettingName } from "@/types";
-import { ActionResponse } from "@/types/action";
+import type { UpdateSettingResponse } from "@/types/action";
 
 export type RenderInputArgs = {
   value: string;
   onChange: (newValue: string) => void;
-  onBlur: (
-    event?:
-      | React.FocusEvent<
-          HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-        >
-      | undefined
-  ) => void;
+  onBlur: (e?: FormEvent<Element>, submittedValue?: string) => void;
   id: string;
   initialValue?: string;
 };
@@ -31,15 +26,16 @@ type SettingItemProps = InputHTMLAttributes<HTMLInputElement> & {
   initialValue?: string;
   label?: string;
   description?: string;
-  inputType?: string; // e.g. "text", "password", "email", etc.
+  inputType?: string;
   renderInput?: (props: RenderInputArgs) => React.ReactNode;
   onUpdate?: (newValue: string) => void;
 };
 
-const initialState: ActionResponse<{ name: SettingName; value: string }> = {
+const initialState: UpdateSettingResponse = {
   success: false,
-  message: [],
+  input: "",
 };
+
 export function SettingItem({
   name,
   initialValue = "",
@@ -51,36 +47,46 @@ export function SettingItem({
   ...inputProps
 }: SettingItemProps) {
   const [value, setValue] = useState<string>(initialValue);
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
 
-  async function handleSubmit(e?: FormEvent) {
+  useEffect(() => {
+    if (initialValue && value === "") {
+      console.log("VALUE GOT RESET TO initialValue");
+      setValue(initialValue);
+    }
+  }, [initialValue, value]);
+
+  const [serverState, setServerState] = useState(initialState);
+
+  async function handleSubmit(e?: FormEvent, submittedValue?: string) {
     if (e) e.preventDefault();
+
+    console.log("submitted value", submittedValue);
+
+    setIsPending(true);
 
     const formData = new FormData();
     formData.append("name", name);
-    formData.append("value", value);
+    formData.append("value", submittedValue || value);
 
-    startTransition(async () => {
-      try {
-        // await updateSetting(formData);
-        await updateSetting(formData);
-        setError(null);
-        if (onUpdate) onUpdate(value);
-      } catch (err: any) {
-        setError(err.message || "Update failed");
-      }
-    });
+    const result = await updateSetting(formData);
+    setServerState(result);
+    if (onUpdate) onUpdate(value);
+
+    setIsPending(false);
   }
 
-  // Default input element that passes the inputType and additional props
+  const handleChange = (newValue: string) => {
+    setValue(newValue);
+  };
+
   const defaultInput = (
     <Input
       id={name}
       type={inputType}
       value={value}
-      onChange={(e) => setValue(e.target.value)}
-      onBlur={handleSubmit}
+      onChange={(e) => handleChange(e.target.value)}
+      onBlur={(e?: any, v?: any) => handleSubmit(e, v)}
       style={{ width: "max-content" }}
       {...inputProps}
     />
@@ -89,8 +95,8 @@ export function SettingItem({
   const inputElement = renderInput
     ? renderInput({
         value,
-        onChange: (newValue: string) => setValue(newValue),
-        onBlur: handleSubmit,
+        onChange: handleChange,
+        onBlur: (e, submittedValue) => handleSubmit(e, submittedValue),
         id: name,
         initialValue,
       })
@@ -102,6 +108,7 @@ export function SettingItem({
       style={{ marginBottom: "1rem" }}
       className="space-y-2 flex flex-col"
     >
+      {serverState.data && <div>serverState.data: {serverState.data}</div>}
       <label
         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         htmlFor={name}
@@ -112,10 +119,10 @@ export function SettingItem({
       <p
         className={cn(
           "text-[0.8rem]",
-          error ? "text-destructive" : "text-muted-foreground"
+          serverState.error ? "text-destructive" : "text-muted-foreground"
         )}
       >
-        {error || description}
+        {serverState.error || description}
       </p>
     </form>
   );
