@@ -1,10 +1,14 @@
 import initTranslations from "@/app/[locale]/i18n";
 import ColorPalette from "@/components/color-palette";
-import {PageHeader} from "@/components/header";
+import { PageHeader } from "@/components/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-export default async function Page({ params }: { params: { locale: string } }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   const { t } = await initTranslations(locale, ["Navigation"]);
   return (

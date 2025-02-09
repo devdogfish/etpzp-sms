@@ -12,7 +12,7 @@ import { cookies } from "next/headers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LayoutProvider } from "@/contexts/use-layout";
 import { Toaster } from "sonner";
-import { fetchAmountIndicators } from "@/lib/db/message";
+import { fetchAmountIndicators } from "@/lib/db/general";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,13 +35,10 @@ export function generateStaticParams() {
 
 type RootLayoutProps = {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 };
 
-export default async function RootLayout({
-  children,
-  params,
-}: RootLayoutProps) {
+export default async function AppLayout({ children, params }: RootLayoutProps) {
   const i18nNamespaces = ["Navigation", "Common Words", "Titles"];
   const { locale } = await params;
   const { resources } = await initTranslations(locale, i18nNamespaces);

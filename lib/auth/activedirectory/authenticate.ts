@@ -4,8 +4,8 @@ import ActiveDirectory from "activedirectory2";
 import { activeDirectoryConfig, SessionData } from "@/lib/auth/config";
 import userExists from "./user";
 import userInGroup from "./group";
-import fetchUser, { dummyFetchUser } from "@/lib/actions/user.actions";
-import { User } from "@/types";
+import saveUser, { dummySaveUser } from "@/lib/actions/user.actions";
+import type { DBUser } from "@/types/user";
 
 export default async function authenticate({
   email,
@@ -37,10 +37,8 @@ export default async function authenticate({
   console.log(hasAppPermission);
   console.log(hasAdminPermission);
 
-  // Sync all of this with the database
-  const userResult = await fetchUser(ad, email, hasAdminPermission.success);
-  // console.log("DB SYNC ResULT");
-  // console.log(userResult);
+  // 4. Sync all of this with the database
+  const userResult = await saveUser(ad, email, hasAdminPermission.success);
 
   return {
     user: userResult.success ? userResult.data : undefined,
@@ -61,7 +59,7 @@ export async function dummyAuthenticate({
   email: string;
   password: string;
 }): Promise<SessionData> {
-  const dummyUser: SessionData = {
+  const dummyUser: SessionData & { user: DBUser } = {
     user: {
       id: "1",
       email: "pepe@gmail.com",
@@ -81,7 +79,7 @@ export async function dummyAuthenticate({
     isAuthenticated: true,
     isAdmin: true,
   };
-  const userResult = await dummyFetchUser(dummyUser.user as User);
+  const userResult = await dummySaveUser(dummyUser.user as DBUser);
   return {
     user: userResult.success ? userResult.data : undefined,
     isAuthenticated: userResult.success,

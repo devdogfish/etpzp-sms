@@ -1,6 +1,6 @@
 "use server";
 
-import { SettingName, User } from "@/types";
+import type { DBUser, SettingName, User } from "@/types/user";
 import db from "../db";
 import ActiveDirectory from "activedirectory2";
 import { z } from "zod";
@@ -11,8 +11,6 @@ import {
   UpdateSettingResponse,
 } from "@/types/action";
 import { getSession } from "../auth/sessions";
-import { cookies } from "next/headers";
-import { sleep } from "../utils";
 
 // These are guaranteed properties when you find the user using A.D.
 type userResult = {
@@ -24,7 +22,7 @@ type userResult = {
   cn: string; // full name
 };
 
-export default async function fetchUser(
+export default async function saveUser(
   ad: ActiveDirectory,
   email: string,
   isAdmin: boolean
@@ -91,8 +89,8 @@ export default async function fetchUser(
   }
 }
 
-export async function dummyFetchUser(
-  user: User
+export async function dummySaveUser(
+  user: DBUser
 ): Promise<DataActionResponse<User>> {
   try {
     const selectResult = await db(
@@ -115,14 +113,14 @@ export async function dummyFetchUser(
 
       try {
         const insertResult = await db(
-          "INSERT INTO public.user (email, name, role, first_name, last_name, display_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
+          "INSERT INTO public.user (email, name, role, first_name, last_name, display_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email, role, first_name, last_name;",
           [
             user.email,
             user.name,
             user.role,
             user.first_name,
             user.last_name,
-            user.first_name + user.last_name,
+            `${user.first_name} ${user.last_name}`,
           ]
         );
 
@@ -146,7 +144,7 @@ export async function dummyFetchUser(
   }
 }
 
-// export async function updateSetting(formData: FormData) {
+// Settings page calls this function to update one setting at a time
 export async function updateSetting(
   formData: FormData
 ): Promise<UpdateSettingResponse> {

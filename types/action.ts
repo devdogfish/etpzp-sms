@@ -1,5 +1,3 @@
-import { updateSetting } from "@/lib/actions/user.actions";
-import { DBMessage, SettingName } from ".";
 // this is for useActionState() forms
 export type ActionResponse<T> = {
   success: boolean;

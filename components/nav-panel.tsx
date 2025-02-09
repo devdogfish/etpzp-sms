@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -131,6 +131,26 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   // 2. Stuff that can be changed in the settings is encrypted from localstorage
   const { session, loading } = useSession();
 
+  const [displayName, setDisplayName] = useState(
+    localStorage.getItem("display_name") || undefined
+  );
+
+  useEffect(() => {
+    // Function to handle storage changes
+    const handleStorageChange = (event: any) => {
+      if (event.key === "display_name") {
+        setDisplayName(event.newValue); // Update state with new value
+      }
+    };
+
+    // Listen for storage events
+    window.addEventListener("storage", handleStorageChange);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
   const handleLogout = async () => {
     const result = await logout();
     if (result.success) {
@@ -154,7 +174,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
           >
             <Account
               size={9}
-              name={localStorage.getItem("display_name") || undefined}
+              name={displayName}
               colorId={
                 Number(localStorage.getItem("profile_color_id")) || undefined
               }

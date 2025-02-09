@@ -16,14 +16,7 @@ export async function createContact(
   formData: FormData
 ): Promise<CreateContactActionResponse<z.infer<typeof ContactSchema>>> {
   const session = await getSession();
-
-  const userId = parseInt(session.user?.id || "");
-  if (userId && isNaN(userId)) {
-    return {
-      success: false,
-      message: ["Invalid user id."],
-    };
-  }
+  const userId = session?.user?.id;
 
   const rawData = {
     name: formData.get("name") as string,
@@ -41,6 +34,7 @@ export async function createContact(
   }
 
   try {
+    if (!userId) throw new Error("Invalid user id.");
     console.log("Fields validated");
     console.log(validatedData);
 
@@ -87,14 +81,8 @@ export async function updateContact(
   formData: FormData
 ): Promise<ActionResponse<z.infer<typeof ContactSchema>>> {
   const session = await getSession();
+  const userId = session?.user?.id;
 
-  const userId = parseInt(session.user?.id || "");
-  if (userId && isNaN(userId)) {
-    return {
-      success: false,
-      message: ["Invalid user id."],
-    };
-  }
   const rawData = {
     name: formData.get("name") as string,
     phone: formData.get("phone") as string,
@@ -110,6 +98,7 @@ export async function updateContact(
     };
   }
   try {
+    if (!userId) throw new Error("Invalid user id.");
     console.log("Fields validated");
     console.log(validatedData);
 
@@ -146,16 +135,10 @@ export async function deleteContact(
   id: string
 ): Promise<ActionResponse<undefined>> {
   const session = await getSession();
-
-  const userId = parseInt(session.user?.id ? session?.user?.id : "");
-  if (userId && isNaN(userId)) {
-    return {
-      success: false,
-      message: ["Invalid user id."],
-    };
-  }
+  const userId = session?.user?.id;
 
   try {
+    if (!userId) throw new Error("Invalid user id.");
     await db("DELETE FROM contact WHERE user_id = $1 AND id = $2", [
       userId,
       id,

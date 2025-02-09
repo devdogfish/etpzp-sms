@@ -2,7 +2,11 @@ import initTranslations from "@/app/[locale]/i18n";
 import { PageHeader } from "@/components/header";
 import { Button } from "@/components/ui/button";
 
-export default async function Page({ params }: { params: { locale: string } }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   const { t } = await initTranslations(locale, ["Navigation"]);
   return (

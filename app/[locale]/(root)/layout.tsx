@@ -1,19 +1,27 @@
 "use client";
+
 import ResizablePanelWrapper from "@/components/resizable-panel-wrapper";
 import NavPanel, { MobileNavPanel } from "@/components/nav-panel";
 import { useTheme } from "next-themes";
 import { SkeletonTheme } from "react-loading-skeleton";
-import { cn } from "@/lib/utils";
 import { useLayout } from "@/contexts/use-layout";
+import { fetchUserSettings } from "@/lib/db/general";
 
-type MainLayoutProps = {
+export default function RootLayout({
+  children,
+}: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
-};
-
-export default function MainLayout({ children, params }: MainLayoutProps) {
+}>) {
   const { theme } = useTheme();
   const { isFullscreen } = useLayout();
+
+  // if (false) {
+  //   const syncUserSettings = async () => {
+  //     const settings = await fetchUserSettings();
+  //   };
+  //   syncUserSettings();
+  // }
+
   return (
     <SkeletonTheme
       // we are adjusting loading skeleton colors for dark mode - defaults for light mode already look good

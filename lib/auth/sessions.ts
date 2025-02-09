@@ -31,14 +31,6 @@ export async function createSession(user: SessionData) {
   console.log(`Session saved ${session}`);
 }
 
-// export async function updateSession(id: string) {
-//   const session = await getSession();
-//   if (session.user) {
-//     session.user = { ...session.user, newMessageContactId: id };
-//   }
-//   session.save();
-// }
-
 export async function getSessionOnClient(): Promise<SessionData> {
   const { user, isAuthenticated, isAdmin } = await getIronSession<SessionData>(
     await cookies(),
