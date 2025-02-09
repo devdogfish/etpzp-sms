@@ -7,7 +7,6 @@ export async function middleware(request: NextRequest) {
   // Handle i18n routing
   const i18nResponse = await i18nRouter(request, i18nConfig);
   const session = await getSession(request, i18nResponse);
-  console.log(session);
 
   const { pathname } = request.nextUrl;
 

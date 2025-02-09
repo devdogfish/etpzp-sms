@@ -3,9 +3,16 @@
 import { AmountIndicators } from "@/types";
 import { getSession } from "../auth/sessions";
 import db from ".";
+import { DataActionResponse } from "@/types/action";
+import { UserSettings } from "@/types/user";
 
-export async function fetchUserSettings() {
+export async function fetchUserSettings(): Promise<UserSettings | undefined> {
   console.log("fetching user settings");
+
+  const { rows } = await db(
+    "SELECT lang, profile_color_id, display_name, dark_mode, primary_color_id FROM public.user;"
+  );
+  return rows[0];
 }
 
 export async function fetchAmountIndicators(): Promise<AmountIndicators> {

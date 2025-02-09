@@ -14,8 +14,6 @@ export default function Account({
   name: string | undefined;
   loading?: boolean;
 }) {
-  const router = useRouter();
-
   if (loading) return <h2 className="text-sm">Loading...</h2>;
   return (
     <div
@@ -25,7 +23,8 @@ export default function Account({
         className={cn(
           "text-sm",
           // For dark purple, we want the text to be white for readability
-          colorId == 5 && "text-background dark:text-foreground"
+          colorId == 5 && "text-background dark:text-foreground",
+          colorId && colorId > 1 && colorId < 5 && "dark:text-background"
         )}
       >
         {getNameInitials(name)}

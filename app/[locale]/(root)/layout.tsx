@@ -6,6 +6,8 @@ import { useTheme } from "next-themes";
 import { SkeletonTheme } from "react-loading-skeleton";
 import { useLayout } from "@/contexts/use-layout";
 import { fetchUserSettings } from "@/lib/db/general";
+import { useEffect } from "react";
+import useIsMounted from "@/hooks/use-mounted";
 
 export default function RootLayout({
   children,
@@ -14,13 +16,51 @@ export default function RootLayout({
 }>) {
   const { theme } = useTheme();
   const { isFullscreen } = useLayout();
+  const isMounted = useIsMounted();
 
-  // if (false) {
-  //   const syncUserSettings = async () => {
-  //     const settings = await fetchUserSettings();
-  //   };
-  //   syncUserSettings();
-  // }
+  useEffect(() => {
+    if (isMounted) {
+      console.log(
+        "checking for invalid values in locastorage: ",
+        localStorage.getItem("profile_color_id") == null ||
+          localStorage.getItem("displayName") == null ||
+          localStorage.getItem("theme") == null ||
+          localStorage.getItem("themeColor") == null
+      );
+
+      if (
+        localStorage.getItem("profile_color_id") == null ||
+        localStorage.getItem("displayName") == null ||
+        localStorage.getItem("theme") == null ||
+        localStorage.getItem("themeColor") == null
+      ) {
+        console.log("a localstorage item was found that was undefined");
+
+        const syncUserSettings = async () => {
+          const settings = await fetchUserSettings();
+          if (settings) {
+            const {
+              profile_color_id,
+              display_name,
+              dark_mode,
+              primary_color_id,
+              lang,
+            } = settings;
+            console.log(settings);
+
+            // Profile
+            // localStorage.setItem("profile_color_id", profile_color_id.toString());
+            // localStorage.setItem("display_name", display_name);
+
+            // Appearance
+            // localStorage.setItem("dark_mode", dark_mode.toString());
+            // localStorage.setItem("primary_color_id", primary_color_id.toString());
+          }
+        };
+        syncUserSettings();
+      }
+    }
+  }, [isMounted]);
 
   return (
     <SkeletonTheme

@@ -168,7 +168,7 @@ export async function updateSetting(
     };
   }
   try {
-    await sleep(3000)
+    await sleep(1000)
     if (!userId) throw new Error("Invalid user id.");
     // Try to validate and parse the raw data.
     const parsedData = UpdateSettingSchema.parse(rawData);

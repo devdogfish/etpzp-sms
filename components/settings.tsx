@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import { RenderInputArgs } from "@/components/settings-item";
 import { useEffect, useState } from "react";
 import { updateSetting } from "@/lib/actions/user.actions";
+import { ThemeColors } from "@/types/theme";
 
 export function LanguageChanger({
   // value,

@@ -1,4 +1,6 @@
-const themes = {
+import { Theme, ThemeColors, ThemeProperties, Themes } from "@/types/theme";
+
+export const themes: Themes = {
   Orange: {
     light: {
       background: "0 0% 100%",
@@ -42,6 +44,7 @@ const themes = {
       border: "12 6.5% 15.1%",
       input: "12 6.5% 15.1%",
       ring: "20.5 90.2% 48.2%",
+      radius: "0.5rem",
     },
   },
   Blue: {
@@ -87,6 +90,7 @@ const themes = {
       border: "217.2 32.6% 17.5%",
       input: "217.2 32.6% 17.5%",
       ring: "224.3 76.3% 48%",
+      radius: "0.5rem",
     },
   },
   Green: {
@@ -132,6 +136,7 @@ const themes = {
       border: "240 3.7% 15.9%",
       input: "240 3.7% 15.9%",
       ring: "142.4 71.8% 29.2%",
+      radius: "0.5rem",
     },
   },
   Rose: {
@@ -177,6 +182,7 @@ const themes = {
       border: "240 3.7% 15.9%",
       input: "240 3.7% 15.9%",
       ring: "346.8 77.2% 49.8%",
+      radius: "0.5rem",
     },
   },
   Zinc: {
@@ -222,6 +228,7 @@ const themes = {
       border: "240 3.7% 15.9%",
       input: "240 3.7% 15.9%",
       ring: "240 4.9% 83.9%",
+      radius: "0.5rem",
     },
   },
 };
@@ -230,10 +237,24 @@ export default function setGlobalColorTheme(
   themeMode: "light" | "dark",
   color: ThemeColors
 ) {
-  const theme = themes[color][themeMode] as {
-    [key: string]: string;
-  };
+  const theme = themes[color][themeMode];
+
   for (const key in theme) {
-    document.documentElement.style.setProperty(`--${key}`, theme[key]);
+    // Use type assertion to specify that key is a key of ThemeProperties
+    document.documentElement.style.setProperty(
+      `--${key}`,
+      theme[key as keyof ThemeProperties]
+    );
   }
+}
+
+// Create a new array to hold the themes in a 1-based index format
+const themesArray = Object.keys(themes).map((key, index) => {
+  return { index: index + 1, name: key, value: themes[key] };
+});
+
+// Function to get theme by index
+function getThemeByIndex(index: number): Theme | undefined {
+  const theme = themesArray.find((theme) => theme.index === index);
+  return theme ? theme.value : undefined; // Return the theme value or undefined if not found
 }
