@@ -43,7 +43,8 @@ export default async function fetchUser(
         data: selectResult.rows[0],
       };
     } else {
-      console.log("Trying to create new user in DB.");
+      // User has never signed up before
+      console.log("Creating new user in DB...");
 
       return new Promise((resolve) => {
         ad.findUser(email, async (err, user: any) => {
@@ -57,14 +58,14 @@ export default async function fetchUser(
           const { cn, displayName, givenName, sn } = user;
           try {
             const insertResult = await db(
-              "INSERT INTO public.user (email, name, role, display_name, first_name, last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
+              "INSERT INTO public.user (email, name, role, first_name, last_name, display_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
               [
-                email,
-                cn,
+                email, // email
+                cn, // complete name
                 isAdmin ? "ADMIN" : "USER",
+                givenName, // first name
+                sn, // surname
                 displayName,
-                givenName,
-                sn,
               ]
             );
 
@@ -109,18 +110,19 @@ export async function dummyFetchUser(
         data: selectResult.rows[0],
       };
     } else {
-      console.log("Trying to create new user in DB.");
+      // User has never signed up before
+      console.log("Creating new user in DB...");
 
       try {
         const insertResult = await db(
-          "INSERT INTO public.user (email, name, role, display_name, first_name, last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
+          "INSERT INTO public.user (email, name, role, first_name, last_name, display_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
           [
             user.email,
             user.name,
             user.role,
-            user.display_name,
             user.first_name,
             user.last_name,
+            user.first_name + user.last_name,
           ]
         );
 
@@ -148,7 +150,6 @@ export async function dummyFetchUser(
 export async function updateSetting(
   formData: FormData
 ): Promise<UpdateSettingResponse> {
-  sleep(1000)
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -160,7 +161,7 @@ export async function updateSetting(
 
   if (!validSettingNames.includes(rawData.name)) {
     console.log(rawData.name);
-    
+
     return {
       success: false,
       error: "Invalid setting",
@@ -180,13 +181,9 @@ export async function updateSetting(
     );
 
     const { rows } = await db(
-      `UPDATE public.user SET ${parsedData.name} = $2 WHERE id = $1 RETURNING lang, profile_color_id, display_name, dark_mode, primary_color_id;`,
+      `UPDATE public.user SET ${parsedData.name} = $2, updated_at = NOW() WHERE id = $1 RETURNING lang, profile_color_id, display_name, dark_mode, primary_color_id;`,
       [userId, parsedData.value]
     );
-
-    // Update the settings cookie
-    const cookieStore = await cookies();
-    cookieStore.set("my-settings", JSON.stringify(rows[0]));
 
     return {
       success: true,

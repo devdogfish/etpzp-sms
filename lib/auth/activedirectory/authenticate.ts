@@ -1,10 +1,10 @@
 "use server";
+
 import ActiveDirectory from "activedirectory2";
 import { activeDirectoryConfig, SessionData } from "@/lib/auth/config";
 import userExists from "./user";
 import userInGroup from "./group";
 import fetchUser, { dummyFetchUser } from "@/lib/actions/user.actions";
-import db from "@/lib/db";
 import { User } from "@/types";
 
 export default async function authenticate({
@@ -66,11 +66,17 @@ export async function dummyAuthenticate({
       id: "1",
       email: "pepe@gmail.com",
       name: "Pepe Maximus",
-      display_name: "Pepe Maximus",
       first_name: "Pepe",
       last_name: "Maximus",
-      color_id: 1,
       role: "ADMIN",
+
+      lang: "pt",
+
+      profile_color_id: 1,
+      display_name: "Pepe Maximus",
+
+      primary_color_id: 1,
+      dark_mode: false,
     },
     isAuthenticated: true,
     isAdmin: true,

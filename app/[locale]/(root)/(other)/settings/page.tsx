@@ -37,23 +37,7 @@ export default function Settings() {
   };
   return (
     <>
-      <PageHeader title={t("SETTING")}>
-        <Button
-          onClick={() => {
-            const userData = getComplexObjectFromCookie("my-settings");
-            console.log(userData);
-          }}
-        >
-          log cookie
-        </Button>
-        <Button
-          onClick={() =>
-            (document.cookie = `my-settings=${"my-settings-value"};expires=${10000};path=/`)
-          }
-        >
-          create cookie
-        </Button>
-      </PageHeader>
+      <PageHeader title={t("SETTING")} />
       <div className="py-4 px-4 space-y-12 h-[calc(100vh-52px)] overflow-y-scroll">
         <SectionHeader
           title="Language"
@@ -63,15 +47,27 @@ export default function Settings() {
             name="lang"
             label="Language"
             description="Set the font you want to use in the app."
-            renderInput={({ value, onChange, onBlur, id }) => (
-              <LanguageChanger
-                // Initial value handled internally
-                id={id}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-              />
-            )}
+            renderInput={({
+              value,
+              onChange,
+              onBlur,
+              id,
+              isPending,
+              setServerState,
+            }) => {
+              return (
+                <LanguageChanger
+                  // This component has custom behavior—only select props are used as it handles its own submission,
+                  // and setServerState is passed so SettingItem elements update with errors.
+                  id={id}
+                  value={value}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  isPending={isPending}
+                  setServerState={setServerState}
+                />
+              );
+            }}
           />
         </SectionHeader>
 
@@ -83,7 +79,7 @@ export default function Settings() {
             name="profile_color_id" // this might need to be the exact database field
             label="Profile color"
             description="Set the profile color you want to see in the app."
-            renderInput={({ value, onChange, onBlur, id }) => {
+            renderInput={({ value, onChange, onBlur, id, isPending }) => {
               const profileColors = [
                 {
                   value: "1",
@@ -125,6 +121,7 @@ export default function Settings() {
                       onBlur(undefined, value);
                     }, 200);
                   }}
+                  disabled={isPending}
                 >
                   <SelectTrigger
                     id={id}
@@ -158,13 +155,14 @@ export default function Settings() {
             name="primary_color_id" // this might need to be the exact database field
             label="Theme color"
             description="Set the font you want to use in the app."
-            renderInput={({ value, onChange, onBlur, id }) => (
+            renderInput={({ value, onChange, onBlur, id, isPending }) => (
               <ThemeColorChanger
                 // Initial value handled internally
                 id={id}
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
+                isPending={isPending}
               />
             )}
           />
@@ -172,7 +170,7 @@ export default function Settings() {
             name="dark_mode"
             label="Theme"
             description="Select the theme for the app."
-            renderInput={({ value, onChange, onBlur, id, className }) => (
+            renderInput={({ value, onChange, onBlur, id, isPending }) => (
               <ThemeToggle
                 id={id}
                 value={value}
@@ -180,6 +178,7 @@ export default function Settings() {
                 onBlur={onBlur}
                 className="order-2"
                 initialValue={initialValues.appearance.darkMode}
+                isPending={isPending}
               />
             )}
           />

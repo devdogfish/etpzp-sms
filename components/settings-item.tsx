@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { updateSetting } from "@/lib/actions/user.actions";
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { SetStateAction } from "react";
 import {
   useState,
   useTransition,
@@ -20,6 +20,8 @@ export type RenderInputArgs = {
   id: string;
   initialValue?: string;
   className?: string;
+  isPending: boolean;
+  setServerState?: React.Dispatch<SetStateAction<UpdateSettingResponse>>;
 };
 
 type SettingItemProps = InputHTMLAttributes<HTMLInputElement> & {
@@ -37,7 +39,6 @@ const initialState: UpdateSettingResponse = {
   input: "",
 };
 
-React.memo(SettingItem);
 export function SettingItem({
   name,
   initialValue = "",
@@ -49,21 +50,11 @@ export function SettingItem({
   ...inputProps
 }: SettingItemProps) {
   const [value, setValue] = useState<string>(initialValue);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [serverState, setServerState] = useState(initialState);
-
-  // this is interfering with the shitty input
-  // useEffect(() => {
-  //   if (initialValue && value === "") {
-  //     console.log("VALUE GOT RESET TO initialValue");
-  //     setValue(initialValue);
-  //   }
-  // }, [initialValue, value, serverState]);
 
   async function handleSubmit(e?: FormEvent, submittedValue?: string) {
     if (e) e.preventDefault();
-
-    console.log("submitted value", submittedValue);
 
     setIsPending(true);
 
@@ -73,7 +64,6 @@ export function SettingItem({
 
     const result = await updateSetting(formData);
     setServerState(result);
-    console.log("serverState");
     console.log(result);
 
     if (onUpdate) onUpdate(value);
@@ -96,6 +86,7 @@ export function SettingItem({
       onChange={(e) => handleChange(e.target.value)}
       onBlur={(e?: any, v?: any) => handleSubmit(e, v)}
       style={{ width: "max-content" }}
+      disabled={isPending}
       {...inputProps}
     />
   );
@@ -107,6 +98,8 @@ export function SettingItem({
         onBlur: (e, submittedValue) => handleSubmit(e, submittedValue),
         id: name,
         initialValue,
+        isPending,
+        setServerState,
       })
     : defaultInput;
 
@@ -116,9 +109,6 @@ export function SettingItem({
       style={{ marginBottom: "1rem" }}
       className="space-y-2 flex flex-col"
     >
-      {typeof serverState.data === "boolean" && (
-        <div>serverState.data: {serverState.data.toString()}</div>
-      )}
       <label
         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         htmlFor={name}

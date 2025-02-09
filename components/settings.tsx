@@ -9,29 +9,39 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useThemeContext } from "@/contexts/theme-data-provider";
-import { useSession } from "@/hooks/use-session";
 import { i18nConfig } from "@/i18nConfig";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { Input } from "./ui/input";
 import { RenderInputArgs } from "@/components/settings-item";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { updateSetting } from "@/lib/actions/user.actions";
 
 export function LanguageChanger({
   // value,
   onChange,
-  onBlur,
   id,
+  setServerState,
 }: RenderInputArgs) {
   const pathname = usePathname();
   const router = useRouter();
   const { t, i18n } = useTranslation(["Navigation"]);
   const currentLocale = i18n.language;
+  const [isPending, setIsPending] = useState<boolean>(false);
 
-  const handleChange = (newLocale: string) => {
-    // set cookie for next-i18n-router
+  const handleChange = async (newLocale: string) => {
+    // Update the database first
+    setIsPending(true);
+    const formData = new FormData();
+    formData.append("name", "lang");
+    formData.append("value", newLocale);
+
+    const result = await updateSetting(formData);
+    if (setServerState) setServerState(result);
+    setIsPending(false);
+
+    // Set cookie for next-i18n-router
     const days = 30;
     const date = new Date();
     date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
@@ -46,19 +56,15 @@ export function LanguageChanger({
     } else {
       router.push(pathname.replace(`/${currentLocale}`, `/${newLocale}`));
     }
-
     router.refresh();
-    onChange(newLocale);
-    setTimeout(() => {
-      onBlur(undefined, newLocale);
-    }, 200);
   };
   return (
     <Select
       defaultValue={currentLocale}
-      // When make this controlled by passing in value. But this breaks the app, so I don't know what's going wrong
+      // When turning into a controlled input by passing in a value, the app breaks - I'm not sure why.
       // value={value}
-      onValueChange={(newValue) => handleChange(newValue)}
+      onValueChange={handleChange}
+      disabled={isPending}
     >
       <SelectTrigger
         id={id}
@@ -109,7 +115,12 @@ const colors = [
     dark: "bg-orange-700",
   },
 ];
-export function ThemeColorChanger({ onChange, onBlur, id }: RenderInputArgs) {
+export function ThemeColorChanger({
+  onChange,
+  onBlur,
+  id,
+  isPending,
+}: RenderInputArgs) {
   const { themeColor, setThemeColor } = useThemeContext();
   const { theme } = useTheme();
   const currentColorIndex = colors.find((color) => color.name === themeColor);
@@ -131,6 +142,7 @@ export function ThemeColorChanger({ onChange, onBlur, id }: RenderInputArgs) {
     <Select
       defaultValue={currentColorIndex?.value || "1"}
       onValueChange={handleChange}
+      disabled={isPending}
     >
       <SelectTrigger
         id={id}
@@ -152,6 +164,7 @@ export function ThemeToggle({
   id,
   initialValue,
   className,
+  isPending,
 }: RenderInputArgs) {
   const { theme, setTheme } = useTheme();
 
@@ -164,7 +177,10 @@ export function ThemeToggle({
   };
   return (
     <div className={cn(className, "grid max-w-md grid-cols-2 gap-8 pt-2")}>
-      <div onClick={() => handleChange("light")}>
+      <div
+        onClick={isPending ? () => {} : () => handleChange("light")}
+        className={cn(isPending && "opacity-50 cursor-not-allowed")}
+      >
         <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
           <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
             <div className="space-y-2 rounded-md bg-white p-2 shadow-sm">
@@ -182,12 +198,20 @@ export function ThemeToggle({
           </div>
         </div>
         <label className="block w-full p-2 text-center font-normal text-sm">
-          Light {theme === "light" && "(active)"}
+          Light {!isPending && theme === "light" && "(active)"}
         </label>
       </div>
 
-      <div onClick={() => handleChange("dark")}>
-        <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
+      <div
+        onClick={isPending ? () => {} : () => handleChange("dark")}
+        className={cn(isPending && "opacity-50 cursor-not-allowed")}
+      >
+        <div
+          className={cn(
+            "items-center rounded-md border-2 border-muted bg-popover p-1",
+            !isPending && "hover:bg-accent hover:text-accent-foreground"
+          )}
+        >
           <div className="space-y-2 rounded-sm bg-slate-950 p-2">
             <div className="space-y-2 rounded-md bg-slate-800 p-2 shadow-sm">
               <div className="h-2 w-[80px] rounded-lg bg-slate-400" />
@@ -204,7 +228,7 @@ export function ThemeToggle({
           </div>
         </div>
         <label className="block w-full p-2 text-center font-normal text-sm">
-          Dark {theme === "dark" && "(active)"}
+          Dark {!isPending && theme === "dark" && "(active)"}
         </label>
       </div>
     </div>

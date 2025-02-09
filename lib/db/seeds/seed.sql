@@ -9,8 +9,8 @@ CREATE TABLE "user" (
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
 
-    -- User Settings
-    lang VARCHAR(2), -- ISO 639-1 language code
+    -- User settings: all have defaults except display name, which defaults to the user's AD name when they first sign up.
+    lang VARCHAR(2) NOT NULL DEFAULT 'pt', -- ISO 639-1 language code
     
     profile_color_id SMALLINT NOT NULL DEFAULT 1,
     display_name VARCHAR(50) NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE "contact" (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     -- color_id SMALLINT NOT NULL DEFAULT 1, Do you really want to feel the pain of implementing this too?
-    UNIQUE (user_id, phone) -- the same phone number may exist between different user, but there cannot be contacts with the same phone number for one user.
+    UNIQUE (user_id, phone) -- The same phone number may exist between different user, but there cannot be contacts with the same phone number for one user.
 );
 
 -- Create recipient table

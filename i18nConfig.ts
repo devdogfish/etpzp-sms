@@ -1,6 +1,6 @@
 export const i18nConfig = {
-  locales: ["en", "pt"],
+  locales: ["pt", "en"],
   defaultLocale: "en",
-  prefixDefault: false, // add this if you want to always see a language even if english is selected it will show `/en` if set to true
-  localePath: '@/app/[locale]/i18n'
+  prefixDefault: false, 
+  localePath: "@/app/[locale]/i18n",
 };

@@ -22,7 +22,6 @@ export type User = {
   name: string;
   first_name: string;
   last_name: string;
-  color_id: number;
 
   email: string;
   role: "USER" | "ADMIN";

@@ -119,12 +119,19 @@ lib/
 
 I want to use the same structure for my components.
 
+If we want to at some point have the settings saved in a cookie, paste this in the updateSetting action:
+
+```js
+// Update the settings cookie
+const cookieStore = await cookies();
+cookieStore.set("my-settings", JSON.stringify(rows[0]));
+```
+
 ## TODO
 
 1. \*\* ** Do a test deployment ** \*\*
 2. Figure out invalid NextConfig and make sure the translation works properly.
 
-- Color setting for user's profile background as well as display name
 - Update chart colors to look nice - get a nice color combination from a color generator
 - Update the message display to look nicer and actually display stuff in the correct manner
 
