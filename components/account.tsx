@@ -21,7 +21,15 @@ export default function Account({
     <div
       className={`w-${size} h-${size} rounded-full content-center bg-chart-${colorId}`}
     >
-      <p className="text-sm">{getNameInitials(name)}</p>
+      <p
+        className={cn(
+          "text-sm",
+          // For dark purple, we want the text to be white for readability
+          colorId == 5 && "text-background dark:text-foreground"
+        )}
+      >
+        {getNameInitials(name)}
+      </p>
     </div>
   );
 }

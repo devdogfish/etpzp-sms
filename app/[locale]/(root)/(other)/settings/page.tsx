@@ -101,13 +101,13 @@ export default function Settings() {
                 },
                 {
                   value: "4",
-                  name: "Purple",
+                  name: "Orange",
                   light: "bg-chart-4",
                   dark: "bg-chart-4",
                 },
                 {
                   value: "5",
-                  name: "Red",
+                  name: "Purple",
                   light: "bg-chart-5",
                   dark: "bg-chart-5",
                 },

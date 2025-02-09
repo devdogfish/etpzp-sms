@@ -70,6 +70,9 @@ export function SettingItem({
 
     if (name === "display_name" || name === "profile_color_id") {
       localStorage.setItem(name, result.data || initialValue);
+
+      // Dispatch a custom event to update other components that display settings stored in localstorage
+      window.dispatchEvent(new Event("settingsUpdated"));
     }
     setIsPending(false);
   }

@@ -130,27 +130,29 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   // 1. Sensitive information is extracted from the encrypted session
   // 2. Stuff that can be changed in the settings is encrypted from localstorage
   const { session, loading } = useSession();
-
-  const [displayName, setDisplayName] = useState(
-    localStorage.getItem("display_name") || undefined
-  );
+  const [{ name, colorId }, setSettings] = useState({
+    name: localStorage.getItem("display_name") || undefined,
+    colorId: Number(localStorage.getItem("profile_color_id")) || undefined,
+  });
 
   useEffect(() => {
-    // Function to handle storage changes
-    const handleStorageChange = (event: any) => {
-      if (event.key === "display_name") {
-        setDisplayName(event.newValue); // Update state with new value
-      }
+    // Function to handle settings localstorage changes
+    const handleStorageChange = () => {
+      setSettings({
+        name: localStorage.getItem("display_name") || undefined,
+        colorId: Number(localStorage.getItem("profile_color_id")) || undefined,
+      });
     };
 
-    // Listen for storage events
-    window.addEventListener("storage", handleStorageChange);
+    // Listen for our custom event settings update event
+    window.addEventListener("settingsUpdated", handleStorageChange);
 
     // Cleanup the event listener on component unmount
     return () => {
-      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("settingsUpdated", handleStorageChange);
     };
   }, []);
+
   const handleLogout = async () => {
     const result = await logout();
     if (result.success) {
@@ -172,23 +174,14 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
               isCollapsed && "w-9 h-9"
             )}
           >
-            <Account
-              size={9}
-              name={displayName}
-              colorId={
-                Number(localStorage.getItem("profile_color_id")) || undefined
-              }
-              loading={loading}
-            />
+            <Account size={9} name={name} colorId={colorId} loading={loading} />
             <div
               className={cn(
                 "flex flex-col items-start",
                 isCollapsed && "hidden"
               )}
             >
-              <p className="font-semibold mb-[-3px]">
-                {localStorage.getItem("display_name") || "No name"}
-              </p>
+              <p className="font-semibold mb-[-3px]">{name || "No name"}</p>
               <span className="text-xs">
                 {session?.isAdmin ? "Admin" : "User"}
               </span>

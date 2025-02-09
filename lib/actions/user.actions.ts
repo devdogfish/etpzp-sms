@@ -11,6 +11,7 @@ import {
   UpdateSettingResponse,
 } from "@/types/action";
 import { getSession } from "../auth/sessions";
+import { sleep } from "../utils";
 
 // These are guaranteed properties when you find the user using A.D.
 type userResult = {
@@ -167,6 +168,7 @@ export async function updateSetting(
     };
   }
   try {
+    await sleep(3000)
     if (!userId) throw new Error("Invalid user id.");
     // Try to validate and parse the raw data.
     const parsedData = UpdateSettingSchema.parse(rawData);
