@@ -69,7 +69,7 @@ export function LanguageChanger({
       >
         <SelectValue placeholder="Select Language" />
       </SelectTrigger>
-      <SelectContent className="light:bg-white">
+      <SelectContent>
         <SelectItem value="en">English</SelectItem>
         <SelectItem value="pt">Portuguese</SelectItem>
       </SelectContent>
@@ -77,21 +77,63 @@ export function LanguageChanger({
   );
 }
 
-export function ThemeColorChanger({
-  value,
-  onChange,
-  onBlur,
-  id,
-}: RenderInputArgs) {
+const colors = [
+  {
+    value: "1",
+    name: "Zinc",
+    light: "bg-zinc-900",
+    dark: "bg-zinc-700",
+  },
+  {
+    value: "2",
+    name: "Rose",
+    light: "bg-rose-600",
+    dark: "bg-rose-700",
+  },
+  {
+    value: "3",
+    name: "Blue",
+    light: "bg-blue-600",
+    dark: "bg-blue-700",
+  },
+  {
+    value: "4",
+    name: "Green",
+    light: "bg-green-600",
+    dark: "bg-green-500",
+  },
+  {
+    value: "5",
+    name: "Orange",
+    light: "bg-orange-500",
+    dark: "bg-orange-700",
+  },
+];
+export function ThemeColorChanger({ onChange, onBlur, id }: RenderInputArgs) {
   const { themeColor, setThemeColor } = useThemeContext();
   const { theme } = useTheme();
+  const currentColorIndex = colors.find((color) => color.name === themeColor);
+
+  const handleChange = (colorIndex: string) => {
+    const colorObject = colors.find((color) => color.value == colorIndex);
+    if (colorObject) {
+      setThemeColor(colorObject.name as ThemeColors);
+      onChange(colorIndex);
+      setTimeout(() => {
+        onBlur(undefined, colorIndex);
+      }, 200);
+    } else {
+      console.log("Invalid color");
+    }
+  };
 
   return (
     <Select
-      onValueChange={(newColor) => setThemeColor(newColor as ThemeColors)}
-      defaultValue={themeColor}
+      defaultValue={currentColorIndex?.value || "1"}
+      onValueChange={handleChange}
     >
       <SelectTrigger
+        id={id}
         className={cn(
           buttonVariants({ variant: "outline" }),
           "w-[200px] appearance-none font-normal justify-between"
@@ -99,28 +141,30 @@ export function ThemeColorChanger({
       >
         <SelectValue />
       </SelectTrigger>
-      <SelectContent>
-        {createSelectItems(
-          [
-            { name: "Zinc", light: "bg-zinc-900", dark: "bg-zinc-700" },
-            { name: "Rose", light: "bg-rose-600", dark: "bg-rose-700" },
-            { name: "Blue", light: "bg-blue-600", dark: "bg-blue-700" },
-            { name: "Green", light: "bg-green-600", dark: "bg-green-500" },
-            { name: "Orange", light: "bg-orange-500", dark: "bg-orange-700" },
-          ],
-          theme
-        )}
-      </SelectContent>
+      <SelectContent>{createSelectItems(colors, theme)}</SelectContent>
     </Select>
   );
 }
 
-export function ThemeModeToggle() {
+export function ThemeToggle({
+  onChange,
+  onBlur,
+  id,
+  initialValue,
+  className,
+}: RenderInputArgs) {
   const { theme, setTheme } = useTheme();
 
+  const handleChange = (value: string) => {
+    setTheme(value);
+    onChange(value);
+    setTimeout(() => {
+      onBlur(undefined, value);
+    }, 200);
+  };
   return (
-    <div className="grid max-w-md grid-cols-2 gap-8 pt-2">
-      <div onClick={() => setTheme("light")}>
+    <div className={cn(className, "grid max-w-md grid-cols-2 gap-8 pt-2")}>
+      <div onClick={() => handleChange("light")}>
         <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
           <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
             <div className="space-y-2 rounded-md bg-white p-2 shadow-sm">
@@ -142,7 +186,7 @@ export function ThemeModeToggle() {
         </label>
       </div>
 
-      <div onClick={() => setTheme("dark")}>
+      <div onClick={() => handleChange("dark")}>
         <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
           <div className="space-y-2 rounded-sm bg-slate-950 p-2">
             <div className="space-y-2 rounded-md bg-slate-800 p-2 shadow-sm">
@@ -168,8 +212,8 @@ export function ThemeModeToggle() {
 }
 
 export const createSelectItems = (data: any[], theme: string | undefined) => {
-  return data.map(({ name, light, dark }) => (
-    <SelectItem key={name} value={name}>
+  return data.map(({ name, light, dark, value }) => (
+    <SelectItem key={value} value={value || name}>
       <div className="flex gap-2">
         <div
           className={cn(

@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { updateSetting } from "@/lib/actions/user.actions";
 import { cn } from "@/lib/utils";
-import type React from "react";
+import React from "react";
 import {
   useState,
   useTransition,
@@ -19,6 +19,7 @@ export type RenderInputArgs = {
   onBlur: (e?: FormEvent<Element>, submittedValue?: string) => void;
   id: string;
   initialValue?: string;
+  className?: string;
 };
 
 type SettingItemProps = InputHTMLAttributes<HTMLInputElement> & {
@@ -36,6 +37,7 @@ const initialState: UpdateSettingResponse = {
   input: "",
 };
 
+React.memo(SettingItem);
 export function SettingItem({
   name,
   initialValue = "",
@@ -48,15 +50,15 @@ export function SettingItem({
 }: SettingItemProps) {
   const [value, setValue] = useState<string>(initialValue);
   const [isPending, setIsPending] = useState(false);
-
-  useEffect(() => {
-    if (initialValue && value === "") {
-      console.log("VALUE GOT RESET TO initialValue");
-      setValue(initialValue);
-    }
-  }, [initialValue, value]);
-
   const [serverState, setServerState] = useState(initialState);
+
+  // this is interfering with the shitty input
+  // useEffect(() => {
+  //   if (initialValue && value === "") {
+  //     console.log("VALUE GOT RESET TO initialValue");
+  //     setValue(initialValue);
+  //   }
+  // }, [initialValue, value, serverState]);
 
   async function handleSubmit(e?: FormEvent, submittedValue?: string) {
     if (e) e.preventDefault();
@@ -71,8 +73,14 @@ export function SettingItem({
 
     const result = await updateSetting(formData);
     setServerState(result);
+    console.log("serverState");
+    console.log(result);
+
     if (onUpdate) onUpdate(value);
 
+    if (name === "display_name" || name === "profile_color_id") {
+      localStorage.setItem(name, result.data || initialValue);
+    }
     setIsPending(false);
   }
 
@@ -108,7 +116,9 @@ export function SettingItem({
       style={{ marginBottom: "1rem" }}
       className="space-y-2 flex flex-col"
     >
-      {serverState.data && <div>serverState.data: {serverState.data}</div>}
+      {typeof serverState.data === "boolean" && (
+        <div>serverState.data: {serverState.data.toString()}</div>
+      )}
       <label
         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         htmlFor={name}
@@ -118,7 +128,7 @@ export function SettingItem({
       {inputElement}
       <p
         className={cn(
-          "text-[0.8rem]",
+          "text-[0.8rem] order-1",
           serverState.error ? "text-destructive" : "text-muted-foreground"
         )}
       >

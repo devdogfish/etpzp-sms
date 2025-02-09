@@ -10,12 +10,7 @@ const ThemeContext = createContext<ThemeColorStateParams>(
 
 export default function ThemeDataProvider({ children }: ThemeProviderProps) {
   const getSavedThemeColor = () => {
-    try {
-      return (localStorage.getItem("themeColor") as ThemeColors) || "Zinc";
-    } catch (error) {
-      return new Error(`Error reading color theme: ${error}`);
-      // return "Zinc" as ThemeColors;
-    }
+    return (localStorage.getItem("themeColor") as ThemeColors) || "Zinc";
   };
 
   const [themeColor, setThemeColor] = useState<ThemeColors>(

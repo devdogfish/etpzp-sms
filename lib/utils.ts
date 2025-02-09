@@ -165,3 +165,22 @@ export function toastActionResult(result: ActionResponse<any>) {
     toast.error(result.message[0], { description: result.message[1] });
   }
 }
+
+export function getComplexObjectFromCookie(cookieName: string) {
+  const nameEQ = `${cookieName}=`;
+  const cookies = document.cookie.split(";");
+  for (let cookie of cookies) {
+    cookie = cookie.trim();
+    if (cookie.startsWith(nameEQ)) {
+      const cookieValue = cookie.substring(nameEQ.length);
+      try {
+        // Decode and parse the JSON string into an object
+        return JSON.parse(decodeURIComponent(cookieValue));
+      } catch (error) {
+        console.error("Error parsing cookie:", error);
+        return null;
+      }
+    }
+  }
+  return null;
+}

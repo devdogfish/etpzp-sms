@@ -4,7 +4,7 @@ import { SettingName, User } from "@/types";
 import db from "../db";
 import ActiveDirectory from "activedirectory2";
 import { z } from "zod";
-import { updateSettingSchema, validSettingNames } from "../form.schemas";
+import { UpdateSettingSchema, validSettingNames } from "../form.schemas";
 import {
   ActionResponse,
   DataActionResponse,
@@ -12,6 +12,7 @@ import {
 } from "@/types/action";
 import { getSession } from "../auth/sessions";
 import { cookies } from "next/headers";
+import { sleep } from "../utils";
 
 // These are guaranteed properties when you find the user using A.D.
 type userResult = {
@@ -147,6 +148,7 @@ export async function dummyFetchUser(
 export async function updateSetting(
   formData: FormData
 ): Promise<UpdateSettingResponse> {
+  sleep(1000)
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -157,16 +159,18 @@ export async function updateSetting(
   };
 
   if (!validSettingNames.includes(rawData.name)) {
+    console.log(rawData.name);
+    
     return {
       success: false,
-      error: "Invalid setting value",
+      error: "Invalid setting",
       input: rawData.value,
     };
   }
   try {
     if (!userId) throw new Error("Invalid user id.");
     // Try to validate and parse the raw data.
-    const parsedData = updateSettingSchema.parse(rawData);
+    const parsedData = UpdateSettingSchema.parse(rawData);
     console.log(`Updating database ${parsedData.name} setting`);
 
     // If validation passed, you can proceed to update the database accordingly.
@@ -187,7 +191,7 @@ export async function updateSetting(
     return {
       success: true,
       input: rawData.value,
-      data: rows[0][rawData.name],
+      data: rows[0][parsedData.name],
     };
   } catch (error) {
     // If the error is produced by zod, extract and send back the error details.

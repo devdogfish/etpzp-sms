@@ -52,7 +52,7 @@ export const validSettingNames = [
   "primary_color_id",
 ];
 // Create a schema that handles each setting separately
-export const updateSettingSchema = z.discriminatedUnion("name", [
+export const UpdateSettingSchema = z.discriminatedUnion("name", [
   // For the language setting (“lang”) we expect a 2‑character string (ISO 639‑1 code)
   z.object({
     name: z.literal("lang"),
@@ -97,9 +97,11 @@ export const updateSettingSchema = z.discriminatedUnion("name", [
   z.object({
     name: z.literal("dark_mode"),
     value: z.preprocess((val) => {
+      console.log("parsing bool from string. current value:", val);
+      
       // Convert strings "true" and "false" to actual booleans.
-      if (val === "true") return true;
-      if (val === "false") return false;
+      if (val === "dark") return true;
+      if (val === "light") return false;
       return val;
     }, z.boolean({ invalid_type_error: "Dark mode must be a boolean value" })),
   }),

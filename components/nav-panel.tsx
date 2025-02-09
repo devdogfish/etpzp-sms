@@ -125,8 +125,11 @@ export function MobileNavPanel() {
 function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   const { t } = useTranslation();
   const { amountIndicators } = useLayout();
-  const { session, loading } = useSession();
   const router = useRouter();
+  // We have to data sources for the user's profile:
+  // 1. Sensitive information is extracted from the encrypted session
+  // 2. Stuff that can be changed in the settings is encrypted from localstorage
+  const { session, loading } = useSession();
 
   const handleLogout = async () => {
     const result = await logout();
@@ -151,8 +154,10 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
           >
             <Account
               size={9}
-              name={session?.user?.display_name}
-              colorId={session?.user?.color_id}
+              name={localStorage.getItem("display_name") || undefined}
+              colorId={
+                Number(localStorage.getItem("profile_color_id")) || undefined
+              }
               loading={loading}
             />
             <div
@@ -161,7 +166,9 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
                 isCollapsed && "hidden"
               )}
             >
-              <p className="font-semibold mb-[-3px]">{session?.user?.name}</p>
+              <p className="font-semibold mb-[-3px]">
+                {localStorage.getItem("display_name") || "No name"}
+              </p>
               <span className="text-xs">
                 {session?.isAdmin ? "Admin" : "User"}
               </span>
@@ -200,7 +207,10 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
           links={[
             {
               title: t("SENT"),
-              label: amountIndicators?.sent == 0 ? "" : amountIndicators?.sent.toString(),
+              label:
+                amountIndicators?.sent == 0
+                  ? ""
+                  : amountIndicators?.sent.toString(),
               icon: MailCheck,
               variant: "ghost",
               href: "/sent",

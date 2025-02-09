@@ -7,6 +7,16 @@ export type CategoryEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFT" | "TRASH";
 
 export type StringBoolMap = { [key: string]: boolean };
 
+export type UserSettings = {
+  lang: string;
+
+  profile_color_id: number;
+  display_name: string;
+
+  dark_mode: boolean;
+  primary_color_id: number;
+};
+
 export type User = {
   id: string;
   name: string;
@@ -18,16 +28,7 @@ export type User = {
   role: "USER" | "ADMIN";
   created_at?: Date;
   updated_at?: Date;
-
-  // User settings
-  lang: string;
-
-  profile_color_id: number;
-  display_name: string;
-
-  dark_mode: boolean;
-  primary_color_id: number;
-};
+} & UserSettings;
 
 export type SettingName =
   | "lang"
