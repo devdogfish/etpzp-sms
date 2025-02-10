@@ -12,7 +12,6 @@ import { redirect } from "next/navigation";
 // This function is for actually authenticating the user and fetching all the users data
 // Once the data is fetched we save it to the session using createSession()
 export async function login(
-  _: ActionResponse<Login> | null,
   formData: FormData
 ): Promise<ActionResponse<Login>> {
   // 1. Type validation
@@ -34,11 +33,10 @@ export async function login(
   console.log("STARTING AUTHENTICATION");
   console.log(email, password);
 
-  const user: SessionData /**& { errors: string[] } */ =
-    await dummyAuthenticate({
-      email,
-      password,
-    });
+  const user: SessionData /**& { errors: string[] } */ = await authenticate({
+    email,
+    password,
+  });
 
   if (!user.isAuthenticated) {
     console.log("Wrong credentials!");
@@ -52,12 +50,26 @@ export async function login(
 
   // If everything went well create a new session and redirect user to dashboard
   await createSession(user);
-  redirect("/");
+  return {
+    success: true,
+    message: [
+      "Authentication successful!",
+      "You will be redirected to the home page.",
+    ],
+  };
 }
 
+// logout logic is handled on it's own page
 export async function logout() {
-  const session = await getSession();
-  session.destroy();
+  "use server";
+  try {
+    const session = await getSession();
+    session.destroy();
+    return { success: true };
+  } catch (error) {
+    console.log("LOGOUT FAILED");
+    console.log(error);
 
-  return { success: true };
+    return { success: false };
+  }
 }

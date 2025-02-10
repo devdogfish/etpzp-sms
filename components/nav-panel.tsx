@@ -26,7 +26,7 @@ import {
   FileText,
 } from "lucide-react";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
-import { cn, normalizePath } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import Account from "./account";
 import { Separator } from "./ui/separator";
 import NavLinks from "./nav-links";
@@ -45,7 +45,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useSession } from "@/hooks/use-session";
-import { logout } from "@/lib/auth";
+import useLanguage from "@/hooks/use-language";
 
 export default function NavPanel({
   navCollapsedSize,
@@ -134,6 +134,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
     name: localStorage.getItem("display_name") || undefined,
     colorId: Number(localStorage.getItem("profile_color_id")) || undefined,
   });
+  const { normalizePath } = useLanguage();
 
   useEffect(() => {
     // Function to handle settings localstorage changes
@@ -154,10 +155,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   }, []);
 
   const handleLogout = async () => {
-    const result = await logout();
-    if (result.success) {
-      router.push("/login");
-    }
+    router.push("/logout");
   };
   return (
     <>

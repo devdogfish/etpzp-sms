@@ -28,8 +28,7 @@ export default function Settings() {
     profile: {
       displayName:
         localStorage.getItem("display_name") || "Initial display name",
-      colorId:
-        localStorage.getItem("profile_color_id") || "Initial display name",
+      colorId: localStorage.getItem("profile_color_id") || undefined,
     },
     appearance: {
       darkMode: theme,

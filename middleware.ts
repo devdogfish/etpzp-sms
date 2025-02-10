@@ -3,12 +3,17 @@ import { i18nConfig } from "./i18nConfig";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "./lib/auth/sessions";
 
+const ignoredPaths = ["/logout"];
 export async function middleware(request: NextRequest) {
   // Handle i18n routing
   const i18nResponse = await i18nRouter(request, i18nConfig);
   const session = await getSession(request, i18nResponse);
 
   const { pathname } = request.nextUrl;
+
+  if (ignoredPaths.includes(pathname)) {
+    return NextResponse.next();
+  }
 
   // Allow public routes
   if (pathname.startsWith("/_next") || pathname.startsWith("/static")) {
@@ -17,12 +22,12 @@ export async function middleware(request: NextRequest) {
 
   // Redirect to "/" if authenticated
   if (session.isAuthenticated && pathname.startsWith("/login")) {
-    return NextResponse.redirect(new URL("/", request.url));
+    // return NextResponse.redirect(new URL("/", request.url));
   }
 
   // Redirect to login if not authenticated
   if (!session.isAuthenticated && !pathname.startsWith("/login")) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    // return NextResponse.redirect(new URL("/login", request.url));
   }
 
   // Don't allow non-admins to see admin-dashboard. Return unauthorized error if authenticated but not admin. This takes you to the typical api page...

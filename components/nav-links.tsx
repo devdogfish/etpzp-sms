@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
 
-import { cn, normalizePath } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Tooltip,
@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { usePathname } from "next/navigation";
-import { useTranslation } from "react-i18next";
+import useLanguage from "@/hooks/use-language";
 
 type NavLink = {
   title: string;
@@ -24,12 +24,12 @@ type NavLink = {
 type NavProps = {
   isCollapsed: boolean;
   links: NavLink[];
-  onMobile?: boolean
+  onMobile?: boolean;
 };
 
 export default function NavLinks({ links, isCollapsed, onMobile }: NavProps) {
   const pathname = usePathname();
-  const { i18n } = useTranslation();
+  const { normalizePath } = useLanguage();
 
   const activeStyles =
     "bg-accent text-primary-accent hover:bg-accent hover:text-accent-foreground";
@@ -39,13 +39,16 @@ export default function NavLinks({ links, isCollapsed, onMobile }: NavProps) {
   const isActive = (link: NavLink) => {
     return (
       !isNewButton(link.size) &&
-      normalizePath(link.href, i18n) === normalizePath(pathname, i18n)
+      normalizePath(link.href) === normalizePath(pathname)
     );
   };
   return (
     <div
       data-collapsed={isCollapsed}
-      className={cn(`group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2`, onMobile && "w-[250px]")}
+      className={cn(
+        `group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2`,
+        onMobile && "w-[250px]"
+      )}
     >
       <nav className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
         {links.map((link, index) =>
@@ -74,7 +77,8 @@ export default function NavLinks({ links, isCollapsed, onMobile }: NavProps) {
                 )}
               </TooltipContent>
             </Tooltip>
-          ) : ( // NavPanel is not collapsed = render links normally without tooltips
+          ) : (
+            // NavPanel is not collapsed = render links normally without tooltips
             <Link
               key={index}
               href={link.href}

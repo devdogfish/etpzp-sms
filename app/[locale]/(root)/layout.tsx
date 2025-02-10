@@ -2,62 +2,35 @@
 
 import ResizablePanelWrapper from "@/components/resizable-panel-wrapper";
 import NavPanel, { MobileNavPanel } from "@/components/nav-panel";
-import { useTheme } from "next-themes";
+import { useTheme as useNextTheme } from "next-themes";
 import { SkeletonTheme } from "react-loading-skeleton";
 import { useLayout } from "@/contexts/use-layout";
-import { fetchUserSettings } from "@/lib/db/general";
 import { useEffect } from "react";
 import useIsMounted from "@/hooks/use-mounted";
+import { useThemeContext } from "@/contexts/theme-data-provider";
+import useLanguage from "@/hooks/use-language";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { theme } = useTheme();
+  const { theme } = useNextTheme();
+  const { syncWithDB } = useThemeContext();
   const { isFullscreen } = useLayout();
   const isMounted = useIsMounted();
+  const { hasLanguageCookie } = useLanguage();
 
   useEffect(() => {
     if (isMounted) {
-      console.log(
-        "checking for invalid values in locastorage: ",
-        localStorage.getItem("profile_color_id") == null ||
-          localStorage.getItem("displayName") == null ||
-          localStorage.getItem("theme") == null ||
-          localStorage.getItem("themeColor") == null
-      );
-
       if (
         localStorage.getItem("profile_color_id") == null ||
-        localStorage.getItem("displayName") == null ||
+        localStorage.getItem("display_name") == null ||
+        localStorage.getItem("primary_color_id") == null ||
         localStorage.getItem("theme") == null ||
-        localStorage.getItem("themeColor") == null
+        hasLanguageCookie() === false
       ) {
-        console.log("a localstorage item was found that was undefined");
-
-        const syncUserSettings = async () => {
-          const settings = await fetchUserSettings();
-          if (settings) {
-            const {
-              profile_color_id,
-              display_name,
-              dark_mode,
-              primary_color_id,
-              lang,
-            } = settings;
-            console.log(settings);
-
-            // Profile
-            // localStorage.setItem("profile_color_id", profile_color_id.toString());
-            // localStorage.setItem("display_name", display_name);
-
-            // Appearance
-            // localStorage.setItem("dark_mode", dark_mode.toString());
-            // localStorage.setItem("primary_color_id", primary_color_id.toString());
-          }
-        };
-        syncUserSettings();
+        syncWithDB();
       }
     }
   }, [isMounted]);

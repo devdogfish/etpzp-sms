@@ -7,12 +7,21 @@ import { DataActionResponse } from "@/types/action";
 import { UserSettings } from "@/types/user";
 
 export async function fetchUserSettings(): Promise<UserSettings | undefined> {
-  console.log("fetching user settings");
+  const session = await getSession();
+  const userId = session?.user?.id;
 
-  const { rows } = await db(
-    "SELECT lang, profile_color_id, display_name, dark_mode, primary_color_id FROM public.user;"
-  );
-  return rows[0];
+  console.log("fetching user settings");
+  try {
+    if (!userId) throw new Error("Invalid user id.");
+    const { rows } = await db(
+      `
+      SELECT lang, profile_color_id, display_name, dark_mode, primary_color_id 
+      FROM public.user WHERE id = $1;
+    `,
+      [userId]
+    );
+    return rows[0];
+  } catch (error) {}
 }
 
 export async function fetchAmountIndicators(): Promise<AmountIndicators> {

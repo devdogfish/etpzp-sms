@@ -3,7 +3,7 @@ import { activeDirectoryConfig } from "@/lib/auth/config";
 import ActiveDirectory from "activedirectory2";
 
 export default async function LoginPage() {
-  getActiveDirectoryData();
+  // getActiveDirectoryData();
   return (
     <main className="flex items-center justify-center w-screen h-screen p-3">
       <LoginForm />

@@ -32,9 +32,4 @@ export type Themes = {
   [key: string]: Theme;
 };
 
-export type ThemeColorStateParams = {
-  themeColor: ThemeColors;
-  setThemeColor: React.Dispatch<React.SetStateAction<ThemeColors>>;
-};
-
 export type ThemeColors = keyof typeof themes; // This will be 'Orange' | 'Blue' | 'Green' | 'Rose' | 'Zinc'

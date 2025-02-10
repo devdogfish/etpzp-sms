@@ -11,14 +11,15 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { login } from "@/lib/auth";
-import { useActionState, useEffect, useState } from "react";
+import { FormEvent, useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
 import { ActionResponse } from "@/types/action";
 import { Login } from "@/lib/auth/config";
 import SubmitButton from "./shared/submit-button";
-import { Eye } from "lucide-react";
+import { Eye, Router } from "lucide-react";
+import { useThemeContext } from "@/contexts/theme-data-provider";
 
 const initialState: ActionResponse<Login> = {
   success: false,
@@ -26,10 +27,26 @@ const initialState: ActionResponse<Login> = {
 };
 export default function LoginForm() {
   const [passInputType, setPassInputType] = useState("password");
-  const [serverState, action] = useActionState(login, initialState);
+  const [serverState, setServerState] = useState(initialState);
+  const { syncWithDB } = useThemeContext();
+  const router = useRouter();
 
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    // Create a FormData from the HTML form element
+    const formData = new FormData(event.currentTarget);
+
+    const result = await login(formData);
+    setServerState(result);
+    if (result.success) {
+      console.log("Login successful, redirecting using router.replace()");
+
+      await syncWithDB();
+      router.replace("/");
+    }
+  }
   return (
-    <form action={action}>
+    <form onSubmit={handleSubmit}>
       <Card className="mx-auto max-w-sm">
         <CardHeader>
           <div className="relative w-[60%] h-10 overflow-hidden mb-2">

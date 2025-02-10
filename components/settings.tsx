@@ -9,15 +9,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useThemeContext } from "@/contexts/theme-data-provider";
-import { i18nConfig } from "@/i18nConfig";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { RenderInputArgs } from "@/components/settings-item";
 import { useEffect, useState } from "react";
 import { updateSetting } from "@/lib/actions/user.actions";
-import { ThemeColors } from "@/types/theme";
+import useLanguage from "@/hooks/use-language";
 
 export function LanguageChanger({
   // value,
@@ -25,8 +23,7 @@ export function LanguageChanger({
   id,
   setServerState,
 }: RenderInputArgs) {
-  const pathname = usePathname();
-  const router = useRouter();
+  const { updateLanguageCookie } = useLanguage();
   const { t, i18n } = useTranslation(["Navigation"]);
   const currentLocale = i18n.language;
   const [isPending, setIsPending] = useState<boolean>(false);
@@ -42,22 +39,7 @@ export function LanguageChanger({
     if (setServerState) setServerState(result);
     setIsPending(false);
 
-    // Set cookie for next-i18n-router
-    const days = 30;
-    const date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-    const expires = date.toUTCString();
-    document.cookie = `NEXT_LOCALE=${newLocale};expires=${expires};path=/`;
-
-    if (
-      currentLocale === i18nConfig.defaultLocale &&
-      !i18nConfig.prefixDefault
-    ) {
-      router.push("/" + newLocale + pathname);
-    } else {
-      router.push(pathname.replace(`/${currentLocale}`, `/${newLocale}`));
-    }
-    router.refresh();
+    updateLanguageCookie(newLocale);
   };
   return (
     <Select
@@ -124,24 +106,20 @@ export function ThemeColorChanger({
 }: RenderInputArgs) {
   const { themeColor, setThemeColor } = useThemeContext();
   const { theme } = useTheme();
-  const currentColorIndex = colors.find((color) => color.name === themeColor);
 
   const handleChange = (colorIndex: string) => {
-    const colorObject = colors.find((color) => color.value == colorIndex);
-    if (colorObject) {
-      setThemeColor(colorObject.name as ThemeColors);
-      onChange(colorIndex);
-      setTimeout(() => {
-        onBlur(undefined, colorIndex);
-      }, 200);
-    } else {
-      console.log("Invalid color");
-    }
+    setThemeColor(Number(colorIndex));
+    onChange(colorIndex);
+
+    // Remove this if you are sure that it works this way
+    // setTimeout(() => {
+    onBlur(undefined, colorIndex);
+    // }, 200);
   };
 
   return (
     <Select
-      defaultValue={currentColorIndex?.value || "1"}
+      defaultValue={themeColor.toString()}
       onValueChange={handleChange}
       disabled={isPending}
     >

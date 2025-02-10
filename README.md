@@ -132,7 +132,6 @@ cookieStore.set("my-settings", JSON.stringify(rows[0]));
 1. \*\* ** Do a test deployment ** \*\*
 2. Figure out invalid NextConfig and make sure the translation works properly.
 
-- Update chart colors to look nice - get a nice color combination from a color generator
 - Update the message display to look nicer and actually display stuff in the correct manner
 
 - Sometimes this happens: Database query error error: duplicate key value violates unique constrain
