@@ -36,13 +36,13 @@
     "iron-session": "^8.0.4",
     "libphonenumber-js": "^1.11.17",
     "lucide-react": "^0.460.0",
-    "next": "15.0.3",
+    "next": "15.1.6",
     "next-i18n-router": "^5.5.1",
     "next-themes": "^0.4.3",
     "pg": "^8.13.1",
-    "react": "19.0.0-rc-66855b96-20241106",
+    "react": "19.0.0",
     "react-day-picker": "8.10.1",
-    "react-dom": "19.0.0-rc-66855b96-20241106",
+    "react-dom": "19.0.0",
     "react-hook-form": "^7.54.1",
     "react-i18next": "^15.1.1",
     "react-loading-skeleton": "^3.5.0",
@@ -56,14 +56,20 @@
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@types/activedirectory2": "^1.2.6",
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "19.0.8",
+    "@types/react-dom": "19.0.3",
     "@types/validator": "^13.12.2",
     "eslint": "^8",
-    "eslint-config-next": "15.0.3",
+    "eslint-config-next": "15.1.6",
     "i18nexus-cli": "^3.5.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.0.8",
+      "@types/react-dom": "19.0.3"
+    }
   }
 }

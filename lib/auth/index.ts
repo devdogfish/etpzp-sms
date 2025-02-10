@@ -61,7 +61,6 @@ export async function login(
 
 // logout logic is handled on it's own page
 export async function logout() {
-  "use server";
   try {
     const session = await getSession();
     session.destroy();

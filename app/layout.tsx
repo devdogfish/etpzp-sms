@@ -4,7 +4,7 @@ import "./globals.css";
 import { i18nConfig } from "@/i18nConfig";
 import { dir } from "i18next";
 import TranslationsProvider from "@/contexts/translations-provider";
-import initTranslations from "./i18n";
+import initTranslations from "@/app/i18n";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import ThemeProvider from "@/contexts/theme-data-provider";
 

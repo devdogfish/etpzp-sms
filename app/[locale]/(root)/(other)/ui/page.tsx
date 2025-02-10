@@ -1,4 +1,4 @@
-import initTranslations from "@/app/[locale]/i18n";
+import initTranslations from "@/app/i18n";
 import { PageHeader } from "@/components/header";
 import { Button } from "@/components/ui/button";
 

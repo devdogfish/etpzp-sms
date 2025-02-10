@@ -1,47 +1,41 @@
-import { i18nRouter } from "next-i18n-router";
-import { i18nConfig } from "./i18nConfig";
-import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "./lib/auth/sessions";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-const ignoredPaths = ["/logout"];
-export async function middleware(request: NextRequest) {
-  // Handle i18n routing
-  const i18nResponse = await i18nRouter(request, i18nConfig);
-  const session = await getSession(request, i18nResponse);
+// Regex to check whether something has an extension, e.g. .jpg
+const PUBLIC_FILE = /\.(.*)$/;
 
-  const { pathname } = request.nextUrl;
+export function middleware(request: NextRequest) {
+  const { nextUrl, headers } = request;
+  // Cloned url to work with
+  const url = nextUrl.clone();
+  // Client language, defaults to en
+  const language =
+    headers
+      .get("accept-language")
+      ?.split(",")?.[0]
+      .split("-")?.[0]
+      .toLowerCase() || "en";
 
-  if (ignoredPaths.includes(pathname)) {
-    return NextResponse.next();
+  try {
+    // Early return if it is a public file such as an image or an api call
+    if (
+      PUBLIC_FILE.test(nextUrl.pathname) ||
+      nextUrl.pathname.includes("/api")
+    ) {
+      return undefined;
+    }
+
+    // Proceed without redirection if on a localized path
+    if (
+      nextUrl.pathname.startsWith("/en") ||
+      nextUrl.pathname.startsWith("/de") ||
+      nextUrl.pathname.startsWith("/fr")
+    ) {
+      return undefined;
+    }
+
+    return undefined;
+  } catch (error) {
+    console.log(error);
   }
-
-  // Allow public routes
-  if (pathname.startsWith("/_next") || pathname.startsWith("/static")) {
-    return i18nResponse;
-  }
-
-  // Redirect to "/" if authenticated
-  if (session.isAuthenticated && pathname.startsWith("/login")) {
-    // return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  // Redirect to login if not authenticated
-  if (!session.isAuthenticated && !pathname.startsWith("/login")) {
-    // return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  // Don't allow non-admins to see admin-dashboard. Return unauthorized error if authenticated but not admin. This takes you to the typical api page...
-  if (pathname.startsWith("/dashboard") && session?.isAdmin) {
-    return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
-      status: 403,
-      headers: { "content-type": "application/json" },
-    });
-  }
-
-  // Return the i18n response for all other cases
-  return i18nResponse;
 }
-
-export const config = {
-  matcher: "/((?!api|static|.*\\..*|_next).*)",
-};
