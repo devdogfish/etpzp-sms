@@ -1,4 +1,4 @@
-import initTranslations from "@/app/[locale]/i18n";
+import initTranslations from "@/app/i18n";
 import ColorPalette from "@/components/color-palette";
 import { PageHeader } from "@/components/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
