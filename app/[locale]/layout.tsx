@@ -39,7 +39,7 @@ type RootLayoutProps = {
 };
 
 export default async function AppLayout({ children, params }: RootLayoutProps) {
-  const i18nNamespaces = ["Navigation", "Common Words", "Titles"];
+  const i18nNamespaces = ["Navigation", "Common Words", "Titles", "login"];
   const { locale } = await params;
   const { resources } = await initTranslations(locale, i18nNamespaces);
 

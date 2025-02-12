@@ -17,6 +17,9 @@ const ThemeContext = createContext<ThemeColorStateParams>(
 );
 
 export default function ThemeDataProvider({ children }: ThemeProviderProps) {
+  if (typeof localStorage === "undefined") {
+    return null;
+  }
   const getSavedThemeColor = (): number => {
     return Number(localStorage.getItem("primary_color_id")) || 1;
   };
