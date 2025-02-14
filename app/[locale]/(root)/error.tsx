@@ -1,3 +1,4 @@
+"use client";
 import ChildrenPanel from "@/components/shared/children-panel";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Frown } from "lucide-react";
@@ -10,8 +11,10 @@ export default function NotFound() {
         <div className="flex flex-col items-center gap-1">
           <Frown className="text-muted-foreground h-10 w-10 stroke-[1.2px]" />
           <div className="flex flex-col items-center">
-            <h2>404 Not Found!</h2>
-            <p className="text-sm">Could not find the requested resource.</p>
+            <h2>ERROR: 404 Not Found!</h2>
+            <p className="text-sm">
+              Could not find the requested resource in [locale].
+            </p>
           </div>
         </div>
         <Link href="/" className={buttonVariants({ variant: "default" })}>

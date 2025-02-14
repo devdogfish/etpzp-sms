@@ -10,7 +10,7 @@ export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const locale = request.cookies.get("NEXT_LOCALE")?.value || "en";
 
-  // For these pathname checks, we use includes instead of `startsWith()`, because there could be a locale in between
+  // Pathname checks use `.includes()` instead of `.startsWith()`, because there could be a locale in between url segments.
   // Redirect logged in users to home
   if (session.isAuthenticated && pathname.includes("/login")) {
     return NextResponse.redirect(new URL(`/${locale}/`, request.url));

@@ -18,11 +18,11 @@ import {
 import { useTranslation } from "react-i18next";
 import SettingItem from "../../../../../components/settings-item";
 import { cn, getComplexObjectFromCookie } from "@/lib/utils";
-import { useTheme } from "next-themes";
+import { useTheme as useNextTheme } from "next-themes";
 
 export default function Settings() {
   const { t } = useTranslation(["Navigation"]);
-  const { theme } = useTheme();
+  const { theme } = useNextTheme();
 
   const initialValues = {
     profile: {

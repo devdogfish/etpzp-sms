@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { usePathname } from "next/navigation";
-import useLanguage from "@/hooks/use-language";
+import useSettings from "@/hooks/use-setting";
 
 type NavLink = {
   title: string;
@@ -29,7 +29,7 @@ type NavProps = {
 
 export default function NavLinks({ links, isCollapsed, onMobile }: NavProps) {
   const pathname = usePathname();
-  const { normalizePath } = useLanguage();
+  const { normalizePath } = useSettings();
 
   const activeStyles =
     "bg-accent text-primary-accent hover:bg-accent hover:text-accent-foreground";

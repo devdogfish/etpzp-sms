@@ -7,8 +7,7 @@ import { SkeletonTheme } from "react-loading-skeleton";
 import { useLayout } from "@/contexts/use-layout";
 import { useEffect } from "react";
 import useIsMounted from "@/hooks/use-mounted";
-import { useThemeContext } from "@/contexts/theme-data-provider";
-import useLanguage from "@/hooks/use-language";
+import useSettings from "@/hooks/use-setting";
 
 export default function RootLayout({
   children,
@@ -16,10 +15,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const { theme } = useNextTheme();
-  const { syncWithDB } = useThemeContext();
+  const { syncWithDB } = useSettings();
   const { isFullscreen } = useLayout();
   const isMounted = useIsMounted();
-  const { hasLanguageCookie } = useLanguage();
+  const { hasLanguageCookie } = useSettings();
 
   useEffect(() => {
     if (isMounted) {

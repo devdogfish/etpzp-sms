@@ -19,7 +19,7 @@ import { ActionResponse } from "@/types/action";
 import { Login } from "@/lib/auth/config";
 import SubmitButton from "./shared/submit-button";
 import { Eye, Router } from "lucide-react";
-import { useThemeContext } from "@/contexts/theme-data-provider";
+import useSettings from "@/hooks/use-setting";
 
 const initialState: ActionResponse<Login> = {
   success: false,
@@ -28,7 +28,7 @@ const initialState: ActionResponse<Login> = {
 export default function LoginForm() {
   const [passInputType, setPassInputType] = useState("password");
   const [serverState, setServerState] = useState(initialState);
-  const { syncWithDB } = useThemeContext();
+  const { syncWithDB } = useSettings();
   const router = useRouter();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {

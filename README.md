@@ -28,6 +28,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - Admin Dashboard with statistics
 - Make sure you don't pass in undefined values into the database, you should always convert them to `null` instead
+- Optimize languages by having only one dedicated namespace + TranslationsProvider for each page.
+
+## Questions
+- Do we want to clear settings localstorage on logout and should that be displayed immediately?
+- Any advice on the colors? Should I add an empty profile color as default?
 
 ## Database
 

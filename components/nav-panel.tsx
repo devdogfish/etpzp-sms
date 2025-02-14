@@ -45,9 +45,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useSession } from "@/hooks/use-session";
-import useLanguage from "@/hooks/use-language";
 import { logout } from "@/lib/auth";
-import { Description } from "@radix-ui/react-dialog";
 import { toast } from "sonner";
 
 export default function NavPanel({
@@ -141,9 +139,11 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   useEffect(() => {
     // Function to handle settings localstorage changes
     const handleStorageChange = () => {
+      const storedPrimaryColor =
+        Number(localStorage.getItem("profile_color_id")) || undefined;
       setSettings({
         name: localStorage.getItem("display_name") || undefined,
-        colorId: Number(localStorage.getItem("profile_color_id")) || undefined,
+        colorId: storedPrimaryColor,
       });
     };
 
@@ -158,8 +158,10 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
 
   const handleLogout = async () => {
     const { success } = await logout();
-    if (success) router.push("/login");
-    else
+    if (success) {
+      router.push("/login");
+      localStorage.clear();
+    } else
       toast.error("Error occurred", {
         description: "You weren't logged out because of an error.",
       });
