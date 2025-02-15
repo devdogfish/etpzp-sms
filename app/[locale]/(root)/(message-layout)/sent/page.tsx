@@ -1,6 +1,6 @@
 import MessagesPageSkeleton from "@/components/messages-page-skeleton";
 import MessagesPage from "@/components/messages-page";
-import { fetchMessagesByStatus, fetchSent } from "@/lib/db/message";
+import { fetchSent } from "@/lib/db/message";
 import { Suspense } from "react";
 import { fetchError } from "@/lib/db";
 

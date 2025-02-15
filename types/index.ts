@@ -3,7 +3,7 @@ import { DBRecipient, NewRecipient } from "./recipient";
 import { MessageSchema } from "@/lib/form.schemas";
 
 export type StatusEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFTED";
-export type CategoryEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFT" | "TRASH";
+export type CategoryEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFTS" | "TRASH";
 
 export type StringBoolMap = { [key: string]: boolean };
 

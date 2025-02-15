@@ -4,7 +4,7 @@ import db from "../db";
 import { ContactSchema } from "../form.schemas";
 import { DBContact } from "@/types/contact";
 import { getSession } from "../auth/sessions";
-import { formatPhone, sleep } from "../utils";
+import { formatPhone } from "../utils";
 import { revalidatePath } from "next/cache";
 import { DatabaseError } from "pg";
 import { ActionResponse } from "@/types/action";

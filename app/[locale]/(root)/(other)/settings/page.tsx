@@ -39,13 +39,13 @@ export default function Settings() {
       <PageHeader title={t("header")} />
       <div className="py-4 px-4 space-y-12 h-[calc(100vh-52px)] overflow-y-scroll">
         <SectionHeader
-          title="Language"
-          subtitle="Select your preferred language for a personalized experience"
+          title={t("language-header")}
+          subtitle={t("language-header_caption")}
         >
           <SettingItem
             name="lang"
-            label="Language"
-            description="Set the font you want to use in the app."
+            label={t("language-language_label")}
+            caption={t("language-language_label_caption")}
             renderInput={({
               value,
               onChange,
@@ -57,7 +57,7 @@ export default function Settings() {
               return (
                 <LanguageChanger
                   // This component has custom behavior—only select props are used as it handles its own submission,
-                  // and setServerState is passed so SettingItem elements update with errors.
+                  // and setServerState is passed so elements update with errors.
                   id={id}
                   value={value}
                   onChange={onChange}
@@ -71,13 +71,13 @@ export default function Settings() {
         </SectionHeader>
 
         <SectionHeader
-          title="Profile"
-          subtitle="Manage your personal information"
+          title={t("profile-header")}
+          subtitle={t("profile-header_caption")}
         >
           <SettingItem
             name="profile_color_id" // this might need to be the exact database field
-            label="Profile color"
-            description="Set the profile color you want to see in the app."
+            label={t("profile-color_label")}
+            caption={t("profile-color_label_caption")}
             renderInput={({ value, onChange, onBlur, id, isPending }) => {
               const profileColors = [
                 {
@@ -140,20 +140,20 @@ export default function Settings() {
           />
           <SettingItem
             name="display_name"
-            label="Display Name"
-            description="Enter a display name for your profile."
+            label={t("profile-name_label")}
+            caption={t("profile-name_label_caption")}
             initialValue={initialValues.profile.displayName}
           />
         </SectionHeader>
 
         <SectionHeader
-          title="Appearance"
-          subtitle="Customize the look and feel of your app"
+          title={t("appearance-header")}
+          subtitle={t("appearance-header_caption")}
         >
           <SettingItem
             name="primary_color_id" // this might need to be the exact database field
-            label="Theme color"
-            description="Set the font you want to use in the app."
+            label={t("appearance-primary_color_label")}
+            caption={t("appearance-primary_color_label_caption")}
             renderInput={({ value, onChange, onBlur, id, isPending }) => (
               <ThemeColorChanger
                 // Initial value handled internally
@@ -167,8 +167,8 @@ export default function Settings() {
           />
           <SettingItem
             name="dark_mode"
-            label="Theme"
-            description="Select the theme for the app."
+            label={t("appearance-theme_label")}
+            caption={t("appearance-theme_label_caption")}
             renderInput={({ value, onChange, onBlur, id, isPending }) => (
               <ThemeToggle
                 id={id}

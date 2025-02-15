@@ -30,15 +30,12 @@ export default function ContactsPage({
   error: string;
 }>) {
   const { layout, fallbackLayout } = useLayout();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["contacts-page"]);
   const [filteredContacts, setFilteredContacts] = useState(contacts);
   const [selected, setSelected] = useState<DBContact | null>(null);
 
   const onMobile = useIsMobile();
   const searchParams = useSearchParams();
-
-  const isMobile = useIsMobile();
-  const router = useRouter();
 
   const onSearch = () => {
     setFilteredContacts(searchContacts(contacts, searchParams.get("query")));
@@ -70,11 +67,10 @@ export default function ContactsPage({
         minSize={22}
         maxSize={50}
       >
-        {/** WE WILL HAVE location SUBSTITUTED HERE */}
-        <PageHeader title={t("contacts_header")}>
+        <PageHeader title={t("header")}>
           <Button size="sm" onClick={showCreateModal}>
-            <CirclePlus className="w-4 h-4" />
-            New contact
+            <CirclePlus />
+            {t("new")}
           </Button>
         </PageHeader>
         <Search

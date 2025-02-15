@@ -60,7 +60,8 @@ export function LanguageChanger({
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="en">English</SelectItem>
-        <SelectItem value="pt">Portuguese</SelectItem>
+        <SelectItem value="pt">Português</SelectItem>
+        <SelectItem value="de">Deutsch</SelectItem>
       </SelectContent>
     </Select>
   );
@@ -146,6 +147,8 @@ export function ThemeToggle({
   isPending,
 }: RenderInputArgs) {
   const { theme, setTheme } = useNextTheme();
+  const { t } = useTranslation();
+  const activeString = `(${t("common:active").toLowerCase()})`;
 
   const handleChange = (value: string) => {
     setTheme(value);
@@ -177,7 +180,8 @@ export function ThemeToggle({
           </div>
         </div>
         <label className="block w-full p-2 text-center font-normal text-sm">
-          Light {!isPending && theme === "light" && "(active)"}
+          {t("appearance-theme_light")}{" "}
+          {!isPending && theme === "light" && activeString}
         </label>
       </div>
 
@@ -207,7 +211,8 @@ export function ThemeToggle({
           </div>
         </div>
         <label className="block w-full p-2 text-center font-normal text-sm">
-          Dark {!isPending && theme === "dark" && "(active)"}
+          {t("appearance-theme_dark")}{" "}
+          {!isPending && theme === "dark" && activeString}
         </label>
       </div>
     </div>

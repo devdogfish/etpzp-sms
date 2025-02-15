@@ -7,12 +7,12 @@ import { fetchError } from "@/lib/db";
 export default function Page() {
   return (
     <Suspense fallback={<MessagesPageSkeleton category="FAILED" />}>
-      <DraftsMessagesPage />
+      <FailedMessagesPage />
     </Suspense>
   );
 }
 
-export async function DraftsMessagesPage() {
+export async function FailedMessagesPage() {
   const messages = await fetchMessagesByStatus("FAILED");
 
   return (

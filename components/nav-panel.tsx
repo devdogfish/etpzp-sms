@@ -137,6 +137,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
     displayName: localStorage.getItem("display_name") || undefined,
     colorId: Number(localStorage.getItem("profile_color_id")) || undefined,
   });
+  const onMobile = useIsMobile();
 
   // Update components when localstorage settings change
   useEffect(() => {
@@ -249,124 +250,118 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
         ]}
       />
 
-      <div className="h-full overflow-auto">
-        <NavLinks
-          isCollapsed={isCollapsed}
-          links={[
-            {
-              title: t("sent"),
-              label:
-                amountIndicators?.sent == 0
-                  ? ""
-                  : amountIndicators?.sent.toString(),
-              icon: MailCheck,
-              variant: "ghost",
-              href: "/sent",
-            },
-            {
-              title: t("scheduled"),
-              label:
-                amountIndicators?.scheduled == 0
-                  ? ""
-                  : amountIndicators?.scheduled.toString(),
-              icon: Calendar,
-              variant: "ghost",
-              href: "/scheduled",
-            },
-            {
-              title: t("failed"),
-              label:
-                amountIndicators?.failed == 0
-                  ? ""
-                  : amountIndicators?.failed.toString(),
-              icon: AlertTriangle,
-              variant: "ghost",
-              href: "/failed",
-            },
-            {
-              title: t("drafts"),
-              label:
-                amountIndicators?.drafted == 0
-                  ? ""
-                  : amountIndicators?.drafted.toString(),
-              icon: FileText,
-              variant: "ghost",
-              href: "/drafts",
-            },
-            {
-              title: t("trash"),
-              label:
-                amountIndicators?.trashed == 0
-                  ? ""
-                  : amountIndicators?.trashed.toString(),
-              icon: Trash2,
-              variant: "ghost",
-              href: "/trash",
-            },
-          ]}
-        />
+      <ScrollArea
+        className={`h-[calc(100vh-52px-56px${isCollapsed ? "-8px" : ""})]`}
+      >
+        <div
+          className={`h-[calc(100vh-52px-56px${
+            isCollapsed ? "-8px" : ""
+          })] flex flex-col`}
+        >
+          <div className="grow">
+            <NavLinks
+              isCollapsed={isCollapsed}
+              links={[
+                {
+                  title: t("sent"),
+                  label:
+                    amountIndicators?.sent == 0
+                      ? ""
+                      : amountIndicators?.sent.toString(),
+                  icon: MailCheck,
+                  variant: "ghost",
+                  href: "/sent",
+                },
+                {
+                  title: t("scheduled"),
+                  label:
+                    amountIndicators?.scheduled == 0
+                      ? ""
+                      : amountIndicators?.scheduled.toString(),
+                  icon: Calendar,
+                  variant: "ghost",
+                  href: "/scheduled",
+                },
+                {
+                  title: t("failed"),
+                  label:
+                    amountIndicators?.failed == 0
+                      ? ""
+                      : amountIndicators?.failed.toString(),
+                  icon: AlertTriangle,
+                  variant: "ghost",
+                  href: "/failed",
+                },
+                {
+                  title: t("drafts"),
+                  label:
+                    amountIndicators?.drafted == 0
+                      ? ""
+                      : amountIndicators?.drafted.toString(),
+                  icon: FileText,
+                  variant: "ghost",
+                  href: "/drafts",
+                },
+                {
+                  title: t("trash"),
+                  label:
+                    amountIndicators?.trashed == 0
+                      ? ""
+                      : amountIndicators?.trashed.toString(),
+                  icon: Trash2,
+                  variant: "ghost",
+                  href: "/trash",
+                },
+              ]}
+            />
 
-        <Separator />
-        <NavLinks
-          isCollapsed={isCollapsed}
-          links={[
-            {
-              title: t("settings"),
-              label: "",
-              icon: Settings,
-              variant: "ghost",
-              href: "/settings",
-            },
-            {
-              title: t("contacts"),
-              label: "",
-              icon: Contact2,
-              variant: "ghost",
-              href: "/contacts",
-            },
-            {
-              title: t("dashboard"),
-              label: "",
-              icon: MonitorCog,
-              variant: "ghost",
-              href: "/dashboard",
-              hidden: !session?.isAdmin,
-            },
-          ]}
-        />
-        {/* <Separator />
-        <NavLinks
-          isCollapsed={isCollapsed}
-          links={[
-            {
-              title: t("COLOR_PALETTE"),
-              icon: Palette,
-              variant: "ghost",
-              href: "/colors",
-            },
-            {
-              title: t("COMPONENT_PREVIEW"),
-              icon: Puzzle,
-              variant: "ghost",
-              href: "/ui",
-            },
-          ]}
-        /> */}
-        <div className="mt-auto"></div>
-        <Separator />
-        <NavLinks
-          isCollapsed={isCollapsed}
-          links={[
-            {
-              title: t("common:log_out"),
-              label: "",
-              icon: LogOut,
-              variant: "ghost",
-              action: handleLogout,
-            },
-          ]}
-        />
-      </div>
+            <Separator />
+            <NavLinks
+              isCollapsed={isCollapsed}
+              links={[
+                {
+                  title: t("settings"),
+                  label: "",
+                  icon: Settings,
+                  variant: "ghost",
+                  href: "/settings",
+                },
+                {
+                  title: t("contacts"),
+                  label: "",
+                  icon: Contact2,
+                  variant: "ghost",
+                  href: "/contacts",
+                },
+                {
+                  title: t("dashboard"),
+                  label: "",
+                  icon: MonitorCog,
+                  variant: "ghost",
+                  href: "/dashboard",
+                  hidden: !session?.isAdmin,
+                },
+              ]}
+            />
+          </div>
+
+          <div className="">
+            <Separator />
+            <NavLinks
+              isCollapsed={isCollapsed}
+              links={[
+                {
+                  title: t("common:log_out"),
+                  label: "",
+                  icon: LogOut,
+                  variant: "ghost",
+                  action: handleLogout,
+                },
+              ]}
+            />
+          </div>
+        </div>
+      </ScrollArea>
     </>
   );
 }

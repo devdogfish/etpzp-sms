@@ -11,7 +11,7 @@ export default async function TranslationLayout({
   params,
 }: LayoutProps) {
   // Internationalization (i18n) stuff
-  const i18nNamespaces = ["message-layout", "common"];
+  const i18nNamespaces = ["messages-page", "contacts-page", "common"];
   const { locale } = await params;
   const { resources } = await initTranslations(locale, i18nNamespaces);
 
