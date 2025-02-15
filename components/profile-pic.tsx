@@ -3,13 +3,13 @@
 import { cn, getNameInitials } from "@/lib/utils";
 
 export default function ProfilePic({
-  size,
+  size = 9,
   name,
   colorId,
   loading,
   fill = true,
 }: {
-  size: number;
+  size?: number;
   colorId?: number;
   name?: string;
   loading?: boolean;

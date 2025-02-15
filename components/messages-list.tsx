@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DBMessage } from "@/types";
+import { useTranslation } from "react-i18next";
 
 type MessageListProps = {
   messages: DBMessage[];
@@ -18,6 +19,7 @@ export function MessageList({
   selectedMessageId,
   setSelected,
 }: MessageListProps) {
+  const { t } = useTranslation();
   return (
     <ScrollArea className="h-[calc(100vh-52px-68px)]">
       <div className="flex flex-col gap-2 p-4 pt-0">
@@ -34,7 +36,7 @@ export function MessageList({
               <div className="flex items-center">
                 <div className="flex items-center gap-2">
                   <div className="font-semibold">
-                    {item.subject ? item.subject : "No Subject"}
+                    {item.subject ? item.subject : t("common:no_subject")}
                   </div>
                   {item.status === "SCHEDULED" ? (
                     <span className="flex h-2 w-2 rounded-full bg-yellow-600" />

@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { CopyButton } from "../shared/copy-button";
 import { Button } from "../ui/button";
 import { NewRecipient } from "@/types/recipient";
+import { useTranslation } from "react-i18next";
 
 export default function InfoContactModal({
   recipient,
@@ -24,6 +25,7 @@ export default function InfoContactModal({
   recipient: NewRecipient;
 }) {
   const { modal, setModal } = useContactModals();
+  const { t} = useTranslation(["modals"])
 
   const showCreateFromRecipientModal = () => {
     setModal((prev) => ({ ...prev, info: false }));
@@ -76,10 +78,10 @@ export default function InfoContactModal({
           <Separator />
           {recipient.contactId && (
             <div className="flex gap-4 justify-between p-4 text-sm">
-              <div>Description</div>
+              <div>{t("common:description")}</div>
               <div>
                 {recipient.contactDescription ||
-                  "This contact doesn't have a description"}
+                  t("common:no_description")}
               </div>
             </div>
           )}

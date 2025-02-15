@@ -33,6 +33,7 @@ import { ActionResponse } from "@/types/action";
 import { useRouter } from "next/navigation";
 import ProfilePic from "./profile-pic";
 import { DBRecipient } from "@/types/recipient";
+import { useTranslation } from "react-i18next";
 
 export function MessageDisplay({
   message,
@@ -46,6 +47,7 @@ export function MessageDisplay({
   const today = new Date();
   const router = useRouter();
   const onMobile = useIsMobile();
+  const { t } = useTranslation();
 
   const handleTrashButtonClick = async () => {
     if (message) {
@@ -141,12 +143,16 @@ export function MessageDisplay({
               >
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">
-                  {message?.in_trash ? "Delete permanently" : "Move to trash"}
+                  {message?.in_trash || message?.status === "DRAFTED"
+                    ? t("common:delete_permanently")
+                    : t("common:move_to_trash")}
                 </span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              {message?.in_trash ? "Delete permanently" : "Move to trash"}
+              {message?.in_trash || message?.status === "DRAFTED"
+                ? t("common:delete_permanently")
+                : t("common:move_to_trash")}
             </TooltipContent>
           </Tooltip>
 
@@ -187,7 +193,7 @@ export function MessageDisplay({
           )}
 
           {/* Reply to all recipients in the message */}
-          {category !== "DRAFT" && (
+          {category !== "DRAFTS" && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -205,7 +211,7 @@ export function MessageDisplay({
           )}
 
           {/* Reply to all recipients in the message */}
-          {category === "DRAFT" && (
+          {category === "DRAFTS" && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -219,10 +225,10 @@ export function MessageDisplay({
                   disabled={!message}
                 >
                   <Edit className="h-4 w-4" />
-                  <span className="sr-only">Continue draft</span>
+                  <span className="sr-only">{t("continue_draft")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Continue draft</TooltipContent>
+              <TooltipContent>{t("continue_draft")}</TooltipContent>
             </Tooltip>
           )}
         </div>
@@ -237,10 +243,10 @@ export function MessageDisplay({
                 disabled={!message}
               >
                 <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
+                <span className="sr-only">{t("common:close")}</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Close</TooltipContent>
+            <TooltipContent>{t("common:close")}</TooltipContent>
           </Tooltip>
         </div>
       </div>
@@ -254,16 +260,14 @@ export function MessageDisplay({
                   console.log("more than 3 recipients");
                   return;
                 }
-                return (
-                  <ProfilePic key={idx} size={9} name={recipient.name || "-"} />
-                );
+                return <ProfilePic key={idx} size={9} name={recipient.name} />;
               })}
               <div className="grid gap-1">
                 <div className="font-semibold">
-                  {message.subject || "No subject"}
+                  {message.subject || t("no_subject")}
                 </div>
                 <div className="flex text-xs">
-                  <div className="font-medium mr-1">To:</div>
+                  <div className="font-medium mr-1">{t("to")}:</div>
 
                   {message.recipients.map((recipient) => (
                     <div key={recipient.id}>
@@ -286,7 +290,7 @@ export function MessageDisplay({
         </div>
       ) : (
         <div className="p-8 text-center text-muted-foreground">
-          No message selected
+          {t("none_selected")}
         </div>
       )}
     </div>

@@ -47,6 +47,17 @@ import { useSession } from "@/hooks/use-session";
 import { logout } from "@/lib/auth";
 import { toast } from "sonner";
 import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function NavPanel({
   navCollapsedSize,
@@ -137,7 +148,22 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
     displayName: localStorage.getItem("display_name") || undefined,
     colorId: Number(localStorage.getItem("profile_color_id")) || undefined,
   });
-  const onMobile = useIsMobile();
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
+  const showAlertDialog = () => {
+    // show the alert dialog
+    setConfirmLogoutOpen(true)
+  };
+
+  const handleLogout = async () => {
+    const { success } = await logout();
+    if (success) {
+      router.push("/login");
+      localStorage.clear();
+    } else
+      toast.error("Error occurred", {
+        description: "You weren't logged out because of an error.",
+      });
+  };
 
   // Update components when localstorage settings change
   useEffect(() => {
@@ -158,17 +184,6 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
       window.removeEventListener("settingsUpdated", handleStorageChange);
     };
   }, []);
-
-  const handleLogout = async () => {
-    const { success } = await logout();
-    if (success) {
-      router.push("/login");
-      localStorage.clear();
-    } else
-      toast.error("Error occurred", {
-        description: "You weren't logged out because of an error.",
-      });
-  };
   return (
     <>
       <div
@@ -251,12 +266,16 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
       />
 
       <ScrollArea
-        className={`h-[calc(100vh-52px-56px${isCollapsed ? "-8px" : ""})]`}
+      /* Maybe we need a fixed height here, but if everything works, all good. */
       >
         <div
-          className={`h-[calc(100vh-52px-56px${
-            isCollapsed ? "-8px" : ""
-          })] flex flex-col`}
+          // In tailwind, this doesn't work, and I don't know why
+
+          style={{
+            height: `calc(100vh - 52px - 56px${isCollapsed ? " - 8px" : ""})`,
+            width: "100%",
+          }}
+          className="flex flex-col"
         >
           <div className="grow">
             <NavLinks
@@ -345,8 +364,9 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             />
           </div>
 
-          <div className="">
+          <div className="shrink">
             <Separator />
+
             <NavLinks
               isCollapsed={isCollapsed}
               links={[
@@ -355,10 +375,28 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
                   label: "",
                   icon: LogOut,
                   variant: "ghost",
-                  action: handleLogout,
+                  action: showAlertDialog,
                 },
               ]}
             />
+
+            {/* Confirm logout dialog */}
+            <AlertDialog open={confirmLogoutOpen} onOpenChange={setConfirmLogoutOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Log Out</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to log out? No data will be lost.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t("common:cancel")}</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleLogout}>
+                    {t("common:continue")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </ScrollArea>

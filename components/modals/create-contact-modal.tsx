@@ -19,12 +19,12 @@ import { createContact } from "@/lib/actions/contact.actions";
 import { CircleAlert, Loader2 } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
 import { cn, toastActionResult } from "@/lib/utils";
-import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { ActionResponse } from "@/types/action";
 import { ContactSchema } from "@/lib/form.schemas";
+import { useTranslation } from "react-i18next";
 
 const initialState: ActionResponse<z.infer<typeof ContactSchema>> = {
   success: false,
@@ -41,6 +41,7 @@ export default function CreateContactModal({
     createContact,
     initialState
   );
+  const { t } = useTranslation(["modals"]);
 
   useEffect(() => {
     if (serverState.success) {
@@ -67,16 +68,18 @@ export default function CreateContactModal({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create new Contact</DialogTitle>
-          <DialogDescription>Add a new contact to your list.</DialogDescription>
+          <DialogTitle>{t("create_contact-header")}</DialogTitle>
+          <DialogDescription>
+            {t("create_contact-header_caption")}
+          </DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t("common:name")}</Label>
             <Input
               name="name"
               id="name"
-              placeholder="Oliveiro"
+              placeholder={t("name_placeholder")}
               defaultValue={serverState.inputs?.name}
               // required
               // minLength={5}
@@ -92,11 +95,11 @@ export default function CreateContactModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone number</Label>
+            <Label htmlFor="phone">{t("common:phone_number")}</Label>
             <Input
               name="phone"
               id="phone"
-              placeholder="1234568900"
+              placeholder={t("phone_placeholder")}
               defaultValue={serverState.inputs?.phone || defaultPhone}
               // required
               // minLength={5}
@@ -112,11 +115,11 @@ export default function CreateContactModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t("common:description")}</Label>
             <Textarea
               name="description"
               id="description"
-              placeholder="Oliveiro is a great friend of mine, I met him at the festival of the edge lords."
+              placeholder={t("description_placeholder")}
               defaultValue={serverState.inputs?.description}
               // required
               // minLength={5}
@@ -147,10 +150,11 @@ export default function CreateContactModal({
               type="button"
               className={cn(buttonVariants({ variant: "outline" }), "mr-auto")}
             >
-              Cancel
+              {t("common:cancel")}
             </DialogClose>
             <Button type="submit" disabled={pending}>
-              {pending && <Loader2 className="h-4 w-4 animate-spin" />} Submit
+              {pending && <Loader2 className="h-4 w-4 animate-spin" />}{" "}
+              {t("common:create")}
             </Button>
           </DialogFooter>
         </form>

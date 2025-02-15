@@ -19,7 +19,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## TODO
 
 - Update the message display to look nicer and actually display stuff in the correct manner
-- Optimize error files (404 and global error.tsx)
+- Optimize error files (404 and global error.tsx). [Read the docs](https://nextjs.org/docs/app/api-reference/file-conventions/error)
 - Sometimes this happens: Database query error error: duplicate key value violates unique constrain
   t "recipient_message_id_phone_key"
 
@@ -29,16 +29,16 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - Admin Dashboard with statistics
 - Make sure you don't pass in undefined values into the database, you should always convert them to `null` instead
-- Optimize languages by having only one dedicated namespace + TranslationsProvider for each page.
-
 
 ## Questions
+
 - Do we want to clear settings localstorage on logout and should that be displayed immediately?
 - Any advice on the colors? Should I add an empty profile color as default?
 - Should I keep the reply-all button to only insert the recipients, or should it also insert sender subject and body?
 - Should I keep the option to change the sender? This would also influence the message-display component
 
 ## Database
+
 Deleting all tables
 
 #### Deleting all tables
