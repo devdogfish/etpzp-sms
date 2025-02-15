@@ -23,9 +23,9 @@ export function LanguageChanger({
   id,
   setServerState,
 }: RenderInputArgs) {
-  const { updateLanguageCookie } = useSettings();
   const { t, i18n } = useTranslation();
   const currentLocale = i18n.language;
+  const { updateLanguageCookie } = useSettings(currentLocale);
   const [isPending, setIsPending] = useState<boolean>(false);
 
   const handleChange = async (newLocale: string) => {

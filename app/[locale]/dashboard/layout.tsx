@@ -1,13 +1,16 @@
 import TranslationsProvider from "@/contexts/translations-provider";
 import initTranslations from "@/app/i18n";
 
-type RootLayoutProps = {
+type LayoutProps = {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 };
 
-export default async function AppLayout({ children, params }: RootLayoutProps) {
-  const i18nNamespaces = ["Navigation", "Common Words", "Titles", "login"];
+export default async function DashboardLayout({
+  children,
+  params,
+}: LayoutProps) {
+  const i18nNamespaces = ["dashboard-page"];
   const { locale } = await params;
   const { resources } = await initTranslations(locale, i18nNamespaces);
 

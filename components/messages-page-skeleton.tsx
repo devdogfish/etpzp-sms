@@ -19,7 +19,7 @@ export default function MessagesPageSkeleton({
   category: CategoryEnums;
 }) {
   const { layout, fallbackLayout } = useLayout();
-  const { t, i18n } = useTranslation(["Common Words"]);
+  const { t, i18n } = useTranslation(["common"]);
   const onMobile = useIsMobile();
   const selected = null;
   return (

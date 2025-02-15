@@ -2,22 +2,15 @@
 
 import { format } from "date-fns/format";
 import {
-  Archive,
   ArchiveRestore,
-  ArchiveX,
   ArrowLeft,
-  Clock,
   Edit,
-  Forward,
   MessageCircleX,
-  MoreVertical,
-  Reply,
   ReplyAll,
   Trash2,
   X,
 } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 import { Separator } from "@/components/ui/separator";
@@ -38,6 +31,8 @@ import {
 import { toast } from "sonner";
 import { ActionResponse } from "@/types/action";
 import { useRouter } from "next/navigation";
+import ProfilePic from "./profile-pic";
+import { DBRecipient } from "@/types/recipient";
 
 export function MessageDisplay({
   message,
@@ -51,6 +46,7 @@ export function MessageDisplay({
   const today = new Date();
   const router = useRouter();
   const onMobile = useIsMobile();
+
   const handleTrashButtonClick = async () => {
     if (message) {
       let result: ActionResponse<null>;
@@ -253,22 +249,27 @@ export function MessageDisplay({
         <div className="flex flex-1 flex-col">
           <div className="flex items-start p-4">
             <div className="flex items-start gap-4 text-sm">
-              <Avatar>
-                <AvatarImage alt={message.subject || "No Subject"} />
-                <AvatarFallback>
-                  {message.subject &&
-                    message.subject
-                      .split(" ")
-                      .map((chunk) => chunk[0])
-                      .join("")}
-                </AvatarFallback>
-              </Avatar>
+              {message.recipients.map((recipient: DBRecipient, idx) => {
+                if (idx > 3) {
+                  console.log("more than 3 recipients");
+                  return;
+                }
+                return (
+                  <ProfilePic key={idx} size={9} name={recipient.name || "-"} />
+                );
+              })}
               <div className="grid gap-1">
-                <div className="font-semibold">{message.subject}</div>
-                <div className="line-clamp-1 text-xs">{message.subject}</div>
-                <div className="line-clamp-1 text-xs">
-                  <span className="font-medium">Reply-To:</span>{" "}
-                  {message.user_id}
+                <div className="font-semibold">
+                  {message.subject || "No subject"}
+                </div>
+                <div className="flex text-xs">
+                  <div className="font-medium mr-1">To:</div>
+
+                  {message.recipients.map((recipient) => (
+                    <div key={recipient.id}>
+                      {recipient?.name || recipient.phone}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -280,15 +281,6 @@ export function MessageDisplay({
           </div>
           <Separator />
           <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
-            <h2>
-              This message has an id of <strong>{message.id}</strong>
-            </h2>
-            <h2>
-              This message has {message.recipients.length} recipients:{" "}
-              {message.recipients.map((r) => (
-                <div key={r.phone}>{JSON.stringify(r)}</div>
-              ))}
-            </h2>
             {message.body}
           </div>
         </div>

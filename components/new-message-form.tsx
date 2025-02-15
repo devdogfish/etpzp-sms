@@ -164,11 +164,11 @@ const NewMessageForm = React.memo(function ({
         <CreateContactFromRecipientModal recipient={moreInfoOn} />
       )}
 
-      <PageHeader title={message.subject ? message.subject : t("NEW_MESSAGE")}>
+      <PageHeader title={message.subject ? message.subject : t("header")}>
         <Button
           variant="ghost"
           className="aspect-1 p-0"
-          onClick={() => setIsFullscreen(!isFullscreen)}
+          onClick={() => setIsFullscreen(prevFullscreen => !prevFullscreen)}
         >
           {isFullscreen ? (
             <Minimize2 className="h-4 w-4" />

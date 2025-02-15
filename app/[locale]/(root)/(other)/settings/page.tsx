@@ -21,7 +21,7 @@ import { cn, getComplexObjectFromCookie } from "@/lib/utils";
 import { useTheme as useNextTheme } from "next-themes";
 
 export default function Settings() {
-  const { t } = useTranslation(["Navigation"]);
+  const { t } = useTranslation();
   const { theme } = useNextTheme();
 
   const initialValues = {
@@ -36,7 +36,7 @@ export default function Settings() {
   };
   return (
     <>
-      <PageHeader title={t("SETTING")} />
+      <PageHeader title={t("header")} />
       <div className="py-4 px-4 space-y-12 h-[calc(100vh-52px)] overflow-y-scroll">
         <SectionHeader
           title="Language"

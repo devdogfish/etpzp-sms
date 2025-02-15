@@ -2,16 +2,10 @@ import initTranslations from "@/app/i18n";
 import { PageHeader } from "@/components/header";
 import { Button } from "@/components/ui/button";
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const { t } = await initTranslations(locale, ["Navigation"]);
+export default async function Page() {
   return (
     <>
-      <PageHeader title={t("component_preview")}>lk</PageHeader>
+      <PageHeader title="Component preview" />
       <div className="p-3">
         <div>
           <h1>Buttons</h1>

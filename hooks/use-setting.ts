@@ -3,7 +3,6 @@ import { useThemeContext } from "@/contexts/theme-data-provider";
 import { i18nConfig } from "@/i18n.config";
 import { fetchUserSettings } from "@/lib/db/general";
 import { usePathname, useRouter } from "next/navigation";
-import { useTranslation } from "react-i18next";
 import { useTheme as useNextTheme } from "next-themes";
 
 type SettingsContext = {
@@ -13,19 +12,16 @@ type SettingsContext = {
   syncWithDB: () => Promise<void>;
 };
 
-// These are helper functions for updating, reading, or deleting any settings stored in cookies or localstorage.
-export default function useSettings(): SettingsContext {
-  const { i18n } = useTranslation();
+// Helper functions for updating, reading, or deleting settings stored in cookies or localstorage.
+export default function useSettings(currentLocale: string): SettingsContext {
   const router = useRouter();
   const currentPathname = usePathname();
-  const currentLocale = i18n.language;
   const { setThemeColor } = useThemeContext();
   const { setTheme } = useNextTheme();
 
   // Helper function to normalize paths
   function normalizePath(path: string) {
-    const currentLocale = i18n.language;
-    const defaultLocale = i18n.options.fallbackLng as string;
+    const defaultLocale = i18nConfig.defaultLocale as string;
 
     // Remove leading slash and split into segments
     const segments = path.replace(/^\//, "").split("/");
@@ -39,7 +35,6 @@ export default function useSettings(): SettingsContext {
   }
 
   const updateLanguageCookie = (newLocale: string) => {
-    // Set cookie for next-i18n-router
     // set cookie for next-i18n-router
     const days = 30;
     const date = new Date();

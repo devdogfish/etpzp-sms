@@ -19,6 +19,7 @@ import { useSearchParams } from "next/navigation";
 import { NewRecipient } from "@/types/recipient";
 import { DBContact } from "@/types/contact";
 import useIsMounted from "@/hooks/use-mounted";
+import ProfilePic from "./profile-pic";
 
 type InputState = {
   value: string;
@@ -244,9 +245,11 @@ export default function RecipientsInput({
                             }));
                           }}
                         >
-                          <div className="rounded-full h-12 w-12 border border-muted-foreground centered">
-                            {getNameInitials(recipient.contact_name)}
-                          </div>
+                          <ProfilePic
+                            name={recipient.contact_name || undefined}
+                            size={12}
+                            fill={false}
+                          />
                           <div className="space-y-1">
                             <div className="font-semibold">
                               {recipient.contact_name || recipient.phone}

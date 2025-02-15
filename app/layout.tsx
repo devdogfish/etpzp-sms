@@ -31,7 +31,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // we have to get it directly from the cookie here, because we are not in the [locale] route segment
+  // We can't get the locale from the url params, thus we parse it from the locale cookie
   const cookieStore = await cookies();
   const currentLocale = cookieStore.get("NEXT_LOCALE");
 

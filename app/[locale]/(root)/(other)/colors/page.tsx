@@ -4,16 +4,10 @@ import { PageHeader } from "@/components/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const { t } = await initTranslations(locale, ["Navigation"]);
+export default async function Page() {
   return (
     <>
-      <PageHeader title={t("color_palette")}>asd</PageHeader>
+      <PageHeader title="Color Palette">asd</PageHeader>
       <ScrollArea className="h-[calc(100vh-50px)] p-3">
         <ColorPalette />
         <div className="flex flex-col gap-3">

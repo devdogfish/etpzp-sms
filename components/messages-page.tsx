@@ -25,7 +25,7 @@ export default function MessagesPage({
   category: CategoryEnums;
 }>) {
   const { layout, fallbackLayout } = useLayout();
-  const { t, i18n } = useTranslation(["Common Words"]);
+  const { t, i18n } = useTranslation(["common"]);
   const [filteredMessages, setFilteredMessages] = useState(messages);
   const [selected, setSelected] = useState<DBMessage | null>(null);
   const [isLarge, setIsLarge] = useState({

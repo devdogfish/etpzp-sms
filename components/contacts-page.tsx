@@ -30,7 +30,7 @@ export default function ContactsPage({
   error: string;
 }>) {
   const { layout, fallbackLayout } = useLayout();
-  const { t, i18n } = useTranslation(["Common Words"]);
+  const { t } = useTranslation();
   const [filteredContacts, setFilteredContacts] = useState(contacts);
   const [selected, setSelected] = useState<DBContact | null>(null);
 
@@ -71,7 +71,7 @@ export default function ContactsPage({
         maxSize={50}
       >
         {/** WE WILL HAVE location SUBSTITUTED HERE */}
-        <PageHeader title={t("CONTACT")}>
+        <PageHeader title={t("contacts_header")}>
           <Button size="sm" onClick={showCreateModal}>
             <CirclePlus className="w-4 h-4" />
             New contact
@@ -79,7 +79,9 @@ export default function ContactsPage({
         </PageHeader>
         <Search
           onSearch={onSearch}
-          placeholder={String(t("search") + " " + t("CONTACT").toLowerCase())}
+          placeholder={String(
+            t("common:search") + " " + t("common:contacts").toLowerCase()
+          )}
           className="pl-8 placeholder:text-muted-foreground border"
         />
         <ContactsList
