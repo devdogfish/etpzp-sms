@@ -140,7 +140,7 @@ export function MobileNavPanel() {
 // 1. Sensitive information is extracted from the encrypted session
 // 2. Stuff that can be changed in the settings is encrypted from localstorage
 function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["navigation", "modals", "common"]);
   const { amountIndicators } = useLayout();
   const router = useRouter();
   const { session, loading } = useSession();
@@ -387,9 +387,11 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             >
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Log Out</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    {t("modals:logout-header")}
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Are you sure you want to log out? No data will be lost.
+                    {t("modals:logout-header_caption")}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

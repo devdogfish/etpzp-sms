@@ -75,9 +75,7 @@ export default function ContactsPage({
         </PageHeader>
         <Search
           onSearch={onSearch}
-          placeholder={String(
-            t("common:search") + " " + t("common:contacts").toLowerCase()
-          )}
+          placeholder={t("search_contacts")}
           className="pl-8 placeholder:text-muted-foreground border"
         />
         <ContactsList

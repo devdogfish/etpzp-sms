@@ -10,9 +10,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -125,10 +123,10 @@ export function MessageDisplay({
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" onClick={reset}>
                   <ArrowLeft className="h-4 w-4" />
-                  <span className="sr-only">Go back</span>
+                  <span className="sr-only">{t("common:go_back")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Go back</TooltipContent>
+              <TooltipContent>{t("common:go_back")}</TooltipContent>
             </Tooltip>
           )}
 
@@ -167,10 +165,10 @@ export function MessageDisplay({
                   onClick={cancelSend}
                 >
                   <MessageCircleX className="w-4 h-4" />
-                  <span className="sr-only">Cancel scheduled message</span>
+                  <span className="sr-only">{t("cancel_scheduled")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Cancel scheduled message</TooltipContent>
+              <TooltipContent>{t("cancel_scheduled")}</TooltipContent>
             </Tooltip>
           )}
 
@@ -185,10 +183,10 @@ export function MessageDisplay({
                   onClick={putBack}
                 >
                   <ArchiveRestore className="w-4 h-4" />
-                  <span className="sr-only">Restore</span>
+                  <span className="sr-only">{t("restore")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Restore</TooltipContent>
+              <TooltipContent>{t("restore")}</TooltipContent>
             </Tooltip>
           )}
 
@@ -203,10 +201,10 @@ export function MessageDisplay({
                   disabled={!message}
                 >
                   <ReplyAll className="h-4 w-4" />
-                  <span className="sr-only">Reply all</span>
+                  <span className="sr-only">{t("forward")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Reply all</TooltipContent>
+              <TooltipContent>{t("forward")}</TooltipContent>
             </Tooltip>
           )}
 
@@ -267,7 +265,7 @@ export function MessageDisplay({
                   {message.subject || t("no_subject")}
                 </div>
                 <div className="flex text-xs">
-                  <div className="font-medium mr-1">{t("to")}:</div>
+                  <div className="font-medium mr-1">{t("common:to")}:</div>
 
                   {message.recipients.map((recipient) => (
                     <div key={recipient.id}>

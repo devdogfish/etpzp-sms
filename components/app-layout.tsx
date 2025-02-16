@@ -26,7 +26,6 @@ export default function AppLayout({
   const isMounted = useIsMounted();
   const { theme } = useNextTheme();
   const { syncWithDB, hasLanguageCookie } = useSettings(locale);
-  const { isFullscreen } = useLayout();
 
   useEffect(() => {
     if (isMounted) {
@@ -53,6 +52,7 @@ export default function AppLayout({
           /* Only wrap what's necessary with the TranslationsProvider */
           resources={resources}
           locale={locale}
+          /* should be ["navigation", "modals", "common"] */
           namespaces={namespaces}
         >
           {/* error.tsx catchall file would get its translations from here, if one existed in /app/[locale]/(root)/error.tsx */}

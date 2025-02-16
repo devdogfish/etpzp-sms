@@ -20,6 +20,7 @@ import { NewRecipient } from "@/types/recipient";
 import { DBContact } from "@/types/contact";
 import useIsMounted from "@/hooks/use-mounted";
 import ProfilePic from "./profile-pic";
+import { useTranslation } from "react-i18next";
 
 type InputState = {
   value: string;
@@ -58,6 +59,7 @@ export default function RecipientsInput({
   } = useNewMessage();
   const { setModal } = useContactModals();
   const [activeError, setActiveError] = useState<boolean>(false);
+  const { t } = useTranslation();
 
   const isMounted = useIsMounted();
 
@@ -148,7 +150,7 @@ export default function RecipientsInput({
           )}
         >
           <span className="my-0.5 mr-0.5 px-0 flex items-center text-sm text-muted-foreground">
-            To
+            {t("common:to")}
           </span>
           {recipients.map((recipient) => (
             <div

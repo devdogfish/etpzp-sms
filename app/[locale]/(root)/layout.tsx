@@ -11,7 +11,7 @@ export default async function NavPanelLayout({
   params,
 }: LayoutProps) {
   // Internationalization (i18n) stuff - no need to include errors namespace as we only put in more specific locations
-  const i18nNamespaces = ["navigation", "common"];
+  const i18nNamespaces = ["navigation", "modals", "common"];
   const { locale } = await params;
   const { resources } = await initTranslations(locale, i18nNamespaces);
 

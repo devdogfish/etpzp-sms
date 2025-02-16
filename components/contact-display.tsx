@@ -34,7 +34,7 @@ export default function ContactDisplay({
   const router = useRouter();
   const { setModal } = useContactModals();
   const showEditModal = () => setModal((prev) => ({ ...prev, edit: true }));
-  // Reset this to the default namespace, because in the layout we have messages-page as default
+  // Reset this to the default namespace, because in the layout it's set to the messages page namespace by default
   const { t } = useTranslation(["contacts-page"]);
 
   const handleDelete = async () => {

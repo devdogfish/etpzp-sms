@@ -26,6 +26,7 @@ import { Calendar } from "./ui/calendar";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { useTranslation } from "react-i18next";
 
 type DateState = {
   date: Date;
@@ -46,6 +47,7 @@ export default function ScheduleMessageDropdown({
     hour: format(Date.now(), "HH"),
     minute: format(Date.now(), "mm"),
   });
+  const { t } = useTranslation(["messages-page", "modals", "common"]);
 
   const handleSchedule = () => {
     console.log("handleSchedule called");
@@ -60,13 +62,10 @@ export default function ScheduleMessageDropdown({
         (scheduledDate.getTime() - new Date().getTime()) / 1000
       );
 
-      // Send secondsFromNow to the server
-      console.log(
-        `Message will be sent in ${Math.floor(secondsFromNow / 60)} minutes`
-      );
-
       // Close the dialog
       setDialog(false);
+
+      // Send secondsFromNow to the server
       submit(secondsFromNow);
     } else {
       console.log(
@@ -88,7 +87,7 @@ export default function ScheduleMessageDropdown({
           ) : (
             <Send className="w-4 h-4" />
           )}
-          Send
+          {t("send")}
         </Button>
         <DropdownMenu onOpenChange={setDropdown}>
           <DropdownMenuTrigger
@@ -110,25 +109,31 @@ export default function ScheduleMessageDropdown({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>
-              <h6 className="font-bold">Schedule send</h6>
+              <h6 className="font-bold">{t("schedule-header")}</h6>
               <p className="text-muted-foreground font-normal">
-                When do you want the message to be sent?
+                {t("schedule-header_caption")}
               </p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Tomorrow morning</DropdownMenuItem>
-            <DropdownMenuItem>Tomorrow afternoon</DropdownMenuItem>
+            <DropdownMenuItem>
+              {t("schedule-tomorrow_morning")}
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              {t("schedule-tomorrow_afternoon")}
+            </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => setDialog(true)}>
               <Clock className="h-4 w-4 mr-2" />
-              <span>Custom date</span>
+              <span>{t("schedule-custom")}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
       <DialogContent className="p-6 min-w-max">
         <DialogHeader>
-          <DialogTitle>Pick date and time</DialogTitle>
-          <DialogDescription>View more info about a message.</DialogDescription>
+          <DialogTitle>{t("modals:schedule_message-header")}</DialogTitle>
+          <DialogDescription>
+            {t("modals:schedule_message-header_caption")}
+          </DialogDescription>
         </DialogHeader>
         <div
           className="p-0 flex gap-4 h-[325px]" /** This is the exact maximum height of the calendar */
@@ -146,7 +151,9 @@ export default function ScheduleMessageDropdown({
           <div className="flex flex-col justify-between w-full">
             <div /**className="flex flex-col h-full justify-center" */>
               <div className="flex flex-col gap-2 mb-3">
-                <Label htmlFor="hour">Hour</Label>
+                <Label htmlFor="hour">
+                  {t("modals:schedule_message-hour_label")}
+                </Label>
                 <Input
                   id="hour"
                   type="number"
@@ -165,7 +172,9 @@ export default function ScheduleMessageDropdown({
                 />
               </div>
               <div className="flex flex-col gap-2 mb-3">
-                <Label htmlFor="minute">Minute</Label>
+                <Label htmlFor="minute">
+                  {t("modals:schedule_message-minute_label")}
+                </Label>
                 <Input
                   id="minute"
                   type="number"
@@ -188,13 +197,12 @@ export default function ScheduleMessageDropdown({
               <DialogClose
                 className={cn(buttonVariants({ variant: "outline" }), "")}
               >
-                Close
+                {t("common:cancel")}
               </DialogClose>
               <Button onClick={handleSchedule}>
-                Schedule for{" "}
-                {selectedDate.date.getHours() +
-                  ":" +
-                  selectedDate.date.getMinutes()}
+                {t("modals:schedule_message-submit", {
+                  time: `${selectedDate.date.getHours()}:${selectedDate.date.getMinutes()}`,
+                })}
               </Button>
             </div>
           </div>

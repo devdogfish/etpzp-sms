@@ -8,6 +8,11 @@ import { cn, toastActionResult } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { PageHeader } from "./header";
 import { sendMessage } from "@/lib/actions/message.create";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Form
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -165,27 +170,43 @@ const NewMessageForm = React.memo(function ({
       )}
 
       <PageHeader title={message.subject ? message.subject : t("header")}>
-        <Button
-          variant="ghost"
-          className="aspect-1 p-0"
-          onClick={() => setIsFullscreen(prevFullscreen => !prevFullscreen)}
-        >
-          {isFullscreen ? (
-            <Minimize2 className="h-4 w-4" />
-          ) : (
-            <Maximize2 className="h-4 w-4" />
-          )}
-        </Button>
-        <Button
-          variant="ghost"
-          className={cn(buttonVariants({ variant: "ghost" }), "aspect-1 p-0")}
-          onClick={() => {
-            setIsFullscreen(false);
-            router.push("/sent");
-          }}
-        >
-          <X className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              className="aspect-1 p-0"
+              onClick={() =>
+                setIsFullscreen((prevFullscreen) => !prevFullscreen)
+              }
+            >
+              {isFullscreen ? (
+                <Minimize2 className="h-4 w-4" />
+              ) : (
+                <Maximize2 className="h-4 w-4" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t("toggle_fullscreen")}</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              className={cn(
+                buttonVariants({ variant: "ghost" }),
+                "aspect-1 p-0"
+              )}
+              onClick={() => {
+                setIsFullscreen(false);
+                router.push("/sent");
+              }}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t("common:close")}</TooltipContent>
+        </Tooltip>
       </PageHeader>
       <form
         ref={formRef}
@@ -262,7 +283,7 @@ const NewMessageForm = React.memo(function ({
               onClick={() => router.push("/")}
             >
               <Trash2 className="h-4 w-4" />
-              Discard
+              {t("discard")}
             </Button>
 
             <SendButton
@@ -273,8 +294,11 @@ const NewMessageForm = React.memo(function ({
                   // .submit() submits the form using default behavior with form submission, while .requestSubmit() submits the form as if a submit got clicked
                   scheduledTime = secondsFromNow;
                   console.log(
-                    `Message will be sent in ${secondsFromNow} seconds!`
+                    `Message will be sent in ${secondsFromNow} seconds or ${Math.floor(
+                      secondsFromNow / 60
+                    )} minutes!`
                   );
+
                   formRef.current.requestSubmit();
                 }
               }}
