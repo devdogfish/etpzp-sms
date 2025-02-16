@@ -58,7 +58,14 @@ export default function AppLayout({
           <NavPanel navCollapsedSize={4} /* resizableHandle is inside here */ />
           <MobileNavPanel /* open state is managed in useLayout context */ />
         </TranslationsProvider>
-        {children}
+        <TranslationsProvider
+          /* Add error translations for uncaught exceptions */
+          resources={resources}
+          locale={locale}
+          namespaces={["errors", "common"]}
+        >
+          {children}
+        </TranslationsProvider>
       </ResizablePanelWrapper>
     </SkeletonTheme>
   );

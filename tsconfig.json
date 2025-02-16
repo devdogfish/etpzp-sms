@@ -32,7 +32,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/[locale]/login/page.tsx",
-    "app/[locale]/(app)/(other)/new-message/not-found.js"
+    "app/[locale]/(app)/(other)/new-message/not-found.js",
+    "app/[locale]/(root)/error.tsx"
   ],
   "exclude": ["node_modules"]
 }

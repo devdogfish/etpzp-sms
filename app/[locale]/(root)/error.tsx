@@ -1,25 +1,36 @@
 "use client";
+
 import ChildrenPanel from "@/components/shared/children-panel";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Frown } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
-export default function NotFound() {
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    // Log the error to an error reporting service
+    console.error(error);
+  }, [error]);
+  const { t } = useTranslation(["errors"]);
   return (
     <ChildrenPanel>
       <div className="h-full flex flex-col items-center justify-center gap-3">
-        <div className="flex flex-col items-center gap-1">
-          <Frown className="text-muted-foreground h-10 w-10 stroke-[1.2px]" />
-          <div className="flex flex-col items-center">
-            <h2>ERROR: 404 Not Found!</h2>
-            <p className="text-sm">
-              Could not find the requested resource in [locale].
-            </p>
-          </div>
-        </div>
-        <Link href="/" className={buttonVariants({ variant: "default" })}>
-          Go Back
-        </Link>
+        <h2>{t("error-header")}</h2>
+        <Button
+          onClick={
+            // Attempt to recover by trying to re-render the segment
+            () => reset()
+          }
+        >
+          {t("try_again")}
+        </Button>
       </div>
     </ChildrenPanel>
   );
