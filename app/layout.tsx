@@ -33,7 +33,7 @@ export default async function RootLayout({
 }) {
   // We can't get the locale from the url params, thus we parse it from the locale cookie
   const cookieStore = await cookies();
-  const currentLocale = cookieStore.get("NEXT_LOCALE");
+  const currentLocale = cookieStore.get("NEXT_LOCALE")?.value;
 
   const layoutCookie = cookieStore.get("react-resizable-panels:layout:mail");
   const collapsedCookie = cookieStore.get("react-resizable-panels:collapsed");
@@ -49,8 +49,8 @@ export default async function RootLayout({
 
   return (
     <html
-      lang={currentLocale?.value}
-      dir={dir(currentLocale?.value)}
+      lang={currentLocale}
+      dir={dir(currentLocale)}
       suppressHydrationWarning
     >
       <body

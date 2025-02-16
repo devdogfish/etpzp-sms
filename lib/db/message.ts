@@ -114,9 +114,8 @@ export async function fetchDraft(
   const session = await getSession();
   const userId = session?.user?.id;
 
-  if (!id) throw new Error("ID passed to fetchDraft was invalid!!!");
-
   try {
+    if (!id) throw new Error("ID passed to fetchDraft was invalid!!!");
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(
       `

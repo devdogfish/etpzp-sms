@@ -55,17 +55,12 @@ export default function AppLayout({
           locale={locale}
           namespaces={namespaces}
         >
+          {/* error.tsx catchall file would get its translations from here, if one existed in /app/[locale]/(root)/error.tsx */}
           <NavPanel navCollapsedSize={4} /* resizableHandle is inside here */ />
           <MobileNavPanel /* open state is managed in useLayout context */ />
         </TranslationsProvider>
-        <TranslationsProvider
-          /* Add error translations for uncaught exceptions */
-          resources={resources}
-          locale={locale}
-          namespaces={["errors", "common"]}
-        >
-          {children}
-        </TranslationsProvider>
+
+        {children}
       </ResizablePanelWrapper>
     </SkeletonTheme>
   );

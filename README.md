@@ -19,7 +19,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## TODO
 
 - Update the message display to look nicer and actually display stuff in the correct manner
-- Optimize error files (404 and global error.tsx). [Read the docs](https://nextjs.org/docs/app/api-reference/file-conventions/error)
 - Sometimes this happens: Database query error error: duplicate key value violates unique constrain
   t "recipient_message_id_phone_key"
 
