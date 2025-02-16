@@ -37,10 +37,11 @@ export default function Settings() {
   return (
     <>
       <PageHeader title={t("header")} />
-      <div className="py-4 px-4 space-y-12 h-[calc(100vh-52px)] overflow-y-scroll">
+      <div className="py-4 px-4 space-y-12 h-[calc(100vh-var(--header-height))] overflow-y-scroll">
         <SectionHeader
           title={t("language-header")}
           subtitle={t("language-header_caption")}
+          anchorName="language"
         >
           <SettingItem
             name="lang"
@@ -73,6 +74,7 @@ export default function Settings() {
         <SectionHeader
           title={t("profile-header")}
           subtitle={t("profile-header_caption")}
+          anchorName="profile"
         >
           <SettingItem
             name="profile_color_id" // this might need to be the exact database field
@@ -149,6 +151,7 @@ export default function Settings() {
         <SectionHeader
           title={t("appearance-header")}
           subtitle={t("appearance-header_caption")}
+          anchorName="appearance"
         >
           <SettingItem
             name="primary_color_id" // this might need to be the exact database field

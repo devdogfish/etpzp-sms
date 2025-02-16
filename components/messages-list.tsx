@@ -21,7 +21,7 @@ export function MessageList({
 }: MessageListProps) {
   const { t } = useTranslation();
   return (
-    <ScrollArea className="h-[calc(100vh-52px-68px)]">
+    <ScrollArea className="h-[calc(100vh-var(--header-height)-68px)]">
       <div className="flex flex-col gap-2 p-4 pt-0">
         {messages.map((item) => (
           <button

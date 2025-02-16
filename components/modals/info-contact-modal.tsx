@@ -25,7 +25,7 @@ export default function InfoContactModal({
   recipient: NewRecipient;
 }) {
   const { modal, setModal } = useContactModals();
-  const { t} = useTranslation(["modals"])
+  const { t } = useTranslation(["modals"]);
 
   const showCreateFromRecipientModal = () => {
     setModal((prev) => ({ ...prev, info: false }));
@@ -44,6 +44,7 @@ export default function InfoContactModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
+            {/* make it so we can interpolate a one of these translations using {{name}} into the actual one */}
             {recipient.contactId ? "Contact" : "Recipient"} info
           </DialogTitle>
           <DialogDescription>
@@ -80,8 +81,7 @@ export default function InfoContactModal({
             <div className="flex gap-4 justify-between p-4 text-sm">
               <div>{t("common:description")}</div>
               <div>
-                {recipient.contactDescription ||
-                  t("common:no_description")}
+                {recipient.contactDescription || t("common:no_description")}
               </div>
             </div>
           )}
@@ -89,12 +89,12 @@ export default function InfoContactModal({
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline" className="mr-auto">
-              Close
+              {t("common:close")}
             </Button>
           </DialogClose>
           {!recipient.contactId && (
             <Button className="" onClick={showCreateFromRecipientModal}>
-              Create
+              TODO: recipient_info-Create contact
             </Button>
           )}
         </DialogFooter>

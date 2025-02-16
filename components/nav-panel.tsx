@@ -151,7 +151,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   const showAlertDialog = () => {
     // show the alert dialog
-    setConfirmLogoutOpen(true)
+    setConfirmLogoutOpen(true);
   };
 
   const handleLogout = async () => {
@@ -188,8 +188,8 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
     <>
       <div
         className={cn(
-          "flex h-[var(--header-height)] items-center justify-center",
-          isCollapsed ? "h-[var(--header-height)]" : "px-2"
+          "flex h-[var(--header-height)] border-b items-center justify-center",
+          !isCollapsed && "px-2"
         )}
       >
         <DropdownMenu>
@@ -220,28 +220,28 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="z-[1000]">
-            {/* <DropdownMenuLabel>My account</DropdownMenuLabel> */}
-            {/* <DropdownMenuSeparator /> */}
-            {/* <DropdownMenuGroup> */}
-            <Link href="/settings#Profile">
-              <DropdownMenuItem>
-                <UserRoundPen />
-                {t("common:edit_profile")}
-              </DropdownMenuItem>
-            </Link>
-            <Link href="/settings">
-              <DropdownMenuItem>
-                <Settings />
-                {t("settings")}
-              </DropdownMenuItem>
-            </Link>
-            <Link href="/dashboard">
-              <DropdownMenuItem>
-                <MonitorCog />
-                {t("dashboard")}
-              </DropdownMenuItem>
-            </Link>
-            {/* </DropdownMenuGroup> */}
+            <DropdownMenuGroup>
+              <Link href="/settings#profile">
+                <DropdownMenuItem>
+                  <UserRoundPen />
+                  {t("common:edit_profile")}
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/settings">
+                <DropdownMenuItem>
+                  <Settings />
+                  {t("settings")}
+                </DropdownMenuItem>
+              </Link>
+              {session?.isAdmin && (
+                <Link href="/dashboard">
+                  <DropdownMenuItem>
+                    <MonitorCog />
+                    {t("dashboard")}
+                  </DropdownMenuItem>
+                </Link>
+              )}
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
@@ -250,7 +250,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <Separator />
+      {/* <Separator /> */}
       <NavLinks
         isCollapsed={isCollapsed}
         links={[
@@ -270,9 +270,10 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
       >
         <div
           // In tailwind, this doesn't work, and I don't know why
-
           style={{
-            height: `calc(100vh - 52px - 56px${isCollapsed ? " - 8px" : ""})`,
+            height: `calc(100vh - var(--header-height) - 56px${
+              isCollapsed ? " - 8px" : ""
+            })`,
             width: "100%",
           }}
           className="flex flex-col"
@@ -364,9 +365,8 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             />
           </div>
 
-          <div className="shrink">
-            <Separator />
-
+          <Separator />
+          <div className="shrink h-[var(--header-height)]">
             <NavLinks
               isCollapsed={isCollapsed}
               links={[
@@ -381,7 +381,10 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             />
 
             {/* Confirm logout dialog */}
-            <AlertDialog open={confirmLogoutOpen} onOpenChange={setConfirmLogoutOpen}>
+            <AlertDialog
+              open={confirmLogoutOpen}
+              onOpenChange={setConfirmLogoutOpen}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Log Out</AlertDialogTitle>

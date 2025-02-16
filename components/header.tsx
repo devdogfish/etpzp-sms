@@ -17,7 +17,7 @@ export function PageHeader({ title, children }: PageHeaderProps) {
   const { setMobileNavPanel } = useLayout();
   return (
     <>
-      <div className="flex items-center gap-2 px-4 h-[52px] min-h-[52px]">
+      <div className="flex items-center gap-2 px-4 h-[var(--header-height)] border-b">
         {onMobile && (
           <Button
             variant="ghost"
@@ -33,7 +33,6 @@ export function PageHeader({ title, children }: PageHeaderProps) {
         <h2 className="mr-auto">{title}</h2>
         {children}
       </div>
-      <Separator />
     </>
   );
 }
@@ -42,16 +41,18 @@ type SectionHeaderProps = {
   title: string;
   subtitle: string;
   children?: React.ReactNode;
+  anchorName: string;
 };
 export function SectionHeader({
   title,
   subtitle,
   children,
+  anchorName,
 }: SectionHeaderProps) {
   return (
     <div>
-      <Link href={`#${title}`} className="mr-auto">
-        <h3 id={title}>{title}</h3>
+      <Link href={`#${anchorName}`} className="mr-auto">
+        <h3 id={anchorName}>{title}</h3>
       </Link>
       <p className="subtitle">{subtitle}</p>
       <Separator className="mt-5 mb-3 lg:max-w-2xl" />
