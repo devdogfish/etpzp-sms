@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useActionState } from "react";
 import {
   Dialog,
@@ -19,21 +17,14 @@ import { Label } from "../ui/label";
 import { updateContact } from "@/lib/actions/contact.actions";
 import { DBContact } from "@/types/contact";
 import { ContactSchema } from "@/lib/form.schemas";
-import {
-  Badge,
-  CheckCircle2,
-  CircleAlert,
-  FileWarning,
-  Loader2,
-  Server,
-} from "lucide-react";
+import { CircleAlert, Loader2 } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
 import { cn, toastActionResult } from "@/lib/utils";
-import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { ActionResponse } from "@/types/action";
+import { useTranslation } from "react-i18next";
 
 const initialState: ActionResponse<undefined> = {
   success: false,
@@ -46,6 +37,7 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
     updateContact.bind(null, contact.id),
     initialState
   );
+  const { t } = useTranslation(["modals"]);
 
   useEffect(() => {
     if (serverState.success) {
@@ -64,16 +56,18 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
     <Dialog open={modal.edit} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Contact</DialogTitle>
-          <DialogDescription>Edit a contact in your list.</DialogDescription>
+          <DialogTitle>{t("edit_contact-header")}</DialogTitle>
+          <DialogDescription>
+            {t("edit_contact-header_caption")}
+          </DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t("common:name")}</Label>
             <Input
               name="name"
               id="name"
-              placeholder="Oliveiro"
+              placeholder={t("name_placeholder")}
               defaultValue={serverState.inputs?.name || contact.name}
               // required
               // minLength={5}
@@ -89,11 +83,11 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone number</Label>
+            <Label htmlFor="phone">{t("common:phone_number")}</Label>
             <Input
               name="phone"
               id="phone"
-              placeholder="1234568900"
+              placeholder={t("phone_placeholder")}
               defaultValue={serverState.inputs?.phone || contact.phone}
               // required
               // minLength={5}
@@ -109,11 +103,11 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t("common:description")}</Label>
             <Textarea
               name="description"
               id="description"
-              placeholder="Oliveiro is a great friend of mine, I met him at the festival of the edge lords."
+              placeholder={t("description_placeholder")}
               defaultValue={
                 serverState.inputs?.description || contact.description
               }

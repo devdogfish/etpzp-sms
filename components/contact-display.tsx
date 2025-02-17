@@ -15,12 +15,13 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn, getNameInitials, toastActionResult } from "@/lib/utils";
 import { CopyButton } from "./shared/copy-button";
 import { deleteContact } from "@/lib/actions/contact.actions";
-import { toast } from "sonner";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import EditContactModal from "./modals/edit-contact-modal";
 import { useRouter } from "next/navigation";
 import { DBContact } from "@/types/contact";
 import { saveDraft } from "@/lib/actions/message.actions";
+import { useTranslation } from "react-i18next";
+import ProfilePic from "./profile-pic";
 
 export default function ContactDisplay({
   contact,
@@ -33,6 +34,8 @@ export default function ContactDisplay({
   const router = useRouter();
   const { setModal } = useContactModals();
   const showEditModal = () => setModal((prev) => ({ ...prev, edit: true }));
+  // Reset this to the default namespace, because in the layout it's set to the messages page namespace by default
+  const { t } = useTranslation(["contacts-page"]);
 
   const handleDelete = async () => {
     if (contact) {
@@ -63,17 +66,17 @@ export default function ContactDisplay({
   return (
     <div className={cn("flex h-full flex-col")}>
       {contact && <EditContactModal contact={contact} />}
-      <div className="flex items-center p-2">
+      <div className="flex items-center p-2 h-[var(--header-height)] border-b">
         <div className="flex items-center gap-2">
           {onMobile && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" onClick={reset}>
                   <ArrowLeft className="h-4 w-4" />
-                  <span className="sr-only">Go back</span>
+                  <span className="sr-only">{t("common:go_back")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Go back</TooltipContent>
+              <TooltipContent>{t("common:go_back")}</TooltipContent>
             </Tooltip>
           )}
 
@@ -86,10 +89,12 @@ export default function ContactDisplay({
                 onClick={handleDelete}
               >
                 <Trash2 className="h-4 w-4" />
-                <span className="sr-only">Delete contact</span>
+                <span className="sr-only">
+                  {t("common:delete_permanently")}
+                </span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Delete contact</TooltipContent>
+            <TooltipContent>{t("common:delete_permanently")}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -101,10 +106,10 @@ export default function ContactDisplay({
                 disabled={!contact}
               >
                 <Share className="h-4 w-4" />
-                <span className="sr-only">Export</span>
+                <span className="sr-only">{t("common:export")}</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Export</TooltipContent>
+            <TooltipContent>{t("common:export")}</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -115,10 +120,10 @@ export default function ContactDisplay({
                 disabled={!contact}
               >
                 <Edit className="h-4 w-4" />
-                <span className="sr-only">Edit</span>
+                <span className="sr-only">{t("common:edit")}</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Edit</TooltipContent>
+            <TooltipContent>{t("common:edit")}</TooltipContent>
           </Tooltip>
         </div>
         <div className="ml-auto flex items-center gap-2">
@@ -127,24 +132,21 @@ export default function ContactDisplay({
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" onClick={reset}>
                   <X className="h-4 w-4" />
-                  <span className="sr-only">Close</span>
+                  <span className="sr-only">{t("common:close")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Close</TooltipContent>
+              <TooltipContent>{t("common:close")}</TooltipContent>
             </Tooltip>
           )}
         </div>
       </div>
-      <Separator />
+      {/* <Separator /> */}
 
       {contact ? (
         <div className="flex flex-1 flex-col">
           <div className="flex items-start p-4">
             <div className="flex items-center gap-4 text-sm">
-              <Avatar>
-                <AvatarImage alt={contact.name || "Selected contact image"} />
-                <AvatarFallback>{getNameInitials(contact.name)}</AvatarFallback>
-              </Avatar>
+              <ProfilePic name={contact.name} />
               <h2>{contact.name}</h2>
             </div>
             {contact.created_at && (
@@ -155,7 +157,7 @@ export default function ContactDisplay({
           </div>
           <Separator />
           <div className="flex gap-4 justify-between items-center p-4 text-sm">
-            <div>Phone</div>
+            <p>{t("common:phone_number")}</p>
             <div className="flex">
               <CopyButton text={contact.phone} variant="none" />
               <Button variant="link" className="p-0" onClick={messageContact}>
@@ -165,15 +167,18 @@ export default function ContactDisplay({
           </div>
           <Separator />
           <div className="flex gap-4 justify-between p-4 text-sm">
-            <div>Description</div>
-            <div>
-              {contact.description || "This contact has no description"}
-            </div>
+            <p>{t("common:description")}</p>
+
+            {contact.description ? (
+              <p>{contact.description}</p>
+            ) : (
+              <p className="italic">{t("no_description")}</p>
+            )}
           </div>
         </div>
       ) : (
         <div className="p-8 text-center text-muted-foreground">
-          No contact selected
+          {t("none_selected")}
         </div>
       )}
     </div>

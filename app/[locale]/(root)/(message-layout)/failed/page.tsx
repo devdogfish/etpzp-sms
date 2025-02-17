@@ -6,20 +6,20 @@ import { fetchError } from "@/lib/db";
 
 export default function Page() {
   return (
-    <Suspense fallback={<MessagesPageSkeleton category="DRAFT" />}>
-      <DraftsMessagesPage />
+    <Suspense fallback={<MessagesPageSkeleton category="FAILED" />}>
+      <FailedMessagesPage />
     </Suspense>
   );
 }
 
-export async function DraftsMessagesPage() {
-  const messages = await fetchMessagesByStatus("DRAFTED");
+export async function FailedMessagesPage() {
+  const messages = await fetchMessagesByStatus("FAILED");
 
   return (
     <MessagesPage
       messages={messages || []}
-      error={fetchError("drafts", !messages)}
-      category="DRAFT"
+      error={fetchError("failed messages", !messages)}
+      category="FAILED"
     />
   );
 }

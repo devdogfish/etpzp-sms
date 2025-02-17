@@ -1,23 +1,31 @@
 "use client";
 
 import { cn, getNameInitials } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 
-export default function Account({
-  size,
+export default function ProfilePic({
+  size = 9,
   name,
   colorId,
   loading,
+  fill = true,
 }: {
-  size: number;
-  colorId: number | undefined;
-  name: string | undefined;
+  size?: number;
+  colorId?: number;
+  name?: string;
   loading?: boolean;
+  fill?: boolean;
 }) {
   if (loading) return <h2 className="text-sm">Loading...</h2>;
   return (
     <div
-      className={`w-${size} h-${size} rounded-full content-center bg-chart-${colorId}`}
+      className={cn(
+        `w-${size} h-${size} rounded-full content-center text-center`,
+        colorId
+          ? `bg-chart-${colorId}`
+          : fill
+          ? `bg-muted`
+          : "border border-muted-foreground"
+      )}
     >
       <p
         className={cn(

@@ -6,7 +6,6 @@ import { fetchRecipients } from "@/lib/db/recipients";
 import { getProcessedRecipients } from "@/lib/recipients.filters";
 import { fetchDraft } from "@/lib/db/message";
 import { Suspense } from "react";
-import { NewRecipient } from "@/types/recipient";
 import { validatePhoneNumber } from "@/lib/utils";
 
 export default async function Page({

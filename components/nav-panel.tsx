@@ -7,27 +7,26 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, Calendar, Menu } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
-  CirclePlus,
+  AlertTriangle,
+  Calendar,
+  LogOut,
+  Menu,
+  UserRoundPen,
+} from "lucide-react";
+import {
   MonitorCog,
-  AlertCircle,
   Settings,
-  Clipboard,
-  Send,
   Trash2,
   Contact2,
-  Palette,
-  Puzzle,
   Pencil,
-  Mails,
   MailCheck,
   FileText,
 } from "lucide-react";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { cn } from "@/lib/utils";
-import Account from "./account";
+import ProfilePic from "./profile-pic";
 import { Separator } from "./ui/separator";
 import NavLinks from "./nav-links";
 import { useTranslation } from "react-i18next";
@@ -45,22 +44,37 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useSession } from "@/hooks/use-session";
-import useLanguage from "@/hooks/use-language";
+import { logout } from "@/lib/auth";
+import { toast } from "sonner";
+import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function NavPanel({
   navCollapsedSize,
 }: {
   navCollapsedSize: number;
 }) {
-  const { layout, isCollapsed, setIsCollapsed, fallbackLayout } = useLayout();
-  const onMobile = useIsMobile();
-
+  const { layout, isCollapsed, setIsCollapsed, fallbackLayout, isFullscreen } =
+    useLayout();
+  // const onMobile = useIsMobile();
+  const hidePanelClassName =
+    ((isFullscreen || useIsMobile()) && "hidden") || undefined;
   return (
     <>
       <ResizablePanel
         className={cn(
           isCollapsed && "min-w-[50px] transition-all duration-300 ease-in-out",
-          onMobile && "hidden"
+          hidePanelClassName
         )}
         defaultSize={layout ? layout[0] : fallbackLayout[0]}
         collapsedSize={navCollapsedSize}
@@ -82,7 +96,7 @@ export default function NavPanel({
       >
         <NavPanelContent isCollapsed={isCollapsed} />
       </ResizablePanel>
-      <ResizableHandle withHandle className={cn(onMobile && "hidden")} />
+      <ResizableHandle withHandle className={hidePanelClassName} />
     </>
   );
 }
@@ -111,7 +125,7 @@ export function MobileNavPanel() {
       /* You can change the animation duration inside the shadCn component (easiest way) */
     >
       <SheetContent side="left" className="w-[300px] p-0">
-        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        <SheetTitle className="sr-only">navigation Menu</SheetTitle>
         <nav onClick={handleNavClick}>
           <NavPanelContent
             isCollapsed={false} // on mobile it will never be collapsed
@@ -122,26 +136,43 @@ export function MobileNavPanel() {
   );
 }
 
+// We have to data sources for the user's profile:
+// 1. Sensitive information is extracted from the encrypted session
+// 2. Stuff that can be changed in the settings is encrypted from localstorage
 function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["navigation", "modals", "common"]);
   const { amountIndicators } = useLayout();
   const router = useRouter();
-  // We have to data sources for the user's profile:
-  // 1. Sensitive information is extracted from the encrypted session
-  // 2. Stuff that can be changed in the settings is encrypted from localstorage
   const { session, loading } = useSession();
-  const [{ name, colorId }, setSettings] = useState({
-    name: localStorage.getItem("display_name") || undefined,
+  const [{ displayName, colorId }, setSettings] = useState({
+    displayName: localStorage.getItem("display_name") || undefined,
     colorId: Number(localStorage.getItem("profile_color_id")) || undefined,
   });
-  const { normalizePath } = useLanguage();
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
+  const showAlertDialog = () => {
+    // show the alert dialog
+    setConfirmLogoutOpen(true);
+  };
 
+  const handleLogout = async () => {
+    const { success } = await logout();
+    if (success) {
+      router.push("/login");
+      localStorage.clear();
+    } else
+      toast.error("Error occurred", {
+        description: "You weren't logged out because of an error.",
+      });
+  };
+
+  // Update components when localstorage settings change
   useEffect(() => {
-    // Function to handle settings localstorage changes
     const handleStorageChange = () => {
+      const storedProfileColorId =
+        Number(localStorage.getItem("profile_color_id")) || undefined;
       setSettings({
-        name: localStorage.getItem("display_name") || undefined,
-        colorId: Number(localStorage.getItem("profile_color_id")) || undefined,
+        displayName: localStorage.getItem("display_name") || undefined,
+        colorId: storedProfileColorId,
       });
     };
 
@@ -153,16 +184,12 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
       window.removeEventListener("settingsUpdated", handleStorageChange);
     };
   }, []);
-
-  const handleLogout = async () => {
-    router.push("/logout");
-  };
   return (
     <>
       <div
         className={cn(
-          "flex h-[var(--header-height)] items-center justify-center",
-          isCollapsed ? "h-[var(--header-height)]" : "px-2"
+          "flex h-[var(--header-height)] border-b items-center justify-center",
+          !isCollapsed && "px-2"
         )}
       >
         <DropdownMenu>
@@ -172,179 +199,211 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
               isCollapsed && "w-9 h-9"
             )}
           >
-            <Account size={9} name={name} colorId={colorId} loading={loading} />
+            <ProfilePic
+              size={9}
+              name={displayName}
+              colorId={colorId}
+              loading={loading}
+            />
             <div
               className={cn(
                 "flex flex-col items-start",
                 isCollapsed && "hidden"
               )}
             >
-              <p className="font-semibold mb-[-3px]">{name || "No name"}</p>
-              <span className="text-xs">
-                {session?.isAdmin ? "Admin" : "User"}
+              <p className="font-semibold mb-[-3px]">
+                {displayName || t("common:no_name")}
+              </p>
+              <span className="text-xs text-muted-foreground">
+                {session?.isAdmin ? t("common:admin") : t("common:user")}
               </span>
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="z-[1000]">
-            <DropdownMenuLabel>My account</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <Link href="/settings#profile">
+                <DropdownMenuItem>
+                  <UserRoundPen />
+                  {t("common:edit_profile")}
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/settings">
+                <DropdownMenuItem>
+                  <Settings />
+                  {t("settings")}
+                </DropdownMenuItem>
+              </Link>
+              {session?.isAdmin && (
+                <Link href="/dashboard">
+                  <DropdownMenuItem>
+                    <MonitorCog />
+                    {t("dashboard")}
+                  </DropdownMenuItem>
+                </Link>
+              )}
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuGroup> */}
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Report a bug</DropdownMenuItem>
-            {/* </DropdownMenuGroup> */}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut />
+              {t("common:log_out")}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <Separator />
+      {/* <Separator /> */}
       <NavLinks
         isCollapsed={isCollapsed}
         links={[
           {
-            title: t("NEW_MESSAGE"),
+            title: t("new_message"),
             icon: Pencil,
             variant: "default",
             href: "/new-message",
             size: "xl",
+            isNewButton: true,
           },
         ]}
       />
 
-      <ScrollArea className="h-[calc(100vh-52px-56px)]">
-        <NavLinks
-          isCollapsed={isCollapsed}
-          links={[
-            {
-              title: t("SENT"),
-              label:
-                amountIndicators?.sent == 0
-                  ? ""
-                  : amountIndicators?.sent.toString(),
-              icon: MailCheck,
-              variant: "ghost",
-              href: "/sent",
-            },
-            {
-              title: t("SCHEDULED"),
-              label:
-                amountIndicators?.scheduled == 0
-                  ? ""
-                  : amountIndicators?.scheduled.toString(),
-              icon: Calendar,
-              variant: "ghost",
-              href: "/scheduled",
-            },
-            {
-              title: t("FAILED"),
-              label:
-                amountIndicators?.failed == 0
-                  ? ""
-                  : amountIndicators?.failed.toString(),
-              icon: AlertTriangle,
-              variant: "ghost",
-              href: "/failed",
-            },
-            {
-              title: t("DRAFT"),
-              label:
-                amountIndicators?.drafted == 0
-                  ? ""
-                  : amountIndicators?.drafted.toString(),
-              icon: FileText,
-              variant: "ghost",
-              href: "/drafts",
-            },
-            // {
-            //   title: t("templates"),
-            //   label: "",
-            //   icon: Clipboard,
-            //   variant: "ghost",
-            //   href: "/templates",
-            // },
-            {
-              title: t("TRASH"),
-              label:
-                amountIndicators?.trashed == 0
-                  ? ""
-                  : amountIndicators?.trashed.toString(),
-              icon: Trash2,
-              variant: "ghost",
-              href: "/trash",
-            },
-          ]}
-        />
-        {/* <NavLinks
-          isCollapsed={isCollapsed}
-          links={[
-            {
-              title: t("ALL"),
-              label: amountIndicators?.all == 0 ? "" : amountIndicators?.all,
-              icon: Mails,
-              variant: "ghost",
-              href: "/all",
-            },
-            // {
-            //   title: t("NOTIFICATION"),
-            //   label: "4",
-            //   icon: AlertCircle,
-            //   variant: "ghost",
-            //   href: "/notifications",
-            // },
-          ]}
-        /> */}
-        <Separator />
-        <NavLinks
-          isCollapsed={isCollapsed}
-          links={[
-            {
-              title: t("SETTING"),
-              label: "",
-              icon: Settings,
-              variant: "ghost",
-              href: "/settings",
-            },
-            {
-              title: t("CONTACT"),
-              label: "",
-              icon: Contact2,
-              variant: "ghost",
-              href: "/contacts",
-            },
-            // {
-            //   title: "Admin Dashboard",
-            //   label: "",
-            //   icon: Shield,
-            //   variant: "ghost",
-            // },
-            {
-              title: t("DASHBOARD"),
-              label: "",
-              icon: MonitorCog,
-              variant: "ghost",
-              href: "/dashboard",
-            },
-          ]}
-        />
-        {/* <Separator />
-        <NavLinks
-          isCollapsed={isCollapsed}
-          links={[
-            {
-              title: t("COLOR_PALETTE"),
-              icon: Palette,
-              variant: "ghost",
-              href: "/colors",
-            },
-            {
-              title: t("COMPONENT_PREVIEW"),
-              icon: Puzzle,
-              variant: "ghost",
-              href: "/ui",
-            },
-          ]}
-        /> */}
+      <ScrollArea
+      /* Maybe we need a fixed height here, but if everything works, all good. */
+      >
+        <div
+          // In tailwind, this doesn't work, and I don't know why
+          style={{
+            height: `calc(100vh - var(--header-height) - 56px${
+              isCollapsed ? " - 8px" : ""
+            })`,
+            width: "100%",
+          }}
+          className="flex flex-col"
+        >
+          <div className="grow">
+            <NavLinks
+              isCollapsed={isCollapsed}
+              links={[
+                {
+                  title: t("sent"),
+                  label:
+                    amountIndicators?.sent == 0
+                      ? ""
+                      : amountIndicators?.sent.toString(),
+                  icon: MailCheck,
+                  variant: "ghost",
+                  href: "/sent",
+                },
+                {
+                  title: t("scheduled"),
+                  label:
+                    amountIndicators?.scheduled == 0
+                      ? ""
+                      : amountIndicators?.scheduled.toString(),
+                  icon: Calendar,
+                  variant: "ghost",
+                  href: "/scheduled",
+                },
+                {
+                  title: t("failed"),
+                  label:
+                    amountIndicators?.failed == 0
+                      ? ""
+                      : amountIndicators?.failed.toString(),
+                  icon: AlertTriangle,
+                  variant: "ghost",
+                  href: "/failed",
+                },
+                {
+                  title: t("drafts"),
+                  label:
+                    amountIndicators?.drafted == 0
+                      ? ""
+                      : amountIndicators?.drafted.toString(),
+                  icon: FileText,
+                  variant: "ghost",
+                  href: "/drafts",
+                },
+                {
+                  title: t("trash"),
+                  label:
+                    amountIndicators?.trashed == 0
+                      ? ""
+                      : amountIndicators?.trashed.toString(),
+                  icon: Trash2,
+                  variant: "ghost",
+                  href: "/trash",
+                },
+              ]}
+            />
+
+            <Separator />
+            <NavLinks
+              isCollapsed={isCollapsed}
+              links={[
+                {
+                  title: t("settings"),
+                  label: "",
+                  icon: Settings,
+                  variant: "ghost",
+                  href: "/settings",
+                },
+                {
+                  title: t("contacts"),
+                  label: "",
+                  icon: Contact2,
+                  variant: "ghost",
+                  href: "/contacts",
+                },
+                {
+                  title: t("dashboard"),
+                  label: "",
+                  icon: MonitorCog,
+                  variant: "ghost",
+                  href: "/dashboard",
+                  hidden: !session?.isAdmin,
+                },
+              ]}
+            />
+          </div>
+
+          <Separator />
+          <div className="shrink h-[var(--header-height)]">
+            <NavLinks
+              isCollapsed={isCollapsed}
+              links={[
+                {
+                  title: t("common:log_out"),
+                  label: "",
+                  icon: LogOut,
+                  variant: "ghost",
+                  action: showAlertDialog,
+                },
+              ]}
+            />
+
+            {/* Confirm logout dialog */}
+            <AlertDialog
+              open={confirmLogoutOpen}
+              onOpenChange={setConfirmLogoutOpen}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {t("modals:logout-header")}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("modals:logout-header_caption")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t("common:cancel")}</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleLogout}>
+                    {t("common:continue")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
       </ScrollArea>
     </>
   );

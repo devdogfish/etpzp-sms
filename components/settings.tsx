@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/select";
 import { useThemeContext } from "@/contexts/theme-data-provider";
 import { cn } from "@/lib/utils";
-import { useTheme } from "next-themes";
+import { useTheme as useNextTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
 import { RenderInputArgs } from "@/components/settings-item";
 import { useEffect, useState } from "react";
 import { updateSetting } from "@/lib/actions/user.actions";
-import useLanguage from "@/hooks/use-language";
+import useSettings from "@/hooks/use-setting";
 
 export function LanguageChanger({
   // value,
@@ -23,9 +23,9 @@ export function LanguageChanger({
   id,
   setServerState,
 }: RenderInputArgs) {
-  const { updateLanguageCookie } = useLanguage();
-  const { t, i18n } = useTranslation(["Navigation"]);
+  const { t, i18n } = useTranslation();
   const currentLocale = i18n.language;
+  const { updateLanguageCookie } = useSettings(currentLocale);
   const [isPending, setIsPending] = useState<boolean>(false);
 
   const handleChange = async (newLocale: string) => {
@@ -60,7 +60,8 @@ export function LanguageChanger({
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="en">English</SelectItem>
-        <SelectItem value="pt">Portuguese</SelectItem>
+        <SelectItem value="pt">Português</SelectItem>
+        <SelectItem value="de">Deutsch</SelectItem>
       </SelectContent>
     </Select>
   );
@@ -105,7 +106,7 @@ export function ThemeColorChanger({
   isPending,
 }: RenderInputArgs) {
   const { themeColor, setThemeColor } = useThemeContext();
-  const { theme } = useTheme();
+  const { theme } = useNextTheme();
 
   const handleChange = (colorIndex: string) => {
     setThemeColor(Number(colorIndex));
@@ -145,7 +146,9 @@ export function ThemeToggle({
   className,
   isPending,
 }: RenderInputArgs) {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useNextTheme();
+  const { t } = useTranslation();
+  const activeString = `(${t("common:active").toLowerCase()})`;
 
   const handleChange = (value: string) => {
     setTheme(value);
@@ -177,7 +180,8 @@ export function ThemeToggle({
           </div>
         </div>
         <label className="block w-full p-2 text-center font-normal text-sm">
-          Light {!isPending && theme === "light" && "(active)"}
+          {t("appearance-theme_light")}{" "}
+          {!isPending && theme === "light" && activeString}
         </label>
       </div>
 
@@ -207,7 +211,8 @@ export function ThemeToggle({
           </div>
         </div>
         <label className="block w-full p-2 text-center font-normal text-sm">
-          Dark {!isPending && theme === "dark" && "(active)"}
+          {t("appearance-theme_dark")}{" "}
+          {!isPending && theme === "dark" && activeString}
         </label>
       </div>
     </div>

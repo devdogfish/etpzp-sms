@@ -25,7 +25,7 @@ export default function MessagesPage({
   category: CategoryEnums;
 }>) {
   const { layout, fallbackLayout } = useLayout();
-  const { t, i18n } = useTranslation(["Common Words"]);
+  const { t } = useTranslation(["messages-page", "common"]); // and more
   const [filteredMessages, setFilteredMessages] = useState(messages);
   const [selected, setSelected] = useState<DBMessage | null>(null);
   const [isLarge, setIsLarge] = useState({
@@ -70,10 +70,10 @@ export default function MessagesPage({
         minSize={22}
         maxSize={50}
       >
-        <PageHeader title={t(category)} />
+        <PageHeader title={t(`header_${category.toLowerCase()}`)} />
         <Search
           onSearch={onSearch}
-          placeholder={String(t("search") + " " + t(category).toLowerCase())}
+          placeholder={t(`search_${category.toLowerCase()}`)}
           className="pl-8 placeholder:text-muted-foreground border"
         />
 
@@ -85,14 +85,15 @@ export default function MessagesPage({
           />
         ) : (
           <div className="p-8 text-center text-muted-foreground">
-            {error ? error : "No messages found"}
+            {error ? error : t("none_found")}
           </div>
         )}
       </ResizablePanel>
       <ResizableHandle withHandle className={cn(onMobile && "hidden")} />
       <ChildrenPanel
         hasMiddleBar
-        className={cn(onMobile && selected === null && "hidden")} // like above we are using reverse logic here. If we are on mobile, and nothing is selected, this component should not be displayed.
+        // reverse logic like above: on mobile and with nothing selected, this component should be hidden.
+        className={cn(onMobile && selected === null && "hidden")}
       >
         <MessageDisplay
           message={selected}

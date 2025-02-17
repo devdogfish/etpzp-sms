@@ -4,6 +4,7 @@ import { cn, getNameInitials } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CreateContact from "./modals/create-contact-modal";
 import { DBContact } from "@/types/contact";
+import { useTranslation } from "react-i18next";
 
 type ContactListProps = {
   contacts: DBContact[];
@@ -16,8 +17,9 @@ export default function ContactsList({
   selectedContactId,
   setSelected,
 }: ContactListProps) {
+  const { t } = useTranslation(["contacts-page"]);
   return (
-    <ScrollArea className="h-[calc(100vh-52px-68px)]">
+    <ScrollArea className="h-[calc(100vh-var(--header-height)-68px)]">
       <div className="flex flex-col gap-2 p-4 pt-0">
         {contacts.length ? (
           contacts.map((contact) => (
@@ -40,7 +42,7 @@ export default function ContactsList({
           ))
         ) : (
           <div className="space-y-3 p-8 text-center text-muted-foreground">
-            <p>You don't have any contacts yet</p>
+            <p>{t("none_found")}</p>
             <CreateContact />
           </div>
         )}

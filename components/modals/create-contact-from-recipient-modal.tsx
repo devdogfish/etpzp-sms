@@ -29,6 +29,7 @@ import { useNewMessage } from "@/contexts/use-new-message";
 import { NewRecipient } from "@/types/recipient";
 import { DBContact } from "@/types/contact";
 import useIsMounted from "@/hooks/use-mounted";
+import { useTranslation } from "react-i18next";
 
 export type CreateContactActionResponse<T> = {
   success: boolean;
@@ -52,13 +53,15 @@ export default function CreateContactFromRecipientModal({
 }: {
   recipient?: NewRecipient;
 }) {
+  const isMounted = useIsMounted();
   const { modal, setModal } = useContactModals();
   const [serverState, action, pending] = useActionState(
     createContact,
     initialState
   );
   const { removeRecipient, getValidatedRecipient } = useNewMessage();
-  const isMounted = useIsMounted();
+  const { t } = useTranslation(["modals"]);
+
   useEffect(() => {
     if (isMounted) {
       toastActionResult(serverState);
@@ -103,7 +106,7 @@ export default function CreateContactFromRecipientModal({
             <Input
               name="name"
               id="name"
-              placeholder="Oliveiro"
+              placeholder={t("name_placeholder")}
               defaultValue={serverState.inputs?.name}
               // required
               // minLength={5}
@@ -123,7 +126,7 @@ export default function CreateContactFromRecipientModal({
             <Input
               name="phone"
               id="phone"
-              placeholder="1234568900"
+              placeholder={t("phone_placeholder")}
               defaultValue={serverState.inputs?.phone || recipient?.phone}
               // required
               // minLength={5}
@@ -139,11 +142,11 @@ export default function CreateContactFromRecipientModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t("common:description")}</Label>
             <Textarea
               name="description"
               id="description"
-              placeholder="Oliveiro is a great friend of mine, I met him at the festival of the edge lords."
+              placeholder={t("description_placeholder")}
               defaultValue={serverState.inputs?.description}
               // required
               // minLength={5}

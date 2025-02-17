@@ -29,7 +29,6 @@ export async function sendMessage(
     return {
       success: false,
       message: ["Invalid Recipients", recipientErrorMessage],
-      errors: { recipients: [recipientErrorMessage] },
     };
   }
   // 2. Validate field types
@@ -58,9 +57,7 @@ export async function sendMessage(
     const payload = {
       // this shit can only be one full word with no special characters or spaces
       sender: validatedData.data.sender,
-      message: `${new Date(
-        scheduledUnixSeconds ? scheduledUnixSeconds * 1000 : Date.now()
-      )} ${validatedData.data.body}`, // this can be string
+      message: validatedData.data.body, // this can be any string
 
       recipients: validRecipients.map(({ phone }) => ({
         msisdn: phone,
@@ -138,7 +135,9 @@ export async function sendMessage(
         // message parameters
         userId,
         validatedData.data.subject,
-        validatedData.data.body,
+        `Sent on (remove this later on):${new Date(
+          scheduledUnixSeconds ? scheduledUnixSeconds * 1000 : Date.now()
+        )}\n\n ${validatedData.data.body}`,
         networkResponse?.ok
           ? scheduledUnixSeconds
             ? "SCHEDULED"

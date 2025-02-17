@@ -19,7 +19,7 @@ export default function MessagesPageSkeleton({
   category: CategoryEnums;
 }) {
   const { layout, fallbackLayout } = useLayout();
-  const { t, i18n } = useTranslation(["Common Words"]);
+  const { t } = useTranslation(["messages-page", "common"]);
   const onMobile = useIsMobile();
   const selected = null;
   return (
@@ -35,7 +35,7 @@ export default function MessagesPageSkeleton({
         minSize={22}
         maxSize={50}
       >
-        <PageHeader title={t(category)} />
+        <PageHeader title={t(`header_${category.toLowerCase()}`)} />
 
         <div className="rounded-md p-4 h-[68px]">
           <Skeleton className="h-9" style={{ borderRadius: "0.375rem" }} />

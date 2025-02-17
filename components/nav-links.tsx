@@ -2,24 +2,27 @@
 
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { usePathname } from "next/navigation";
-import useLanguage from "@/hooks/use-language";
+import useSettings from "@/hooks/use-setting";
+import { useTranslation } from "react-i18next";
 
 type NavLink = {
   title: string;
   label?: string;
   icon: LucideIcon;
-  href: string;
+  href?: string;
+  action?: () => void;
   variant: "default" | "ghost";
   size?: "sm" | "md" | "xl";
+  hidden?: boolean;
+  isNewButton?: boolean;
 };
 type NavProps = {
   isCollapsed: boolean;
@@ -29,18 +32,15 @@ type NavProps = {
 
 export default function NavLinks({ links, isCollapsed, onMobile }: NavProps) {
   const pathname = usePathname();
-  const { normalizePath } = useLanguage();
+  const { i18n } = useTranslation();
+  const { normalizePath } = useSettings(i18n.language);
 
   const activeStyles =
     "bg-accent text-primary-accent hover:bg-accent hover:text-accent-foreground";
 
-  const isNewButton = (size: string | undefined) => size === "xl"; // we only have one xl button and that is the new-message button
   // isActive takes Link, compares it to the current url, and returns whether it is the same link we are on or not.
-  const isActive = (link: NavLink) => {
-    return (
-      !isNewButton(link.size) &&
-      normalizePath(link.href) === normalizePath(pathname)
-    );
+  const isActive = (href: string, isNewButton: boolean | undefined) => {
+    return !isNewButton && normalizePath(href) === normalizePath(pathname);
   };
   return (
     <div
@@ -51,22 +51,43 @@ export default function NavLinks({ links, isCollapsed, onMobile }: NavProps) {
       )}
     >
       <nav className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
-        {links.map((link, index) =>
-          isCollapsed ? ( // NavPanel is collapsed = render with tooltips
+        {links.map((link, index) => {
+          const desktopItemClassName = cn(
+            buttonVariants({
+              variant: link.variant,
+              size: link.isNewButton ? "lg" : "sm",
+            }),
+            "w-full justify-start",
+            link.href && isActive(link.href, link.isNewButton) && activeStyles,
+            link.isNewButton && "justify-center",
+            link.hidden === true && "hidden"
+          );
+
+          return isCollapsed ? ( // NavPanel is collapsed = render with tooltips
             <Tooltip key={index} delayDuration={0}>
-              <TooltipTrigger asChild>
-                <Link
-                  href={link.href}
-                  className={cn(
-                    buttonVariants({ variant: link.variant, size: "icon" }),
-                    isNewButton(link.size) && "mb-3",
-                    "h-9 w-9",
-                    isActive(link) && activeStyles
-                  )}
-                >
-                  <link.icon className="h-4 w-4" />
-                  <span className="sr-only">{link.title}</span>
-                </Link>
+              <TooltipTrigger
+                className={cn(
+                  buttonVariants({ variant: link.variant, size: "icon" }),
+                  link.isNewButton && "mb-3",
+                  "h-9 w-9",
+                  link.href &&
+                    isActive(link.href, link.isNewButton) &&
+                    activeStyles,
+                  link.hidden === true && "hidden"
+                )}
+                asChild
+              >
+                {link.href ? (
+                  <Link href={link.href}>
+                    <link.icon className="h-4 w-4" />
+                    <span className="sr-only">{link.title}</span>
+                  </Link>
+                ) : (
+                  <Button onClick={link.action} variant="none">
+                    <link.icon className="h-4 w-4" />
+                    <span className="sr-only">{link.title}</span>
+                  </Button>
+                )}
               </TooltipTrigger>
               <TooltipContent side="right" className="flex items-center gap-4">
                 {link.title}
@@ -79,37 +100,47 @@ export default function NavLinks({ links, isCollapsed, onMobile }: NavProps) {
             </Tooltip>
           ) : (
             // NavPanel is not collapsed = render links normally without tooltips
-            <Link
-              key={index}
-              href={link.href}
-              className={cn(
-                buttonVariants({
-                  variant: link.variant,
-                  size: isNewButton(link.size) ? "lg" : "sm",
-                }),
-                "justify-start",
-                isActive(link) && activeStyles,
-                isNewButton(link.size) && "justify-center"
-              )}
-            >
-              {!isNewButton(link.size) && (
-                <link.icon className="mr-2 h-4 w-4" />
-              )}
-              {link.title}
-              {link.label && (
-                <span
-                  className={cn(
-                    "ml-auto",
-                    link.variant === "default" &&
-                      "text-background dark:text-white"
+            <div key={index}>
+              {link.href ? (
+                <Link href={link.href} className={desktopItemClassName}>
+                  {!link.isNewButton && <link.icon className="mr-2 h-4 w-4" />}
+                  {link.title}
+                  {link.label && (
+                    <span
+                      className={cn(
+                        "ml-auto",
+                        link.variant === "default" &&
+                          "text-background dark:text-white"
+                      )}
+                    >
+                      {link.label}
+                    </span>
                   )}
+                </Link>
+              ) : (
+                <Button
+                  onClick={link.action}
+                  variant="none"
+                  className={desktopItemClassName}
                 >
-                  {link.label}
-                </span>
+                  {!link.isNewButton && <link.icon className="mr-2 h-4 w-4" />}
+                  {link.title}
+                  {link.label && (
+                    <span
+                      className={cn(
+                        "ml-auto",
+                        link.variant === "default" &&
+                          "text-background dark:text-white"
+                      )}
+                    >
+                      {link.label}
+                    </span>
+                  )}
+                </Button>
               )}
-            </Link>
-          )
-        )}
+            </div>
+          );
+        })}
       </nav>
     </div>
   );

@@ -28,7 +28,7 @@ type SettingItemProps = InputHTMLAttributes<HTMLInputElement> & {
   name: string;
   initialValue?: string;
   label?: string;
-  description?: string;
+  caption?: string;
   inputType?: string;
   renderInput?: (props: RenderInputArgs) => React.ReactNode;
   onUpdate?: (newValue: string) => void;
@@ -43,7 +43,7 @@ export function SettingItem({
   name,
   initialValue = "",
   label,
-  description,
+  caption,
   inputType = "text",
   renderInput,
   onUpdate,
@@ -125,7 +125,7 @@ export function SettingItem({
           serverState.error ? "text-destructive" : "text-muted-foreground"
         )}
       >
-        {serverState.error || description}
+        {serverState.error || caption}
       </p>
     </form>
   );

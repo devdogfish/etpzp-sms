@@ -1,25 +1,25 @@
 import MessagesPageSkeleton from "@/components/messages-page-skeleton";
 import MessagesPage from "@/components/messages-page";
-import { fetchMessagesByStatus, fetchSent } from "@/lib/db/message";
+import { fetchMessagesByStatus } from "@/lib/db/message";
 import { Suspense } from "react";
 import { fetchError } from "@/lib/db";
 
 export default function Page() {
   return (
-    <Suspense fallback={<MessagesPageSkeleton category="SENT" />}>
-      <SentMessagesPage />
+    <Suspense fallback={<MessagesPageSkeleton category="DRAFTS" />}>
+      <DraftsMessagesPage />
     </Suspense>
   );
 }
 
-export async function SentMessagesPage() {
-  const messages = await fetchSent();
+export async function DraftsMessagesPage() {
+  const messages = await fetchMessagesByStatus("DRAFTED");
 
   return (
     <MessagesPage
       messages={messages || []}
-      error={fetchError("sent messages", !messages)}
-      category="SENT"
+      error={fetchError("drafts", !messages)}
+      category="DRAFTS"
     />
   );
 }

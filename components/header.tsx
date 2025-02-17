@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { useLayout } from "@/contexts/use-layout";
+import Link from "next/link";
 
 type PageHeaderProps = {
   title: string;
@@ -16,7 +17,7 @@ export function PageHeader({ title, children }: PageHeaderProps) {
   const { setMobileNavPanel } = useLayout();
   return (
     <>
-      <div className="flex items-center gap-2 px-4 h-[52px] min-h-[52px]">
+      <div className="flex items-center gap-2 px-4 h-[var(--header-height)] border-b">
         {onMobile && (
           <Button
             variant="ghost"
@@ -32,7 +33,6 @@ export function PageHeader({ title, children }: PageHeaderProps) {
         <h2 className="mr-auto">{title}</h2>
         {children}
       </div>
-      <Separator />
     </>
   );
 }
@@ -41,17 +41,19 @@ type SectionHeaderProps = {
   title: string;
   subtitle: string;
   children?: React.ReactNode;
+  anchorName: string;
 };
 export function SectionHeader({
   title,
   subtitle,
   children,
+  anchorName,
 }: SectionHeaderProps) {
-  const onMobile = useIsMobile();
-  const { setMobileNavPanel } = useLayout();
   return (
     <div>
-      <h3 className="mr-auto">{title}</h3>
+      <Link href={`#${anchorName}`} className="mr-auto">
+        <h3 id={anchorName}>{title}</h3>
+      </Link>
       <p className="subtitle">{subtitle}</p>
       <Separator className="mt-5 mb-3 lg:max-w-2xl" />
       <div className="space-y-5 px-5">{children}</div>

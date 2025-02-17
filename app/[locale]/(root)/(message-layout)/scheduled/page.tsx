@@ -7,12 +7,12 @@ import { fetchError } from "@/lib/db";
 export default function Page() {
   return (
     <Suspense fallback={<MessagesPageSkeleton category="SCHEDULED" />}>
-      <DraftsMessagesPage />
+      <ScheduledMessagesPage />
     </Suspense>
   );
 }
 
-export async function DraftsMessagesPage() {
+export async function ScheduledMessagesPage() {
   const messages = await fetchCurrentlyScheduled();
 
   return (
