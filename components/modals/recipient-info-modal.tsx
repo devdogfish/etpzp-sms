@@ -18,7 +18,7 @@ import { Button } from "../ui/button";
 import { NewRecipient } from "@/types/recipient";
 import { useTranslation } from "react-i18next";
 
-export default function InfoContactModal({
+export default function RecipientInfoModal({
   recipient,
 }: {
   recipient: NewRecipient;
@@ -44,12 +44,17 @@ export default function InfoContactModal({
         <DialogHeader>
           <DialogTitle>
             {/* make it so we can interpolate a one of these translations using {{name}} into the actual one */}
-            {recipient.contactId ? "Contact" : "Recipient"} info
+            {recipient.contactId
+              ? t("common:contact").toLowerCase()
+              : t("common:recipient").toLowerCase()}
+            info
           </DialogTitle>
           <DialogDescription>
             View more info about a
-            {recipient.contactId ? " contact" : " recipient"} of the new
-            message.
+            {recipient.contactId
+              ? t("common:contact").toLowerCase()
+              : t("common:recipient").toLowerCase()}
+            of the new message.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-1 flex-col">

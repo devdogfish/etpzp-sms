@@ -42,7 +42,7 @@ import { DBContact } from "@/types/contact";
 
 // contact manipulation modals
 import InsertContactModal from "./modals/insert-contact-modal";
-import InfoContactModal from "./modals/info-contact-modal";
+import RecipientInfoModal from "./modals/recipient-info-modal";
 import { useLayout } from "@/contexts/use-layout";
 import type { DBMessage, Message } from "@/types";
 import { ActionResponse } from "@/types/action";
@@ -165,7 +165,7 @@ const NewMessageForm = React.memo(function ({
       <InsertContactModal contacts={contacts} />
       <CreateContactModal />
 
-      {moreInfoOn && <InfoContactModal recipient={moreInfoOn} />}
+      {moreInfoOn && <RecipientInfoModal recipient={moreInfoOn} />}
       {moreInfoOn && !moreInfoOn.contactId && (
         <CreateContactFromRecipientModal recipient={moreInfoOn} />
       )}
