@@ -3,7 +3,12 @@ import { DBRecipient, NewRecipient } from "./recipient";
 import { MessageSchema } from "@/lib/form.schemas";
 
 export type StatusEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFTED";
-export type CategoryEnums = "SENT" | "SCHEDULED" | "FAILED" | "DRAFTS" | "TRASH";
+export type CategoryEnums =
+  | "SENT"
+  | "SCHEDULED"
+  | "FAILED"
+  | "DRAFTS"
+  | "TRASH";
 
 export type StringBoolMap = { [key: string]: boolean };
 
@@ -35,12 +40,11 @@ export type DBMessage = {
   sms_reference_id: string;
 };
 
-export type AmountIndicators =
-  | {
-      sent: number;
-      scheduled: number;
-      failed: number;
-      drafted: number;
-      trashed: number;
-    }
-  | undefined;
+export type AmountIndicators = {
+  sent: number;
+  scheduled: number;
+  failed: number;
+  drafted: number;
+  trashed: number;
+  contacts: number;
+};

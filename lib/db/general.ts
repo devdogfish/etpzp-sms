@@ -3,10 +3,9 @@
 import { AmountIndicators } from "@/types";
 import { getSession } from "../auth/sessions";
 import db from ".";
-import { DataActionResponse } from "@/types/action";
 import { UserSettings } from "@/types/user";
 
-export async function fetchUserSettings(): Promise<UserSettings | undefined> {
+export async function fetchUserSettings() {
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -20,30 +19,34 @@ export async function fetchUserSettings(): Promise<UserSettings | undefined> {
     `,
       [userId]
     );
-    return rows[0];
+    return rows[0] as UserSettings;
   } catch (error) {}
 }
 
-export async function fetchAmountIndicators(): Promise<AmountIndicators> {
+export async function fetchAmountIndicators() {
   const session = await getSession();
   const userId = session?.user?.id;
 
   try {
     if (!userId) throw new Error("Invalid user id.");
-    const sentResult = await db(
+    const { rows } = await db(
       `
-          SELECT
-            COUNT(CASE WHEN send_time < NOW() AND in_trash = false THEN 1 END) AS sent,
-            COUNT(CASE WHEN status = 'SCHEDULED' AND in_trash = false AND send_time > NOW() THEN 1 END) AS scheduled,
-            COUNT(CASE WHEN status = 'FAILED' AND in_trash = false THEN 1 END) AS failed,
-            COUNT(CASE WHEN status = 'DRAFTED' AND in_trash = false THEN 1 END) AS drafted,
-            COUNT(CASE WHEN in_trash = true THEN 1 END) AS trashed
-          FROM message
-          WHERE user_id = $1;
-        `,
+        SELECT
+          CAST(COUNT(CASE WHEN send_time < NOW() AND in_trash = false THEN 1 END) AS INTEGER) AS sent,
+          CAST(COUNT(CASE WHEN status = 'SCHEDULED' AND in_trash = false AND send_time > NOW() THEN 1 END) AS INTEGER) AS scheduled,
+          CAST(COUNT(CASE WHEN status = 'FAILED' AND in_trash = false THEN 1 END) AS INTEGER) AS failed,
+          CAST(COUNT(CASE WHEN status = 'DRAFTED' AND in_trash = false THEN 1 END) AS INTEGER) AS drafted,
+          CAST(COUNT(CASE WHEN in_trash = true THEN 1 END) AS INTEGER) AS trashed,
+          CAST((SELECT COUNT(*) FROM contact WHERE contact.user_id = message.user_id) AS INTEGER) AS contacts
+        FROM message
+        WHERE user_id = $1
+        GROUP BY user_id;
+      `,
       [userId]
     );
+    console.log("amount Indicators fetched");
+    console.log(rows);
 
-    return sentResult.rows[0];
+    return rows[0] as AmountIndicators;
   } catch (error) {}
 }

@@ -169,7 +169,7 @@ export default function ContactDisplay({
           <div className="flex gap-4 justify-between p-4 text-sm">
             <p>{t("common:description")}</p>
 
-            {contact.description ? (
+            {contact.description?.trim() ? (
               <p>{contact.description}</p>
             ) : (
               <p className="italic">{t("no_description")}</p>

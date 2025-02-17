@@ -7,6 +7,8 @@ import { createSession, getSession } from "./sessions";
 import { LoginSchema } from "@/lib/form.schemas";
 import { Login, SessionData } from "./config";
 import { ActionResponse } from "@/types/action";
+import initTranslations from "@/app/i18n";
+import { cookies } from "next/headers";
 
 // This function is for actually authenticating the user and fetching all the users data
 // Once the data is fetched we save it to the session using createSession()
@@ -21,7 +23,7 @@ export async function login(
   if (!validatedData.success) {
     return {
       success: false,
-      message: ["Error", "Please fix the errors in the form"],
+      message: ["common:fix_zod_errors"],
       inputs: { email, password },
       errors: validatedData.error.flatten().fieldErrors,
     };
@@ -39,10 +41,9 @@ export async function login(
 
   if (!user.isAuthenticated) {
     console.log("Wrong credentials!");
-
     return {
       success: false,
-      message: ["Wrong credentials! Try again"],
+      message: ["server-wrong_credentials"],
       inputs: { email, password },
     };
   }
@@ -52,8 +53,8 @@ export async function login(
   return {
     success: true,
     message: [
-      "Authentication successful!",
-      "You will be redirected to the home page.",
+      "server-auth_success_header",
+      "server-auth_success_header_caption",
     ],
   };
 }

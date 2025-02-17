@@ -192,9 +192,7 @@ export default function RecipientsInput({
               className={cn(
                 "h-full my-0.5 w-full p-0 ring-0 focus:ring-0 shadow-none rounded-none placeholder:text-muted-foreground"
               )}
-              placeholder={
-                recipients.length !== 0 && input.isFocused ? "Phone number" : ""
-              }
+              placeholder={input.isFocused ? t("common:phone_number") : ""}
               value={input.value}
               onChange={onInputChange}
               onKeyDown={handleKeyDown}

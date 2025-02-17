@@ -246,7 +246,7 @@ const NewMessageForm = React.memo(function ({
 
             <Input
               name="subject"
-              placeholder="Message subject (optional)"
+              placeholder={t("subject_placeholder")}
               className={cn(
                 "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground border-b border-b-border"
               )}
@@ -265,7 +265,7 @@ const NewMessageForm = React.memo(function ({
               placeholder={
                 serverState.errors?.body
                   ? serverState.errors?.body[0]
-                  : "Start writing your message"
+                  : t("body_placeholder")
               }
               onChange={handleInputChange}
               defaultValue={

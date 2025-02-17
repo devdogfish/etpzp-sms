@@ -137,15 +137,30 @@ export function convertToRecipient(contact: DBContact): NewRecipient {
   };
 }
 
-export function toastActionResult(result: ActionResponse<any>) {
+export function toastActionResult(
+  result: ActionResponse<any>,
+  translate?: (translationKey: string) => string
+) {
   if (!Array.isArray(result.message) || !result.message)
     throw new Error("Toast message must be an array of strings.");
 
   // thankfully, this doesn't throw an error
-  if (result.success) {
-    toast.success(result.message[0], { description: result.message[1] });
+  if (translate) {
+    if (result.success) {
+      toast.success(translate(result.message[0]), {
+        description: translate(result.message[1]),
+      });
+    } else {
+      toast.error(translate(result.message[0]), {
+        description: translate(result.message[1]),
+      });
+    }
   } else {
-    toast.error(result.message[0], { description: result.message[1] });
+    if (result.success) {
+      toast.success(result.message[0], { description: result.message[1] });
+    } else {
+      toast.error(result.message[0], { description: result.message[1] });
+    }
   }
 }
 

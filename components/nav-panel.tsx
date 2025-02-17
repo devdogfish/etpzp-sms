@@ -59,14 +59,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default function NavPanel({
-  navCollapsedSize,
-}: {
-  navCollapsedSize: number;
-}) {
+export default function NavPanel() {
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout, isFullscreen } =
     useLayout();
-  // const onMobile = useIsMobile();
+  // In case we need to check for large screens
+  let isExtraLargeScreen = window.innerWidth >= 1200;
+  // the nav panel is a bit bigger than that, but the elements inside keep it at its minimum size
+  const COLLAPSED_SIZE = 2;
+
   const hidePanelClassName =
     ((isFullscreen || useIsMobile()) && "hidden") || undefined;
   return (
@@ -77,7 +77,7 @@ export default function NavPanel({
           hidePanelClassName
         )}
         defaultSize={layout ? layout[0] : fallbackLayout[0]}
-        collapsedSize={navCollapsedSize}
+        collapsedSize={COLLAPSED_SIZE}
         collapsible={true}
         minSize={13}
         maxSize={35}
@@ -348,7 +348,10 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
                 },
                 {
                   title: t("contacts"),
-                  label: "",
+                  label:
+                    amountIndicators?.contacts == 0
+                      ? ""
+                      : amountIndicators?.contacts.toString(),
                   icon: Contact2,
                   variant: "ghost",
                   href: "/contacts",
@@ -366,7 +369,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
           </div>
 
           <Separator />
-          <div className="shrink h-[var(--header-height)]">
+          <div className="shrink h-[var(--header-height)] flex flex-col justify-center">
             <NavLinks
               isCollapsed={isCollapsed}
               links={[

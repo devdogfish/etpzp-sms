@@ -7,7 +7,7 @@ type LayoutProps = {
 };
 
 export default async function LoginLayout({ children, params }: LayoutProps) {
-  const i18nNamespaces = ["login-page"];
+  const i18nNamespaces = ["login-page", "common"];
   const { locale } = await params;
   const { resources } = await initTranslations(locale, i18nNamespaces);
 

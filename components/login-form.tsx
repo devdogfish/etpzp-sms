@@ -21,6 +21,7 @@ import SubmitButton from "./shared/submit-button";
 import { Eye, Router } from "lucide-react";
 import useSettings from "@/hooks/use-setting";
 import { useTranslation } from "react-i18next";
+import { toastActionResult } from "@/lib/utils";
 
 const initialState: ActionResponse<Login> = {
   success: false,
@@ -32,6 +33,7 @@ export default function LoginForm() {
   const [serverState, setServerState] = useState(initialState);
   const { syncWithDB } = useSettings(i18n.language);
   const router = useRouter();
+  const { t } = useTranslation(["login-page", "common"]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -40,9 +42,9 @@ export default function LoginForm() {
 
     const result = await login(formData);
     setServerState(result);
+    toastActionResult(result, t);
     if (result.success) {
       console.log("Login successful, redirecting using router.replace()");
-
       await syncWithDB();
       router.replace("/");
     }
@@ -62,31 +64,29 @@ export default function LoginForm() {
             />
           </div>
           <CardTitle className="text-2xl">
-            Sign in {/**with Microsoft */}
+            {t("header")} {/**with Microsoft */}
           </CardTitle>
-          <CardDescription>
-            with Microsoft to continue to Etpzp SMS
-          </CardDescription>
+          <CardDescription>{t("header_caption")}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-2">
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("email_label")}</Label>
             <Input
               name="email"
               id="email"
               type="email"
               defaultValue={serverState.inputs?.email}
-              placeholder="0000@etpzp.pt"
+              placeholder={t("email_placeholder")}
               aria-describedby="email"
             />
             {serverState.errors?.email && (
               <p id="email-error" className="text-sm text-red-500">
-                {serverState.errors.email[0]}
+                {t(serverState.errors.email[0])}
               </p>
             )}
           </div>
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("password_label")}</Label>
             <div className="flex items-center gap-1 relative">
               <Input
                 name="password"
@@ -110,16 +110,16 @@ export default function LoginForm() {
             </div>
             {serverState.errors?.password && (
               <p id="password-error" className="text-sm text-red-500">
-                {serverState.errors.password[0]}
+                {t(serverState.errors.password[0])}
               </p>
             )}
           </div>
           {!serverState.success && (
             <p className="text-sm text-destructive text-center">
-              {serverState.message[0]}
+              {t(serverState.message[0])}
             </p>
           )}
-          <SubmitButton className="w-full">Login</SubmitButton>
+          <SubmitButton className="w-full">{t("button_submit")}</SubmitButton>
         </CardContent>
       </Card>
     </form>

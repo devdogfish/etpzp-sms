@@ -10,7 +10,7 @@ import {
 } from "react";
 
 type LayoutContextType = {
-  amountIndicators: AmountIndicators;
+  amountIndicators: AmountIndicators | undefined;
   fallbackLayout: number[];
 
   layout: number[];
@@ -37,7 +37,7 @@ export function LayoutProvider({
   children: React.ReactNode;
   initialLayout: number[];
   initialIsCollapsed: boolean;
-  amountIndicators: AmountIndicators;
+  amountIndicators: AmountIndicators | undefined;
 }) {
   // desktop layout 3 column react-resizable-panels data
   const [layout, setLayout] = useState(initialLayout);

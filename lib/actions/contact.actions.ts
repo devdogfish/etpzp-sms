@@ -50,7 +50,7 @@ export async function createContact(
     console.log(result.rows[0]);
 
     // this is messing everything up
-    // revalidatePath("/");
+    revalidatePath("/");
 
     return {
       success: true,

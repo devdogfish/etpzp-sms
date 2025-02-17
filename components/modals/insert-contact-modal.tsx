@@ -25,6 +25,7 @@ import { Checkbox } from "../ui/checkbox";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { DBContact } from "@/types/contact";
+import { useTranslation } from "react-i18next";
 
 export default function InsertContactModal({
   contacts,
@@ -34,6 +35,7 @@ export default function InsertContactModal({
   const { modal, setModal } = useContactModals();
   const [selected, setSelected] = useState<DBContact[]>([]);
   const { addRecipient } = useNewMessage();
+  const { t } = useTranslation(["modals"]);
 
   const onInsert = () => {
     selected.forEach((contact: DBContact) => {
@@ -56,7 +58,10 @@ export default function InsertContactModal({
       <Dialog open={modal.insert} onOpenChange={setInsertModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-start">Insert Contacts</DialogTitle>
+            <DialogTitle>{t("insert_contact-header")}</DialogTitle>
+            <DialogDescription>
+              {t("insert_contact-header_caption")}
+            </DialogDescription>
           </DialogHeader>
           {contacts.length ? (
             <Table>
@@ -74,8 +79,8 @@ export default function InsertContactModal({
                       }}
                     />
                   </TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Phone Number</TableHead>
+                  <TableHead>{t("common:name")}</TableHead>
+                  <TableHead>{t("common:phone_number")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -113,12 +118,10 @@ export default function InsertContactModal({
               </TableBody>
             </Table>
           ) : (
-            <div className="flex flex-col items-center gap-4">
-              <DialogDescription className="self-start sm:self-center">
-                You don't have any contacts yet. Start by creating a new contact
-                first
+            <div className="flex flex-col items-center gap-4 py-4">
+              <DialogDescription className="self-start sm:self-center text-center text-red-400">
+                {t("insert_contact-no_contacts")}
               </DialogDescription>
-              <div className="">CONTACT IMAGE</div>
               <Button
                 className="w-min"
                 onClick={() => {
@@ -126,7 +129,7 @@ export default function InsertContactModal({
                   showCreateModal();
                 }}
               >
-                Create new contact
+                {t("insert_contact-button_create_new")}
               </Button>
             </div>
           )}
@@ -138,15 +141,15 @@ export default function InsertContactModal({
                   buttonVariants({ variant: "outline" })
                 )}
               >
-                Close
+                {t("common:cancel")}
               </DialogClose>
               {contacts.length !== 0 && (
                 <Button disabled={!selected.length} onClick={onInsert}>
-                  {selected.length === 0
-                    ? `Insert ${!selected.length && "0"} contacts`
-                    : selected.length === 1
-                    ? `Insert contact`
-                    : `Insert ${selected.length} contacts`}
+                  {selected.length === 1
+                    ? t("insert_contact-button_insert_one")
+                    : t("insert_contact-button_insert_x", {
+                        amount: selected.length,
+                      })}
                 </Button>
               )}
             </div>
