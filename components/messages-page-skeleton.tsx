@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+
 import ChildrenPanel from "./shared/children-panel";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useLayout } from "@/contexts/use-layout";
@@ -11,17 +11,20 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { PageHeader } from "./header";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { CategoryEnums } from "@/types";
+import { AmountIndicators, CategoryEnums } from "@/types";
 
 export default function MessagesPageSkeleton({
   category,
 }: {
   category: CategoryEnums;
 }) {
-  const { layout, fallbackLayout } = useLayout();
+  const { layout, fallbackLayout, amountIndicators } = useLayout();
   const { t } = useTranslation(["messages-page", "common"]);
   const onMobile = useIsMobile();
   const selected = null;
+  const skeletonsAmount: number = amountIndicators
+    ? amountIndicators[category.toLowerCase() as keyof AmountIndicators]
+    : 4;
   return (
     <>
       <ResizablePanel
@@ -42,9 +45,15 @@ export default function MessagesPageSkeleton({
         </div>
 
         <div className="flex flex-col gap-2 p-4 pt-0 mt-2 overflow-hidden">
-          {Array.from({ length: 5 }).map((_, i) => {
-            return <MessageSkeleton key={i} />;
-          })}
+          {skeletonsAmount > 0 ? (
+            Array.from({ length: skeletonsAmount }).map((_, i) => {
+              return <MessageSkeleton key={i} />;
+            })
+          ) : (
+            <div className="p-8 text-center text-muted-foreground">
+              <Skeleton className="w-full" />
+            </div>
+          )}
         </div>
       </ResizablePanel>
       <ResizableHandle withHandle className={cn(onMobile && "hidden")} />

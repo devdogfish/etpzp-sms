@@ -46,9 +46,8 @@ export async function createContact(
     );
     console.log(result.rows[0]);
 
-    // This was messing everything up because it was re-rendering the form component, losing all the state
+    // This was messing everything up because it was re-rendering the form component, therefore losing all the state
     revalidatePath("/");
-
     return {
       success: true,
       message: ["modals:create_contact-success"],
@@ -105,7 +104,6 @@ export async function updateContact(
     );
 
     revalidatePath("/contacts");
-
     return { success: true, message: ["modals:edit_contact-success"] };
   } catch (error) {
     let message;
@@ -136,6 +134,7 @@ export async function deleteContact(
       userId,
       id,
     ]);
+
     revalidatePath("/contacts");
     return { success: true, message: ["contacts-page:server-delete_success"] };
   } catch (error) {

@@ -21,13 +21,15 @@ export default function MessagesPage({
   category,
 }: Readonly<{
   messages: DBMessage[];
-  error?: string;
+  error: string;
   category: CategoryEnums;
 }>) {
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation(["messages-page", "common"]); // and more
   const [filteredMessages, setFilteredMessages] = useState(messages);
-  const [selected, setSelected] = useState<DBMessage | null>(null);
+  const [selected, setSelected] = useState<DBMessage | null>(
+    filteredMessages[0] || null
+  );
   const [isLarge, setIsLarge] = useState({
     bool: window.matchMedia("(min-width: 1024px)").matches,
     breakpoint: window.matchMedia("(min-width: 1024px)").matches ? 29 : 44,
@@ -45,6 +47,14 @@ export default function MessagesPage({
   useEffect(() => {
     // Filter the messages with URLsearchParams on page load
     setFilteredMessages(searchMessages(messages, query, currentPage));
+    if (selected && messages.some((msg) => msg.id === selected.id)) {
+      // Keep the current selection
+      setSelected(selected);
+    } else {
+      // If the selected message is not in the new messages, set it to null or handle accordingly
+      setSelected(messages[0] || null);
+    }
+
     // We are managing state for when to replace icons with words. The breakpoint be less on big screens while on smaller screens, the icons should show up faster.
     const handleResize = () => {
       const _isLarge = window.matchMedia("(min-width: 1024px)").matches;
@@ -85,11 +95,12 @@ export default function MessagesPage({
           />
         ) : (
           <div className="p-8 text-center text-muted-foreground">
-            {error ? error : t("none_found")}
+            {error || t("none_found")}
           </div>
         )}
       </ResizablePanel>
       <ResizableHandle withHandle className={cn(onMobile && "hidden")} />
+
       <ChildrenPanel
         hasMiddleBar
         // reverse logic like above: on mobile and with nothing selected, this component should be hidden.
@@ -97,13 +108,7 @@ export default function MessagesPage({
       >
         <MessageDisplay
           message={selected}
-          reset={(index?: number) => {
-            if (typeof index === "number" && messages.length > 0) {
-              setSelected(messages[index]);
-            } else {
-              setSelected(null);
-            }
-          }}
+          reset={() => setSelected(null)}
           category={category}
         />
       </ChildrenPanel>

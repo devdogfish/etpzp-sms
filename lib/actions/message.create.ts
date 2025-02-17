@@ -8,6 +8,7 @@ import { formatPhone } from "../utils";
 import { NewRecipient } from "@/types/recipient";
 import { SuccessResponse } from "./testing/default-response";
 import { ActionResponse } from "@/types/action";
+import { revalidatePath } from "next/cache";
 
 export async function sendMessage(
   data: Message
@@ -157,6 +158,8 @@ export async function sendMessage(
     );
     console.log("------\n\n");
 
+    // Update the amount indicators in the nav panel
+    revalidatePath("/");
     return {
       success: true,
       message: [

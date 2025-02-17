@@ -27,21 +27,18 @@ export default function ContactDisplay({
   reset,
 }: {
   contact: DBContact | null;
-  reset: (index?: number) => void;
+  reset: () => void;
 }) {
   const onMobile = useIsMobile();
   const router = useRouter();
-  const { t } = useTranslation(["contacts-page"]);
+  const { t } = useTranslation(["contacts-page", "common"]);
   const { setModal } = useContactModals();
   const showEditModal = () => setModal((prev) => ({ ...prev, edit: true }));
-  // Reset this to the default namespace, because in the layout it's set to the messages page namespace by default
 
   const handleDelete = async () => {
     if (contact) {
       const result = await deleteContact(contact.id);
       toastActionResult(result, t);
-      // automatically select the first contact if on desktop
-      reset(0);
     }
   };
   const messageContact = async () => {

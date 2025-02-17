@@ -40,7 +40,7 @@ export function MessageDisplay({
 }: {
   message: DBMessage | null;
   category?: CategoryEnums;
-  reset: (index?: number) => void;
+  reset: () => void;
 }) {
   const today = new Date();
   const onMobile = useIsMobile();
@@ -58,8 +58,6 @@ export function MessageDisplay({
       }
 
       toastActionResult(result, t);
-      // automatically select the first contact if on desktop
-      reset(0);
     }
   };
 
@@ -75,24 +73,17 @@ export function MessageDisplay({
           contactId: r.contact_id?.toString(),
         })),
       });
-      console.log(
-        "created new draft with id ",
-        newDraft.draftId,
-        " to then redirect to edit it on the new message page"
-      );
 
       if (newDraft.draftId) {
         router.push(`/new-message?draft=${newDraft.draftId}`);
-      } else toast.error("An error occurred");
+      }
     }
   };
 
   const putBack = async () => {
     if (message) {
       const result = await toggleTrash(message.id, false);
-      if (result.success) {
-        reset(0);
-      }
+
       toastActionResult(result);
     }
   };
@@ -100,18 +91,11 @@ export function MessageDisplay({
   const cancelSend = async () => {
     if (message) {
       const smsReferenceId = parseInt(message.sms_reference_id);
-      console.log("message's sms_referencId");
-      console.log(message.sms_reference_id);
-      console.log(`type: ${typeof message.sms_reference_id}`);
 
       if (smsReferenceId && !isNaN(smsReferenceId)) {
         const result = await cancelCurrentlyScheduled(smsReferenceId);
-        if (result?.success) {
-          reset(0);
-        }
+
         toastActionResult(result);
-      } else {
-        toast.error("Message id not found.");
       }
     }
   };

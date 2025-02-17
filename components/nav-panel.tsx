@@ -315,9 +315,9 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
                 {
                   title: t("drafts"),
                   label:
-                    amountIndicators?.drafted == 0
+                    amountIndicators?.drafts == 0
                       ? ""
-                      : amountIndicators?.drafted.toString(),
+                      : amountIndicators?.drafts.toString(),
                   icon: FileText,
                   variant: "ghost",
                   href: "/drafts",
@@ -325,9 +325,9 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
                 {
                   title: t("trash"),
                   label:
-                    amountIndicators?.trashed == 0
+                    amountIndicators?.trash == 0
                       ? ""
-                      : amountIndicators?.trashed.toString(),
+                      : amountIndicators?.trash.toString(),
                   icon: Trash2,
                   variant: "ghost",
                   href: "/trash",

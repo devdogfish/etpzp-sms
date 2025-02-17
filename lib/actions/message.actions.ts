@@ -142,12 +142,11 @@ export async function saveDraft(
     );
 
     if (draftId) {
-      const [_, draftQuery] = await Promise.all([
-        // delete old recipients to then update them with our new ones
-        db(`DELETE FROM recipient WHERE message_id = $1`, [draftId]),
-        // Update existing draft
-        db(
-          `
+      // delete old recipients to then update them with our new ones. We are await these separately so that we can be sure that there are no duplicate recipients
+      await db(`DELETE FROM recipient WHERE message_id = $1`, [draftId]);
+      // Update existing draft
+      draft = await db(
+        `
             WITH insert_message AS (
               UPDATE message SET subject = $3, body = $4, sender = $5 WHERE id = $2 AND user_id = $1
               RETURNING *
@@ -163,21 +162,19 @@ export async function saveDraft(
             )
             SELECT * FROM insert_message
           `,
-          [
-            userId,
-            draftId,
-            data.subject,
-            data.body,
-            data.sender,
+        [
+          userId,
+          draftId,
+          data.subject,
+          data.body,
+          data.sender,
 
-            // Recipients / contacts
-            data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
-            data.recipients.map((recipient) => recipient.phone), // phone number array
-            data.recipients.map((_, index) => index), // for the ordering of the recipient
-          ]
-        ),
-      ]);
-      draft = draftQuery;
+          // Recipients / contacts
+          data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
+          data.recipients.map((recipient) => recipient.phone), // phone number array
+          data.recipients.map((_, index) => index), // for the ordering of the recipient
+        ]
+      );
     } else {
       console.log("Create new draft");
 

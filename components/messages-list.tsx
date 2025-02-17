@@ -1,11 +1,11 @@
 "use client";
-import { ComponentProps, useEffect } from "react";
-import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { DBMessage } from "@/types";
+import { ComponentProps } from "react";
+import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
+import { Badge } from "@/components/ui/badge";
+import type { DBMessage } from "@/types";
 import { useTranslation } from "react-i18next";
 
 type MessageListProps = {
@@ -19,7 +19,7 @@ export function MessageList({
   selectedMessageId,
   setSelected,
 }: MessageListProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["messages-page"]);
   return (
     <ScrollArea className="h-[calc(100vh-var(--header-height)-68px)]">
       <div className="flex flex-col gap-2 p-4 pt-0">

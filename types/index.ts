@@ -44,7 +44,7 @@ export type AmountIndicators = {
   sent: number;
   scheduled: number;
   failed: number;
-  drafted: number;
-  trashed: number;
+  drafts: number;
+  trash: number;
   contacts: number;
 };

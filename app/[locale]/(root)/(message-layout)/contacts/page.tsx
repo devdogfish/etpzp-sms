@@ -4,16 +4,17 @@ import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 import { fetchContacts } from "@/lib/db/contact";
 import { fetchError } from "@/lib/db";
 import { Suspense } from "react";
+import ContactsPageSkeleton from "@/components/contacts-page-skeleton";
 
-export async function Page() {
+export default async function Page() {
   return (
-    <Suspense fallback={"Loading..."}>
+    <Suspense fallback={<ContactsPageSkeleton />}>
       <ContactsPageFetcher />
     </Suspense>
   );
 }
 
-export default async function ContactsPageFetcher() {
+export async function ContactsPageFetcher() {
   const contacts = await fetchContacts();
 
   return (

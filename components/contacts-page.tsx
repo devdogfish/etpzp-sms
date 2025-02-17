@@ -28,7 +28,9 @@ export default function ContactsPage({
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation(["contacts-page"]);
   const [filteredContacts, setFilteredContacts] = useState(contacts);
-  const [selected, setSelected] = useState<DBContact | null>(contacts[0]);
+  const [selected, setSelected] = useState<DBContact | null>(
+    filteredContacts[0] || null
+  );
 
   const onMobile = useIsMobile();
   const searchParams = useSearchParams();
@@ -39,13 +41,19 @@ export default function ContactsPage({
 
   useEffect(() => {
     setFilteredContacts(searchContacts(contacts, searchParams.get("query")));
+    if (selected && contacts.some((msg) => msg.id === selected.id)) {
+      // Keep the current selection
+      setSelected(selected);
+    } else {
+      // If the selected contact is not in the new messages, select the first contact or handle accordingly
+      setSelected(contacts[0] || null);
+    }
 
-    setFilteredContacts(contacts);
-    setSelected((prev) => {
-      if (prev !== null)
-        return contacts.find((contact) => contact.id == prev.id) || null;
-      else return null;
-    });
+    // setSelected((prev) => {
+    //   if (prev !== null)
+    //     return contacts.find((contact) => contact.id == prev.id) || null;
+    //   else return null;
+    // });
   }, [contacts]);
 
   const { setModal } = useContactModals();
@@ -74,11 +82,17 @@ export default function ContactsPage({
           placeholder={t("search_contacts")}
           className="pl-8 placeholder:text-muted-foreground border"
         />
-        <ContactsList
-          contacts={filteredContacts}
-          selectedContactId={selected?.id || null}
-          setSelected={setSelected}
-        />
+        {filteredContacts.length > 0 ? (
+          <ContactsList
+            contacts={filteredContacts}
+            selectedContactId={selected?.id || null}
+            setSelected={setSelected}
+          />
+        ) : (
+          <div className="p-8 text-center text-muted-foreground">
+            {error || t("none_found")}
+          </div>
+        )}
       </ResizablePanel>
       <ResizableHandle withHandle className={cn(onMobile && "hidden")} />
 
@@ -87,16 +101,7 @@ export default function ContactsPage({
         // reverse logic like above: on mobile and with nothing selected, this component should be hidden.
         className={cn(onMobile && selected === null && "hidden")} // like above we are using reverse logic here. If we are on mobile, and nothing is selected, this component should not be displayed.
       >
-        <ContactDisplay
-          contact={selected}
-          reset={(index?: number) => {
-            if (typeof index === "number" && contacts.length > 0) {
-              setSelected(contacts[index]);
-            } else {
-              setSelected(null);
-            }
-          }}
-        />
+        <ContactDisplay contact={selected} reset={() => setSelected(null)} />
       </ChildrenPanel>
     </>
   );
