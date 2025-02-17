@@ -32,7 +32,7 @@ export default function ContactsPage({
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation(["contacts-page"]);
   const [filteredContacts, setFilteredContacts] = useState(contacts);
-  const [selected, setSelected] = useState<DBContact | null>(null);
+  const [selected, setSelected] = useState<DBContact | null>(contacts[0]);
 
   const onMobile = useIsMobile();
   const searchParams = useSearchParams();
@@ -90,7 +90,16 @@ export default function ContactsPage({
         hasMiddleBar
         className={cn(onMobile && selected === null && "hidden")} // like above we are using reverse logic here. If we are on mobile, and nothing is selected, this component should not be displayed.
       >
-        <ContactDisplay contact={selected} reset={() => setSelected(null)} />
+        <ContactDisplay
+          contact={selected}
+          reset={(index?: number) => {
+            if (typeof index === "number" && contacts.length > 0) {
+              setSelected(contacts[index]);
+            } else {
+              setSelected(null);
+            }
+          }}
+        />
       </ChildrenPanel>
     </>
   );

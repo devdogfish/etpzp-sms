@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { z } from "zod";
 import { useActionState } from "react";
 import {
   Dialog,
@@ -22,11 +21,10 @@ import { cn, toastActionResult } from "@/lib/utils";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useContactModals } from "@/contexts/use-contact-modals";
-import { ActionResponse } from "@/types/action";
-import { ContactSchema } from "@/lib/form.schemas";
+import { CreateContactResponse } from "@/types/action";
 import { useTranslation } from "react-i18next";
 
-const initialState: ActionResponse<z.infer<typeof ContactSchema>> = {
+const initialState: CreateContactResponse = {
   success: false,
   message: [],
 };
@@ -45,16 +43,16 @@ export default function CreateContactModal({
 
   useEffect(() => {
     if (serverState.success) {
-      toastActionResult(serverState);
+      toastActionResult(serverState, t);
       onOpenChange(false);
     }
   }, [serverState]);
 
   const onOpenChange = (value: boolean) => {
-    clearInput();
     setModal((prev) => ({ ...prev, create: value }));
+    clearInputs();
   };
-  const clearInput = () => {
+  const clearInputs = () => {
     // This is unfortunately the easiest way to reset this shit
     serverState.errors = undefined;
     serverState.message = [];
@@ -89,7 +87,7 @@ export default function CreateContactModal({
             />
             {serverState.errors?.name && (
               <p id="name-error" className="text-sm text-red-500">
-                {serverState.errors.name[0]}
+                {t(serverState.errors.name[0])}
               </p>
             )}
           </div>
@@ -109,7 +107,7 @@ export default function CreateContactModal({
             />
             {serverState.errors?.phone && (
               <p id="phone-error" className="text-sm text-red-500">
-                {serverState.errors.phone[0]}
+                {t(serverState.errors.phone[0])}
               </p>
             )}
           </div>
@@ -131,7 +129,7 @@ export default function CreateContactModal({
             />
             {serverState.errors?.description && (
               <p id="description-error" className="text-sm text-red-500">
-                {serverState.errors.description[0]}
+                {t(serverState.errors.description[0])}
               </p>
             )}
           </div>
@@ -140,7 +138,7 @@ export default function CreateContactModal({
             <Alert variant={serverState.success ? "default" : "destructive"}>
               {!serverState.success && <CircleAlert className="w-4 h-4" />}
               <AlertDescription className="relative top-1">
-                {serverState.message}
+                {t(serverState.message.join(", "))}
               </AlertDescription>
             </Alert>
           )}

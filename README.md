@@ -35,6 +35,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Any advice on the colors? Should I add an empty profile color as default?
 - Should I keep the reply-all button to only insert the recipients, or should it also insert sender subject and body?
 - Should I keep the option to change the sender? This would also influence the message-display component
+- Give the example of edit contact modal and the question is: how should I give feedback to the user, right now I am using both badges and toasts, but only toasting on success. Should it stay like this
 
 ## Database
 

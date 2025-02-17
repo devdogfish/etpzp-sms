@@ -28,7 +28,7 @@ import React, {
 import RecipientsInput from "./recipients-input";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 import { useNewMessage } from "@/contexts/use-new-message";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -74,6 +74,7 @@ const NewMessageForm = React.memo(function ({
   const [loading, setLoading] = useState(false);
   const [serverState, setServerState] = useState(initialState);
   const { isFullscreen, setIsFullscreen } = useLayout();
+  const pathname = usePathname();
 
   // focused state for all 4 inputs in the form to handle their hovering states when this gets refactored
   const [focused, setFocused] = useState([false, false, false, false]);
@@ -142,17 +143,17 @@ const NewMessageForm = React.memo(function ({
     setDraftId(draft?.id);
 
     if (isMounted) {
-      // DEBUG
-      console.log(
-        "Calling draft save action with these args: ",
-        draftId,
-        message
-      );
-
       const save = async () => {
         const result = await saveDraft(draftId, message);
         setDraftId(result.draftId);
         toastActionResult(result);
+        if (!draft && result.draftId) {
+          // Update the url with the current draft so that when revalidating, the form will keep its values
+          const params = new URLSearchParams(searchParams.toString());
+          params.set("draft", result.draftId);
+
+          router.push(pathname + "?" + params.toString());
+        }
       };
 
       save();

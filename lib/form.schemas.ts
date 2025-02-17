@@ -41,7 +41,10 @@ export const LoginSchema = z.object({
 
 export const ContactSchema = z.object({
   // id: z.string(),
-  name: z.string().min(2).max(50),
+  name: z
+    .string()
+    .min(2, { message: "modals:zod_error-short_name" })
+    .max(50, { message: "modals:zod_error-long_name" }),
   phone: CustomPhone(),
   description: CustomString()
     .max(255, { message: "modals:zod_error-long_contact_description" })

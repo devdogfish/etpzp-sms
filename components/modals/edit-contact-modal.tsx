@@ -41,19 +41,27 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
 
   useEffect(() => {
     if (serverState.success) {
+      toastActionResult(serverState, t);
       onOpenChange(false);
-      toastActionResult(serverState);
-      serverState.inputs = undefined;
-      serverState.errors = undefined;
-      serverState.message = [];
     }
   }, [serverState]);
 
   const onOpenChange = (value: boolean) => {
     setModal((prev) => ({ ...prev, edit: value }));
+    clearInputs();
+  };
+  const clearInputs = () => {
+    // This is unfortunately the easiest way to reset this shit
+    serverState.errors = undefined;
+    serverState.message = [];
+    serverState.inputs = {};
   };
   return (
-    <Dialog open={modal.edit} onOpenChange={onOpenChange}>
+    <Dialog
+      /* We do need these shits unfortunately */
+      open={modal.edit}
+      onOpenChange={onOpenChange}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("edit_contact-header")}</DialogTitle>
@@ -77,7 +85,7 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
             />
             {serverState.errors?.name && (
               <p id="name-error" className="text-sm text-red-500">
-                {serverState.errors.name[0]}
+                {t(serverState.errors.name[0])}
               </p>
             )}
           </div>
@@ -97,7 +105,7 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
             />
             {serverState.errors?.phone && (
               <p id="phone-error" className="text-sm text-red-500">
-                {serverState.errors.phone[0]}
+                {t(serverState.errors.phone[0])}
               </p>
             )}
           </div>
@@ -121,16 +129,16 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
             />
             {serverState.errors?.description && (
               <p id="description-error" className="text-sm text-red-500">
-                {serverState.errors.description[0]}
+                {t(serverState.errors.description[0])}
               </p>
             )}
           </div>
 
-          {serverState?.message && (
+          {serverState.message.length > 0 && (
             <Alert variant={serverState.success ? "default" : "destructive"}>
               {!serverState.success && <CircleAlert className="w-4 h-4" />}
               <AlertDescription className="relative top-1">
-                {serverState.message}
+                {t(serverState.message)}
               </AlertDescription>
             </Alert>
           )}
@@ -140,10 +148,11 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
               type="button"
               className={cn(buttonVariants({ variant: "outline" }), "mr-auto")}
             >
-              Cancel
+              {t("common:cancel")}
             </DialogClose>
             <Button type="submit" disabled={pending}>
-              {pending && <Loader2 className="h-4 w-4 animate-spin" />} Submit
+              {pending && <Loader2 className="h-4 w-4 animate-spin" />}{" "}
+              {t("common:update")}
             </Button>
           </DialogFooter>
         </form>

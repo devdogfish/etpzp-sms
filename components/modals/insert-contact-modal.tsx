@@ -35,7 +35,7 @@ export default function InsertContactModal({
   const { modal, setModal } = useContactModals();
   const [selected, setSelected] = useState<DBContact[]>([]);
   const { addRecipient } = useNewMessage();
-  const { t } = useTranslation(["modals"]);
+  const { t } = useTranslation(["modals", "common"]);
 
   const onInsert = () => {
     selected.forEach((contact: DBContact) => {
@@ -43,7 +43,7 @@ export default function InsertContactModal({
       addRecipient(contact.phone, contacts);
     });
 
-    // reset the selected table in this modal
+    // reset the selected table in this modal (deselect the selected ones)
     setSelected([]);
     // close the modal
     setInsertModal(false);
@@ -62,6 +62,7 @@ export default function InsertContactModal({
             <DialogDescription>
               {t("insert_contact-header_caption")}
             </DialogDescription>
+            <Button onClick={showCreateModal}>Create new</Button>
           </DialogHeader>
           {contacts.length ? (
             <Table>

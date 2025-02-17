@@ -7,14 +7,13 @@ import { getSession } from "../auth/sessions";
 import { formatPhone } from "../utils";
 import { revalidatePath } from "next/cache";
 import { DatabaseError } from "pg";
-import { ActionResponse } from "@/types/action";
+import { ActionResponse, CreateContactResponse } from "@/types/action";
 import { z } from "zod";
-import { CreateContactActionResponse } from "@/components/modals/create-contact-from-recipient-modal";
 
 export async function createContact(
-  _: CreateContactActionResponse<z.infer<typeof ContactSchema>> | null,
+  _: CreateContactResponse | null,
   formData: FormData
-): Promise<CreateContactActionResponse<z.infer<typeof ContactSchema>>> {
+): Promise<CreateContactResponse> {
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -27,7 +26,7 @@ export async function createContact(
   if (!validatedData.success) {
     return {
       success: false,
-      message: ["Please fix the errors in the form"],
+      message: ["common:fix_zod_errors"],
       errors: validatedData.error.flatten().fieldErrors,
       inputs: rawData,
     };
@@ -35,8 +34,6 @@ export async function createContact(
 
   try {
     if (!userId) throw new Error("Invalid user id.");
-    console.log("Fields validated");
-    console.log(validatedData);
 
     const { name, phone, description } = validatedData.data;
     const validatedPhone = formatPhone(phone);
@@ -49,23 +46,22 @@ export async function createContact(
     );
     console.log(result.rows[0]);
 
-    // this is messing everything up
+    // This was messing everything up because it was re-rendering the form component, losing all the state
     revalidatePath("/");
 
     return {
       success: true,
-      message: ["Contact created successfully!"],
+      message: ["modals:create_contact-success"],
       data: result.rows[0],
     };
   } catch (error) {
     let message = "";
     if (error instanceof DatabaseError && error.code === "23505") {
       // check if it is a duplicate key error by comparing it with the error code
-      message = "Phone number already exists in another contact";
+      message = "modals:zod_error-duplicate_phone";
     } else {
-      message = "An unknown error occurred. Failed to create contact.";
+      message = "modals:create_contact-unknown_error";
     }
-    console.log("END CATCH BLOCK", message);
 
     return {
       success: false,
@@ -92,20 +88,16 @@ export async function updateContact(
   if (!validatedData.success) {
     return {
       success: false,
-      message: ["Please fix the errors in the form"],
+      message: ["common:fix_zod_errors"],
       errors: validatedData.error.flatten().fieldErrors,
       inputs: rawData,
     };
   }
   try {
     if (!userId) throw new Error("Invalid user id.");
-    console.log("Fields validated");
-    console.log(validatedData);
 
     const { name, phone, description } = validatedData.data;
     const validatedPhone = formatPhone(phone);
-    if (!validatedPhone)
-      throw new Error("Phone number is unexpectedly invalid!");
 
     await db(
       "UPDATE contact SET name = $1, phone = $2, description = $3 WHERE user_id = $4 AND id = $5",
@@ -114,15 +106,16 @@ export async function updateContact(
 
     revalidatePath("/contacts");
 
-    return { success: true, message: ["Contact updated successfully!"] };
+    return { success: true, message: ["modals:edit_contact-success"] };
   } catch (error) {
     let message;
     if (error instanceof DatabaseError && error.code === "23505") {
       // check if it is a duplicate key error by comparing it with the error code
-      message = "Phone number already exists in another contact";
+      message = "modals:zod_error-duplicate_phone";
     } else {
-      message = "An unknown error occurred. Failed to create contact.";
+      message = "modals:create_contact-unknown_error";
     }
+
     return {
       success: false,
       message: [message],
@@ -144,12 +137,11 @@ export async function deleteContact(
       id,
     ]);
     revalidatePath("/contacts");
-    return { success: true, message: ["Contact deleted successfully!"] };
+    return { success: true, message: ["contacts-page:server-delete_success"] };
   } catch (error) {
-    // Check if we are
     return {
       success: false,
-      message: ["An unknown error occurred. Failed to delete contact."],
+      message: ["contacts-page:server-delete_unknown_error"],
     };
   }
 }

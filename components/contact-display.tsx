@@ -28,7 +28,7 @@ export default function ContactDisplay({
   reset,
 }: {
   contact: DBContact | null;
-  reset: () => void;
+  reset: (index?: number) => void;
 }) {
   const onMobile = useIsMobile();
   const router = useRouter();
@@ -40,8 +40,13 @@ export default function ContactDisplay({
   const handleDelete = async () => {
     if (contact) {
       const result = await deleteContact(contact.id);
-      toastActionResult(result);
-      reset();
+      toastActionResult(result, t);
+      if (onMobile) {
+        reset();
+      } else {
+        // automatically select the first contact if on desktop
+        reset(0);
+      }
     }
   };
   const messageContact = async () => {
@@ -71,7 +76,7 @@ export default function ContactDisplay({
           {onMobile && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={reset}>
+                <Button variant="ghost" size="icon" onClick={() => reset()}>
                   <ArrowLeft className="h-4 w-4" />
                   <span className="sr-only">{t("common:go_back")}</span>
                 </Button>
@@ -130,7 +135,7 @@ export default function ContactDisplay({
           {contact && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={reset}>
+                <Button variant="ghost" size="icon" onClick={() => reset()}>
                   <X className="h-4 w-4" />
                   <span className="sr-only">{t("common:close")}</span>
                 </Button>

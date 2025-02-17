@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { z } from "zod";
 import { useActionState } from "react";
 import {
   Dialog,
@@ -19,34 +18,19 @@ import { createContact } from "@/lib/actions/contact.actions";
 import { CircleAlert, Loader2 } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
 import { cn, convertToRecipient, toastActionResult } from "@/lib/utils";
-import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useContactModals } from "@/contexts/use-contact-modals";
-import { ActionResponse } from "@/types/action";
-import { ContactSchema } from "@/lib/form.schemas";
+import { ActionResponse, CreateContactResponse } from "@/types/action";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { NewRecipient } from "@/types/recipient";
-import { DBContact } from "@/types/contact";
 import useIsMounted from "@/hooks/use-mounted";
 import { useTranslation } from "react-i18next";
 
-export type CreateContactActionResponse<T> = {
-  success: boolean;
-  message: string[];
-  data?: DBContact;
-  errors?: {
-    [K in keyof T]?: string[];
-  };
-  inputs?: {
-    [K in keyof T]?: string;
-  };
+const initialState: CreateContactResponse = {
+  success: false,
+  message: [],
 };
-const initialState: CreateContactActionResponse<z.infer<typeof ContactSchema>> =
-  {
-    success: false,
-    message: [],
-  };
 
 export default function CreateContactFromRecipientModal({
   recipient,
@@ -79,12 +63,13 @@ export default function CreateContactFromRecipientModal({
   }, [serverState]);
 
   const onOpenChange = (value: boolean) => {
-    clearServerState();
     setModal((prev) => ({ ...prev, createFromRecipient: value }));
+    clearInputs();
   };
 
   // This is unfortunately the easiest way to reset this shit
-  const clearServerState = () => {
+  const clearInputs = () => {
+    // This is unfortunately the easiest way to reset this shit
     serverState.errors = undefined;
     serverState.message = [];
     serverState.inputs = {};
@@ -97,12 +82,14 @@ export default function CreateContactFromRecipientModal({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create new Contact</DialogTitle>
-          <DialogDescription>Add a new contact to your list.</DialogDescription>
+          <DialogTitle>{t("create_contact-header")}</DialogTitle>
+          <DialogDescription>
+            {t("create_contact-header_caption")}
+          </DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t("common:name")}</Label>
             <Input
               name="name"
               id="name"
@@ -116,13 +103,13 @@ export default function CreateContactFromRecipientModal({
             />
             {serverState.errors?.name && (
               <p id="name-error" className="text-sm text-red-500">
-                {serverState.errors.name[0]}
+                {t(serverState.errors.name[0])}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone number</Label>
+            <Label htmlFor="phone">{t("common:phone_number")}</Label>
             <Input
               name="phone"
               id="phone"
@@ -136,7 +123,7 @@ export default function CreateContactFromRecipientModal({
             />
             {serverState.errors?.phone && (
               <p id="phone-error" className="text-sm text-red-500">
-                {serverState.errors.phone[0]}
+                {t(serverState.errors.phone[0])}
               </p>
             )}
           </div>
@@ -158,7 +145,7 @@ export default function CreateContactFromRecipientModal({
             />
             {serverState.errors?.description && (
               <p id="description-error" className="text-sm text-red-500">
-                {serverState.errors.description[0]}
+                {t(serverState.errors.description[0])}
               </p>
             )}
           </div>
@@ -167,7 +154,7 @@ export default function CreateContactFromRecipientModal({
             <Alert variant={serverState.success ? "default" : "destructive"}>
               {!serverState.success && <CircleAlert className="w-4 h-4" />}
               <AlertDescription className="relative top-1">
-                {serverState.message}
+                {t(serverState.message.join(", "))}
               </AlertDescription>
             </Alert>
           )}
@@ -177,10 +164,11 @@ export default function CreateContactFromRecipientModal({
               type="button"
               className={cn(buttonVariants({ variant: "outline" }), "mr-auto")}
             >
-              Cancel
+              {t("common:cancel")}
             </DialogClose>
             <Button type="submit" disabled={pending}>
-              {pending && <Loader2 className="h-4 w-4 animate-spin" />} Submit
+              {pending && <Loader2 className="h-4 w-4 animate-spin" />}{" "}
+              {t("common:create")}
             </Button>
           </DialogFooter>
         </form>
