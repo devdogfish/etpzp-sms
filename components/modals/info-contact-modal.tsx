@@ -8,7 +8,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "../ui/dialog";
-
 import { DialogClose } from "@/components/ui/dialog";
 import { cn, getNameInitials } from "@/lib/utils";
 import { useContactModals } from "@/contexts/use-contact-modals";

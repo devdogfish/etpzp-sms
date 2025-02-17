@@ -3,7 +3,6 @@
 import { format } from "date-fns/format";
 import { ArrowLeft, Edit, Share, Trash2, X } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -32,21 +31,17 @@ export default function ContactDisplay({
 }) {
   const onMobile = useIsMobile();
   const router = useRouter();
+  const { t } = useTranslation(["contacts-page"]);
   const { setModal } = useContactModals();
   const showEditModal = () => setModal((prev) => ({ ...prev, edit: true }));
   // Reset this to the default namespace, because in the layout it's set to the messages page namespace by default
-  const { t } = useTranslation(["contacts-page"]);
 
   const handleDelete = async () => {
     if (contact) {
       const result = await deleteContact(contact.id);
       toastActionResult(result, t);
-      if (onMobile) {
-        reset();
-      } else {
-        // automatically select the first contact if on desktop
-        reset(0);
-      }
+      // automatically select the first contact if on desktop
+      reset(0);
     }
   };
   const messageContact = async () => {

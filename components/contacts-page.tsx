@@ -8,11 +8,7 @@ import { PageHeader } from "./header";
 import { useTranslation } from "react-i18next";
 import ContactsList from "./contacts-list";
 
-import {
-  cn,
-  searchContacts,
-  // searchContacts
-} from "@/lib/utils";
+import { cn, searchContacts } from "@/lib/utils";
 import ContactDisplay from "./contact-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Search from "./shared/search";
@@ -88,6 +84,7 @@ export default function ContactsPage({
 
       <ChildrenPanel
         hasMiddleBar
+        // reverse logic like above: on mobile and with nothing selected, this component should be hidden.
         className={cn(onMobile && selected === null && "hidden")} // like above we are using reverse logic here. If we are on mobile, and nothing is selected, this component should not be displayed.
       >
         <ContactDisplay

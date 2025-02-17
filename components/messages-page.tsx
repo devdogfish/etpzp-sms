@@ -97,7 +97,13 @@ export default function MessagesPage({
       >
         <MessageDisplay
           message={selected}
-          reset={() => setSelected(null)}
+          reset={(index?: number) => {
+            if (typeof index === "number" && messages.length > 0) {
+              setSelected(messages[index]);
+            } else {
+              setSelected(null);
+            }
+          }}
           category={category}
         />
       </ChildrenPanel>

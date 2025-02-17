@@ -40,12 +40,12 @@ export function MessageDisplay({
 }: {
   message: DBMessage | null;
   category?: CategoryEnums;
-  reset: () => void;
+  reset: (index?: number) => void;
 }) {
   const today = new Date();
-  const router = useRouter();
   const onMobile = useIsMobile();
-  const { t } = useTranslation();
+  const router = useRouter();
+  const { t } = useTranslation(["messages-page"]);
 
   const handleTrashButtonClick = async () => {
     if (message) {
@@ -57,8 +57,9 @@ export function MessageDisplay({
         result = await toggleTrash(message.id, true);
       }
 
-      toastActionResult(result);
-      reset();
+      toastActionResult(result, t);
+      // automatically select the first contact if on desktop
+      reset(0);
     }
   };
 
@@ -90,7 +91,7 @@ export function MessageDisplay({
     if (message) {
       const result = await toggleTrash(message.id, false);
       if (result.success) {
-        reset();
+        reset(0);
       }
       toastActionResult(result);
     }
@@ -106,7 +107,7 @@ export function MessageDisplay({
       if (smsReferenceId && !isNaN(smsReferenceId)) {
         const result = await cancelCurrentlyScheduled(smsReferenceId);
         if (result?.success) {
-          reset();
+          reset(0);
         }
         toastActionResult(result);
       } else {
@@ -116,12 +117,12 @@ export function MessageDisplay({
   };
   return (
     <div className={cn("flex h-full flex-col")}>
-      <div className="flex items-center p-2">
+      <div className="flex items-center p-2 h-[var(--header-height)] border-b">
         <div className="flex items-center gap-2">
           {onMobile && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={reset}>
+                <Button variant="ghost" size="icon" onClick={() => reset()}>
                   <ArrowLeft className="h-4 w-4" />
                   <span className="sr-only">{t("common:go_back")}</span>
                 </Button>
@@ -237,7 +238,7 @@ export function MessageDisplay({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={reset}
+                onClick={() => reset()}
                 disabled={!message}
               >
                 <X className="h-4 w-4" />
@@ -248,7 +249,7 @@ export function MessageDisplay({
           </Tooltip>
         </div>
       </div>
-      <Separator />
+      {/* <Separator /> */}
       {message ? (
         <div className="flex flex-1 flex-col">
           <div className="flex items-start p-4">
