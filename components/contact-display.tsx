@@ -143,7 +143,7 @@ export default function ContactDisplay({
         <div className="flex flex-1 flex-col">
           <div className="flex items-start p-4">
             <div className="flex items-center gap-4 text-sm">
-              <ProfilePic name={contact.name} />
+              <ProfilePic name={contact.name} size={9} />
               <h2>{contact.name}</h2>
             </div>
             {contact.created_at && (
@@ -169,7 +169,7 @@ export default function ContactDisplay({
             {contact.description?.trim() ? (
               <p>{contact.description}</p>
             ) : (
-              <p className="italic">{t("no_description")}</p>
+              <p className="italic">{t("common:no_description")}</p>
             )}
           </div>
         </div>
