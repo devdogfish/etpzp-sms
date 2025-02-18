@@ -7,7 +7,7 @@ import { SkeletonTheme } from "react-loading-skeleton";
 import { useLayout } from "@/contexts/use-layout";
 import { useEffect } from "react";
 import useIsMounted from "@/hooks/use-mounted";
-import useSettings from "@/hooks/use-setting";
+import useSettings from "@/hooks/use-settings";
 import TranslationsProvider from "@/contexts/translations-provider";
 
 type LayoutProps = Readonly<{

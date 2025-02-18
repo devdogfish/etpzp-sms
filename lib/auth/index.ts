@@ -59,7 +59,6 @@ export async function login(
   };
 }
 
-// logout logic is handled on it's own page
 export async function logout() {
   try {
     const session = await getSession();

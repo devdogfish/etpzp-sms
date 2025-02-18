@@ -58,6 +58,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import useSettings from "@/hooks/use-settings";
 
 export default function NavPanel() {
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout, isFullscreen } =
@@ -140,7 +141,7 @@ export function MobileNavPanel() {
 // 1. Sensitive information is extracted from the encrypted session
 // 2. Stuff that can be changed in the settings is encrypted from localstorage
 function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
-  const { t } = useTranslation(["navigation", "modals", "common"]);
+  const { t, i18n } = useTranslation(["navigation", "modals", "common"]);
   const { amountIndicators } = useLayout();
   const router = useRouter();
   const { session, loading } = useSession();
@@ -148,6 +149,8 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
     displayName: localStorage.getItem("display_name") || undefined,
     colorId: Number(localStorage.getItem("profile_color_id")) || undefined,
   });
+  const { resetLocalSettings } = useSettings(i18n.language);
+
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   const showAlertDialog = () => {
     // show the alert dialog
@@ -157,8 +160,8 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   const handleLogout = async () => {
     const { success } = await logout();
     if (success) {
+      resetLocalSettings();
       router.push("/login");
-      localStorage.clear();
     } else
       toast.error("Error occurred", {
         description: "You weren't logged out because of an error.",

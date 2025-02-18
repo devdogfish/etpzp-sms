@@ -40,6 +40,12 @@ export default async function authenticate({
   // 4. Sync all of this with the database
   const userResult = await saveUser(ad, email, hasAdminPermission.success);
 
+  // Check if this is the same
+  console.log("This should get shown...");
+  console.log(
+    "but for some reason I saw the messages from the saveUser resolve."
+  );
+
   return {
     user: userResult.success ? userResult.data : undefined,
     isAuthenticated: hasAppPermission.success,

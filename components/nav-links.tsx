@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { usePathname } from "next/navigation";
-import useSettings from "@/hooks/use-setting";
+import useSettings from "@/hooks/use-settings";
 import { useTranslation } from "react-i18next";
 
 type NavLink = {

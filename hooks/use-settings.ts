@@ -10,6 +10,7 @@ type SettingsContext = {
   normalizePath: (path: string) => string;
   hasLanguageCookie: () => boolean;
   syncWithDB: () => Promise<void>;
+  resetLocalSettings: () => void;
 };
 
 // Helper functions for updating, reading, or deleting settings stored in cookies or localstorage.
@@ -99,5 +100,18 @@ export default function useSettings(currentLocale: string): SettingsContext {
     }
   };
 
-  return { updateLanguageCookie, normalizePath, hasLanguageCookie, syncWithDB };
+  const resetLocalSettings = () => {
+    localStorage.clear();
+    setTheme("light");
+    setThemeColor(1);
+    updateLanguageCookie(i18nConfig.defaultLocale);
+  };
+
+  return {
+    updateLanguageCookie,
+    normalizePath,
+    hasLanguageCookie,
+    syncWithDB,
+    resetLocalSettings,
+  };
 }

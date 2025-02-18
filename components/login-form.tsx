@@ -19,7 +19,7 @@ import { ActionResponse } from "@/types/action";
 import { Login } from "@/lib/auth/config";
 import SubmitButton from "./shared/submit-button";
 import { Eye, Router } from "lucide-react";
-import useSettings from "@/hooks/use-setting";
+import useSettings from "@/hooks/use-settings";
 import { useTranslation } from "react-i18next";
 import { toastActionResult } from "@/lib/utils";
 
