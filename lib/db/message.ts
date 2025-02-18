@@ -40,11 +40,25 @@ export async function fetchSent(): Promise<DBMessage[] | undefined> {
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(
       `
-        SELECT m.*, 
-              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone) ORDER BY r.index) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
+        SELECT 
+            m.*, 
+            COALESCE(
+                json_agg(
+                    json_build_object(
+                        'id', r.id,
+                        'contact_id', r.contact_id,
+                        'name', c.name,           -- Added contact name
+                        'phone', r.phone,         -- The recipient phone
+                        'description', c.description  -- Added contact description
+                    ) ORDER BY r.index
+                ) FILTER (WHERE r.id IS NOT NULL), '[]'::json
+            ) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
-        WHERE m.user_id = $1 AND m.send_time < NOW() AND m.in_trash = false
+        LEFT JOIN contact c ON r.contact_id = c.id
+        WHERE m.user_id = $1 
+          AND m.send_time < NOW() 
+          AND m.in_trash = false
         GROUP BY m.id
         ORDER BY m.created_at DESC;
       `,
