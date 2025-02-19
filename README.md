@@ -17,7 +17,7 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## TODO
-
+0. Instead of calling revalidatePath("/"), create a function to for the amountIndicators to only refetch them. This will keep all the components from getting refreshed
 1. Translate the entire app - look in actions/, search for toastActionResult(result) (without the translation function parameter)
 2. Check if all the `revalidation` in actions is correctly placed and in working order
 3. Edit the message.create to create a message by updating the existing draft by binding the function with the draftId

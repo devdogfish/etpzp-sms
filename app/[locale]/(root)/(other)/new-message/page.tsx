@@ -30,6 +30,8 @@ export async function PageFetcher({
   const { alphabetical, mostUsed } = getProcessedRecipients(
     recipientsResult || []
   );
+  console.log("refetching draft in new-message-page fetcher");
+  
 
   const draft = searchParams.draft
     ? await fetchDraft(searchParams.draft)

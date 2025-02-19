@@ -14,6 +14,8 @@ export async function createContact(
   _: CreateContactResponse | null,
   formData: FormData
 ): Promise<CreateContactResponse> {
+  console.log("create contact called");
+
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -47,7 +49,9 @@ export async function createContact(
     console.log(result.rows[0]);
 
     // This was messing everything up because it was re-rendering the form component, therefore losing all the state
+    // This is messing everything up for the new-messages-page. Instead maybe create a function to revalidateAmount indicators so that the components don't get refreshed
     revalidatePath("/");
+
     return {
       success: true,
       message: ["modals:create_contact-success"],

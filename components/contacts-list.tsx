@@ -29,7 +29,7 @@ export default function ContactsList({
             )}
             onClick={() => setSelected(contact)}
           >
-            <ProfilePic name={contact.name} fill={false} size={12} />
+            <ProfilePic name={contact.name} fill={false} size={10} />
             <div className="space-y-1">
               <div className="font-semibold">{contact.name}</div>
               <div className="text-xs font-medium">{contact.phone}</div>
