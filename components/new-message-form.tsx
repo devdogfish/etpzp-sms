@@ -98,7 +98,7 @@ const NewMessageForm = React.memo(function ({
     setLoading(true);
     const formData = new FormData(e.currentTarget);
     const result = await sendMessage({
-      sender: formData.get("sender") as "ETPZP" | "ExampleSMS" | "Test",
+      sender: formData.get("sender") as string,
       recipients: recipients as NewRecipient[],
       subject: formData.get("subject") as string,
       body: formData.get("body") as string,
@@ -152,10 +152,14 @@ const NewMessageForm = React.memo(function ({
 
   useEffect(() => {
     if (isMounted && draft) {
+      console.log("draft is defined");
+      console.log(draft);
+      
+      
       const { body, subject, sender, recipients } = draft;
       setMessage({ body, subject: subject || undefined, sender, recipients });
     }
-  }, []);
+  }, [isMounted]);
 
   // Saving draft logic
   useEffect(() => {

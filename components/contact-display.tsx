@@ -146,9 +146,12 @@ export default function ContactDisplay({
               <ProfilePic name={contact.name} size={9} />
               <h2>{contact.name}</h2>
             </div>
+
             {contact.created_at && (
               <div className="ml-auto text-xs text-muted-foreground">
-                {format(new Date(contact.created_at), "PPpp")}
+                {t("common:created_on_date", {
+                  date: format(new Date(contact.created_at), "PPpp"),
+                })}
               </div>
             )}
           </div>
