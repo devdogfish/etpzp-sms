@@ -8,6 +8,12 @@ import { fetchDraft } from "@/lib/db/message";
 import { Suspense } from "react";
 import { validatePhoneNumber } from "@/lib/utils";
 
+const EMPTY_MESSAGE = {
+  body: "",
+  subject: undefined,
+  sender: "ETPZP",
+  recipients: [],
+};
 export default async function Page({
   searchParams,
 }: {
@@ -31,7 +37,6 @@ export async function PageFetcher({
     recipientsResult || []
   );
   console.log("refetching draft in new-message-page fetcher");
-  
 
   const draft = searchParams.draft
     ? await fetchDraft(searchParams.draft)
@@ -65,15 +70,15 @@ export async function PageFetcher({
       }}
       allContacts={contacts || []}
       defaultMessage={{
-        body: draft?.body || "",
-        subject: draft?.subject || undefined,
-        sender: draft?.sender,
+        body: draft?.body || EMPTY_MESSAGE.body,
+        subject: draft?.subject || EMPTY_MESSAGE.subject,
+        sender: draft?.sender || EMPTY_MESSAGE.sender,
         recipients:
           draft?.recipients.map((r) => ({
             ...r,
             error: validatePhoneNumber(r.phone),
             formattedPhone: validatePhoneNumber(r.phone).formattedPhone,
-          })) || [],
+          })) || EMPTY_MESSAGE.recipients,
       }}
     >
       <NewMessageForm

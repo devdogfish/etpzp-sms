@@ -140,7 +140,10 @@ export async function deleteContact(
     ]);
 
     revalidatePath("/contacts");
-    return { success: true, message: ["contacts-page:server-delete_success"] };
+    return {
+      success: true,
+      message: ["contacts-page:server-delete_success"],
+    };
   } catch (error) {
     return {
       success: false,

@@ -24,7 +24,7 @@ export const MessageSchema = z.object({
   sender: CustomString().optional(),
   // recipients are handled internally for more thorough error messages
   subject: CustomString().optional(),
-  body: CustomString().min(1, "new-message-page:zod_error-body-empty"),
+  body: CustomString().min(1, "new-message-page:zod_error-body_empty"),
   sendDelay: z
     .number({ message: "new-message-page:zod_error-invalid_schedule_date" })
     .positive({ message: "new-message-page:zod_error-negative_schedule_date" })

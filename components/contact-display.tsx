@@ -56,7 +56,7 @@ export default function ContactDisplay({
       if (newDraft.success && newDraft.draftId) {
         router.push(`/new-message?draft=${newDraft.draftId}`);
       } else {
-        toastActionResult(newDraft);
+        toastActionResult(newDraft, t);
       }
     }
   };

@@ -47,20 +47,16 @@ export default function CreateContactFromRecipientModal({
   const { t } = useTranslation(["modals"]);
 
   useEffect(() => {
-    console.log("server state changed", isMounted);
-    
     if (isMounted) {
-      console.log("is mounted");
-      
-      toastActionResult(serverState);
-      
+      toastActionResult(serverState, t);
+
       if (serverState.success) {
         onOpenChange(false);
         console.log("successfully created from recipient");
-        
+
         if (recipient && serverState.data) {
           console.log("REPLACING RECIPIENT WITH EXISTING", serverState.data);
-          
+
           // Replacing original recipient with newly created contact
           const newRecipient = convertToRecipient(serverState.data);
           removeRecipient(recipient, getValidatedRecipient(newRecipient));

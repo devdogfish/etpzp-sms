@@ -47,7 +47,10 @@ export async function toggleTrash(
   }
 }
 
-export async function deleteMessage(id: string): Promise<ActionResponse<null>> {
+export async function deleteMessage(
+  id: string,
+  revalidate?: string
+): Promise<ActionResponse<null>> {
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -58,14 +61,15 @@ export async function deleteMessage(id: string): Promise<ActionResponse<null>> {
       [userId, id]
     );
 
-    console.log(result);
-
-    revalidatePath("/trash");
-    return { success: true, message: ["messages-page:server-delete_success"] };
+    if (revalidate) revalidatePath(revalidate);
+    return {
+      success: true,
+      message: ["common:server-delete_message_success"],
+    };
   } catch (error) {
     return {
       success: false,
-      message: ["messages-page:server-delete_unknown_error"],
+      message: ["common:server-delete_message_unknown_error"],
     };
   }
 }
@@ -140,6 +144,8 @@ export async function saveDraft(
     );
 
     if (draftId) {
+      console.log("Updating old draft...");
+
       // 1. Delete old recipients first
       await db(`DELETE FROM recipient WHERE message_id = $1`, [draftId]);
 
@@ -215,13 +221,13 @@ export async function saveDraft(
     // revalidatePath("/drafts"); // Revalidate the drafts page if you have one
     return {
       success: true,
-      message: ["messages-page:server-save_draft_success"],
+      message: ["common:server-save_draft_success"],
       draftId: draftId || draft.rows[0].id,
     };
   } catch (error) {
     return {
       success: false,
-      message: ["messages-page:server-save_draft_unknown_error"],
+      message: ["common:server-save_draft_unknown_error"],
     };
   }
 }

@@ -4,7 +4,7 @@ import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
 import { Maximize2, Minimize2, Trash2, X } from "lucide-react";
 import SendButton from "./send-button";
-import { cn, toastActionResult } from "@/lib/utils";
+import { capitalizeFirstLetter, cn, toastActionResult } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { PageHeader } from "./header";
 import { sendMessage } from "@/lib/actions/message.create";
@@ -46,11 +46,12 @@ import RecipientInfoModal from "./modals/recipient-info-modal";
 import { useLayout } from "@/contexts/use-layout";
 import type { DBMessage, Message } from "@/types";
 import { ActionResponse } from "@/types/action";
-import { saveDraft } from "@/lib/actions/message.actions";
+import { deleteMessage, saveDraft } from "@/lib/actions/message.actions";
 import useDebounce from "@/hooks/use-debounce";
 import useIsMounted from "@/hooks/use-mounted";
 import CreateContactFromRecipientModal from "./modals/create-contact-from-recipient-modal";
 import CreateContactModal from "./modals/create-contact-modal";
+import { format } from "date-fns";
 
 const initialState: ActionResponse<Message> = {
   success: false,
@@ -67,7 +68,7 @@ const NewMessageForm = React.memo(function ({
   draft?: DBMessage;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
-  const { t } = useTranslation();
+  const { t } = useTranslation(["new-message-page"]);
   const router = useRouter();
   const { recipients, moreInfoOn, setMessage, message, draftId, setDraftId } =
     useNewMessage();
@@ -79,6 +80,7 @@ const NewMessageForm = React.memo(function ({
   // focused state for all 4 inputs in the form to handle their hovering states when this gets refactored
   const [focused, setFocused] = useState([false, false, false, false]);
   const isMounted = useIsMounted();
+  const debouncedSaveDraft = useDebounce(message, 2000);
 
   let scheduledTime = 0;
   const searchParams = useSearchParams();
@@ -95,7 +97,6 @@ const NewMessageForm = React.memo(function ({
     e.preventDefault();
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-
     const result = await sendMessage({
       sender: formData.get("sender") as "ETPZP" | "ExampleSMS" | "Test",
       recipients: recipients as NewRecipient[],
@@ -108,7 +109,13 @@ const NewMessageForm = React.memo(function ({
     setServerState(result);
 
     if (result.success) {
-      toastActionResult(result);
+      // Message got sent successfully
+      if (result.scheduledDate) {
+        return toast.success(
+          t(result.message[0], { date: format(result.scheduledDate, "PPpp") })
+        );
+      }
+      toastActionResult(result, t);
       // reset the form
       formRef.current?.reset();
       setMessage((prev) => ({ ...prev, recipients: [] }));
@@ -119,17 +126,29 @@ const NewMessageForm = React.memo(function ({
       Object.entries(zodErrors).forEach(
         ([input, errorArray], index) =>
           setTimeout(() => {
-            toast.error(input, { description: errorArray.join(", ") });
+            toast.error(capitalizeFirstLetter(input), {
+              description: errorArray.map((error) => t(error)).join(", "),
+            });
             waitTime += index * inBetweenTime;
           }, index * inBetweenTime) // Increase delay by 50ms for each error
       );
       setTimeout(() => {
-        toast.error(result.message[0], { description: result.message[1] });
+        toastActionResult(result, t);
       }, Object.entries(zodErrors).length * inBetweenTime);
     }
   };
 
-  const debouncedSaveDraft = useDebounce(message, 2000);
+  const discardDraft = async () => {
+    if (draftId) {
+      // Drafts should also be discarded (deleted) immediately
+      const result: ActionResponse<null> = await deleteMessage(
+        draftId,
+        pathname
+      );
+      toastActionResult(result, t);
+    }
+    router.push("/sent");
+  };
 
   useEffect(() => {
     if (isMounted && draft) {
@@ -138,6 +157,7 @@ const NewMessageForm = React.memo(function ({
     }
   }, []);
 
+  // Saving draft logic
   useEffect(() => {
     // Set draftId at the top to ensure we use the latest value in the save function.
     setDraftId(draft?.id);
@@ -146,7 +166,7 @@ const NewMessageForm = React.memo(function ({
       const save = async () => {
         const result = await saveDraft(draftId, message);
         setDraftId(result.draftId);
-        toastActionResult(result);
+        toastActionResult(result, t);
         if (!draft && result.draftId) {
           // Update the url with the current draft so that when revalidating, the form will keep its values
           const params = new URLSearchParams(searchParams.toString());
@@ -265,7 +285,7 @@ const NewMessageForm = React.memo(function ({
               )}
               placeholder={
                 serverState.errors?.body
-                  ? serverState.errors?.body[0]
+                  ? t(serverState.errors?.body[0])
                   : t("body_placeholder")
               }
               onChange={handleInputChange}
@@ -281,7 +301,7 @@ const NewMessageForm = React.memo(function ({
               variant="secondary"
               type="button"
               className="w-max"
-              onClick={() => router.push("/")}
+              onClick={discardDraft}
             >
               <Trash2 className="h-4 w-4" />
               {t("discard")}

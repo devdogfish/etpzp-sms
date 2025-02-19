@@ -7,6 +7,7 @@ import {
   Edit,
   MessageCircleX,
   ReplyAll,
+  Send,
   Trash2,
   X,
 } from "lucide-react";
@@ -28,7 +29,7 @@ import {
 } from "@/lib/actions/message.actions";
 import { toast } from "sonner";
 import { ActionResponse } from "@/types/action";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import ProfilePic from "./profile-pic";
 import { DBRecipient } from "@/types/recipient";
 import { useTranslation } from "react-i18next";
@@ -46,13 +47,15 @@ export function MessageDisplay({
   const onMobile = useIsMobile();
   const router = useRouter();
   const { t } = useTranslation(["messages-page"]);
+  const pathname = usePathname();
 
   const handleTrashButtonClick = async () => {
     if (message) {
       let result: ActionResponse<null>;
+
       // Drafts should also be discarded (deleted) immediately
       if (message.in_trash || message.status === "DRAFTED") {
-        result = await deleteMessage(message.id);
+        result = await deleteMessage(message.id, pathname);
       } else {
         result = await toggleTrash(message.id, true);
       }
@@ -61,7 +64,7 @@ export function MessageDisplay({
     }
   };
 
-  const replyAll = async () => {
+  const resend = async () => {
     if (message) {
       const newDraft = await saveDraft(undefined, {
         sender: message.sender,
@@ -84,7 +87,7 @@ export function MessageDisplay({
     if (message) {
       const result = await toggleTrash(message.id, false);
 
-      toastActionResult(result);
+      toastActionResult(result, t);
     }
   };
 
@@ -95,7 +98,10 @@ export function MessageDisplay({
       if (smsReferenceId && !isNaN(smsReferenceId)) {
         const result = await cancelCurrentlyScheduled(smsReferenceId);
 
-        toastActionResult(result);
+        toastActionResult(result, t);
+      } else {
+        // TODO TRANSLATION: server-cancel_scheduled_invalid_id
+        toast.error(t("messages-page:server-cancel_scheduled_unknown_error"));
       }
     }
   };
@@ -182,14 +188,14 @@ export function MessageDisplay({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={replyAll}
+                  onClick={resend}
                   disabled={!message}
                 >
-                  <ReplyAll className="h-4 w-4" />
-                  <span className="sr-only">{t("forward")}</span>
+                  <Send className="h-4 w-4" />
+                  <span className="sr-only">{t("resend")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t("forward")}</TooltipContent>
+              <TooltipContent>{t("resend")}</TooltipContent>
             </Tooltip>
           )}
 
@@ -276,6 +282,28 @@ export function MessageDisplay({
           {t("none_selected")}
         </div>
       )}
+      {
+        // You can remove the message check if you want to, I like it better that this bottom bar only shows up on selection
+        category === "DRAFTS" && message && (
+          <>
+            <Separator className="mt-auto" />
+            <div className="flex px-4 py-2 justify-end gap-2">
+              <Button
+                variant="default"
+                type="button"
+                className="w-max"
+                disabled={!message}
+                onClick={() =>
+                  message ? router.push(`/new-message?draft=${message.id}`) : ""
+                }
+              >
+                <Edit className="h-4 w-4" />
+                {t("continue_draft")}
+              </Button>
+            </div>
+          </>
+        )
+      }
     </div>
   );
 }

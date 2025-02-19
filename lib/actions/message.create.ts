@@ -157,7 +157,7 @@ export async function sendMessage(
       message: [
         isScheduled
           ? "new-message-page:server-schedule_success"
-          : "server-send_success",
+          : "new-message-page:server-send_success",
       ],
       scheduledDate: isScheduled
         ? new Date(scheduledUnixSeconds * 1000)
@@ -167,6 +167,7 @@ export async function sendMessage(
     return {
       success: false,
       message: [
+        // TODO TRANSLATION: new-message-page:server-unknown_error
         "Unknown Error",
         "Something went wrong. Please try again later.",
       ],

@@ -48,7 +48,6 @@ export default function RecipientsInput({
     recipients,
     addRecipient,
     removeRecipient,
-    // Suggested recipients
     searchedRecipients,
     searchRecipients,
     setMessage,
@@ -124,12 +123,11 @@ export default function RecipientsInput({
   useEffect(() => {
     if (error) {
       setActiveError(error);
+      // look for errors in recipients to then update the UI
       const noErrorRecipientFound = recipients.find(
         (recipient) => recipient.formattedPhone !== undefined
       );
       if (noErrorRecipientFound) setActiveError(false);
-      console.log("looking for recipient without errors");
-      console.log(noErrorRecipientFound);
     }
   }, [recipients, error]);
 
@@ -247,7 +245,7 @@ export default function RecipientsInput({
                         >
                           <ProfilePic
                             name={recipient.contact_name || undefined}
-                            size={12}
+                            size={10}
                             fill={false}
                           />
                           <div className="space-y-1">
