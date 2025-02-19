@@ -3,7 +3,7 @@ import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const CustomString = (options?: { message: string }) => {
   return z.string({
-    message: options?.message || "common:zod_error-not_string",
+    message: options?.message || "common:error-not_string",
   });
 };
 const CustomPhone = () => {
@@ -11,13 +11,11 @@ const CustomPhone = () => {
     // this returns a boolean telling zod whether the phone data is valid or not
     (input: string) => {
       const parsedPhone = parsePhoneNumberFromString(input);
-      console.log("logging new contact from Schema file:");
-      console.log(parsedPhone);
 
       return (parsedPhone && parsedPhone.isValid()) || false;
     },
     {
-      message: "common:zod_error-invalid_phone",
+      message: "common:error-invalid_phone",
     }
   );
 };
@@ -27,8 +25,9 @@ export const MessageSchema = z.object({
   // recipients are handled internally for more thorough error messages
   subject: CustomString().optional(),
   body: CustomString().min(1, "new-message-page:zod_error-body-empty"),
-  sendDelay: z.coerce
+  sendDelay: z
     .number({ message: "new-message-page:zod_error-invalid_schedule_date" })
+    .positive({ message: "new-message-page:zod_error-negative_schedule_date" })
     .optional(),
 });
 
