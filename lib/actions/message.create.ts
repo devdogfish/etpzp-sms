@@ -70,23 +70,23 @@ export async function sendMessage(
       sendtime: scheduledUnixSeconds, // Extract the UNIX timestamp for scheduled messages
     };
 
-    const networkResponse = await fetch(
-      `${process.env.GATEWAYAPI_URL}/rest/mtsms`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-    // const networkResponse = SuccessResponse;
+    // const networkResponse = await fetch(
+    //   `${process.env.GATEWAYAPI_URL}/rest/mtsms`,
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(payload),
+    //   }
+    // );
+    const networkResponse = SuccessResponse;
     console.log("Response");
     console.log(networkResponse);
 
     if (!networkResponse.ok) {
-      console.log(JSON.stringify(await networkResponse.json()));
+      // console.log(JSON.stringify(await networkResponse.json()));
 
       throw new Error(
         "Network response was not ok " + networkResponse?.statusText
@@ -110,7 +110,8 @@ export async function sendMessage(
       }`
     );
 
-    const response = await networkResponse.json();
+    // const response = await networkResponse.json();
+    const response = { ids: [null] };
     console.log("NetworkResponse.json()");
     console.log(response);
 

@@ -17,6 +17,7 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## TODO
+
 0. Instead of calling revalidatePath("/"), create a function to for the amountIndicators to only refetch them. This will keep all the components from getting refreshed
 1. Translate the entire app - look in actions/, search for toastActionResult(result) (without the translation function parameter)
 2. Check if all the `revalidation` in actions is correctly placed and in working order
@@ -33,6 +34,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Make sure you don't pass in undefined values into the database, you should always convert them to `null` instead
 - Test the app for bugs
 - Consider replacing the suspense boundaries with loading.tsx Next.js file conventions for cleaner code IF in production the loading still doesn't work as it should
+
+## Bugs
+
+- Message schedule cancel doesn't work anymore
+- Recipient suggestions is getting corrupted if there are less than a couple and we are adding contacts with the same phone number
 
 ## Questions
 

@@ -27,7 +27,10 @@ type MessageContextValues = {
   // Recipient management
   recipients: NewRecipient[];
   addRecipient: (phone: string, contacts: DBContact[]) => void;
-  removeRecipient: (recipient: NewRecipient, replaceWithRecipient?: NewRecipient) => void;
+  removeRecipient: (
+    recipient: NewRecipient,
+    replaceWithRecipient?: NewRecipient
+  ) => void;
   getValidatedRecipient: (recipient: NewRecipient) => NewRecipient;
 
   // Recipient search and suggestions
@@ -88,9 +91,9 @@ export function NewMessageProvider({
   // Memoized values
   const recommendedRecipients: DBContactRecipient[] = useMemo(() => {
     // adjust this to your liking
-    const amount = 5;
-    const topRecipients = suggestedRecipients.mostUsed.slice(0, amount);
-    const remainingCount = amount - topRecipients.length;
+    const AMOUNT = 5;
+    const topRecipients = suggestedRecipients.mostUsed.slice(0, AMOUNT);
+    const remainingCount = AMOUNT - topRecipients.length;
 
     if (remainingCount <= 0) return topRecipients;
 
