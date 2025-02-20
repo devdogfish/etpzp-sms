@@ -104,13 +104,16 @@ const NewMessageForm = React.memo(function ({
     e.preventDefault();
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const result = await sendMessage({
-      sender: formData.get("sender") as string,
-      recipients: recipients as NewRecipient[],
-      subject: formData.get("subject") as string,
-      body: formData.get("body") as string,
-      sendDelay: scheduledTime as number,
-    });
+    const result = await sendMessage(
+      {
+        sender: formData.get("sender") as string,
+        recipients: recipients as NewRecipient[],
+        subject: formData.get("subject") as string,
+        body: formData.get("body") as string,
+        sendDelay: scheduledTime as number,
+      },
+      existingDraftId
+    );
 
     setLoading(false);
     setServerState(result);
@@ -161,8 +164,7 @@ const NewMessageForm = React.memo(function ({
     if (isMounted && draft) {
       console.log("draft is defined");
       console.log(draft);
-      
-      
+
       const { body, subject, sender, recipients } = draft;
       setMessage({
         body,

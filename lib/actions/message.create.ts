@@ -11,7 +11,8 @@ import { ActionResponse } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
 export async function sendMessage(
-  data: Message
+  data: Message,
+  existingDraftId: string | undefined
 ): Promise<ActionResponse<Message> & { scheduledDate?: Date }> {
   // 1. Check authentication
   const { isAuthenticated, user } = await getSession();
@@ -93,10 +94,10 @@ export async function sendMessage(
     //   }
     // );
     // const response = await networkResponse.json();
+    // console.log(networkResponse, response);
 
     const networkResponse = SuccessResponse;
     const response = { ids: [null] };
-    // console.log(networkResponse);
 
     if (!networkResponse.ok) {
       console.log(JSON.stringify(response));
@@ -108,47 +109,106 @@ export async function sendMessage(
 
     console.log("SAVING REFERENCE_ID", response.ids[0] || null);
 
-    // Using message_id from the message insertion, to create recipient.
-    await db(
-      `
-      WITH insert_message AS (
-        INSERT INTO message (user_id, subject, body, status, failure_reason, send_time, sms_reference_id) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7) 
-        RETURNING id
-      )
-      INSERT INTO recipient (message_id, contact_id, phone, index)
-      SELECT 
-        insert_message.id, 
-        unnest($8::int[]) as contact_id,
-        unnest($9::text[]) as phone,
-        unnest($10::int[]) as index
-      FROM insert_message;
-      `,
-      [
-        // message parameters
-        userId,
-        validatedData.data.subject,
-        `Sent on (remove this later on):${new Date(
-          scheduledUnixSeconds ? scheduledUnixSeconds * 1000 : Date.now()
-        )}\n\n ${validatedData.data.body}`,
-        networkResponse?.ok
-          ? scheduledUnixSeconds
-            ? "SCHEDULED"
-            : "SENT"
-          : "FAILED", // status here
-        networkResponse?.statusText || null,
-        scheduledUnixSeconds
-          ? new Date(scheduledUnixSeconds * 1000)
-          : new Date(Date.now()),
-        response.ids[0] || null,
+    // -------- BEGIN DATABASE LOGIC --------
+    if (typeof existingDraftId === "undefined" || !existingDraftId) {
+      // Insert new message and recipients
+      await db(
+        `
+          WITH insert_message AS (
+            INSERT INTO message (user_id, subject, body, status, failure_reason, send_time, sms_reference_id) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7) 
+            RETURNING id
+          )
+          INSERT INTO recipient (message_id, contact_id, phone, index)
+          SELECT 
+            insert_message.id, 
+            unnest($8::int[]) as contact_id,
+            unnest($9::text[]) as phone,
+            unnest($10::int[]) as index
+          FROM insert_message;
+        `,
+        [
+          // message parameters
+          userId,
+          validatedData.data.subject,
+          validatedData.data.body,
+          networkResponse?.ok
+            ? scheduledUnixSeconds
+              ? "SCHEDULED"
+              : "SENT"
+            : "FAILED", // status here
+          networkResponse?.statusText || null,
+          scheduledUnixSeconds
+            ? new Date(scheduledUnixSeconds * 1000)
+            : new Date(Date.now()),
+          response.ids[0] || null,
 
-        // recipient parameters:
-        validRecipients.map((recipient) => recipient.contactId || null), // contact_id array
-        validRecipients.map((recipient) => recipient.phone), // phone number array
-        validRecipients.map((_, index) => index), // for the ordering of the recipient
-      ]
-    );
-    console.log("------\n\n");
+          // recipient parameters:
+          validRecipients.map((recipient) => recipient.contactId || null), // contact_id array
+          validRecipients.map((recipient) => recipient.phone), // phone number array
+          validRecipients.map((_, index) => index), // for the ordering of the recipient
+        ]
+      );
+    } else {
+      // Update existing message record
+      const result = await db(
+        `
+          UPDATE message
+          SET subject = $1,
+              body = $2,
+              status = $3,
+              failure_reason = $4,
+              send_time = $5,
+              sms_reference_id = $6
+          WHERE id = $7
+          RETURNING id;
+        `,
+        [
+          validatedData.data.subject,
+          validatedData.data.body,
+          networkResponse?.ok
+            ? scheduledUnixSeconds
+              ? "SCHEDULED"
+              : "SENT"
+            : "FAILED",
+          networkResponse?.statusText || null,
+          scheduledUnixSeconds
+            ? new Date(scheduledUnixSeconds * 1000)
+            : new Date(Date.now()),
+          response.ids[0] || null,
+          existingDraftId,
+        ]
+      );
+
+      // In case update didn't match any rows - invalid message id
+      if (result.rowCount === 0) {
+        throw new Error("Invalid message id provided");
+      }
+
+      // Update or replace the recipients. For simplicity, here we delete the old ones and insert new ones.
+      await db(`DELETE FROM recipient WHERE message_id = $1`, [
+        existingDraftId,
+      ]);
+      // check if for this query I can use VALUES isntead of SELECT
+      await db(
+        `
+        INSERT INTO recipient (message_id, contact_id, phone, index)
+        SELECT $1, 
+               unnest($2::int[]), 
+               unnest($3::text[]), 
+               unnest($4::int[])
+        `,
+        [
+          existingDraftId,
+          validRecipients.map((r) => r.contactId || null),
+          validRecipients.map((r) => r.phone),
+          validRecipients.map((_, index) => index),
+        ]
+      );
+    }
+    // -------- END DATABASE LOGIC --------
+
+    console.log("All operations executed without errors \n------\n\n");
 
     // Update the amount indicators in the nav panel
     revalidatePath("/");

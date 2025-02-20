@@ -10,7 +10,7 @@ export default async function DashboardLayout({
   children,
   params,
 }: LayoutProps) {
-  const i18nNamespaces = ["dashboard-page"];
+  const i18nNamespaces = ["dashboard-page", "errors", "common"];
   const { locale } = await params;
   const { resources } = await initTranslations(locale, i18nNamespaces);
 
