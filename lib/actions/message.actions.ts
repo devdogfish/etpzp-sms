@@ -30,22 +30,27 @@ export async function toggleTrash(
     return {
       success: true,
       message: [
-        `Message ${inTrash ? "moved to trash" : "restored"} successfully!`,
+        inTrash
+          ? "messages-page:server-move_trash_success"
+          : "messages-page:server-restore_success",
       ],
     };
   } catch (error) {
     return {
       success: false,
       message: [
-        `An unknown error occurred. Failed to ${
-          inTrash ? "move message to trash" : "restore message"
-        }.`,
+        inTrash
+          ? "messages-page:server-move_trash_unknown_error"
+          : "messages-page:server-restore_unknown_error",
       ],
     };
   }
 }
 
-export async function deleteMessage(id: string): Promise<ActionResponse<null>> {
+export async function deleteMessage(
+  id: string,
+  revalidate?: string
+): Promise<ActionResponse<null>> {
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -56,15 +61,15 @@ export async function deleteMessage(id: string): Promise<ActionResponse<null>> {
       [userId, id]
     );
 
-    console.log(result);
-
-    revalidatePath("/trash");
-    return { success: true, message: ["Message deleted successfully!"] };
+    if (revalidate) revalidatePath(revalidate);
+    return {
+      success: true,
+      message: ["common:server-delete_message_success"],
+    };
   } catch (error) {
-    // Check if we are
     return {
       success: false,
-      message: ["An unknown error occurred. Failed to delete message."],
+      message: ["common:server-delete_message_unknown_error"],
     };
   }
 }
@@ -111,16 +116,13 @@ export async function cancelCurrentlyScheduled(
     );
     return {
       success: true,
-      message: ["Cancel successful", "Message was moved to failed"],
+      message: ["messages-page:server-cancel_scheduled_success"],
       data: result.rows[0],
     };
   } catch (error) {
     return {
       success: false,
-      message: [
-        "Unknown Error",
-        "Something went wrong. Make sure the message you are trying to cancel is valid.",
-      ],
+      message: ["messages-page:server-cancel_scheduled_unknown_error"],
       data: undefined,
     };
   }
@@ -142,9 +144,13 @@ export async function saveDraft(
     );
 
     if (draftId) {
-      // delete old recipients to then update them with our new ones. We are await these separately so that we can be sure that there are no duplicate recipients
+      console.log("Updating old draft...");
+
+      // 1. Delete old recipients first
       await db(`DELETE FROM recipient WHERE message_id = $1`, [draftId]);
-      // Update existing draft
+
+      // 2. Insert the new recipients after that
+      // We are await these separately so that we can be sure that there are no duplicate recipients
       draft = await db(
         `
             WITH insert_message AS (
@@ -176,7 +182,7 @@ export async function saveDraft(
         ]
       );
     } else {
-      console.log("Create new draft");
+      console.log("Creating new draft...");
 
       // Create new draft
       draft = await db(
@@ -215,13 +221,13 @@ export async function saveDraft(
     // revalidatePath("/drafts"); // Revalidate the drafts page if you have one
     return {
       success: true,
-      message: ["Draft saved successfully"],
+      message: ["common:server-save_draft_success"],
       draftId: draftId || draft.rows[0].id,
     };
   } catch (error) {
     return {
       success: false,
-      message: ["An unknown error occurred. Failed to save draft."],
+      message: ["common:server-save_draft_unknown_error"],
     };
   }
 }

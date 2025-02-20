@@ -50,7 +50,9 @@ export async function createContact(
 
     // This was messing everything up because it was re-rendering the form component, therefore losing all the state
     // This is messing everything up for the new-messages-page. Instead maybe create a function to revalidateAmount indicators so that the components don't get refreshed
-    revalidatePath("/");
+    revalidatePath("/new-message");
+    // MOST_UP_TO_DATE: On the new-message page, when we have a revalidate for `/` OR `/new-message` the contact from recipient creation gets interrupted.
+    // POSSIBLE_SOLUTION: One solution would be to create a function in the layout context that I can call anytime to revalidate the amount indicators. I know this would work, but I don't like it very much because it makes the codebase inconsistent; in some places we use revalidate and in some places we use the function.
 
     return {
       success: true,
@@ -140,7 +142,10 @@ export async function deleteContact(
     ]);
 
     revalidatePath("/contacts");
-    return { success: true, message: ["contacts-page:server-delete_success"] };
+    return {
+      success: true,
+      message: ["contacts-page:server-delete_success"],
+    };
   } catch (error) {
     return {
       success: false,

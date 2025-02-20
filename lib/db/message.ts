@@ -131,6 +131,7 @@ export async function fetchDraft(
   try {
     if (!id) throw new Error("ID passed to fetchDraft was invalid!!!");
     if (!userId) throw new Error("Invalid user id.");
+
     const result = await db(
       `
         -- Select the message fields, along with an array of recipients
@@ -155,7 +156,6 @@ export async function fetchDraft(
       [userId, id]
     );
 
-    console.log(result.rows);
     return result.rows[0];
   } catch (error) {}
 }

@@ -12,46 +12,57 @@ import { revalidatePath } from "next/cache";
 
 export async function sendMessage(
   data: Message
-): Promise<ActionResponse<Message>> {
+): Promise<ActionResponse<Message> & { scheduledDate?: Date }> {
   // 1. Check authentication
   const { isAuthenticated, user } = await getSession();
   const userId = user?.id;
   if (!isAuthenticated || !userId) {
     return {
       success: false,
-      message: ["Authentication Error", "Please log in to continue."],
+      message: ["common:error-authentication"],
     };
   }
 
-  const { validRecipients, invalidRecipients, recipientErrorMessage } =
-    analyzeRawRecipients(data.recipients);
-
-  if (recipientErrorMessage !== null) {
-    return {
-      success: false,
-      message: ["Invalid Recipients", recipientErrorMessage],
-    };
-  }
   // 2. Validate field types
   const validatedData = MessageSchema.safeParse(data);
   if (!validatedData.success) {
     return {
       success: false,
-      message: ["Error Occurred", `Please fix the errors in the below.`],
+      message: ["common:fix_zod_errors"],
       errors: validatedData.error.flatten().fieldErrors,
     };
   }
 
-  console.log(validatedData.data.sendDelay);
-  // if (!validatedData.data.sendDelay) {
-  //   return { success: false, message: ["SChedule failed"] };
-  // }
+  // 3. Validate recipients
+  if (!data.recipients.length) {
+    return {
+      success: false,
+      message: ["new-message-page:server-no_recipients_error"],
+    };
+  }
+  const { validRecipients, invalidRecipients } = analyzeRawRecipients(
+    data.recipients
+  );
+
+  if (!validRecipients.length && invalidRecipients.length) {
+    return {
+      success: false,
+      message: [
+        `new-message-page:server-invalid_phone_numbers_error ${invalidRecipients
+          .map((r) => r.phone)
+          .join(", ")}`,
+      ],
+    };
+  }
+
   // Convert the our send time from seconds to milliseconds
   // JavaScript's Date object uses milliseconds, so we multiply by 1000 to turn send time into ms. as well
-  let scheduledUnixSeconds: number | undefined = undefined;
+  const isScheduled = !!validatedData.data.sendDelay;
+  let scheduledUnixSeconds: number = 0;
   if (validatedData.data.sendDelay && validatedData.data.sendDelay > 0) {
     scheduledUnixSeconds = Date.now() / 1000 + validatedData.data.sendDelay;
     console.log("UNIX EPOCH SECONDS CALCULATED: ", scheduledUnixSeconds);
+    console.log(validatedData.data.sendDelay);
   }
 
   try {
@@ -67,7 +78,7 @@ export async function sendMessage(
       destaddr: "DISPLAY", // Flash SMS
 
       // The API is case-sensitive - `sendtime` has to be spelled exactly like this
-      sendtime: scheduledUnixSeconds, // Extract the UNIX timestamp for scheduled messages
+      sendtime: isScheduled ? scheduledUnixSeconds : undefined, // Extract the UNIX timestamp for scheduled messages
     };
 
     // const networkResponse = await fetch(
@@ -81,39 +92,19 @@ export async function sendMessage(
     //     body: JSON.stringify(payload),
     //   }
     // );
+    // const response = await networkResponse.json();
+
     const networkResponse = SuccessResponse;
-    console.log("Response");
-    console.log(networkResponse);
+    const response = { ids: [null] };
+    // console.log(networkResponse);
 
     if (!networkResponse.ok) {
-      // console.log(JSON.stringify(await networkResponse.json()));
+      console.log(JSON.stringify(response));
 
       throw new Error(
         "Network response was not ok " + networkResponse?.statusText
       );
     }
-
-    console.log(
-      `Message is being saved with ${
-        networkResponse?.ok
-          ? scheduledUnixSeconds
-            ? "SCHEDULED"
-            : "SENT"
-          : "FAILED"
-      } status.`
-    );
-    console.log(
-      `Message is scheduled to be sent ${
-        scheduledUnixSeconds
-          ? "on the " + new Date(scheduledUnixSeconds * 1000) + "."
-          : "right now."
-      }`
-    );
-
-    // const response = await networkResponse.json();
-    const response = { ids: [null] };
-    console.log("NetworkResponse.json()");
-    console.log(response);
 
     console.log("SAVING REFERENCE_ID", response.ids[0] || null);
 
@@ -164,18 +155,19 @@ export async function sendMessage(
     return {
       success: true,
       message: [
-        "Success!",
-        scheduledUnixSeconds
-          ? `Your message is scheduled to be sent on ${new Date(
-              scheduledUnixSeconds * 1000
-            )}`
-          : "Your message has been sent successfully.",
+        isScheduled
+          ? "new-message-page:server-schedule_success"
+          : "new-message-page:server-send_success",
       ],
+      scheduledDate: isScheduled
+        ? new Date(scheduledUnixSeconds * 1000)
+        : undefined,
     };
   } catch (error) {
     return {
       success: false,
       message: [
+        // TODO TRANSLATION: new-message-page:server-unknown_error
         "Unknown Error",
         "Something went wrong. Please try again later.",
       ],
@@ -183,14 +175,9 @@ export async function sendMessage(
   }
 }
 
-function analyzeRawRecipients(recipients: NewRecipient[]): {
-  validRecipients: NewRecipient[];
-  invalidRecipients: NewRecipient[];
-  recipientErrorMessage: string | null;
-} {
+function analyzeRawRecipients(recipients: NewRecipient[]) {
   const validRecipients: NewRecipient[] = [];
   const invalidRecipients: NewRecipient[] = [];
-  let recipientErrorMessage = null;
 
   recipients.forEach((recipient) => {
     const parsedPhone = formatPhone(recipient.phone);
@@ -204,16 +191,5 @@ function analyzeRawRecipients(recipients: NewRecipient[]): {
     }
   });
 
-  if (recipients.length === 0) {
-    recipientErrorMessage = "The message must have at least one recipient.";
-    console.log(recipientErrorMessage);
-  } else if (validRecipients.length === 0 && invalidRecipients) {
-    const invalidPhoneNumbers = recipients.map((people) => people.phone);
-
-    recipientErrorMessage = `The following phone ${
-      invalidRecipients.length > 1 ? "numbers are" : "number is"
-    } not valid: ${invalidPhoneNumbers.join(", ")}`;
-  }
-
-  return { validRecipients, invalidRecipients, recipientErrorMessage };
+  return { validRecipients, invalidRecipients };
 }

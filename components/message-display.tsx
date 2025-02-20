@@ -7,6 +7,7 @@ import {
   Edit,
   MessageCircleX,
   ReplyAll,
+  Send,
   Trash2,
   X,
 } from "lucide-react";
@@ -28,7 +29,7 @@ import {
 } from "@/lib/actions/message.actions";
 import { toast } from "sonner";
 import { ActionResponse } from "@/types/action";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import ProfilePic from "./profile-pic";
 import { DBRecipient } from "@/types/recipient";
 import { useTranslation } from "react-i18next";
@@ -46,13 +47,15 @@ export function MessageDisplay({
   const onMobile = useIsMobile();
   const router = useRouter();
   const { t } = useTranslation(["messages-page"]);
+  const pathname = usePathname();
 
   const handleTrashButtonClick = async () => {
     if (message) {
       let result: ActionResponse<null>;
+
       // Drafts should also be discarded (deleted) immediately
       if (message.in_trash || message.status === "DRAFTED") {
-        result = await deleteMessage(message.id);
+        result = await deleteMessage(message.id, pathname);
       } else {
         result = await toggleTrash(message.id, true);
       }
@@ -61,7 +64,7 @@ export function MessageDisplay({
     }
   };
 
-  const replyAll = async () => {
+  const resend = async () => {
     if (message) {
       const newDraft = await saveDraft(undefined, {
         sender: message.sender,
@@ -84,7 +87,7 @@ export function MessageDisplay({
     if (message) {
       const result = await toggleTrash(message.id, false);
 
-      toastActionResult(result);
+      toastActionResult(result, t);
     }
   };
 
@@ -95,7 +98,9 @@ export function MessageDisplay({
       if (smsReferenceId && !isNaN(smsReferenceId)) {
         const result = await cancelCurrentlyScheduled(smsReferenceId);
 
-        toastActionResult(result);
+        toastActionResult(result, t);
+      } else {
+        toast.error(t("messages-page:server-cancel_scheduled_invalid_id"));
       }
     }
   };
@@ -182,14 +187,14 @@ export function MessageDisplay({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={replyAll}
+                  onClick={resend}
                   disabled={!message}
                 >
-                  <ReplyAll className="h-4 w-4" />
-                  <span className="sr-only">{t("forward")}</span>
+                  <Send className="h-4 w-4" />
+                  <span className="sr-only">{t("resend")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t("forward")}</TooltipContent>
+              <TooltipContent>{t("resend")}</TooltipContent>
             </Tooltip>
           )}
 
@@ -249,22 +254,40 @@ export function MessageDisplay({
                 <div className="font-semibold">
                   {message.subject || t("no_subject")}
                 </div>
-                <div className="flex text-xs">
-                  <div className="font-medium mr-1">{t("common:to")}:</div>
+                <div className="flex text-xs gap-1">
+                  <div className="font-medium">{t("common:to")}:</div>
 
-                  {message.recipients.map((recipient) => (
+                  {message.recipients.map((recipient, index) => (
                     <div key={recipient.id}>
-                      {recipient?.name || recipient.phone}
+                      {recipient?.name ||
+                        recipient.phone +
+                          (index < message.recipients.length - 1 ? ", " : "")}
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-            {message.created_at && (
-              <div className="ml-auto text-xs text-muted-foreground">
-                {format(new Date(message.created_at), "PPpp")}
-              </div>
-            )}
+            <div className="flex flex-col ml-auto text-xs gap-1">
+              {message.created_at && (
+                <div className="text-muted-foreground">
+                  {t("common:created_on_date", {
+                    date: format(new Date(message.created_at), "PPpp"),
+                  })}
+                </div>
+              )}
+              {message.send_time && (
+                <div className="text-muted-foreground">
+                  {t(
+                    category === "SCHEDULED"
+                      ? "scheduled_for_date"
+                      : "sent_on_date",
+                    {
+                      date: format(new Date(message.send_time), "PPpp"),
+                    }
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           <Separator />
           <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
@@ -276,6 +299,28 @@ export function MessageDisplay({
           {t("none_selected")}
         </div>
       )}
+      {
+        // You can remove the message check if you want to, I like it better that this bottom bar only shows up on selection
+        category === "DRAFTS" && message && (
+          <>
+            <Separator className="mt-auto" />
+            <div className="flex px-4 py-2 justify-end gap-2">
+              <Button
+                variant="default"
+                type="button"
+                className="w-max"
+                disabled={!message}
+                onClick={() =>
+                  message ? router.push(`/new-message?draft=${message.id}`) : ""
+                }
+              >
+                <Edit className="h-4 w-4" />
+                {t("continue_draft")}
+              </Button>
+            </div>
+          </>
+        )
+      }
     </div>
   );
 }

@@ -48,7 +48,7 @@ export default function CreateContactFromRecipientModal({
 
   useEffect(() => {
     if (isMounted) {
-      toastActionResult(serverState);
+      toastActionResult(serverState, t);
 
       if (serverState.success) {
         onOpenChange(false);
