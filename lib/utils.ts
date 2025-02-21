@@ -9,6 +9,7 @@ import { NewRecipient } from "@/types/recipient";
 import { DBMessage } from "@/types";
 import { ActionResponse } from "@/types/action";
 import { toast } from "sonner";
+import { enUS, pt, de } from "date-fns/locale";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -185,4 +186,25 @@ export function getComplexObjectFromCookie(cookieName: string) {
 
 export function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export function getDateFnsLocale(i18nLocale: string) {
+  console.log("current locale passed to getDateLocale ufnction:", i18nLocale);
+
+  let dateFnsLocale;
+  switch (i18nLocale) {
+    case "pt":
+      dateFnsLocale = pt;
+      break;
+    case "en":
+      dateFnsLocale = enUS;
+      break;
+    case "de":
+      dateFnsLocale = de;
+      break;
+    default:
+      dateFnsLocale = pt;
+  }
+  if (!dateFnsLocale) throw new Error("Invalid locale passed in");
+  return dateFnsLocale;
 }

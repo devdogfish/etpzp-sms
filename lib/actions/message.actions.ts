@@ -143,6 +143,10 @@ export async function saveDraft(
       data.recipients.map((recipient) => recipient.phone)
     );
 
+    console.log("BEGIN IF block for saving draft... With this data:");
+    console.log(data);
+    
+    
     if (draftId) {
       console.log("Updating old draft...");
 

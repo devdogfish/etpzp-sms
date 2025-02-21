@@ -21,6 +21,7 @@ import { DBContact } from "@/types/contact";
 import { saveDraft } from "@/lib/actions/message.actions";
 import { useTranslation } from "react-i18next";
 import ProfilePic from "./profile-pic";
+import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
 
 export default function ContactDisplay({
   contact,
@@ -149,9 +150,10 @@ export default function ContactDisplay({
 
             {contact.created_at && (
               <div className="ml-auto text-xs text-muted-foreground">
-                {t("common:created_on_date", {
-                  date: format(new Date(contact.created_at), "PPpp"),
-                })}
+                {`${t("common:created_on")} ${format(
+                  new Date(contact.created_at),
+                  PORTUGUESE_DATE_FORMAT
+                )}`}
               </div>
             )}
           </div>

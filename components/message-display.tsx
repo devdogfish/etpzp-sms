@@ -33,6 +33,8 @@ import { usePathname, useRouter } from "next/navigation";
 import ProfilePic from "./profile-pic";
 import { DBRecipient } from "@/types/recipient";
 import { useTranslation } from "react-i18next";
+import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
+import { useEffect } from "react";
 
 export function MessageDisplay({
   message,
@@ -268,23 +270,9 @@ export function MessageDisplay({
               </div>
             </div>
             <div className="flex flex-col ml-auto text-xs gap-1">
-              {message.created_at && (
-                <div className="text-muted-foreground">
-                  {t("common:created_on_date", {
-                    date: format(new Date(message.created_at), "PPpp"),
-                  })}
-                </div>
-              )}
               {message.send_time && (
                 <div className="text-muted-foreground">
-                  {t(
-                    category === "SCHEDULED"
-                      ? "scheduled_for_date"
-                      : "sent_on_date",
-                    {
-                      date: format(new Date(message.send_time), "PPpp"),
-                    }
-                  )}
+                  {format(new Date(message.send_time), PORTUGUESE_DATE_FORMAT)}
                 </div>
               )}
             </div>

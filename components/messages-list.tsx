@@ -1,12 +1,13 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn, getDateFnsLocale } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ComponentProps } from "react";
 import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import { Badge } from "@/components/ui/badge";
 import type { DBMessage } from "@/types";
 import { useTranslation } from "react-i18next";
+import { pt } from "date-fns/locale";
 
 type MessageListProps = {
   messages: DBMessage[];
@@ -19,7 +20,7 @@ export function MessageList({
   selectedMessageId,
   setSelected,
 }: MessageListProps) {
-  const { t } = useTranslation(["messages-page"]);
+  const { t, i18n } = useTranslation(["messages-page"]);
   return (
     <ScrollArea className="h-[calc(100vh-var(--header-height)-68px)]">
       <div className="flex flex-col gap-2 p-4 pt-0">
@@ -54,9 +55,11 @@ export function MessageList({
                       : "text-muted-foreground"
                   )}
                 >
-                  {formatDistanceToNow(new Date(item.created_at), {
-                    addSuffix: true,
-                  })}
+                  {item.send_time &&
+                    formatDistanceToNow(new Date(item.send_time), {
+                      addSuffix: true,
+                      locale: getDateFnsLocale(i18n.language),
+                    })}
                 </div>
               </div>
               <div className="text-xs font-medium">{item.subject}</div>

@@ -27,7 +27,7 @@ export const MessageSchema = z.object({
   body: CustomString().min(1, "new-message-page:zod_error-body_empty"),
   sendDelay: z
     .number({ message: "new-message-page:zod_error-invalid_schedule_date" })
-    .positive({ message: "new-message-page:zod_error-negative_schedule_date" })
+    // .positive({ message: "new-message-page:zod_error-negative_schedule_date" })
     .optional(),
 });
 

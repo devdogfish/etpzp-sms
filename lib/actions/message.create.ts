@@ -111,6 +111,10 @@ export async function sendMessage(
 
     // -------- BEGIN DATABASE LOGIC --------
     if (typeof existingDraftId === "undefined" || !existingDraftId) {
+      console.log(
+        "The draftId is not defined, creating new message with INSERT query"
+      );
+
       // Insert new message and recipients
       await db(
         `
@@ -121,7 +125,7 @@ export async function sendMessage(
           )
           INSERT INTO recipient (message_id, contact_id, phone, index)
           SELECT 
-            insert_message.id, 
+            insert_message.id,
             unnest($8::int[]) as contact_id,
             unnest($9::text[]) as phone,
             unnest($10::int[]) as index
@@ -150,6 +154,11 @@ export async function sendMessage(
         ]
       );
     } else {
+      console.log(
+        "Updating existing message item with draftId: ",
+        existingDraftId
+      );
+
       // Update existing message record
       const result = await db(
         `

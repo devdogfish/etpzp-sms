@@ -52,6 +52,8 @@ import useIsMounted from "@/hooks/use-mounted";
 import CreateContactFromRecipientModal from "./modals/create-contact-from-recipient-modal";
 import CreateContactModal from "./modals/create-contact-modal";
 import { format } from "date-fns";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
 
 const initialState: ActionResponse<Message> = {
   success: false,
@@ -83,6 +85,7 @@ const NewMessageForm = React.memo(function ({
   const [serverState, setServerState] = useState(initialState);
   const { isFullscreen, setIsFullscreen } = useLayout();
   const pathname = usePathname();
+  const onMobile = useIsMobile();
 
   // focused state for all 4 inputs in the form to handle their hovering states when this gets refactored
   const [focused, setFocused] = useState([false, false, false, false]);
@@ -104,6 +107,7 @@ const NewMessageForm = React.memo(function ({
     e.preventDefault();
     setLoading(true);
     const formData = new FormData(e.currentTarget);
+    const existingDraftId = draftId;
     const result = await sendMessage(
       {
         sender: formData.get("sender") as string,
@@ -122,7 +126,10 @@ const NewMessageForm = React.memo(function ({
       // Message got sent successfully
       if (result.scheduledDate) {
         return toast.success(
-          t(result.message[0], { date: format(result.scheduledDate, "PPpp") })
+          `${t(result.message[0])} ${format(
+            new Date(result.scheduledDate),
+            PORTUGUESE_DATE_FORMAT
+          )}`
         );
       }
       toastActionResult(result, t);
@@ -209,24 +216,26 @@ const NewMessageForm = React.memo(function ({
       )}
 
       <PageHeader title={message.subject ? message.subject : t("header")}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              className="aspect-1 p-0"
-              onClick={() =>
-                setIsFullscreen((prevFullscreen) => !prevFullscreen)
-              }
-            >
-              {isFullscreen ? (
-                <Minimize2 className="h-4 w-4" />
-              ) : (
-                <Maximize2 className="h-4 w-4" />
-              )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{t("toggle_fullscreen")}</TooltipContent>
-        </Tooltip>
+        {!onMobile && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                className="aspect-1 p-0"
+                onClick={() =>
+                  setIsFullscreen((prevFullscreen) => !prevFullscreen)
+                }
+              >
+                {isFullscreen ? (
+                  <Minimize2 className="h-4 w-4" />
+                ) : (
+                  <Maximize2 className="h-4 w-4" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t("toggle_fullscreen")}</TooltipContent>
+          </Tooltip>
+        )}
 
         <Tooltip>
           <TooltipTrigger asChild>
