@@ -5,9 +5,7 @@ import { DBMessage, StatusEnums } from "@/types";
 import { getSession } from "../auth/sessions";
 import { NewRecipient } from "@/types/recipient";
 
-export async function fetchMessagesByStatus(
-  status: StatusEnums
-): Promise<DBMessage[] | undefined> {
+export async function fetchMessagesByStatus(status: StatusEnums) {
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -17,7 +15,14 @@ export async function fetchMessagesByStatus(
     const result = await db(
       `
         SELECT m.*, 
-              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone) ORDER BY r.index) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
+              COALESCE(
+                json_agg(
+                  json_build_object(
+                      'id', r.id, 
+                      'phone', r.phone
+                  ) ORDER BY r.phone -- Order by phone number numerically
+                ) FILTER (WHERE r.id IS NOT NULL), '[]'::json
+              ) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.status = $2 AND m.in_trash = false
@@ -27,11 +32,11 @@ export async function fetchMessagesByStatus(
       [userId, status]
     );
 
-    return result.rows;
+    return result.rows as DBMessage[];
   } catch (error) {}
 }
 
-export async function fetchSent(): Promise<DBMessage[] | undefined> {
+export async function fetchSent() {
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -40,25 +45,18 @@ export async function fetchSent(): Promise<DBMessage[] | undefined> {
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(
       `
-        SELECT 
-            m.*, 
-            COALESCE(
+        SELECT m.*, 
+              COALESCE(
                 json_agg(
-                    json_build_object(
-                        'id', r.id,
-                        'contact_id', r.contact_id,
-                        'name', c.name,           -- Added contact name
-                        'phone', r.phone,         -- The recipient phone
-                        'description', c.description  -- Added contact description
-                    ) ORDER BY r.index
+                  json_build_object(
+                      'id', r.id, 
+                      'phone', r.phone
+                  ) ORDER BY r.phone -- Order by phone number numerically
                 ) FILTER (WHERE r.id IS NOT NULL), '[]'::json
-            ) AS recipients
+              ) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
-        LEFT JOIN contact c ON r.contact_id = c.id
-        WHERE m.user_id = $1 
-          AND m.send_time < NOW() 
-          AND m.in_trash = false
+        WHERE m.user_id = $1 AND m.send_time < NOW() AND m.in_trash = false
         GROUP BY m.id
         ORDER BY m.created_at DESC;
       `,
@@ -66,11 +64,11 @@ export async function fetchSent(): Promise<DBMessage[] | undefined> {
     );
     console.log(result.rows);
 
-    return result.rows;
+    return result.rows as DBMessage[];
   } catch (error) {}
 }
 
-export async function fetchTrashedMessages(): Promise<DBMessage[] | undefined> {
+export async function fetchTrashedMessages() {
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -80,7 +78,14 @@ export async function fetchTrashedMessages(): Promise<DBMessage[] | undefined> {
     const result = await db(
       `
         SELECT m.*, 
-              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone) ORDER BY r.index) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
+              COALESCE(
+                json_agg(
+                  json_build_object(
+                      'id', r.id, 
+                      'phone', r.phone
+                  ) ORDER BY r.phone -- Order by phone number numerically
+                ) FILTER (WHERE r.id IS NOT NULL), '[]'::json
+              ) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.in_trash = true
@@ -91,13 +96,11 @@ export async function fetchTrashedMessages(): Promise<DBMessage[] | undefined> {
     );
 
     console.log(result.rows);
-    return result.rows;
+    return result.rows as DBMessage[];
   } catch (error) {}
 }
 
-export async function fetchCurrentlyScheduled(): Promise<
-  DBMessage[] | undefined
-> {
+export async function fetchCurrentlyScheduled() {
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -107,7 +110,14 @@ export async function fetchCurrentlyScheduled(): Promise<
     const result = await db(
       `
         SELECT m.*, 
-              COALESCE(json_agg(json_build_object('id', r.id, 'contact_id', r.contact_id, 'phone', r.phone) ORDER BY r.index) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
+              COALESCE(
+                json_agg(
+                  json_build_object(
+                      'id', r.id, 
+                      'phone', r.phone
+                  ) ORDER BY r.phone -- Order by phone number numerically
+                ) FILTER (WHERE r.id IS NOT NULL), '[]'::json
+              ) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.status = 'SCHEDULED' AND m.send_time > NOW()
@@ -118,44 +128,40 @@ export async function fetchCurrentlyScheduled(): Promise<
     );
 
     console.log(result.rows);
-    return result.rows;
+    return result.rows as DBMessage[];
   } catch (error) {}
 }
 
-export async function fetchDraft(
-  id: string
-): Promise<(DBMessage & { recipients: NewRecipient[] }) | undefined> {
+export async function fetchDraft(id: string) {
   const session = await getSession();
   const userId = session?.user?.id;
 
   try {
-    if (!id) throw new Error("ID passed to fetchDraft was invalid!!!");
-    if (!userId) throw new Error("Invalid user id.");
+    if (!id) throw new Error("Invalid draft ID");
+    if (!userId) throw new Error("Invalid user id");
 
     const result = await db(
       `
-        -- Select the message fields, along with an array of recipients
-        SELECT m.*, 
-              COALESCE(json_agg(json_build_object(
-                  'phone', r.phone,
-                  'error', NULL,  -- Assuming no error handling is needed here
-                  'contactId', c.id,
-                  'contactName', c.name,
-                  'contactDescription', c.description
-              ) ORDER BY r.index) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS recipients
+       SELECT m.*, 
+              COALESCE(
+                json_agg(
+                  json_build_object(
+                      'id', r.id, 
+                      'phone', r.phone
+                  ) ORDER BY r.phone -- Order by phone number numerically
+                ) FILTER (WHERE r.id IS NOT NULL), '[]'::json
+              ) AS recipients
         FROM message m
-        -- Left join the recipient table to get all recipients for the message
         LEFT JOIN recipient r ON m.id = r.message_id
-        -- Left join the contact table to get contact details
-        LEFT JOIN contact c ON r.contact_id = c.id
         WHERE m.user_id = $1 AND m.id = $2 AND m.status = 'DRAFTED'
-        -- Group the results by message id and order by creation time
         GROUP BY m.id
         ORDER BY m.created_at DESC;
       `,
       [userId, id]
     );
+    console.log("draft fetch result");
+    console.log(result.rows[0]);
 
-    return result.rows[0];
+    return result.rows[0] as DBMessage & { recipients: NewRecipient[] };
   } catch (error) {}
 }

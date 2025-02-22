@@ -1,18 +1,8 @@
-import MessagesPageSkeleton from "@/components/messages-page-skeleton";
 import MessagesPage from "@/components/messages-page";
 import { fetchCurrentlyScheduled } from "@/lib/db/message";
-import { Suspense } from "react";
 import { fetchError } from "@/lib/db";
 
-export default function Page() {
-  return (
-    <Suspense fallback={<MessagesPageSkeleton category="SCHEDULED" />}>
-      <ScheduledMessagesPage />
-    </Suspense>
-  );
-}
-
-export async function ScheduledMessagesPage() {
+export default async function Page() {
   const messages = await fetchCurrentlyScheduled();
 
   return (

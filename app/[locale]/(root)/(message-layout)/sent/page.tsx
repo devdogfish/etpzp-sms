@@ -1,18 +1,8 @@
-import MessagesPageSkeleton from "@/components/messages-page-skeleton";
 import MessagesPage from "@/components/messages-page";
 import { fetchSent } from "@/lib/db/message";
-import { Suspense } from "react";
 import { fetchError } from "@/lib/db";
 
-export default function Page() {
-  return (
-    <Suspense fallback={<MessagesPageSkeleton category="SENT" />}>
-      <SentMessagesPage />
-    </Suspense>
-  );
-}
-
-export async function SentMessagesPage() {
+export default async function Page() {
   const messages = await fetchSent();
 
   return (
