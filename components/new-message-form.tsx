@@ -62,11 +62,9 @@ const initialState: ActionResponse<Message> = {
 
 const NewMessageForm = React.memo(function ({
   contacts,
-  error,
   draft,
 }: {
   contacts: DBContact[];
-  error: string;
   draft?: DBMessage;
 }) {
   const formRef = useRef<HTMLFormElement>(null);

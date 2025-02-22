@@ -5,7 +5,11 @@ import parsePhoneNumber, {
 } from "libphonenumber-js";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { NewRecipient } from "@/types/recipient";
+import {
+  DBRecipient,
+  NewRecipient,
+  RecipientWithContact,
+} from "@/types/recipient";
 import { DBMessage } from "@/types";
 import { ActionResponse } from "@/types/action";
 import { toast } from "sonner";
@@ -207,4 +211,54 @@ export function getDateFnsLocale(i18nLocale: string) {
   }
   if (!dateFnsLocale) throw new Error("Invalid locale passed in");
   return dateFnsLocale;
+}
+
+export function matchContactsToRecipients(
+  rawRecipients: DBRecipient[],
+  contacts: DBContact[]
+) {
+  // Return recipients if no data to filter
+  if (!rawRecipients.length || !contacts.length)
+    return rawRecipients as RecipientWithContact[];
+
+  return rawRecipients.map((recipient) => ({
+    ...recipient,
+    contact: contacts.find((contact) => contact.phone === recipient.phone),
+  })) as RecipientWithContact[];
+}
+
+export function rankRecipients(
+  data: (RecipientWithContact & { last_used: Date })[]
+) {
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+  const processedData = data.reduce((acc, item) => {
+    if (!acc[item.phone]) {
+      acc[item.phone] = {
+        id: item.id,
+        phone: item.phone,
+        usage_count: 0,
+      };
+    }
+
+    if (new Date(item.last_used) >= oneWeekAgo) {
+      acc[item.phone].usage_count++;
+    }
+
+    return acc;
+  }, {} as Record<string, RecipientWithContact & { usage_count: number }>);
+
+  return Object.values(processedData).sort((a, b) => {
+    // Sort by usage count (descending)
+    if (b.usage_count !== a.usage_count) {
+      return b.usage_count - a.usage_count;
+    }
+    // Sort by whether they have contact info
+    if (!!b.contact !== !!a.contact) {
+      return b.contact ? 1 : -1;
+    }
+    // Sort alphabetically by contact name or phone
+    return (a.contact?.id || a.phone).localeCompare(b.contact?.id || b.phone);
+  });
 }

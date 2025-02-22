@@ -11,18 +11,20 @@ export type NewRecipient = {
 };
 
 // Processed recipient - once it ran through the function
-export type DBContactRecipient = {
+export type RecipientWithContact = {
   id: string;
   phone: string;
 
-  // if it is a contact
-  contact_id: string | null;
-  contact_name: string | null;
-  contact_description: string | null;
+  contact?: {
+    id: string;
+    name?: string;
+    phone: string;
+    description?: string;
+  };
 };
 
 // No joins - normal query directly from the DB
 export type DBRecipient = {
-  id: number;
+  id: string;
   phone: string;
 };

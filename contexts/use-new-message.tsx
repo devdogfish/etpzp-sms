@@ -12,10 +12,15 @@ import {
 import { toast } from "sonner";
 import type { Message } from "@/types";
 import type { DBContact } from "@/types/contact";
-import type { DBContactRecipient, NewRecipient } from "@/types/recipient";
+import type {
+  DBRecipient,
+  NewRecipient,
+  RecipientWithContact,
+} from "@/types/recipient";
 import {
   convertToRecipient,
-  generateUniqueId,
+  matchContactsToRecipients,
+  rankRecipients,
   validatePhoneNumber,
 } from "@/lib/utils";
 
@@ -34,8 +39,8 @@ type MessageContextValues = {
   getValidatedRecipient: (recipient: NewRecipient) => NewRecipient;
 
   // Recipient search and suggestions
-  searchedRecipients: DBContactRecipient[];
   searchRecipients: (searchTerm: string) => void;
+  suggestedRecipients: RecipientWithContact[];
 
   // UI state
   moreInfoOn: NewRecipient | null;
@@ -50,72 +55,79 @@ type MessageContextValues = {
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
 
-type ProviderProps = {
-  suggestedRecipients: {
-    all: DBContactRecipient[];
-    alphabetical: DBContactRecipient[];
-    mostUsed: DBContactRecipient[];
-  };
-  allContacts: DBContact[];
+type ContextProps = {
   children: React.ReactNode;
-
-  defaultMessage: Message;
+  fetchedContacts: DBContact[];
+  fetchedRecipients: DBRecipient[];
+  initialMessage: Message;
 };
 
 export function NewMessageProvider({
-  suggestedRecipients,
-  allContacts,
+  fetchedContacts,
+  fetchedRecipients,
   children,
-  defaultMessage,
-}: ProviderProps) {
+  initialMessage,
+}: ContextProps) {
   // Message state
-  const [message, setMessage] = useState<Message>(
-    defaultMessage || {
-      sender: "ETPZP",
-      recipients: [],
-      subject: "",
-      body: "",
-      sendDelay: 0,
-    }
-  );
+  const [message, setMessage] = useState<Message>(initialMessage);
   // draft id saved here, so that it is persisted on revalidation.
   const [draftId, setDraftId] = useState<string>();
+  const recipients =
+    // Associate contacts with matching phone numbers  to recipients
+    matchContactsToRecipients(fetchedRecipients, fetchedContacts) || [];
 
   // UI state
   const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
   const [selectedPhone, setSelectedPhone] = useState<string | undefined>();
-  const [searchedRecipients, setSearchedRecipients] = useState<
-    DBContactRecipient[]
-  >([]);
+  const [suggestedRecipients, setSuggestedRecipients] = useState(recipients);
 
+  const usageRankedRecipients = rankRecipients(
+    recipients as (RecipientWithContact & { last_used: Date })[]
+  );
   // Memoized values
-  const recommendedRecipients: DBContactRecipient[] = useMemo(() => {
+  const recommendedRecipients: RecipientWithContact[] = useMemo(() => {
     // adjust this to your liking
     const AMOUNT = 5;
-    const topRecipients = suggestedRecipients.mostUsed.slice(0, AMOUNT);
-    const remainingCount = AMOUNT - topRecipients.length;
+    const topRecipients = usageRankedRecipients.slice(0, AMOUNT);
 
-    if (remainingCount <= 0) return topRecipients;
+    if (topRecipients.length === AMOUNT) {
+      // Check if there are enough topRecipients
+      return matchContactsToRecipients(topRecipients, fetchedContacts);
+    } else {
+      // If not look for unused contacts to fill the gap
+      const extraContacts = fetchedContacts
+        // 1. Filter out the ones that already exist in the top recipients
+        .filter(
+          (contact) => !topRecipients.some((top) => top.phone === contact.phone)
+        )
+        // 2. Get only the extra ones we need to fill the gap
+        .slice(0, AMOUNT - topRecipients.length)
+        // 3. Adjust the contacts to match the other recipients in the array
+        .map(({ id, phone, name, description }) => ({
+          id,
+          phone,
+          contact: {
+            id,
+            name,
+            phone,
+            description,
+          },
+        }));
 
-    const additionalRecipients = allContacts
-      .filter(
-        (contact) => !topRecipients.some((top) => top.contact_id === contact.id)
-      )
-      .slice(0, remainingCount)
-      .map(({ id, phone, name, description }) => ({
-        id,
-        phone,
-        contact_id: id,
-        contact_name: name,
-        contact_description: description || null,
-      }));
+      console.log(`Recommended recipients in suggested:`);
+      console.log([...topRecipients, ...extraContacts]);
 
-    return [...topRecipients, ...additionalRecipients];
-  }, [suggestedRecipients.mostUsed, allContacts]);
+      return matchContactsToRecipients(
+        [...topRecipients, ...extraContacts],
+        fetchedContacts
+      ) as RecipientWithContact[];
+    }
+    // TODO: These re-rendering conditions need to be checked
+  }, [fetchedContacts]);
 
   // Helper functions
   const getUniques = useCallback(
-    (newRecipients: DBContactRecipient[]): DBContactRecipient[] => {
+    (newRecipients: RecipientWithContact[]): RecipientWithContact[] => {
       return newRecipients.filter(
         (recipient) =>
           !message.recipients.some((r) => r.phone === recipient.phone)
@@ -158,15 +170,15 @@ export function NewMessageProvider({
         };
       });
 
-      // Immediately update searchedRecipients
-      setSearchedRecipients((prevSearched) =>
+      // Immediately update suggestedRecipients
+      setSuggestedRecipients((prevSearched) =>
         getUniques(prevSearched.filter((r) => r.phone !== phone))
       );
 
       // Update selectedPhone to the next available recipient
       setSelectedPhone((prevSelected) => {
         if (prevSelected === phone) {
-          const nextRecipient = searchedRecipients.find(
+          const nextRecipient = suggestedRecipients.find(
             (r) => r.phone !== phone
           );
           return nextRecipient ? nextRecipient.phone : undefined;
@@ -174,7 +186,7 @@ export function NewMessageProvider({
         return prevSelected;
       });
     },
-    [message.recipients, getValidatedRecipient, searchedRecipients, getUniques]
+    [message.recipients, getValidatedRecipient, suggestedRecipients, getUniques]
   );
 
   const removeRecipient = useCallback(
@@ -194,19 +206,19 @@ export function NewMessageProvider({
   const searchRecipients = (rawSearchTerm: string) => {
     const searchTerm = rawSearchTerm.trim().toLowerCase();
 
-    if (searchTerm.length && suggestedRecipients.all.length) {
+    if (searchTerm.length && suggestedRecipients.length) {
       const filteredRecipients = getUniques(
-        suggestedRecipients.all.filter(
+        suggestedRecipients.filter(
           (recipient) =>
-            (recipient.contact_name?.toLowerCase().includes(searchTerm) ||
+            (recipient.contact?.name?.toLowerCase().includes(searchTerm) ||
               recipient.phone.toLowerCase().includes(searchTerm)) &&
             !message.recipients.some((r) => r.phone === recipient.phone)
         )
       );
-      setSearchedRecipients(filteredRecipients);
+      setSuggestedRecipients(filteredRecipients);
       setSelectedPhone(filteredRecipients[0]?.phone);
     } else {
-      setSearchedRecipients(getUniques(recommendedRecipients));
+      setSuggestedRecipients(getUniques(recommendedRecipients));
       setSelectedPhone(recommendedRecipients[0]?.phone);
     }
   };
@@ -215,59 +227,39 @@ export function NewMessageProvider({
   const updateSelectedPhone = useCallback(
     (input: "ArrowDown" | "ArrowUp") => {
       setSelectedPhone((prevPhone) => {
-        const currentIndex = searchedRecipients.findIndex(
+        const currentIndex = suggestedRecipients.findIndex(
           (item) => item.phone === prevPhone
         );
-        const length = searchedRecipients.length;
+        const length = suggestedRecipients.length;
         const newIndex =
           input === "ArrowUp"
             ? (currentIndex - 1 + length) % length
             : (currentIndex + 1) % length;
-        return searchedRecipients[newIndex]?.phone;
+        return suggestedRecipients[newIndex]?.phone;
       });
     },
-    [searchedRecipients]
+    [suggestedRecipients]
   );
 
-  // DEBUG
-  // useEffect(() => {
-  //   console.log(`draftId changed ${draftId}`);
-  // }, [draftId]);
-
-  // Context value
-  const contextValue = useMemo(
-    () => ({
-      message,
-      setMessage,
-      recipients: message.recipients,
-      addRecipient,
-      removeRecipient,
-      searchedRecipients,
-      searchRecipients,
-      getValidatedRecipient,
-      moreInfoOn,
-      setMoreInfoOn,
-      selectedPhone,
-      updateSelectedPhone,
-      draftId,
-      setDraftId,
-    }),
-    [
-      message,
-      addRecipient,
-      removeRecipient,
-      searchedRecipients,
-      searchRecipients,
-      getValidatedRecipient,
-      moreInfoOn,
-      selectedPhone,
-      updateSelectedPhone,
-      draftId,
-      setDraftId,
-    ]
-  );
   return (
-    <NewMessageContext.Provider value={contextValue}>
+    <NewMessageContext.Provider
+      value={{
+        message,
+        setMessage,
+        recipients: message.recipients,
+        addRecipient,
+        removeRecipient,
+        suggestedRecipients,
+        searchRecipients,
+        getValidatedRecipient,
+        moreInfoOn,
+        setMoreInfoOn,
+        selectedPhone,
+        updateSelectedPhone,
+        draftId,
+        setDraftId,
+      }}
+    >
       {children}
     </NewMessageContext.Provider>
   );

@@ -132,7 +132,7 @@ export async function fetchCurrentlyScheduled() {
   } catch (error) {}
 }
 
-export async function fetchDraft(id: string) {
+export async function fetchDraft(id?: string) {
   const session = await getSession();
   const userId = session?.user?.id;
 

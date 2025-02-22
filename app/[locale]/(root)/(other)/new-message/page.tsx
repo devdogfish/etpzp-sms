@@ -3,89 +3,44 @@ import { NewMessageProvider } from "@/contexts/use-new-message";
 import { fetchContacts } from "@/lib/db/contact";
 import { fetchError } from "@/lib/db";
 import { fetchRecipients } from "@/lib/db/recipients";
-import { getProcessedRecipients } from "@/lib/recipients.filters";
 import { fetchDraft } from "@/lib/db/message";
-import { Suspense } from "react";
-import { validatePhoneNumber } from "@/lib/utils";
+import { matchContactsToRecipients, validatePhoneNumber } from "@/lib/utils";
 
-const EMPTY_MESSAGE = {
+type NewMessagePageProps = {
+  params: Promise<{ draft: string }>;
+};
+export const EMPTY_MESSAGE = {
   body: "",
   subject: undefined,
   sender: "ETPZP",
   recipients: [],
+  sendDelay: undefined,
 };
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: { draft: string };
-}) {
-  return (
-    <Suspense fallback={"...Loading"}>
-      <PageFetcher searchParams={await searchParams} />
-    </Suspense>
-  );
-}
-
-export async function PageFetcher({
-  searchParams,
-}: {
-  searchParams: { draft: string | undefined };
-}) {
+export default async function Page({ params }: NewMessagePageProps) {
   const contacts = await fetchContacts();
-  const recipientsResult = await fetchRecipients();
-  const { alphabetical, mostUsed } = getProcessedRecipients(
-    recipientsResult || []
-  );
-  console.log("refetching draft in new-message-page fetcher");
+  const rawRecipients = await fetchRecipients();
 
-  const draft = searchParams.draft
-    ? await fetchDraft(searchParams.draft)
-    : undefined;
+  // const { draft } = await params;
+  const draft = "3";
+  const fetchedDraft = await fetchDraft(draft);
 
   return (
     <NewMessageProvider
-      suggestedRecipients={{
-        all: contacts?.length
-          ? [
-              // All existing recipients..
-              ...alphabetical,
-              // plus the contacts that have never been used inside a message..
-              ...contacts
-                .filter(
-                  (contact) =>
-                    !alphabetical.some((a) => a.phone === contact.phone)
-                )
-                // converted the DBContactRecipient type.
-                .map((contact) => ({
-                  id: contact.id,
-                  phone: contact.phone,
-                  contact_id: contact.id,
-                  contact_name: contact.name,
-                  contact_description: contact.description || null,
-                })),
-            ]
-          : alphabetical,
-        alphabetical,
-        mostUsed,
-      }}
-      allContacts={contacts || []}
-      defaultMessage={{
-        body: draft?.body || EMPTY_MESSAGE.body,
-        subject: draft?.subject || EMPTY_MESSAGE.subject,
-        sender: draft?.sender || EMPTY_MESSAGE.sender,
+      fetchedRecipients={rawRecipients || []}
+      fetchedContacts={contacts || []}
+      initialMessage={{
+        body: fetchedDraft?.body || EMPTY_MESSAGE.body,
+        subject: fetchedDraft?.subject || EMPTY_MESSAGE.subject,
+        sender: fetchedDraft?.sender || EMPTY_MESSAGE.sender,
         recipients:
-          draft?.recipients.map((r) => ({
+          fetchedDraft?.recipients.map((r) => ({
             ...r,
             error: validatePhoneNumber(r.phone),
             formattedPhone: validatePhoneNumber(r.phone).formattedPhone,
           })) || EMPTY_MESSAGE.recipients,
       }}
     >
-      <NewMessageForm
-        contacts={contacts || []}
-        error={fetchError("contacts", !contacts)}
-        draft={draft}
-      />
+      <NewMessageForm contacts={contacts || []} draft={fetchedDraft} />
     </NewMessageProvider>
   );
 }

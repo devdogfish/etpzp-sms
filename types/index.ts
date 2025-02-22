@@ -15,15 +15,6 @@ export type StringBoolMap = { [key: string]: boolean };
 export type Message = z.infer<typeof MessageSchema> & {
   recipients: NewRecipient[];
 };
-// {
-//   // new Message
-//   id?: string;
-//   sender: string;
-//   recipients: NewRecipient[];
-//   subject: string;
-//   body: string;
-//   sendDelay?: number;
-// };
 
 export type DBMessage = {
   id: string;

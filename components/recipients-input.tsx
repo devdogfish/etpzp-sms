@@ -48,10 +48,8 @@ export default function RecipientsInput({
     recipients,
     addRecipient,
     removeRecipient,
-    searchedRecipients,
+    suggestedRecipients,
     searchRecipients,
-    setMessage,
-    getValidatedRecipient,
     setMoreInfoOn,
     selectedPhone,
     updateSelectedPhone,
@@ -211,7 +209,7 @@ export default function RecipientsInput({
               }}
             />
 
-            {isDropdownOpen && searchedRecipients.length !== 0 && (
+            {isDropdownOpen && suggestedRecipients.length !== 0 && (
               <div className="absolute top-[85%] bg-background border rounded-lg">
                 <ScrollArea className="w-[300px] h-[330px]">
                   <div
@@ -223,7 +221,7 @@ export default function RecipientsInput({
                         : "Search results"}
                     </h3>
                     <div className="flex flex-col gap-1">
-                      {searchedRecipients.map((recipient) => (
+                      {suggestedRecipients.map((recipient) => (
                         <button
                           key={recipient.phone}
                           className={cn(
@@ -244,16 +242,16 @@ export default function RecipientsInput({
                           }}
                         >
                           <ProfilePic
-                            name={recipient.contact_name || undefined}
+                            name={recipient.contact?.name || undefined}
                             size={10}
                             fill={false}
                           />
                           <div className="space-y-1">
                             <div className="font-semibold">
-                              {recipient.contact_name || recipient.phone}
+                              {recipient.contact?.name || recipient.phone}
                             </div>
                             <div className="text-xs font-medium">
-                              {recipient.contact_name ? recipient.phone : ""}
+                              {recipient.contact?.name ? recipient.phone : ""}
                             </div>
                           </div>
                         </button>

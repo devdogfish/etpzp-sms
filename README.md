@@ -18,8 +18,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## TODO
 
-DO THIS NEXT: 2. Edit the message.create to create a message by updating the existing draft by binding the function with the draftId
-
 0. Instead of calling revalidatePath("/"), create a function to for the amountIndicators to only refetch them. This will keep all the components from getting refreshed
 1. Check if all the `revalidation` in actions is correctly placed and in working order
 2. Add checks on /new-message to only save the draft if the message is not equal to a empty message in that case
