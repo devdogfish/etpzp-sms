@@ -62,7 +62,6 @@ export function MessageList({
                     })}
                 </div>
               </div>
-              <div className="text-xs font-medium">{item.subject}</div>
             </div>
             <div className="line-clamp-2 text-xs text-muted-foreground">
               {item.body.substring(0, 300)}

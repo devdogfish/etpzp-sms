@@ -13,7 +13,12 @@ import { revalidatePath } from "next/cache";
 export async function sendMessage(
   data: Message,
   existingDraftId: string | undefined
-): Promise<ActionResponse<Message> & { scheduledDate?: Date }> {
+): Promise<
+  ActionResponse<Message> & {
+    scheduledDate?: Date;
+    invalidRecipients?: NewRecipient[];
+  }
+> {
   // 1. Check authentication
   const { isAuthenticated, user } = await getSession();
   const userId = user?.id;
@@ -48,11 +53,8 @@ export async function sendMessage(
   if (!validRecipients.length && invalidRecipients.length) {
     return {
       success: false,
-      message: [
-        `new-message-page:server-invalid_phone_numbers_error ${invalidRecipients
-          .map((r) => r.phone)
-          .join(", ")}`,
-      ],
+      message: [`new-message-page:server-invalid_phone_numbers_error`],
+      invalidRecipients,
     };
   }
 
@@ -201,15 +203,13 @@ export async function sendMessage(
       // check if for this query I can use VALUES isntead of SELECT
       await db(
         `
-        INSERT INTO recipient (message_id, contact_id, phone, index)
+        INSERT INTO recipient (message_id, phone, index)
         SELECT $1, 
-               unnest($2::int[]), 
-               unnest($3::text[]), 
-               unnest($4::int[])
+          unnest($2::text[]), 
+          unnest($3::int[])
         `,
         [
           existingDraftId,
-          validRecipients.map((r) => r.contactId || null),
           validRecipients.map((r) => r.phone),
           validRecipients.map((_, index) => index),
         ]

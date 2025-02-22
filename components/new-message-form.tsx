@@ -137,6 +137,7 @@ const NewMessageForm = React.memo(function ({
       formRef.current?.reset();
       setMessage((prev) => ({ ...prev, recipients: [] }));
     } else {
+      // Display input specific error messages
       const zodErrors = result.errors || {};
       let waitTime = 0;
       const inBetweenTime = 300;
@@ -149,8 +150,18 @@ const NewMessageForm = React.memo(function ({
             waitTime += index * inBetweenTime;
           }, index * inBetweenTime) // Increase delay by 50ms for each error
       );
+
+      // Display the general error message
       setTimeout(() => {
-        toastActionResult(result, t);
+        if (result.invalidRecipients) {
+          toast.error(
+            `${t(result.message)} ${result.invalidRecipients
+              .map((r) => r.phone)
+              .join(", ")}`
+          );
+        } else {
+          toastActionResult(result, t);
+        }
       }, Object.entries(zodErrors).length * inBetweenTime);
     }
   };

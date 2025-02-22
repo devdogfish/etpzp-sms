@@ -148,14 +148,13 @@ export async function fetchDraft(id: string) {
                   json_build_object(
                       'id', r.id, 
                       'phone', r.phone
-                  ) ORDER BY r.phone -- Order by phone number numerically
+                  ) ORDER BY r.index -- Order by phone number numerically
                 ) FILTER (WHERE r.id IS NOT NULL), '[]'::json
               ) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
         WHERE m.user_id = $1 AND m.id = $2 AND m.status = 'DRAFTED'
-        GROUP BY m.id
-        ORDER BY m.created_at DESC;
+        GROUP BY m.id;
       `,
       [userId, id]
     );

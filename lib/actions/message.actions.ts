@@ -20,7 +20,11 @@ export async function toggleTrash(
   try {
     if (!userId) throw new Error("Invalid user id.");
     await db(
-      "UPDATE message SET in_trash = $1 WHERE user_id = $2 AND id = $3 RETURNING *",
+      `
+        UPDATE message
+        SET in_trash = $1 
+        WHERE user_id = $2 AND id = $3;
+      `,
       [inTrash, userId, id]
     );
 
@@ -57,7 +61,9 @@ export async function deleteMessage(
   try {
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(
-      "DELETE FROM message WHERE user_id = $1 AND id = $2",
+      `
+        DELETE FROM message WHERE user_id = $1 AND id = $2
+      `,
       [userId, id]
     );
 
@@ -93,14 +99,12 @@ export async function cancelCurrentlyScheduled(
         },
       }
     );
+    const response = await networkResponse.json();
 
     console.log(networkResponse);
-
-    console.log(await networkResponse.json());
+    console.log(response);
 
     if (!networkResponse.ok) {
-      console.log(JSON.stringify(await networkResponse.json()));
-
       throw new Error(
         "Network response was not ok " + networkResponse?.statusText
       );
@@ -108,9 +112,9 @@ export async function cancelCurrentlyScheduled(
 
     const result = await db(
       `
-      UPDATE message 
-      SET status = 'FAILED', failure_reason = 'The scheduled message was canceled by the user.' 
-      WHERE user_id = $1 AND sms_reference_id = $2
+        UPDATE message
+        SET status = 'FAILED', failure_reason = 'The scheduled message was canceled by the user.' 
+        WHERE user_id = $1 AND sms_reference_id = $2
       `,
       [userId, sms_reference_id]
     );
@@ -145,8 +149,7 @@ export async function saveDraft(
 
     console.log("BEGIN IF block for saving draft... With this data:");
     console.log(data);
-    
-    
+
     if (draftId) {
       console.log("Updating old draft...");
 
@@ -159,15 +162,14 @@ export async function saveDraft(
         `
             WITH insert_message AS (
               UPDATE message SET subject = $3, body = $4, sender = $5 WHERE id = $2 AND user_id = $1
-              RETURNING *
+              RETURNING id
             ),
             insert_recipients AS (
-              INSERT INTO recipient (message_id, contact_id, phone, index)
+              INSERT INTO recipient (message_id,  phone, index)
               SELECT
                 insert_message.id, 
-                unnest($6::int[]) as contact_id,
-                unnest($7::text[]) as phone,
-                unnest($8::int[]) as index
+                unnest($6::text[]) as phone,
+                unnest($7::int[]) as index
               FROM insert_message
             )
             SELECT * FROM insert_message
@@ -179,8 +181,7 @@ export async function saveDraft(
           data.body,
           data.sender,
 
-          // Recipients / contacts
-          data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
+          // Recipients
           data.recipients.map((recipient) => recipient.phone), // phone number array
           data.recipients.map((_, index) => index), // for the ordering of the recipient
         ]
@@ -197,12 +198,11 @@ export async function saveDraft(
             RETURNING id
           ),
           insert_recipients AS (
-            INSERT INTO recipient (message_id, contact_id, phone, index)
+            INSERT INTO recipient (message_id, phone, index)
             SELECT 
               insert_message.id, 
-              unnest($6::int[]) as contact_id,
-              unnest($7::text[]) as phone,
-              unnest($8::int[]) as index
+              unnest($6::text[]) as phone,
+              unnest($7::int[]) as index
             FROM insert_message
           )
           SELECT id FROM insert_message
@@ -214,10 +214,9 @@ export async function saveDraft(
           data.sender,
           "DRAFTED",
 
-          // Recipients / contacts
-          data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
+          // Recipients
           data.recipients.map((recipient) => recipient.phone), // phone number array
-          data.recipients.map((_, index) => index), // for the ordering of the recipient
+          data.recipients.map((_, index) => index), // for persisting the user specified recipient order
         ]
       );
     }
