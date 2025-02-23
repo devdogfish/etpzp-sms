@@ -18,6 +18,7 @@ import { Button } from "./ui/button";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { DBContact } from "@/types/contact";
 import CreateContactModal from "./modals/create-contact-modal";
+import useIsMounted from "@/hooks/use-mounted";
 
 export default function ContactsPage({
   contacts,
@@ -29,11 +30,13 @@ export default function ContactsPage({
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation(["contacts-page"]);
   const [filteredContacts, setFilteredContacts] = useState(contacts);
+  const onMobile = useIsMobile();
+  const isMounted = useIsMounted();
+
   const [selected, setSelected] = useState<DBContact | null>(
     filteredContacts[0] || null
   );
 
-  const onMobile = useIsMobile();
   const searchParams = useSearchParams();
 
   const onSearch = () => {
@@ -49,13 +52,14 @@ export default function ContactsPage({
       // If the selected contact is not in the new messages, select the first contact or handle accordingly
       setSelected(contacts[0] || null);
     }
-
-    // setSelected((prev) => {
-    //   if (prev !== null)
-    //     return contacts.find((contact) => contact.id == prev.id) || null;
-    //   else return null;
-    // });
   }, [contacts]);
+
+  useEffect(() => {
+    if (isMounted && onMobile) {
+      // On mobile, it should show the list by default without having the first one selected like on desktop.
+      setSelected(null);
+    }
+  }, [isMounted]);
 
   const { setModal } = useContactModals();
   const showCreateModal = () => setModal((prev) => ({ ...prev, create: true }));

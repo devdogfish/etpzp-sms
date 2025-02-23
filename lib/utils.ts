@@ -136,9 +136,12 @@ export function convertToRecipient(contact: DBContact): NewRecipient {
   const { id, name, phone, description } = contact;
   return {
     phone,
-    contactId: id,
-    contactName: name,
-    contactDescription: description,
+    contact: {
+      id,
+      name,
+      phone,
+      description,
+    },
   };
 }
 

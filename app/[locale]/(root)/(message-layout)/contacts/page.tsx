@@ -1,5 +1,4 @@
 import ContactsPage from "@/components/contacts-page";
-import CreateContactModal from "@/components/modals/create-contact-modal";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 import { fetchContacts } from "@/lib/db/contact";
 import { fetchError } from "@/lib/db";

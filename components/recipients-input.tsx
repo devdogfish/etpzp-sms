@@ -32,9 +32,13 @@ React.memo(RecipientsInput);
 export default function RecipientsInput({
   contacts,
   error,
+  onFocus,
+  onBlur,
 }: {
   contacts: DBContact[];
   error?: boolean;
+  onFocus: () => void;
+  onBlur: () => void;
 }) {
   const [input, setInput] = useState<InputState>({
     value: "",
@@ -185,6 +189,8 @@ export default function RecipientsInput({
             )} /* we are taking advantage of the default positioning of absolute elements this common parent div */
           >
             <Input
+              // this name only used for the focus state, not for submitting any value
+              name="new-recipient"
               className={cn(
                 "h-full my-0.5 w-full p-0 ring-0 focus:ring-0 shadow-none rounded-none placeholder:text-muted-foreground"
               )}
@@ -199,6 +205,7 @@ export default function RecipientsInput({
                 }));
                 setIsDropdownOpen(true);
                 searchRecipients(input.value);
+                onFocus();
               }}
               onBlur={() => {
                 setInput((prevInput) => ({
@@ -206,6 +213,7 @@ export default function RecipientsInput({
                   isFocused: false,
                 }));
                 setIsDropdownOpen(false);
+                onBlur();
               }}
             />
 

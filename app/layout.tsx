@@ -67,7 +67,7 @@ export default async function RootLayout({
               <LayoutProvider
                 initialLayout={initialLayout}
                 initialIsCollapsed={initialIsCollapsed}
-                amountIndicators={amountIndicators}
+                initialAmountIndicators={amountIndicators}
               >
                 <Toaster richColors position="top-center" />
                 {children}

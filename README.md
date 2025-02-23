@@ -18,8 +18,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## TODO
 
-0. Instead of calling revalidatePath("/"), create a function to for the amountIndicators to only refetch them. This will keep all the components from getting refreshed
-1. Check if all the `revalidation` in actions is correctly placed and in working order
 2. Add checks on /new-message to only save the draft if the message is not equal to a empty message in that case
 
 - MESSAGE DISPLAY: Update the message display to look nicer and actually display stuff in the correct manner
@@ -33,9 +31,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - SCHEDULED MESSAGES: - For scheduled messages, it would be better to do polling WHEN THE USER LOGS IN because when our server is not running we might loose callbacks
   - Create a separate thread to get the delivery status while loading everything else
 
-## Bugs
-
-- On `/new-message`, some times the default values don't get filled correctly.
 
 ## If there is extra time (after deployment in school)
 

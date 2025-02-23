@@ -34,7 +34,8 @@ import ProfilePic from "./profile-pic";
 import { DBRecipient } from "@/types/recipient";
 import { useTranslation } from "react-i18next";
 import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useContacts } from "@/contexts/use-contacts";
 
 export function MessageDisplay({
   message,
@@ -50,6 +51,7 @@ export function MessageDisplay({
   const router = useRouter();
   const { t } = useTranslation(["messages-page"]);
   const pathname = usePathname();
+  const { contacts } = useContacts();
 
   const handleTrashButtonClick = async () => {
     if (message) {
@@ -75,7 +77,6 @@ export function MessageDisplay({
         // convert DBRecipient to NewRecipient
         recipients: message.recipients.map((r) => ({
           phone: r.phone,
-          contactId: r.contact_id?.toString(),
         })),
       });
 
@@ -250,7 +251,12 @@ export function MessageDisplay({
                   console.log("more than 3 recipients");
                   return;
                 }
-                return <ProfilePic key={idx} size={9} name={recipient.name} />;
+                const foundContact = contacts.find(
+                  (contact) => contact.phone === recipient.phone
+                );
+                return (
+                  <ProfilePic key={idx} size={9} name={foundContact?.name} />
+                );
               })}
               <div className="grid gap-1">
                 <div className="font-semibold">
@@ -259,13 +265,18 @@ export function MessageDisplay({
                 <div className="flex text-xs gap-1">
                   <div className="font-medium">{t("common:to")}:</div>
 
-                  {message.recipients.map((recipient, index) => (
-                    <div key={recipient.id}>
-                      {recipient?.name ||
-                        recipient.phone +
-                          (index < message.recipients.length - 1 ? ", " : "")}
-                    </div>
-                  ))}
+                  {message.recipients.map((recipient, index) => {
+                    const foundContact = contacts.find(
+                      (contact) => contact.phone === recipient.phone
+                    );
+                    return (
+                      <div key={recipient.id}>
+                        {foundContact?.name ||
+                          recipient.phone +
+                            (index < message.recipients.length - 1 ? ", " : "")}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

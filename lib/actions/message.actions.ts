@@ -67,7 +67,11 @@ export async function deleteMessage(
       [userId, id]
     );
 
-    if (revalidate) revalidatePath(revalidate);
+    if (revalidate) {
+      console.log("revalidating on server from deleteMessage");
+
+      revalidatePath(revalidate);
+    }
     return {
       success: true,
       message: ["common:server-delete_message_success"],
@@ -134,7 +138,8 @@ export async function cancelCurrentlyScheduled(
 
 export async function saveDraft(
   draftId: string | undefined,
-  data: Message
+  data: Message,
+  pathname?: string
 ): Promise<DraftActionResponse<string>> {
   const session = await getSession();
   const userId = session?.user?.id;
@@ -221,6 +226,10 @@ export async function saveDraft(
       );
     }
 
+    if (pathname) {
+      revalidatePath(pathname);
+      console.log("revalidating on server from saveDraft");
+    }
     // revalidatePath("/drafts"); // Revalidate the drafts page if you have one
     return {
       success: true,

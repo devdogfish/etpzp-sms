@@ -24,6 +24,7 @@ import {
   validatePhoneNumber,
 } from "@/lib/utils";
 import useIsMounted from "@/hooks/use-mounted";
+import { EMPTY_MESSAGE } from "@/app/[locale]/(root)/(other)/new-message/page";
 
 type MessageContextValues = {
   // Message state
@@ -49,11 +50,9 @@ type MessageContextValues = {
   selectedPhone: string | undefined;
   updateSelectedPhone: (direction: "ArrowDown" | "ArrowUp") => void;
 
-  // Current message id (saved as draft until it is sent)
-  draftId: string | undefined;
-  setDraftId: React.Dispatch<React.SetStateAction<string | undefined>>;
-
   revalidateRecipients: () => void;
+  focusedInput: string | null;
+  setFocusedInput: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
@@ -72,9 +71,10 @@ export function NewMessageProvider({
   initialMessage,
 }: ContextProps) {
   // Message state
-  const [message, setMessage] = useState<Message>(initialMessage);
+  const [message, setMessage] = useState<Message>(
+    initialMessage || EMPTY_MESSAGE
+  );
   // draft id saved here, so that it is persisted on revalidation.
-  const [draftId, setDraftId] = useState<string>();
   const recipients =
     // Associate contacts with matching phone numbers  to recipients
     matchContactsToRecipients(fetchedRecipients, fetchedContacts) || [];
@@ -83,6 +83,7 @@ export function NewMessageProvider({
   const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
   const [selectedPhone, setSelectedPhone] = useState<string | undefined>();
   const [suggestedRecipients, setSuggestedRecipients] = useState(recipients);
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
   const usageRankedRecipients = rankRecipients(
     recipients as (RecipientWithContact & { last_used: Date })[]
@@ -264,6 +265,7 @@ export function NewMessageProvider({
     },
     [suggestedRecipients]
   );
+  const [state, setState] = useState(false);
 
   useEffect(() => {
     console.log(`FETCHED CONTACTS CHANGED`, fetchedContacts);
@@ -285,9 +287,9 @@ export function NewMessageProvider({
         setMoreInfoOn,
         selectedPhone,
         updateSelectedPhone,
-        draftId,
-        setDraftId,
         revalidateRecipients,
+        focusedInput,
+        setFocusedInput,
       }}
     >
       {children}

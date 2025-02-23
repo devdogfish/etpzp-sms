@@ -54,18 +54,20 @@ import CreateContactModal from "./modals/create-contact-modal";
 import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
+import { EMPTY_MESSAGE } from "@/app/[locale]/(root)/(other)/new-message/page";
 
 const initialState: ActionResponse<Message> = {
   success: false,
   message: [],
 };
 
+// apparently, when something gets revalidated or the url gets updated, this component gets re-rendered, while the new-message-context keeps it's state
 const NewMessageForm = React.memo(function ({
   contacts,
-  draft,
+  editDraft,
 }: {
   contacts: DBContact[];
-  draft?: DBMessage;
+  editDraft?: DBMessage;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation(["new-message-page"]);
@@ -75,24 +77,31 @@ const NewMessageForm = React.memo(function ({
     moreInfoOn,
     setMessage,
     message,
-    draftId,
-    setDraftId,
-    addRecipient,
-    revalidateRecipients,
+    focusedInput,
+    setFocusedInput,
   } = useNewMessage();
   const [loading, setLoading] = useState(false);
   const [serverState, setServerState] = useState(initialState);
-  const { isFullscreen, setIsFullscreen } = useLayout();
+  const { isFullscreen, setIsFullscreen, refetchAmountIndicators } =
+    useLayout();
   const pathname = usePathname();
   const onMobile = useIsMobile();
+  const [pendingDraft, setPendingDraft] = useState(false);
+  const [draft, setDraft] = useState({
+    id: editDraft?.id || null,
+    pending: false,
+  });
 
-  // focused state for all 4 inputs in the form to handle their hovering states when this gets refactored
-  const [focused, setFocused] = useState([false, false, false, false]);
   const isMounted = useIsMounted();
   const debouncedSaveDraft = useDebounce(message, 2000);
+  const previousDraftRef = useRef(message);
+  const searchParams = useSearchParams();
+  const [focusedElementRef, setFocusedElementRef] = useState(null);
 
   let scheduledTime = 0;
-  const searchParams = useSearchParams();
+  useEffect(() => {
+    console.log(isMounted);
+  }, [isMounted]);
 
   // When the controlled inputs value changes, we update the state
   const handleInputChange = (
@@ -106,17 +115,13 @@ const NewMessageForm = React.memo(function ({
     e.preventDefault();
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const existingDraftId = draftId;
-    const result = await sendMessage(
-      {
-        sender: formData.get("sender") as string,
-        recipients: recipients as NewRecipient[],
-        subject: formData.get("subject") as string,
-        body: formData.get("body") as string,
-        sendDelay: scheduledTime as number,
-      },
-      existingDraftId
-    );
+    const result = await sendMessage(draft.id, {
+      sender: formData.get("sender") as string,
+      recipients: recipients as NewRecipient[],
+      subject: formData.get("subject") as string,
+      body: formData.get("body") as string,
+      sendDelay: scheduledTime as number,
+    });
 
     setLoading(false);
     setServerState(result);
@@ -167,10 +172,10 @@ const NewMessageForm = React.memo(function ({
   };
 
   const discardDraft = async () => {
-    if (draftId) {
+    if (draft.id) {
       // Drafts should also be discarded (deleted) immediately
       const result: ActionResponse<null> = await deleteMessage(
-        draftId,
+        draft.id,
         pathname
       );
       toastActionResult(result, t);
@@ -178,28 +183,98 @@ const NewMessageForm = React.memo(function ({
     router.push("/sent");
   };
 
-  // Saving draft logic
+  // Saving editDraft logic
   useEffect(() => {
-    // Set draftId at the top to ensure we use the latest value in the save function.
-    setDraftId(draft?.id);
+    if (!isMounted) return;
 
-    if (isMounted) {
-      const save = async () => {
-        const result = await saveDraft(draftId, message);
-        setDraftId(result.draftId);
-        toastActionResult(result, t);
-        if (!draft && result.draftId) {
-          // Update the url with the current draft so that when revalidating, the form will keep its values
+    const save = async () => {
+      if (
+        JSON.stringify(debouncedSaveDraft) !==
+        JSON.stringify(previousDraftRef.current)
+      ) {
+        setPendingDraft(true);
+        console.log("Saving draft with id:", draft.id);
+        const { draftId } = await saveDraft(draft.id || undefined, message);
+        setPendingDraft(false);
+
+        if (draftId) {
+          setDraft((prev) => ({ ...prev, id: draftId || null }));
+          // Update the URL without causing a re-render by using standard javascript web Apis
+          // This process of updating the url also revalidates the server, conflicting with the amount indicator refetch.
           const params = new URLSearchParams(searchParams.toString());
-          params.set("draft", result.draftId);
+          params.set("editDraft", draftId);
+          router.replace(pathname + "?" + params.toString());
 
-          router.push(pathname + "?" + params.toString());
+          // Re-fetch amount indicators after updating the url, so that the component re-rendering doesn't interfere with it:
+          refetchAmountIndicators();
         }
-      };
+      }
+    };
 
+    const discard = async () => {
+      if (draft.id) {
+        // This revalidates, but we need it to update the amount Indicators
+        console.log("Deleting draft with id:", draft.id);
+
+        await deleteMessage(draft.id);
+
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("editDraft");
+        router.replace(pathname + "?" + params.toString());
+
+        // Re-fetch amount indicators after updating the url, so that the component re-rendering doesn't interfere with it:
+        refetchAmountIndicators();
+      }
+    };
+
+    if (
+      !message.body &&
+      !message.subject &&
+      !message.recipients.length &&
+      message.sender === "ETPZP"
+    ) {
+      console.log("MESSAGE FORM IS EMPTY, EMPTY DRAFT BE GONE");
+
+      // Delete the old draft
+      discard();
+    } else {
       save();
     }
   }, [debouncedSaveDraft]);
+  useEffect(() => {
+    if (focusedInput) {
+      const inputElement = document.querySelector(
+        `[name="${focusedInput}"]`
+      ) as HTMLElement;
+
+      if (inputElement) {
+
+        if (
+          focusedInput === "body" &&
+          inputElement instanceof HTMLTextAreaElement
+        ) {
+          // For textarea, set cursor at the end
+          inputElement.focus();
+          inputElement.setSelectionRange(
+            inputElement.value.length,
+            inputElement.value.length
+          );
+        } else {
+          inputElement.focus();
+        }
+
+        // For Select component, we need to manually trigger the focus
+        if (focusedInput === "sender") {
+          const selectTrigger = document.querySelector(
+            '[data-select-trigger="sender"]'
+          ) as HTMLElement;
+          if (selectTrigger) {
+            selectTrigger.click();
+          }
+        }
+      } else console.log("FOCUS_STATE: Input element undefined (invalid name)");
+    }
+  }, [focusedInput]);
   return (
     <ContactModalsProvider>
       {/* We can only put the modal here, because it carries state */}
@@ -212,6 +287,13 @@ const NewMessageForm = React.memo(function ({
       )}
 
       <PageHeader title={message.subject ? message.subject : t("header")}>
+        <p>
+          {message !== EMPTY_MESSAGE
+            ? pendingDraft
+              ? "Saving editDraft..."
+              : "Saved to drafts"
+            : ""}
+        </p>
         {!onMobile && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -267,13 +349,18 @@ const NewMessageForm = React.memo(function ({
             >
               <Select
                 name="sender"
-                defaultValue={draft?.sender || "ETPZP"}
+                defaultValue={editDraft?.sender || "ETPZP"}
                 onValueChange={(value) => {
                   setMessage((prev) => ({ ...prev, sender: value }));
                 }}
               >
                 {/** It defaults to the first SelectItem */}
-                <SelectTrigger className="w-full rounded-none border-none shadow-none focus:ring-0 px-5 py-1 h-11">
+                <SelectTrigger
+                  className="w-full rounded-none border-none shadow-none focus:ring-0 px-5 py-1 h-11"
+                  onFocus={() => setFocusedInput("sender")}
+                  onBlur={() => setFocusedInput(null)}
+                  data-select-trigger="sender"
+                >
                   <SelectValue placeholder="ETPZP" />
                 </SelectTrigger>
                 <SelectContent>
@@ -286,6 +373,8 @@ const NewMessageForm = React.memo(function ({
             <RecipientsInput
               contacts={contacts}
               error={!!serverState.errors?.recipients}
+              onFocus={() => setFocusedInput("new-recipient")}
+              onBlur={() => setFocusedInput(null)}
             />
 
             <Input
@@ -295,7 +384,9 @@ const NewMessageForm = React.memo(function ({
                 "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground border-b border-b-border"
               )}
               onChange={handleInputChange}
-              defaultValue={draft?.subject || undefined}
+              defaultValue={message?.subject || EMPTY_MESSAGE.subject}
+              onFocus={() => setFocusedInput("subject")}
+              onBlur={() => setFocusedInput(null)}
             />
           </div>
           <div className="px-4 flex-grow mt-[1.25rem] mb-2">
@@ -312,9 +403,9 @@ const NewMessageForm = React.memo(function ({
                   : t("body_placeholder")
               }
               onChange={handleInputChange}
-              defaultValue={
-                draft?.body || (searchParams.get("body") as string) || undefined
-              }
+              defaultValue={message?.body || EMPTY_MESSAGE.body}
+              onFocus={() => setFocusedInput("body")}
+              onBlur={() => setFocusedInput(null)}
             />
           </div>
 

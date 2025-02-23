@@ -11,8 +11,8 @@ import { ActionResponse } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
 export async function sendMessage(
-  data: Message,
-  existingDraftId: string | undefined
+  existingDraftId: string | null,
+  data: Message
 ): Promise<
   ActionResponse<Message> & {
     scheduledDate?: Date;
@@ -220,7 +220,7 @@ export async function sendMessage(
     console.log("All operations executed without errors \n------\n\n");
 
     // Update the amount indicators in the nav panel
-    revalidatePath("/");
+    revalidatePath("/new-message");
     return {
       success: true,
       message: [
