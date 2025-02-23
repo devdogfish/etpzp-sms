@@ -1,14 +1,14 @@
 import MessagesPage from "@/components/messages-page";
 import { fetchCurrentlyScheduled } from "@/lib/db/message";
-import { fetchError } from "@/lib/db";
 
 export default async function Page() {
   const messages = await fetchCurrentlyScheduled();
+  console.log("ATTENTION: re-rendered scheduled server component");
 
   return (
     <MessagesPage
       messages={messages || []}
-      error={fetchError("scheduled messages", !messages)}
+      error={messages === undefined}
       category="SCHEDULED"
     />
   );

@@ -1,5 +1,4 @@
 import MessagesPage from "@/components/messages-page";
-import { fetchError } from "@/lib/db";
 import { fetchTrashedMessages } from "@/lib/db/message";
 
 export default async function Page() {
@@ -8,7 +7,7 @@ export default async function Page() {
   return (
     <MessagesPage
       messages={messages || []}
-      error={fetchError("messages in trash", !messages)}
+      error={messages === undefined}
       category="TRASH"
     />
   );

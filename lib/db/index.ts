@@ -23,7 +23,3 @@ async function db(query: string, params?: any[]): Promise<QueryResult> {
 }
 
 export default db;
-
-export function fetchError(name: string, isError: boolean) {
-  return isError ? `An unknown error occurred. Failed to fetch ${name}.` : "";
-}

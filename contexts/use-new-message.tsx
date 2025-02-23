@@ -141,11 +141,6 @@ export function NewMessageProvider({
   );
 
   const revalidateRecipients = () => {
-    console.log("RevalidateRecipients called");
-    console.log(
-      `Checking ${message.recipients.length} recipients for contacts`
-    );
-
     setMessage((prevMessage) => ({
       // For some reason this inner part gets run twice while the outer function only gets run once
       ...prevMessage,
@@ -265,10 +260,11 @@ export function NewMessageProvider({
     },
     [suggestedRecipients]
   );
-  const [state, setState] = useState(false);
 
   useEffect(() => {
-    console.log(`FETCHED CONTACTS CHANGED`, fetchedContacts);
+    console.log(
+      `Contacts got re-fetched, revalidating recipients with new contacts`
+    );
     revalidateRecipients();
   }, [fetchedContacts]);
 

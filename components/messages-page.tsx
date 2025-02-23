@@ -14,6 +14,7 @@ import { MessageDisplay } from "./message-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Search from "./shared/search";
 import { useSearchParams } from "next/navigation";
+import useIsMounted from "@/hooks/use-mounted";
 
 export default function MessagesPage({
   messages,
@@ -21,7 +22,7 @@ export default function MessagesPage({
   category,
 }: Readonly<{
   messages: DBMessage[];
-  error: string;
+  error: boolean;
   category: CategoryEnums;
 }>) {
   const { layout, fallbackLayout } = useLayout();
@@ -30,6 +31,7 @@ export default function MessagesPage({
   const [selected, setSelected] = useState<DBMessage | null>(
     filteredMessages[0] || null
   );
+  const isMounted = useIsMounted();
   const [isLarge, setIsLarge] = useState({
     bool: window.matchMedia("(min-width: 1024px)").matches,
     breakpoint: window.matchMedia("(min-width: 1024px)").matches ? 29 : 44,
@@ -40,8 +42,8 @@ export default function MessagesPage({
   const currentPage = Number(searchParams.get("page")) || 1;
 
   // Update ui based on search term
-  const onSearch = () => {
-    setFilteredMessages(searchMessages(messages, query, currentPage));
+  const onSearch = (searchTerm: string) => {
+    setFilteredMessages(searchMessages(messages, searchTerm, currentPage));
   };
 
   useEffect(() => {
@@ -66,6 +68,13 @@ export default function MessagesPage({
 
     return () => window.removeEventListener("resize", handleResize); // Cleanup
   }, [messages]);
+
+  useEffect(() => {
+    if (isMounted && onMobile) {
+      // On mobile, it should show the list by default without having the first one selected like on desktop.
+      setSelected(null);
+    }
+  }, [isMounted]);
 
   return (
     <>

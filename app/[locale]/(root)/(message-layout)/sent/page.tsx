@@ -1,6 +1,5 @@
 import MessagesPage from "@/components/messages-page";
 import { fetchSent } from "@/lib/db/message";
-import { fetchError } from "@/lib/db";
 
 export default async function Page() {
   const messages = await fetchSent();
@@ -8,7 +7,7 @@ export default async function Page() {
   return (
     <MessagesPage
       messages={messages || []}
-      error={fetchError("sent messages", !messages)}
+      error={messages === undefined}
       category="SENT"
     />
   );

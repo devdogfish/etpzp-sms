@@ -158,8 +158,6 @@ export async function fetchDraft(id?: string) {
       `,
       [userId, id]
     );
-    console.log("draft fetch result");
-    console.log(result.rows[0]);
 
     return result.rows[0] as DBMessage & { recipients: NewRecipient[] };
   } catch (error) {}

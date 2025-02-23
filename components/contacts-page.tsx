@@ -19,16 +19,12 @@ import { useContactModals } from "@/contexts/use-contact-modals";
 import { DBContact } from "@/types/contact";
 import CreateContactModal from "./modals/create-contact-modal";
 import useIsMounted from "@/hooks/use-mounted";
+import { useContacts } from "@/contexts/use-contacts";
 
-export default function ContactsPage({
-  contacts,
-  error,
-}: Readonly<{
-  contacts: DBContact[];
-  error: string;
-}>) {
+export default function ContactsPage() {
   const { layout, fallbackLayout } = useLayout();
   const { t } = useTranslation(["contacts-page"]);
+  const { contacts, contactFetchError } = useContacts();
   const [filteredContacts, setFilteredContacts] = useState(contacts);
   const onMobile = useIsMobile();
   const isMounted = useIsMounted();
@@ -39,8 +35,8 @@ export default function ContactsPage({
 
   const searchParams = useSearchParams();
 
-  const onSearch = () => {
-    setFilteredContacts(searchContacts(contacts, searchParams.get("query")));
+  const onSearch = (searchTerm: string) => {
+    setFilteredContacts(searchContacts(contacts, searchTerm));
   };
 
   useEffect(() => {
@@ -99,7 +95,7 @@ export default function ContactsPage({
           />
         ) : (
           <div className="p-8 text-center text-muted-foreground">
-            {error || t("none_found")}
+            {contactFetchError || t("none_found")}
           </div>
         )}
       </ResizablePanel>

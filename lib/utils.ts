@@ -196,8 +196,6 @@ export function capitalizeFirstLetter(string: string) {
 }
 
 export function getDateFnsLocale(i18nLocale: string) {
-  console.log("current locale passed to getDateLocale ufnction:", i18nLocale);
-
   let dateFnsLocale;
   switch (i18nLocale) {
     case "pt":

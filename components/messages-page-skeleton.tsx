@@ -46,7 +46,8 @@ export default function MessagesPageSkeleton({
 
         <div className="flex flex-col gap-2 p-4 pt-0 mt-2 overflow-hidden">
           {skeletonsAmount > 0 ? (
-            Array.from({ length: skeletonsAmount }).map((_, i) => {
+            // Math.min() makes it so that the maximum will be x, even if the variable has a larger number
+            Array.from({ length: Math.min(skeletonsAmount, 10) }).map((_, i) => {
               return <MessageSkeleton key={i} />;
             })
           ) : (

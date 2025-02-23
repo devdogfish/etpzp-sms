@@ -44,9 +44,12 @@ export default function ContactsPageSkeleton() {
 
         <div className="flex flex-col gap-2 p-4 pt-0 mt-2 overflow-hidden">
           {skeletonsAmount > 0 ? (
-            Array.from({ length: skeletonsAmount }).map((_, i) => {
-              return <ContactSkeleton key={i} />;
-            })
+            // Math.min() makes it so that the maximum will be x, even if the variable has a larger number
+            Array.from({ length: Math.min(skeletonsAmount, 10) }).map(
+              (_, i) => {
+                return <ContactSkeleton key={i} />;
+              }
+            )
           ) : (
             <div className="p-8 text-center text-muted-foreground">
               <Skeleton className="w-full" />

@@ -51,7 +51,7 @@ export function MessageDisplay({
   const router = useRouter();
   const { t } = useTranslation(["messages-page"]);
   const pathname = usePathname();
-  const { contacts } = useContacts();
+  const { contacts, contactFetchError } = useContacts();
 
   const handleTrashButtonClick = async () => {
     if (message) {
@@ -81,7 +81,7 @@ export function MessageDisplay({
       });
 
       if (newDraft.draftId) {
-        router.push(`/new-message?draft=${newDraft.draftId}`);
+        router.push(`/new-message?editDraft=${newDraft.draftId}`);
       }
     }
   };
@@ -210,7 +210,7 @@ export function MessageDisplay({
                   size="icon"
                   onClick={() =>
                     message
-                      ? router.push(`/new-message?draft=${message.id}`)
+                      ? router.push(`/new-message?editDraft=${message.id}`)
                       : ""
                   }
                   disabled={!message}
@@ -310,7 +310,9 @@ export function MessageDisplay({
                 className="w-max"
                 disabled={!message}
                 onClick={() =>
-                  message ? router.push(`/new-message?draft=${message.id}`) : ""
+                  message
+                    ? router.push(`/new-message?editDraft=${message.id}`)
+                    : ""
                 }
               >
                 <Edit className="h-4 w-4" />

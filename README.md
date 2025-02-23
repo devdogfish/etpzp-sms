@@ -18,11 +18,13 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## TODO
 
-2. Add checks on /new-message to only save the draft if the message is not equal to a empty message in that case
-
-- MESSAGE DISPLAY: Update the message display to look nicer and actually display stuff in the correct manner
+#### UP NEXT - MESSAGE DISPLAY:
+- Update the message display to look nicer and actually display stuff in the correct manner
   - All recipients should be shown, but most of them should be hidden with an arrow to expand them. And if possible, they should be ordered numerically.
-- SCHEDULED PAGE: Add the correct date formatting for scheduled messages, and also display scheduled messages in a different way so that it is easier to tell when they will be sent. What should this look like
+  - Follow the contact profiles stacked on top of each other type design from iMessage groups. At a certain amount of recipients, there should be displayed one profilePic with the amount of other recipients that are not displayed in those couple profilePics with a label saying how many are left. For example: `+4` for 4 more contacts
+
+#### AFTER THAT - SCHEDULED PAGE:
+- Add the correct date formatting for scheduled messages, and also display scheduled messages in a different way so that it is easier to tell when they will be sent. What should this look like
   - Created at xxxxx
   - Below that When it will be sent
   - in the message list, on each message item, have it be the sendTime
@@ -30,7 +32,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
   - Display scheduled messages in a different way so that it is easier to tell when they will be sent
 - SCHEDULED MESSAGES: - For scheduled messages, it would be better to do polling WHEN THE USER LOGS IN because when our server is not running we might loose callbacks
   - Create a separate thread to get the delivery status while loading everything else
-
 
 ## If there is extra time (after deployment in school)
 

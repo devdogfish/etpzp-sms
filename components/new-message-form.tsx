@@ -99,9 +99,6 @@ const NewMessageForm = React.memo(function ({
   const [focusedElementRef, setFocusedElementRef] = useState(null);
 
   let scheduledTime = 0;
-  useEffect(() => {
-    console.log(isMounted);
-  }, [isMounted]);
 
   // When the controlled inputs value changes, we update the state
   const handleInputChange = (
@@ -171,16 +168,16 @@ const NewMessageForm = React.memo(function ({
     }
   };
 
+  // When the user pressed discard at the bottom
   const discardDraft = async () => {
     if (draft.id) {
       // Drafts should also be discarded (deleted) immediately
-      const result: ActionResponse<null> = await deleteMessage(
-        draft.id,
-        pathname
-      );
+      const result: ActionResponse<null> = await deleteMessage(draft.id);
       toastActionResult(result, t);
     }
     router.push("/sent");
+    // Revalidating doesn't seem to work, so we re-fetch the amount indicators manually
+    refetchAmountIndicators();
   };
 
   // Saving editDraft logic
@@ -193,7 +190,6 @@ const NewMessageForm = React.memo(function ({
         JSON.stringify(previousDraftRef.current)
       ) {
         setPendingDraft(true);
-        console.log("Saving draft with id:", draft.id);
         const { draftId } = await saveDraft(draft.id || undefined, message);
         setPendingDraft(false);
 
@@ -205,24 +201,25 @@ const NewMessageForm = React.memo(function ({
           params.set("editDraft", draftId);
           router.replace(pathname + "?" + params.toString());
 
-          // Re-fetch amount indicators after updating the url, so that the component re-rendering doesn't interfere with it:
-          refetchAmountIndicators();
+          // Only fetch this shit conservatively, for the first time the draft gets saved
+          if (!draft.id) {
+            // Re-fetch amount indicators after updating the url, so that the component re-rendering doesn't interfere with it
+            refetchAmountIndicators();
+          }
         }
       }
     };
 
+    // Empty drafts should be deleted from db
     const discard = async () => {
       if (draft.id) {
-        // This revalidates, but we need it to update the amount Indicators
-        console.log("Deleting draft with id:", draft.id);
-
         await deleteMessage(draft.id);
 
         const params = new URLSearchParams(searchParams.toString());
         params.delete("editDraft");
         router.replace(pathname + "?" + params.toString());
 
-        // Re-fetch amount indicators after updating the url, so that the component re-rendering doesn't interfere with it:
+        // Re-fetch amount indicators after updating the url, so that the component re-rendering doesn't interfere with it
         refetchAmountIndicators();
       }
     };
@@ -242,13 +239,13 @@ const NewMessageForm = React.memo(function ({
     }
   }, [debouncedSaveDraft]);
   useEffect(() => {
+    // Reapply input focus state (except sender dropdown) - extra logic removed.
     if (focusedInput) {
       const inputElement = document.querySelector(
         `[name="${focusedInput}"]`
       ) as HTMLElement;
 
       if (inputElement) {
-
         if (
           focusedInput === "body" &&
           inputElement instanceof HTMLTextAreaElement
@@ -261,16 +258,6 @@ const NewMessageForm = React.memo(function ({
           );
         } else {
           inputElement.focus();
-        }
-
-        // For Select component, we need to manually trigger the focus
-        if (focusedInput === "sender") {
-          const selectTrigger = document.querySelector(
-            '[data-select-trigger="sender"]'
-          ) as HTMLElement;
-          if (selectTrigger) {
-            selectTrigger.click();
-          }
         }
       } else console.log("FOCUS_STATE: Input element undefined (invalid name)");
     }
@@ -355,12 +342,7 @@ const NewMessageForm = React.memo(function ({
                 }}
               >
                 {/** It defaults to the first SelectItem */}
-                <SelectTrigger
-                  className="w-full rounded-none border-none shadow-none focus:ring-0 px-5 py-1 h-11"
-                  onFocus={() => setFocusedInput("sender")}
-                  onBlur={() => setFocusedInput(null)}
-                  data-select-trigger="sender"
-                >
+                <SelectTrigger className="w-full rounded-none border-none shadow-none focus:ring-0 px-5 py-1 h-11">
                   <SelectValue placeholder="ETPZP" />
                 </SelectTrigger>
                 <SelectContent>
