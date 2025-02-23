@@ -28,6 +28,7 @@ export async function toggleTrash(
       [inTrash, userId, id]
     );
 
+    // TODO: Make this dynamic (read from the database result to revalidate which path)
     revalidatePath("/sent");
     revalidatePath("/failed");
 
@@ -53,7 +54,7 @@ export async function toggleTrash(
 
 export async function deleteMessage(
   id: string,
-  revalidate?: string
+  pathname?: string
 ): Promise<ActionResponse<null>> {
   const session = await getSession();
   const userId = session?.user?.id;
@@ -65,7 +66,7 @@ export async function deleteMessage(
       id,
     ]);
 
-    if (revalidate) revalidatePath(revalidate);
+    if (pathname) revalidatePath(pathname);
 
     return {
       success: true,
@@ -223,7 +224,6 @@ export async function saveDraft(
 
     if (pathname) revalidatePath(pathname);
 
-    // revalidatePath("/drafts"); // Revalidate the drafts page if you have one
     return {
       success: true,
       message: ["common:server-save_draft_success"],
