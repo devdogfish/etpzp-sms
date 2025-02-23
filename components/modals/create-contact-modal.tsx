@@ -23,6 +23,8 @@ import { Alert, AlertDescription } from "../ui/alert";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { CreateContactResponse } from "@/types/action";
 import { useTranslation } from "react-i18next";
+import { usePathname } from "next/navigation";
+import { DBContact } from "@/types/contact";
 
 const initialState: CreateContactResponse = {
   success: false,
@@ -31,12 +33,15 @@ const initialState: CreateContactResponse = {
 
 export default function CreateContactModal({
   defaultPhone,
+  onCreateNew,
 }: {
   defaultPhone?: string;
+  onCreateNew?: (contact: DBContact) => void;
 }) {
   const { modal, setModal } = useContactModals();
+  const pathname = usePathname();
   const [serverState, action, pending] = useActionState(
-    createContact,
+    createContact.bind(null, pathname),
     initialState
   );
   const { t } = useTranslation(["modals"]);
@@ -45,6 +50,7 @@ export default function CreateContactModal({
     if (serverState.success) {
       toastActionResult(serverState, t);
       onOpenChange(false);
+      if (onCreateNew && serverState.data) onCreateNew(serverState.data);
     }
   }, [serverState]);
 

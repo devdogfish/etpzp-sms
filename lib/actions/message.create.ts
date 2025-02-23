@@ -150,7 +150,7 @@ export async function sendMessage(
           response.ids[0] || null,
 
           // recipient parameters:
-          validRecipients.map((recipient) => recipient.contactId || null), // contact_id array
+          validRecipients.map((recipient) => recipient.contact?.id || null), // contact_id array
           validRecipients.map((recipient) => recipient.phone), // phone number array
           validRecipients.map((_, index) => index), // for the ordering of the recipient
         ]

@@ -26,6 +26,7 @@ import { useNewMessage } from "@/contexts/use-new-message";
 import { NewRecipient } from "@/types/recipient";
 import useIsMounted from "@/hooks/use-mounted";
 import { useTranslation } from "react-i18next";
+import { usePathname } from "next/navigation";
 
 const initialState: CreateContactResponse = {
   success: false,
@@ -39,8 +40,9 @@ export default function CreateContactFromRecipientModal({
 }) {
   const isMounted = useIsMounted();
   const { modal, setModal } = useContactModals();
+  const pathname = usePathname();
   const [serverState, action, pending] = useActionState(
-    createContact,
+    createContact.bind(null, pathname),
     initialState
   );
   const { removeRecipient, getValidatedRecipient } = useNewMessage();

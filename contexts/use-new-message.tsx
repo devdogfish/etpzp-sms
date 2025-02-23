@@ -23,6 +23,7 @@ import {
   rankRecipients,
   validatePhoneNumber,
 } from "@/lib/utils";
+import useIsMounted from "@/hooks/use-mounted";
 
 type MessageContextValues = {
   // Message state
@@ -51,6 +52,8 @@ type MessageContextValues = {
   // Current message id (saved as draft until it is sent)
   draftId: string | undefined;
   setDraftId: React.Dispatch<React.SetStateAction<string | undefined>>;
+
+  revalidateRecipients: () => void;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
@@ -135,6 +138,27 @@ export function NewMessageProvider({
     },
     [message.recipients]
   );
+
+  const revalidateRecipients = () => {
+    console.log("RevalidateRecipients called");
+    console.log(
+      `Checking ${message.recipients.length} recipients for contacts`
+    );
+
+    setMessage((prevMessage) => ({
+      // For some reason this inner part gets run twice while the outer function only gets run once
+      ...prevMessage,
+      recipients: prevMessage.recipients.map((recipient, index) => {
+        const foundContact = fetchedContacts.find(
+          (contact) => contact.phone === recipient.phone
+        );
+
+        if (foundContact) {
+          return { ...recipient, contact: foundContact };
+        } else return recipient;
+      }),
+    }));
+  };
 
   const getValidatedRecipient = useCallback(
     (recipient: NewRecipient): NewRecipient => {
@@ -241,6 +265,11 @@ export function NewMessageProvider({
     [suggestedRecipients]
   );
 
+  useEffect(() => {
+    console.log(`FETCHED CONTACTS CHANGED`, fetchedContacts);
+    revalidateRecipients();
+  }, [fetchedContacts]);
+
   return (
     <NewMessageContext.Provider
       value={{
@@ -258,6 +287,7 @@ export function NewMessageProvider({
         updateSelectedPhone,
         draftId,
         setDraftId,
+        revalidateRecipients,
       }}
     >
       {children}

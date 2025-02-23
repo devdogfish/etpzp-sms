@@ -5,9 +5,10 @@ import { fetchError } from "@/lib/db";
 import { fetchRecipients } from "@/lib/db/recipients";
 import { fetchDraft } from "@/lib/db/message";
 import { matchContactsToRecipients, validatePhoneNumber } from "@/lib/utils";
+import { DraftingCompass } from "lucide-react";
 
 type NewMessagePageProps = {
-  params: Promise<{ draft: string }>;
+  searchParams: Promise<{ draft: string }>;
 };
 export const EMPTY_MESSAGE = {
   body: "",
@@ -16,14 +17,17 @@ export const EMPTY_MESSAGE = {
   recipients: [],
   sendDelay: undefined,
 };
-export default async function Page({ params }: NewMessagePageProps) {
+export default async function Page({ searchParams }: NewMessagePageProps) {
   const contacts = await fetchContacts();
   const rawRecipients = await fetchRecipients();
 
-  // const { draft } = await params;
-  const draft = "3";
-  const fetchedDraft = await fetchDraft(draft);
-
+  const draftInUrl = await searchParams;
+  const fetchedDraft = await fetchDraft(draftInUrl.draft);
+  
+  
+  console.log("Re-rendering new-message server component");
+  console.log(contacts);
+  
   return (
     <NewMessageProvider
       fetchedRecipients={rawRecipients || []}

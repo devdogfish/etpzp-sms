@@ -164,7 +164,7 @@ export default function RecipientsInput({
                     onClick={() => showRecipientInfo(recipient)}
                     className="h-full content-center rounded-l-xl pl-1.5"
                   >
-                    {recipient.contactName || recipient.phone}
+                    {recipient?.contact?.name || recipient.phone}
                   </div>
                   <Button
                     variant="none"

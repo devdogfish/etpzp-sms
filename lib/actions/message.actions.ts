@@ -143,7 +143,7 @@ export async function saveDraft(
     if (!userId) throw new Error("Invalid user id.");
     let draft;
     console.log(
-      data.recipients.map((recipient) => recipient.contactId || null), // contact_id array
+      data.recipients.map((recipient) => recipient.contact?.id || null), // contact_id array
       data.recipients.map((recipient) => recipient.phone)
     );
 

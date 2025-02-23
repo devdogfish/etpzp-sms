@@ -45,13 +45,13 @@ export default function RecipientInfoModal({
         <DialogHeader>
           <DialogTitle>
             {/* make it so we can interpolate a one of these translations using {{name}} into the actual one */}
-            {recipient.contactId
+            {recipient.contact?.id
               ? t("info-header_contact")
               : t("info-header_recipient")}
           </DialogTitle>
           <DialogDescription>
             {t("info-header_caption", {
-              type: recipient.contactId
+              type: recipient.contact?.id
                 ? t("common:contact").toLowerCase()
                 : t("common:recipient").toLowerCase(),
             })}
@@ -60,8 +60,8 @@ export default function RecipientInfoModal({
         <div className="flex flex-1 flex-col">
           <div className="flex items-start p-4">
             <div className="flex items-center gap-4 text-sm">
-              <ProfilePic name={recipient.contactName} />
-              <h2>{recipient.contactName || t("info-name_fallback")}</h2>
+              <ProfilePic name={recipient.contact?.name} />
+              <h2>{recipient.contact?.name || t("info-name_fallback")}</h2>
             </div>
           </div>
           <Separator />
@@ -72,12 +72,12 @@ export default function RecipientInfoModal({
             </CopyButton>
           </div>
           <Separator />
-          {recipient.contactId && (
+          {recipient.contact?.id && (
             <div className="flex gap-4 justify-between p-4 text-sm">
               <p>{t("common:description")}</p>
 
-              {recipient.contactDescription?.trim() ? (
-                <p>{recipient.contactDescription}</p>
+              {recipient.contact?.description?.trim() ? (
+                <p>{recipient.contact?.description}</p>
               ) : (
                 <p className="italic">{t("common:no_description")}</p>
               )}
@@ -90,7 +90,7 @@ export default function RecipientInfoModal({
               {t("common:close")}
             </Button>
           </DialogClose>
-          {!recipient.contactId && (
+          {!recipient.contact?.id && (
             <Button onClick={showCreateFromRecipientModal}>
               {t("info-button_create_contact")}
             </Button>

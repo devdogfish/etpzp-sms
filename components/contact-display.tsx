@@ -49,7 +49,6 @@ export default function ContactDisplay({
         recipients: [
           {
             phone: contact.phone,
-            contactId: contact.id.toString(),
           },
         ],
       });

@@ -5,9 +5,12 @@ export type NewRecipient = {
   formattedPhone?: string;
 
   // if it is a contact
-  contactId?: string;
-  contactName?: string;
-  contactDescription?: string;
+  contact?: {
+    id: string;
+    name?: string;
+    phone: string;
+    description?: string;
+  };
 };
 
 // Processed recipient - once it ran through the function

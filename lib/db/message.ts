@@ -148,7 +148,7 @@ export async function fetchDraft(id?: string) {
                   json_build_object(
                       'id', r.id, 
                       'phone', r.phone
-                  ) ORDER BY r.index -- Order by phone number numerically
+                  ) ORDER BY r.index -- This determines in which order the recipient chips are on new-message
                 ) FILTER (WHERE r.id IS NOT NULL), '[]'::json
               ) AS recipients
         FROM message m

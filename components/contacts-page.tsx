@@ -17,6 +17,7 @@ import { CirclePlus } from "lucide-react";
 import { Button } from "./ui/button";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { DBContact } from "@/types/contact";
+import CreateContactModal from "./modals/create-contact-modal";
 
 export default function ContactsPage({
   contacts,
@@ -72,6 +73,10 @@ export default function ContactsPage({
         maxSize={50}
       >
         <PageHeader title={t("header")}>
+          {/* Not sure if this is allowed to be here */}
+          <CreateContactModal
+            onCreateNew={(contact: DBContact) => setSelected(contact)}
+          />
           <Button size="sm" onClick={showCreateModal}>
             <CirclePlus />
             {t("new")}

@@ -78,6 +78,7 @@ const NewMessageForm = React.memo(function ({
     draftId,
     setDraftId,
     addRecipient,
+    revalidateRecipients,
   } = useNewMessage();
   const [loading, setLoading] = useState(false);
   const [serverState, setServerState] = useState(initialState);
@@ -135,6 +136,7 @@ const NewMessageForm = React.memo(function ({
       formRef.current?.reset();
       setMessage((prev) => ({ ...prev, recipients: [] }));
     } else {
+      // Something went wrong:
       // Display input specific error messages
       const zodErrors = result.errors || {};
       let waitTime = 0;
@@ -149,7 +151,7 @@ const NewMessageForm = React.memo(function ({
           }, index * inBetweenTime) // Increase delay by 50ms for each error
       );
 
-      // Display the general error message
+      // Display general error message
       setTimeout(() => {
         if (result.invalidRecipients) {
           toast.error(
@@ -175,21 +177,6 @@ const NewMessageForm = React.memo(function ({
     }
     router.push("/sent");
   };
-
-  useEffect(() => {
-    if (isMounted && draft) {
-      console.log("draft is defined");
-      console.log(draft);
-
-      const { body, subject, sender, recipients } = draft;
-      setMessage({
-        body,
-        subject: subject || undefined,
-        sender,
-        recipients,
-      });
-    }
-  }, [isMounted]);
 
   // Saving draft logic
   useEffect(() => {
@@ -220,7 +207,7 @@ const NewMessageForm = React.memo(function ({
       <CreateContactModal />
 
       {moreInfoOn && <RecipientInfoModal recipient={moreInfoOn} />}
-      {moreInfoOn && !moreInfoOn.contactId && (
+      {moreInfoOn && !moreInfoOn.contact?.id && (
         <CreateContactFromRecipientModal recipient={moreInfoOn} />
       )}
 

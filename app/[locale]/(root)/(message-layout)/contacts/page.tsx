@@ -6,10 +6,10 @@ import { fetchError } from "@/lib/db";
 
 export default async function Page() {
   const contacts = await fetchContacts();
+  console.log("Server contacts re-rendered");
 
   return (
     <ContactModalsProvider>
-      <CreateContactModal />
       <ContactsPage
         contacts={contacts || []}
         error={fetchError("contacts", !contacts)}
