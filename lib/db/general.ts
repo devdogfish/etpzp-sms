@@ -44,8 +44,6 @@ export async function fetchAmountIndicators() {
       `,
       [userId]
     );
-    console.log("amount Indicators fetched");
-    console.log(rows);
 
     return rows[0] as AmountIndicators;
   } catch (error) {}

@@ -60,18 +60,13 @@ export async function deleteMessage(
 
   try {
     if (!userId) throw new Error("Invalid user id.");
-    const result = await db(
-      `
-        DELETE FROM message WHERE user_id = $1 AND id = $2
-      `,
-      [userId, id]
-    );
+    await db(`DELETE FROM message WHERE user_id = $1 AND id = $2`, [
+      userId,
+      id,
+    ]);
 
-    if (revalidate) {
-      console.log("revalidating on server from deleteMessage");
+    if (revalidate) revalidatePath(revalidate);
 
-      revalidatePath(revalidate);
-    }
     return {
       success: true,
       message: ["common:server-delete_message_success"],
@@ -226,10 +221,8 @@ export async function saveDraft(
       );
     }
 
-    if (pathname) {
-      revalidatePath(pathname);
-      console.log("revalidating on server from saveDraft");
-    }
+    if (pathname) revalidatePath(pathname);
+
     // revalidatePath("/drafts"); // Revalidate the drafts page if you have one
     return {
       success: true,

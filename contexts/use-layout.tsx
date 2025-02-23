@@ -7,6 +7,7 @@ import {
   Dispatch,
   SetStateAction,
   useContext,
+  useEffect,
   useState,
 } from "react";
 
@@ -57,12 +58,15 @@ export function LayoutProvider({
 
   const refetchAmountIndicators = async () => {
     const amountIndicators = await fetchAmountIndicators();
-    console.log("RE-FETCHED AMOUNT INDICATORS: ", amountIndicators);
 
     if (amountIndicators) {
       setAmountIndicators(amountIndicators);
     }
   };
+  useEffect(() => {
+    setAmountIndicators(initialAmountIndicators);
+  }, [initialAmountIndicators]);
+
   return (
     <LayoutContext.Provider
       value={{

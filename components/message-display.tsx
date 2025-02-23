@@ -59,6 +59,8 @@ export function MessageDisplay({
 
       // Drafts should also be discarded (deleted) immediately
       if (message.in_trash || message.status === "DRAFTED") {
+        console.log(pathname);
+        
         result = await deleteMessage(message.id, pathname);
       } else {
         result = await toggleTrash(message.id, true);

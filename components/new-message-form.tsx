@@ -82,8 +82,7 @@ const NewMessageForm = React.memo(function ({
   } = useNewMessage();
   const [loading, setLoading] = useState(false);
   const [serverState, setServerState] = useState(initialState);
-  const { isFullscreen, setIsFullscreen, refetchAmountIndicators } =
-    useLayout();
+  const { isFullscreen, setIsFullscreen } = useLayout();
   const pathname = usePathname();
   const onMobile = useIsMobile();
   const [pendingDraft, setPendingDraft] = useState(false);
@@ -96,7 +95,6 @@ const NewMessageForm = React.memo(function ({
   const debouncedSaveDraft = useDebounce(message, 2000);
   const previousDraftRef = useRef(message);
   const searchParams = useSearchParams();
-  const [focusedElementRef, setFocusedElementRef] = useState(null);
 
   let scheduledTime = 0;
 
@@ -175,9 +173,9 @@ const NewMessageForm = React.memo(function ({
       const result: ActionResponse<null> = await deleteMessage(draft.id);
       toastActionResult(result, t);
     }
+
+    // The navigation already re-fetches the amount indicators
     router.push("/sent");
-    // Revalidating doesn't seem to work, so we re-fetch the amount indicators manually
-    refetchAmountIndicators();
   };
 
   // Saving editDraft logic
@@ -195,17 +193,10 @@ const NewMessageForm = React.memo(function ({
 
         if (draftId) {
           setDraft((prev) => ({ ...prev, id: draftId || null }));
-          // Update the URL without causing a re-render by using standard javascript web Apis
-          // This process of updating the url also revalidates the server, conflicting with the amount indicator refetch.
+          // Updating the URL revalidates the server (including fetching amount indicators) and re-renders the component.
           const params = new URLSearchParams(searchParams.toString());
           params.set("editDraft", draftId);
           router.replace(pathname + "?" + params.toString());
-
-          // Only fetch this shit conservatively, for the first time the draft gets saved
-          if (!draft.id) {
-            // Re-fetch amount indicators after updating the url, so that the component re-rendering doesn't interfere with it
-            refetchAmountIndicators();
-          }
         }
       }
     };
@@ -215,12 +206,10 @@ const NewMessageForm = React.memo(function ({
       if (draft.id) {
         await deleteMessage(draft.id);
 
+        // Updating the URL revalidates the server (including fetching amount indicators) and re-renders the component.
         const params = new URLSearchParams(searchParams.toString());
         params.delete("editDraft");
         router.replace(pathname + "?" + params.toString());
-
-        // Re-fetch amount indicators after updating the url, so that the component re-rendering doesn't interfere with it
-        refetchAmountIndicators();
       }
     };
 
@@ -245,6 +234,7 @@ const NewMessageForm = React.memo(function ({
         `[name="${focusedInput}"]`
       ) as HTMLElement;
 
+      // Move cursor to end of textarea to prevent default behavior of placing it at the beginning.
       if (inputElement) {
         if (
           focusedInput === "body" &&
@@ -259,7 +249,7 @@ const NewMessageForm = React.memo(function ({
         } else {
           inputElement.focus();
         }
-      } else console.log("FOCUS_STATE: Input element undefined (invalid name)");
+      }
     }
   }, [focusedInput]);
   return (
