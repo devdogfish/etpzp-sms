@@ -6,7 +6,7 @@ import { useLayout } from "@/contexts/use-layout";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
-import { MessageDisplay } from "./message-display";
+import MessageDisplay from "./message-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PageHeader } from "./header";
 import Skeleton from "react-loading-skeleton";
@@ -47,9 +47,11 @@ export default function MessagesPageSkeleton({
         <div className="flex flex-col gap-2 p-4 pt-0 mt-2 overflow-hidden">
           {skeletonsAmount > 0 ? (
             // Math.min() makes it so that the maximum will be x, even if the variable has a larger number
-            Array.from({ length: Math.min(skeletonsAmount, 10) }).map((_, i) => {
-              return <MessageSkeleton key={i} />;
-            })
+            Array.from({ length: Math.min(skeletonsAmount, 10) }).map(
+              (_, i) => {
+                return <MessageSkeleton key={i} />;
+              }
+            )
           ) : (
             <div className="p-8 text-center text-muted-foreground">
               <Skeleton className="w-full" />

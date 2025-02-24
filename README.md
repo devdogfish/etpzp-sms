@@ -17,7 +17,9 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## TODO
+
 #### UP NEXT - MESSAGE DISPLAY:
+
 - Update the message display to look nicer and actually display stuff in the correct manner
   - All recipients should be shown, but most of them should be hidden with an arrow to expand them. And if possible, they should be ordered numerically.
   - Follow the contact profiles stacked on top of each other type design from iMessage groups. At a certain amount of recipients, there should be displayed one profilePic with the amount of other recipients that are not displayed in those couple profilePics with a label saying how many are left. For example: `+4` for 4 more contacts
@@ -25,7 +27,13 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Make sure when the server components re-refetch because of revalidation, that the contexts update their state values with the newly fetched data!
 - Implement `TODO` comments
 
+## Bugs
+
+- When sending a new message, subject and body don't get cleared
+- When adding all suggested and then typing a custom phone number, it says duplicate recipients even though the number is unique
+
 #### AFTER THAT - SCHEDULED PAGE:
+
 - Add the correct date formatting for scheduled messages, and also display scheduled messages in a different way so that it is easier to tell when they will be sent. What should this look like
   - Created at xxxxx
   - Below that When it will be sent
@@ -36,6 +44,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
   - Create a separate thread to get the delivery status while loading everything else
 
 ## If there is extra time (after deployment in school)
+
 1. \*\* ** Do a test deployment ** \*\*
 
 - Admin Dashboard with statistics and admin settings
@@ -46,7 +55,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Consideration: Add links to a the item you just modified/created and display them in the success toast messages, so that the user can easily view more details
 
 ## Database
+
 #### Deleting all tables
+
 ```sql
 DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```

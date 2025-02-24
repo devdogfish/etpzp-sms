@@ -1,0 +1,50 @@
+/* Base class for absolute centering (if needed) */
+.profile-absolute {
+  position: absolute;
+  /* Reducing width/height and increasing scale makes the text inside the element bigger */
+  width: 67%;
+  height: 67%;
+  /* Uncomment this if you prefer
+    opacity: 0.9; */
+}
+
+/* Big profile: centered in container with scale */
+.profile-big {
+  z-index: 1;
+  /* Center using helper translate and scale */
+  top: 40%;
+  left: 52%;
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.profile-top-left {
+  top: 0;
+  left: -7px;
+  transform: scale(0.7);
+  transform-origin: top left;
+}
+
+.profile-bottom-left {
+  left: 0;
+  bottom: 0;
+  transform-origin: bottom left;
+  transform: scale(0.4);
+}
+
+.profile-top-right {
+  top: -5px;
+  right: 0;
+  transform: scale(0.3);
+  transform-origin: top right;
+}
+
+.profile-bottom-right {
+  z-index: 2;
+
+  /* This works, while top:100% and left: 100% places it way outside of the parent. */
+  right: 0;
+  bottom: -3px;
+  transform-origin: bottom right;
+  transform: scale(0.82);
+  font-weight: 700;
+}

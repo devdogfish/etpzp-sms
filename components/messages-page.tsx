@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { MessageList } from "./messages-list";
 
 import { cn, searchMessages } from "@/lib/utils";
-import { MessageDisplay } from "./message-display";
+import MessageDisplay from "./message-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Search from "./shared/search";
 import { useSearchParams } from "next/navigation";

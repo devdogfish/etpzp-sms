@@ -1,5 +1,6 @@
 "use client";
 
+import styles from "@/app/scattered-profiles.module.css";
 import { format } from "date-fns/format";
 import {
   ArchiveRestore,
@@ -20,7 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import { CategoryEnums, DBMessage } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn, toastActionResult } from "@/lib/utils";
+import { cn, shuffleArray, toastActionResult } from "@/lib/utils";
 import {
   cancelCurrentlyScheduled,
   deleteMessage,
@@ -34,10 +35,11 @@ import ProfilePic from "./profile-pic";
 import { DBRecipient } from "@/types/recipient";
 import { useTranslation } from "react-i18next";
 import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
-import { useEffect, useState } from "react";
 import { useContacts } from "@/contexts/use-contacts";
+import { PRIMARY_COLOR_CSS_NAMES } from "@/lib/theme.colors";
+import React, { useEffect, useMemo, useState } from "react";
 
-export function MessageDisplay({
+function MessageDisplay({
   message,
   category,
   reset,
@@ -52,6 +54,8 @@ export function MessageDisplay({
   const { t } = useTranslation(["messages-page"]);
   const pathname = usePathname();
   const { contacts, contactFetchError } = useContacts();
+  // State to store random colors for each item
+  const [profileColors, setProfileColors] = useState<string[]>([]);
 
   const handleTrashButtonClick = async () => {
     if (message) {
@@ -60,7 +64,7 @@ export function MessageDisplay({
       // Drafts should also be discarded (deleted) immediately
       if (message.in_trash || message.status === "DRAFTED") {
         console.log(pathname);
-        
+
         result = await deleteMessage(message.id, pathname);
       } else {
         result = await toggleTrash(message.id, true);
@@ -109,6 +113,31 @@ export function MessageDisplay({
       }
     }
   };
+
+  const initialColors = PRIMARY_COLOR_CSS_NAMES;
+  let colors = [...initialColors]; // Create a copy of the array by spreading it.
+  useEffect(() => {
+    if (message) {
+      shuffleArray(colors);
+
+      setProfileColors(
+        message.recipients.map((item, index) => {
+          // Create a stable color for each item by using the index or item (in case the order doesn't change)
+
+          if (colors.length === 0) {
+            // All items have been used
+            // Reset the array using the initial array and reshuffle
+            colors = [...initialColors]; // Reset array to original values
+            shuffleArray(colors); // Shuffle the reset array
+          }
+
+          // Pick and remove the first item from the shuffled colors
+          return colors.pop() as string;
+        })
+      );
+    }
+  }, [message]);
+
   return (
     <div className={cn("flex h-full flex-col")}>
       <div className="flex items-center p-2 h-[var(--header-height)] border-b">
@@ -246,20 +275,53 @@ export function MessageDisplay({
       {/* <Separator /> */}
       {message ? (
         <div className="flex flex-1 flex-col">
-          <div className="flex items-start p-4">
-            <div className="flex items-start gap-4 text-sm">
-              {message.recipients.map((recipient: DBRecipient, idx) => {
-                if (idx > 3) {
-                  console.log("more than 3 recipients");
-                  return;
-                }
-                const foundContact = contacts.find(
-                  (contact) => contact.phone === recipient.phone
-                );
-                return (
-                  <ProfilePic key={idx} size={9} name={foundContact?.name} />
-                );
-              })}
+          <div className="flex justify-between p-4">
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex relative min-w-[50px] min-h-[50px]">
+                {message.recipients.map((recipient: DBRecipient, index) => {
+                  if (index >= 5) return; // Max recipients reached; remaining will be shown as a single picture with count
+
+                  let foundContactName: string | undefined = undefined;
+
+                  foundContactName = contacts.find(
+                    (contact) => contact.phone === recipient.phone
+                  )?.name;
+
+                  if (index == 4) {
+                    // the fifth recipient should be the number of missing recipients
+                    const missingRecipients = message.recipients.length - index;
+                    if (missingRecipients > 1) {
+                      // if there are many missing recipients,
+                      foundContactName = `+ ${missingRecipients}`;
+                    }
+                  }
+
+                  return (
+                    <ProfilePic
+                      key={index}
+                      // size={10}
+                      customSize
+                      name={foundContactName}
+                      className={cn(
+                        styles["profile-absolute"],
+                        index === 0 &&
+                          cn("center-absolute", styles["profile-big"]),
+                        index === 1 && styles["profile-top-left"],
+                        index === 2 && styles["profile-bottom-left"],
+                        index === 3 && styles["profile-top-right"],
+                        index === 4 && styles["profile-bottom-right"]
+                      )}
+                      // The dynamically generated class `bg-${chosenColor}` won't work because Tailwind purges unused classes in production, and it doesn't recognize dynamically created class names.
+                      style={{
+                        // Only show color for saved contacts
+                        backgroundColor: foundContactName
+                          ? profileColors[index]
+                          : "",
+                      }}
+                    />
+                  );
+                })}
+              </div>
               <div className="grid gap-1">
                 <div className="font-semibold">
                   {message.subject || t("no_subject")}
@@ -273,16 +335,15 @@ export function MessageDisplay({
                     );
                     return (
                       <div key={recipient.id}>
-                        {foundContact?.name ||
-                          recipient.phone +
-                            (index < message.recipients.length - 1 ? ", " : "")}
+                        {(foundContact?.name || recipient.phone) +
+                          (index < message.recipients.length - 1 ? ", " : "")}
                       </div>
                     );
                   })}
                 </div>
               </div>
             </div>
-            <div className="flex flex-col ml-auto text-xs gap-1">
+            <div className="flex flex-col text-xs gap-1">
               {message.send_time && (
                 <div className="text-muted-foreground">
                   {format(new Date(message.send_time), PORTUGUESE_DATE_FORMAT)}
@@ -290,6 +351,7 @@ export function MessageDisplay({
               )}
             </div>
           </div>
+
           <Separator />
           <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
             {message.body}
@@ -327,3 +389,4 @@ export function MessageDisplay({
     </div>
   );
 }
+export default React.memo(MessageDisplay);

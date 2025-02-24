@@ -261,3 +261,10 @@ export default function setGlobalColorTheme(
 const themesArray = Object.keys(themes).map((key, index) => {
   return { index: index + 1, name: key, value: themes[key] };
 });
+
+export const PRIMARY_COLOR_CSS_NAMES = [
+  "salmon",
+  "dodgerblue",
+  "gold",
+  "mediumorchid",
+];

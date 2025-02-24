@@ -252,7 +252,7 @@ export default function RecipientsInput({
                           <ProfilePic
                             name={recipient.contact?.name || undefined}
                             size={10}
-                            fill={false}
+                            fill={true}
                           />
                           <div className="space-y-1">
                             <div className="font-semibold">
