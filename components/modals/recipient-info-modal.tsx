@@ -9,10 +9,8 @@ import {
   DialogFooter,
 } from "../ui/dialog";
 import { DialogClose } from "@/components/ui/dialog";
-import { cn, getNameInitials } from "@/lib/utils";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { Separator } from "../ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { CopyButton } from "../shared/copy-button";
 import { Button } from "../ui/button";
 import { NewRecipient } from "@/types/recipient";

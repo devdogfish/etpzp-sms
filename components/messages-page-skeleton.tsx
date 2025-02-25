@@ -12,6 +12,7 @@ import { PageHeader } from "./header";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { AmountIndicators, CategoryEnums } from "@/types";
+import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 
 export default function MessagesPageSkeleton({
   category,
@@ -64,7 +65,10 @@ export default function MessagesPageSkeleton({
         hasMiddleBar
         className={cn(onMobile && selected === null && "hidden")} // like above we are using reverse logic here. If we are on mobile, and nothing is selected, this component should not be displayed.
       >
-        <MessageDisplay message={null} reset={() => {}} category={category} />
+        {/* If you need other modals somewhere else, move the provider up the component tree. And don't forget to update the skeleton too! */}
+        <ContactModalsProvider>
+          <MessageDisplay message={null} reset={() => {}} category={category} />
+        </ContactModalsProvider>
       </ChildrenPanel>
     </>
   );

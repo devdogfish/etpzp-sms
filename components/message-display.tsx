@@ -5,6 +5,8 @@ import { format } from "date-fns/format";
 import {
   ArchiveRestore,
   ArrowLeft,
+  ChevronDown,
+  ChevronLeft,
   Edit,
   MessageCircleX,
   ReplyAll,
@@ -32,12 +34,14 @@ import { toast } from "sonner";
 import { ActionResponse } from "@/types/action";
 import { usePathname, useRouter } from "next/navigation";
 import ProfilePic from "./profile-pic";
-import { DBRecipient } from "@/types/recipient";
+import { DBRecipient, NewRecipient } from "@/types/recipient";
 import { useTranslation } from "react-i18next";
 import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
 import { useContacts } from "@/contexts/use-contacts";
 import { PRIMARY_COLOR_CSS_NAMES } from "@/lib/theme.colors";
 import React, { useEffect, useMemo, useState } from "react";
+import { useContactModals } from "@/contexts/use-contact-modals";
+import RecipientInfoModal from "./modals/recipient-info-modal";
 
 function MessageDisplay({
   message,
@@ -53,9 +57,20 @@ function MessageDisplay({
   const router = useRouter();
   const { t } = useTranslation(["messages-page"]);
   const pathname = usePathname();
+  const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
+  const { modal, setModal } = useContactModals();
+
+  const [recipientsExpanded, setRecipientsExpanded] = useState(false);
   const { contacts, contactFetchError } = useContacts();
   // State to store random colors for each item
   const [profileColors, setProfileColors] = useState<string[]>([]);
+  const showInfoAbout = (recipient: NewRecipient) => {
+    console.log("user wants to see more info about");
+    // TODO: Continue here
+    console.log(recipient);
+    setMoreInfoOn(recipient);
+    setModal((prev) => ({ ...prev, info: true }));
+  };
 
   const handleTrashButtonClick = async () => {
     if (message) {
@@ -140,6 +155,7 @@ function MessageDisplay({
 
   return (
     <div className={cn("flex h-full flex-col")}>
+      {moreInfoOn && <RecipientInfoModal recipient={moreInfoOn} />}
       <div className="flex items-center p-2 h-[var(--header-height)] border-b">
         <div className="flex items-center gap-2">
           {onMobile && (
@@ -276,8 +292,8 @@ function MessageDisplay({
       {message ? (
         <div className="flex flex-1 flex-col">
           <div className="flex justify-between p-4">
-            <div className="flex items-center gap-4 text-sm w-full">
-              <div className="flex relative min-w-[50px] min-h-[50px]">
+            <div className="flex gap-4 text-sm w-full">
+              <div className="flex relative min-w-[50px] min-h-[50px] h-[50px]">
                 {message.recipients.map((recipient: DBRecipient, index) => {
                   if (index >= 5) return; // Max recipients reached; remaining will be shown as a single picture with count
 
@@ -323,7 +339,7 @@ function MessageDisplay({
                 })}
               </div>
               <div className="flex flex-col gap-1 grow overflow-hidden">
-                <div className="flex justify-between items-center ">
+                <div className="flex justify-between items-center relative">
                   <span className="font-semibold ellipsis">
                     {message.subject || t("no_subject")}
                   </span>
@@ -338,27 +354,63 @@ function MessageDisplay({
                       )}
                     </span>
                   )}
+                  <Button
+                    onClick={() =>
+                      setRecipientsExpanded((prevExpanded) => !prevExpanded)
+                    }
+                    variant="none"
+                    className="p-0 pl-1 h-min absolute right-0 bottom-[-20px] bg-background z-10 rounded-none"
+                  >
+                    <ChevronDown
+                      className={cn(
+                        "duration-200",
+                        !recipientsExpanded && "rotate-90"
+                      )}
+                    />
+                  </Button>
                 </div>
-                <div className="flex text-xs gap-1">
-                  <div className="font-medium">{t("common:to")}:</div>
+                <div className={cn("flex text-xs gap-1 relative")}>
+                  {!recipientsExpanded && (
+                    <div
+                      className="container-overlay"
+                      onClick={() => setRecipientsExpanded(true)}
+                    />
+                  )}
+                  <div
+                    className={cn(
+                      "flex gap-1",
+                      recipientsExpanded ? "flex-wrap mr-5" : ""
+                    )}
+                  >
+                    <div className="font-medium">{t("common:to")}:</div>
 
-                  <div className="flex">
-                    {message.recipients.map((recipient, index) => {
-                      const foundContact = contacts.find(
-                        (contact) => contact.phone === recipient.phone
-                      );
-                      return (
-                        <span key={recipient.id} className="whitespace-nowrap">
-                          {(foundContact?.name || recipient.phone) +
-                            (index < message.recipients.length - 1 ? ", " : "")}
-                        </span>
-                      );
-                    })}
+                    {message.recipients.map(
+                      (recipientWithoutContact, index) => {
+                        const recipient = {
+                          ...recipientWithoutContact,
+                          contact: contacts.find(
+                            (contact) =>
+                              contact.phone === recipientWithoutContact.phone
+                          ),
+                        };
+                        return (
+                          <div key={recipient.id} className="flex">
+                            <Button
+                              variant="none"
+                              onClick={() => showInfoAbout(recipient)}
+                              className="whitespace-nowrap p-0 text-xs h-min hover:bg-muted px-[2px]"
+                            >
+                              {recipient.contact?.name || recipient.phone}
+                            </Button>
+                            {index < message.recipients.length - 1 && ", "}
+                          </div>
+                        );
+                      }
+                    )}
                   </div>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col text-xs gap-1"></div>
           </div>
 
           <Separator />
