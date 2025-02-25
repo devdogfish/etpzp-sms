@@ -180,3 +180,9 @@ h6 {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.ellipsis {
+  white-space: nowrap; /* Prevents text from wrapping */
+  overflow: hidden; /* Hides overflowed text */
+  text-overflow: ellipsis; /* Adds ellipsis (...) */
+}

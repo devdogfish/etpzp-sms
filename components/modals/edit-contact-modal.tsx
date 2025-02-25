@@ -25,6 +25,7 @@ import { Alert, AlertDescription } from "../ui/alert";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { ActionResponse } from "@/types/action";
 import { useTranslation } from "react-i18next";
+import { useContacts } from "@/contexts/use-contacts";
 
 const initialState: ActionResponse<undefined> = {
   success: false,
@@ -37,12 +38,14 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
     updateContact.bind(null, contact.id),
     initialState
   );
+  const { refetchContacts } = useContacts();
   const { t } = useTranslation(["modals"]);
 
   useEffect(() => {
     if (serverState.success) {
       toastActionResult(serverState, t);
       onOpenChange(false);
+      refetchContacts();
     }
   }, [serverState]);
 

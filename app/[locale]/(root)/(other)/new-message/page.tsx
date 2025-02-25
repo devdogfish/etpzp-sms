@@ -5,6 +5,7 @@ import { fetchRecipients } from "@/lib/db/recipients";
 import { fetchDraft } from "@/lib/db/message";
 import { validatePhoneNumber } from "@/lib/utils";
 import { Message } from "@/types";
+import { ContactsProvider } from "@/contexts/use-contacts";
 
 type NewMessagePageProps = {
   searchParams: Promise<{ editDraft: string }>;
@@ -15,7 +16,6 @@ export const EMPTY_MESSAGE: Message = {
   recipients: [],
 };
 export default async function Page({ searchParams }: NewMessagePageProps) {
-  const contacts = await fetchContacts();
   const rawRecipients = await fetchRecipients();
 
   const draftInUrl = await searchParams;
@@ -24,7 +24,6 @@ export default async function Page({ searchParams }: NewMessagePageProps) {
   return (
     <NewMessageProvider
       fetchedRecipients={rawRecipients || []}
-      fetchedContacts={contacts || []}
       // initialMessage={fetchedDraft || EMPTY_MESSAGE}
       initialMessage={
         fetchedDraft
@@ -42,7 +41,7 @@ export default async function Page({ searchParams }: NewMessagePageProps) {
           : EMPTY_MESSAGE
       }
     >
-      <NewMessageForm contacts={contacts || []} editDraft={fetchedDraft} />
+      <NewMessageForm editDraft={fetchedDraft} />
     </NewMessageProvider>
   );
 }

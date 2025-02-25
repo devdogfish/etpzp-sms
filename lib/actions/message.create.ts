@@ -200,7 +200,7 @@ export async function sendMessage(
       await db(`DELETE FROM recipient WHERE message_id = $1`, [
         existingDraftId,
       ]);
-      // check if for this query I can use VALUES isntead of SELECT
+      // check if for this query I can use VALUES instead of SELECT
       await db(
         `
         INSERT INTO recipient (message_id, phone, index)

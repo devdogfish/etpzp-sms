@@ -15,7 +15,7 @@ export async function createContact(
   _: CreateContactResponse | null,
   formData: FormData
 ): Promise<CreateContactResponse> {
-  console.log("create contact called");
+  console.log("create contact called, will revalidate:", pathname);
 
   const session = await getSession();
   const userId = session?.user?.id;

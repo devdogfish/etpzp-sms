@@ -276,7 +276,7 @@ function MessageDisplay({
       {message ? (
         <div className="flex flex-1 flex-col">
           <div className="flex justify-between p-4">
-            <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-4 text-sm w-full">
               <div className="flex relative min-w-[50px] min-h-[50px]">
                 {message.recipients.map((recipient: DBRecipient, index) => {
                   if (index >= 5) return; // Max recipients reached; remaining will be shown as a single picture with count
@@ -322,34 +322,43 @@ function MessageDisplay({
                   );
                 })}
               </div>
-              <div className="grid gap-1">
-                <div className="font-semibold">
-                  {message.subject || t("no_subject")}
+              <div className="flex flex-col gap-1 grow overflow-hidden">
+                <div className="flex justify-between items-center ">
+                  <span className="font-semibold ellipsis">
+                    {message.subject || t("no_subject")}
+                  </span>
+                  {message.send_time && (
+                    <span
+                      className="text-xs text-muted-foreground relative whitespace-nowrap"
+                      style={{ top: "1px" }}
+                    >
+                      {format(
+                        new Date(message.send_time),
+                        PORTUGUESE_DATE_FORMAT
+                      )}
+                    </span>
+                  )}
                 </div>
                 <div className="flex text-xs gap-1">
                   <div className="font-medium">{t("common:to")}:</div>
 
-                  {message.recipients.map((recipient, index) => {
-                    const foundContact = contacts.find(
-                      (contact) => contact.phone === recipient.phone
-                    );
-                    return (
-                      <div key={recipient.id}>
-                        {(foundContact?.name || recipient.phone) +
-                          (index < message.recipients.length - 1 ? ", " : "")}
-                      </div>
-                    );
-                  })}
+                  <div className="flex">
+                    {message.recipients.map((recipient, index) => {
+                      const foundContact = contacts.find(
+                        (contact) => contact.phone === recipient.phone
+                      );
+                      return (
+                        <span key={recipient.id} className="whitespace-nowrap">
+                          {(foundContact?.name || recipient.phone) +
+                            (index < message.recipients.length - 1 ? ", " : "")}
+                        </span>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col text-xs gap-1">
-              {message.send_time && (
-                <div className="text-muted-foreground">
-                  {format(new Date(message.send_time), PORTUGUESE_DATE_FORMAT)}
-                </div>
-              )}
-            </div>
+            <div className="flex flex-col text-xs gap-1"></div>
           </div>
 
           <Separator />

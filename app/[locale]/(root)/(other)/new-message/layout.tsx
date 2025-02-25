@@ -1,6 +1,8 @@
 import initTranslations from "@/app/i18n";
 import TranslationsProvider from "@/contexts/translations-provider";
 import ChildrenPanel from "@/components/shared/children-panel";
+import { ContactsProvider } from "@/contexts/use-contacts";
+import { fetchContacts } from "@/lib/db/contact";
 
 type LayoutProps = Readonly<{
   children: React.ReactNode;
@@ -24,7 +26,11 @@ export default async function TranslationLayout({
       locale={locale}
       namespaces={i18nNamespaces}
     >
-      <ChildrenPanel>{children}</ChildrenPanel>
+      <ChildrenPanel>
+        <ContactsProvider initialContacts={(await fetchContacts()) || []}>
+          {children}
+        </ContactsProvider>
+      </ChildrenPanel>
     </TranslationsProvider>
   );
 }

@@ -34,11 +34,10 @@ export async function login(
   console.log("STARTING AUTHENTICATION");
   console.log(email, password);
 
-  const user: SessionData /**& { errors: string[] } */ =
-    await dummyAuthenticate({
-      email,
-      password,
-    });
+  const user: SessionData /**& { errors: string[] } */ = await authenticate({
+    email,
+    password,
+  });
 
   if (!user.isAuthenticated) {
     console.log("Wrong credentials!");

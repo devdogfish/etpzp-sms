@@ -25,6 +25,7 @@ import {
 } from "@/lib/utils";
 import useIsMounted from "@/hooks/use-mounted";
 import { EMPTY_MESSAGE } from "@/app/[locale]/(root)/(other)/new-message/page";
+import { useContacts } from "./use-contacts";
 
 type MessageContextValues = {
   // Message state
@@ -59,13 +60,11 @@ const NewMessageContext = createContext<MessageContextValues | null>(null);
 
 type ContextProps = {
   children: React.ReactNode;
-  fetchedContacts: DBContact[];
   fetchedRecipients: DBRecipient[];
   initialMessage: Message;
 };
 
 export function NewMessageProvider({
-  fetchedContacts,
   fetchedRecipients,
   children,
   initialMessage,
@@ -74,10 +73,11 @@ export function NewMessageProvider({
   const [message, setMessage] = useState<Message>(
     initialMessage || EMPTY_MESSAGE
   );
+  const { contacts } = useContacts();
   // draft id saved here, so that it is persisted on revalidation.
   const recipients =
     // Associate contacts with matching phone numbers  to recipients
-    matchContactsToRecipients(fetchedRecipients, fetchedContacts) || [];
+    matchContactsToRecipients(fetchedRecipients, contacts) || [];
 
   // UI state
   const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
@@ -96,10 +96,10 @@ export function NewMessageProvider({
 
     if (topRecipients.length === AMOUNT) {
       // Check if there are enough topRecipients
-      return matchContactsToRecipients(topRecipients, fetchedContacts);
+      return matchContactsToRecipients(topRecipients, contacts);
     } else {
       // If not look for unused contacts to fill the gap
-      const extraContacts = fetchedContacts
+      const extraContacts = contacts
         // 1. Filter out the ones that already exist in the top recipients
         .filter(
           (contact) => !topRecipients.some((top) => top.phone === contact.phone)
@@ -123,11 +123,11 @@ export function NewMessageProvider({
 
       return matchContactsToRecipients(
         [...topRecipients, ...extraContacts],
-        fetchedContacts
+        contacts
       ) as RecipientWithContact[];
     }
     // TODO: These re-rendering conditions need to be checked
-  }, [fetchedContacts]);
+  }, [contacts]);
 
   // Helper functions
   const getUniques = useCallback(
@@ -145,7 +145,7 @@ export function NewMessageProvider({
       // For some reason this inner part gets run twice while the outer function only gets run once
       ...prevMessage,
       recipients: prevMessage.recipients.map((recipient, index) => {
-        const foundContact = fetchedContacts.find(
+        const foundContact = contacts.find(
           (contact) => contact.phone === recipient.phone
         );
 
@@ -169,7 +169,7 @@ export function NewMessageProvider({
 
   // Recipient management functions
   const addRecipient = useCallback(
-    (phone: string, contacts: DBContact[]) => {
+    (phone: string) => {
       if (message.recipients.some((item) => item.phone === phone)) {
         toast.error("Duplicate recipients", {
           description: "You cannot add the same recipient multiple times",
@@ -266,7 +266,7 @@ export function NewMessageProvider({
       `Contacts got re-fetched, revalidating recipients with new contacts`
     );
     revalidateRecipients();
-  }, [fetchedContacts]);
+  }, [contacts]);
 
   return (
     <NewMessageContext.Provider

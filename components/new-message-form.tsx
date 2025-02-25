@@ -55,6 +55,7 @@ import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
 import { EMPTY_MESSAGE } from "@/app/[locale]/(root)/(other)/new-message/page";
+import { useContacts } from "@/contexts/use-contacts";
 
 const initialState: ActionResponse<Message> = {
   success: false,
@@ -63,12 +64,11 @@ const initialState: ActionResponse<Message> = {
 
 // apparently, when something gets revalidated or the url gets updated, this component gets re-rendered, while the new-message-context keeps it's state
 const NewMessageForm = React.memo(function ({
-  contacts,
   editDraft,
 }: {
-  contacts: DBContact[];
   editDraft?: DBMessage;
 }) {
+  const { contacts } = useContacts();
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation(["new-message-page"]);
   const router = useRouter();

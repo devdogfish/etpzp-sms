@@ -25,6 +25,7 @@ import { CreateContactResponse } from "@/types/action";
 import { useTranslation } from "react-i18next";
 import { usePathname } from "next/navigation";
 import { DBContact } from "@/types/contact";
+import { useContacts } from "@/contexts/use-contacts";
 
 const initialState: CreateContactResponse = {
   success: false,
@@ -41,15 +42,17 @@ export default function CreateContactModal({
   const { modal, setModal } = useContactModals();
   const pathname = usePathname();
   const [serverState, action, pending] = useActionState(
-    createContact.bind(null, pathname),
+    createContact.bind(null, "/contacts"),
     initialState
   );
+  const { refetchContacts } = useContacts();
   const { t } = useTranslation(["modals"]);
 
   useEffect(() => {
     if (serverState.success) {
       toastActionResult(serverState, t);
       onOpenChange(false);
+      refetchContacts();
       if (onCreateNew && serverState.data) onCreateNew(serverState.data);
     }
   }, [serverState]);
