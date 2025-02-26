@@ -3,7 +3,7 @@ import { NewMessageProvider } from "@/contexts/use-new-message";
 import { fetchContacts } from "@/lib/db/contact";
 import { fetchRecipients } from "@/lib/db/recipients";
 import { fetchDraft } from "@/lib/db/message";
-import { validatePhoneNumber } from "@/lib/utils";
+import { sleep, validatePhoneNumber } from "@/lib/utils";
 import { Message } from "@/types";
 import { ContactsProvider } from "@/contexts/use-contacts";
 
@@ -18,6 +18,7 @@ export const EMPTY_MESSAGE: Message = {
 export default async function Page({ searchParams }: NewMessagePageProps) {
   const rawRecipients = await fetchRecipients();
 
+  await sleep(10000);
   const draftInUrl = await searchParams;
   const fetchedDraft = await fetchDraft(draftInUrl.editDraft);
 

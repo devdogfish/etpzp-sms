@@ -43,16 +43,14 @@ export default function RecipientInfoModal({
         <DialogHeader>
           <DialogTitle>
             {/* make it so we can interpolate a one of these translations using {{name}} into the actual one */}
-            {recipient.contact?.id
+            {recipient.contact
               ? t("info-header_contact")
               : t("info-header_recipient")}
           </DialogTitle>
           <DialogDescription>
-            {t("info-header_caption", {
-              type: recipient.contact?.id
-                ? t("common:contact").toLowerCase()
-                : t("common:recipient").toLowerCase(),
-            })}
+            {recipient.contact
+              ? t("info-header_caption_contact")
+              : t("info-header_caption_recipient")}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-1 flex-col">
@@ -70,7 +68,7 @@ export default function RecipientInfoModal({
             </CopyButton>
           </div>
           <Separator />
-          {recipient.contact?.id && (
+          {recipient.contact && (
             <div className="flex gap-4 justify-between p-4 text-sm">
               <p>{t("common:description")}</p>
 

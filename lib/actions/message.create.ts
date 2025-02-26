@@ -235,11 +235,7 @@ export async function sendMessage(
   } catch (error) {
     return {
       success: false,
-      message: [
-        // TODO TRANSLATION: new-message-page:server-unknown_error
-        "Unknown Error",
-        "Something went wrong. Please try again later.",
-      ],
+      message: ["new-message-page:server-unknown_error"],
     };
   }
 }

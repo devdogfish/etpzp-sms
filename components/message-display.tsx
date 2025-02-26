@@ -65,8 +65,6 @@ function MessageDisplay({
   // State to store random colors for each item
   const [profileColors, setProfileColors] = useState<string[]>([]);
   const showInfoAbout = (recipient: NewRecipient) => {
-    console.log("user wants to see more info about");
-    // TODO: Continue here
     console.log(recipient);
     setMoreInfoOn(recipient);
     setModal((prev) => ({ ...prev, info: true }));
@@ -372,6 +370,7 @@ function MessageDisplay({
                 <div className={cn("flex text-xs gap-1 relative")}>
                   {!recipientsExpanded && (
                     <div
+                      // Have a div cover the recipients so that the user has to expand the recipients first to be able to view more info
                       className="container-overlay"
                       onClick={() => setRecipientsExpanded(true)}
                     />
