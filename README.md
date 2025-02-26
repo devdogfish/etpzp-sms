@@ -20,12 +20,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 #### UP NEXT - MESSAGE DISPLAY:
 
-- Add a new-message-page skeleton
 - Make sure when the server components re-refetch because of revalidation, that the contexts update their state values with the newly fetched data!
 
 Latest conversation
 
-- maybe add the possibility to upload images for the contact,
+- Maybe add the possibility to upload images for the contact,
 - Maybe add some shades of blue between the different columns, to show a hierarchy
 - Move all messages where an gateway Api error got returned, to **Failed** page, and add an error code so that the user can ask for tech support/help and they can research the error code then.
 - Add badges for message cards only in trash, as sent, scheduled, and failed will always only have that exact type of message and that would leave the user looking through all the messages, if there is one that isn't of that type.

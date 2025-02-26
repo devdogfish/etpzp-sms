@@ -6,13 +6,15 @@ import { Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { useLayout } from "@/contexts/use-layout";
 import Link from "next/link";
+import Skeleton from "react-loading-skeleton";
 
 type PageHeaderProps = {
   title: string;
   children?: React.ReactNode;
+  skeleton?: boolean;
 };
 
-export function PageHeader({ title, children }: PageHeaderProps) {
+export function PageHeader({ title, children, skeleton }: PageHeaderProps) {
   const onMobile = useIsMobile();
   const { setMobileNavPanel } = useLayout();
   return (
@@ -30,7 +32,16 @@ export function PageHeader({ title, children }: PageHeaderProps) {
             <span className="sr-only">Toggle mobile menu</span>
           </Button>
         )}
-        <h2 className="mr-auto">{title}</h2>
+        {skeleton ? (
+          <Skeleton
+            // Consider to set this to 158 later which is the width of `Nova mensagem` title
+            width=""
+            height={28}
+            containerClassName="mr-auto w-[30%]"
+          />
+        ) : (
+          <h2 className="mr-auto">{title}</h2>
+        )}
         {children}
       </div>
     </>
