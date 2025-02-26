@@ -22,12 +22,6 @@ import useIsMounted from "@/hooks/use-mounted";
 import ProfilePic from "./profile-pic";
 import { useTranslation } from "react-i18next";
 
-type InputState = {
-  value: string;
-  isFocused: boolean;
-  error?: string;
-};
-
 React.memo(RecipientsInput);
 export default function RecipientsInput({
   contacts,
@@ -40,21 +34,20 @@ export default function RecipientsInput({
   onFocus: () => void;
   onBlur: () => void;
 }) {
-  const [input, setInput] = useState<InputState>({
-    value: "",
-    isFocused: false,
-    error: undefined,
-  });
   const container = useRef<HTMLDivElement | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const searchParams = useSearchParams();
   const {
+    message,
+    setMessage,
     recipients,
     addRecipient,
     removeRecipient,
     suggestedRecipients,
     searchRecipients,
     setMoreInfoOn,
+
+    // Which one in the suggested recipients/contacts is currently selected. You can change the selection with up and down arrow keys.
     selectedPhone,
     updateSelectedPhone,
   } = useNewMessage();
@@ -66,21 +59,17 @@ export default function RecipientsInput({
 
   useEffect(() => {
     if (isMounted) {
-      const addInitialRecipients = () => {
-        // Add recipient from URL if present
-        const contactId = searchParams.get("contactId");
-        if (contactId) {
-          const contact = contacts.find((contact) => contact.id == contactId);
-          if (contact) {
-            addRecipient(contact.phone, contacts);
-          }
+      // Add initial recipients parsed from URL if present
+      const contactId = searchParams.get("contactId");
+      if (contactId) {
+        const contact = contacts.find((contact) => contact.id == contactId);
+        if (contact) {
+          addRecipient(contact.phone, contacts);
         }
+      }
 
-        // Update searched recipients after adding all initial recipients
-        searchRecipients("");
-      };
-
-      addInitialRecipients();
+      // Update searched recipients after adding all initial recipients
+      searchRecipients("");
     }
   }, [isMounted]);
 
@@ -92,7 +81,7 @@ export default function RecipientsInput({
       }
     }, 0);
 
-    const trimmedInput = input.value.trim();
+    const trimmedInput = message.recipientInput.value.trim();
     if (e.key === "Enter" || e.key === "Tab") {
       e.preventDefault();
       e.stopPropagation();
@@ -100,8 +89,14 @@ export default function RecipientsInput({
         addRecipient(selectedPhone, contacts);
       } else if (trimmedInput !== "") {
         addRecipient(trimmedInput, contacts);
-        // reset input value
-        setInput((prevInput) => ({ ...prevInput, value: "" }));
+        // reset the input's value
+        setMessage((m) => ({
+          ...m,
+          recipientInput: {
+            ...m.recipientInput,
+            value: "",
+          },
+        }));
       }
     } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       updateSelectedPhone(e.key);
@@ -114,9 +109,12 @@ export default function RecipientsInput({
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setInput((prevInput) => ({
-      ...prevInput,
-      value,
+    setMessage((m) => ({
+      ...m,
+      recipientInput: {
+        ...m.recipientInput,
+        value,
+      },
     }));
     setIsDropdownOpen(true);
     searchRecipients(value);
@@ -145,7 +143,7 @@ export default function RecipientsInput({
         <div
           className={cn(
             "w-full flex flex-wrap items-center gap-x-1 py-1 h-full border-b px-5 z-50",
-            input.isFocused && "border-primary",
+            message.recipientInput.isFocused && "border-primary",
             activeError && "border-red-500"
           )}
         >
@@ -194,23 +192,31 @@ export default function RecipientsInput({
               className={cn(
                 "h-full my-0.5 w-full p-0 ring-0 focus:ring-0 shadow-none rounded-none placeholder:text-muted-foreground"
               )}
-              placeholder={input.isFocused ? t("common:phone_number") : ""}
-              value={input.value}
+              placeholder={
+                message.recipientInput.isFocused ? t("common:phone_number") : ""
+              }
+              value={message.recipientInput.value}
               onChange={onInputChange}
               onKeyDown={handleKeyDown}
               onFocus={() => {
-                setInput((prevInput) => ({
-                  ...prevInput,
-                  isFocused: true,
+                setMessage((m) => ({
+                  ...m,
+                  recipientInput: {
+                    ...m.recipientInput,
+                    isFocused: true,
+                  },
                 }));
                 setIsDropdownOpen(true);
-                searchRecipients(input.value);
+                searchRecipients(message.recipientInput.value);
                 onFocus();
               }}
               onBlur={() => {
-                setInput((prevInput) => ({
-                  ...prevInput,
-                  isFocused: false,
+                setMessage((m) => ({
+                  ...m,
+                  recipientInput: {
+                    ...m.recipientInput,
+                    isFocused: false,
+                  },
                 }));
                 setIsDropdownOpen(false);
                 onBlur();
@@ -224,7 +230,7 @@ export default function RecipientsInput({
                     className="p-2" /* this is necessary to have a separate container so that the items scroll all the way up to the end of the container */
                   >
                     <h3 className="mb-2 px-2 text-sm font-medium">
-                      {input.value.length === 0
+                      {message.recipientInput.value.length === 0
                         ? "Suggestions"
                         : "Search results"}
                     </h3>
@@ -242,10 +248,13 @@ export default function RecipientsInput({
                             e.preventDefault();
 
                             addRecipient(recipient.phone, contacts);
-                            // reset input value
-                            setInput((prevInput) => ({
-                              ...prevInput,
-                              value: "",
+                            // reset message.recipientInput value
+                            setMessage((m) => ({
+                              ...m,
+                              recipientInput: {
+                                ...m.recipientInput,
+                                isFocused: true,
+                              },
                             }));
                           }}
                         >

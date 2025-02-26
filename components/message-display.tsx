@@ -6,10 +6,8 @@ import {
   ArchiveRestore,
   ArrowLeft,
   ChevronDown,
-  ChevronLeft,
   Edit,
   MessageCircleX,
-  ReplyAll,
   Send,
   Trash2,
   X,
@@ -153,7 +151,12 @@ function MessageDisplay({
 
   return (
     <div className={cn("flex h-full flex-col")}>
-      {moreInfoOn && <RecipientInfoModal recipient={moreInfoOn} />}
+      {moreInfoOn && (
+        <RecipientInfoModal
+          recipient={moreInfoOn}
+          allowContactCreation={false}
+        />
+      )}
       <div className="flex items-center p-2 h-[var(--header-height)] border-b">
         <div className="flex items-center gap-2">
           {onMobile && (

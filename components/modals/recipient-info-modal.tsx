@@ -19,8 +19,10 @@ import ProfilePic from "../profile-pic";
 
 export default function RecipientInfoModal({
   recipient,
+  allowContactCreation = true,
 }: {
   recipient: NewRecipient;
+  allowContactCreation: boolean;
 }) {
   const { modal, setModal } = useContactModals();
   const { t } = useTranslation(["modals"]);
@@ -67,31 +69,35 @@ export default function RecipientInfoModal({
               {recipient.phone}
             </CopyButton>
           </div>
-          <Separator />
-          {recipient.contact && (
-            <div className="flex gap-4 justify-between p-4 text-sm">
-              <p>{t("common:description")}</p>
+          {recipient.contact && ( // Contact description information
+            <>
+              <Separator />
+              <div className="flex gap-4 justify-between p-4 text-sm">
+                <p>{t("common:description")}</p>
 
-              {recipient.contact?.description?.trim() ? (
-                <p>{recipient.contact?.description}</p>
-              ) : (
-                <p className="italic">{t("common:no_description")}</p>
-              )}
-            </div>
+                {recipient.contact?.description?.trim() ? (
+                  <p>{recipient.contact?.description}</p>
+                ) : (
+                  <p className="italic">{t("common:no_description")}</p>
+                )}
+              </div>
+            </>
           )}
         </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline" className="mr-auto">
-              {t("common:close")}
-            </Button>
-          </DialogClose>
-          {!recipient.contact?.id && (
-            <Button onClick={showCreateFromRecipientModal}>
-              {t("info-button_create_contact")}
-            </Button>
-          )}
-        </DialogFooter>
+        {allowContactCreation && (
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" className="mr-auto">
+                {t("common:close")}
+              </Button>
+            </DialogClose>
+            {!recipient.contact?.id && (
+              <Button onClick={showCreateFromRecipientModal}>
+                {t("info-button_create_contact")}
+              </Button>
+            )}
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

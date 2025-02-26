@@ -1,5 +1,5 @@
 import NewMessageForm from "@/components/new-message-form";
-import { NewMessageProvider } from "@/contexts/use-new-message";
+import { MessageState, NewMessageProvider } from "@/contexts/use-new-message";
 import { fetchRecipients } from "@/lib/db/recipients";
 import { fetchDraft } from "@/lib/db/message";
 import { validatePhoneNumber } from "@/lib/utils";
@@ -8,11 +8,18 @@ import { Message } from "@/types";
 type NewMessagePageProps = {
   searchParams: Promise<{ editDraft: string }>;
 };
-export const EMPTY_MESSAGE: Message = {
-  body: "",
+export const EMPTY_MESSAGE: MessageState = {
   sender: "ETPZP",
+  subject: "",
   recipients: [],
+  body: "",
+  recipientInput: {
+    isFocused: false,
+    value: "",
+    error: undefined,
+  },
 };
+
 export default async function Page({ searchParams }: NewMessagePageProps) {
   const rawRecipients = await fetchRecipients();
 
@@ -35,6 +42,11 @@ export default async function Page({ searchParams }: NewMessagePageProps) {
                   error: validatePhoneNumber(r.phone),
                   formattedPhone: validatePhoneNumber(r.phone).formattedPhone,
                 })) || EMPTY_MESSAGE.recipients,
+              recipientInput: {
+                value: "",
+                isFocused: false,
+                error: undefined,
+              },
             }
           : EMPTY_MESSAGE
       }

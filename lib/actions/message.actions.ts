@@ -139,14 +139,10 @@ export async function saveDraft(
 ): Promise<DraftActionResponse<string>> {
   const session = await getSession();
   const userId = session?.user?.id;
+  let draft;
 
   try {
     if (!userId) throw new Error("Invalid user id.");
-    let draft;
-    console.log(
-      data.recipients.map((recipient) => recipient.contact?.id || null), // contact_id array
-      data.recipients.map((recipient) => recipient.phone)
-    );
 
     console.log("BEGIN IF block for saving draft... With this data:");
     console.log(data);

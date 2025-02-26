@@ -125,12 +125,11 @@ export async function sendMessage(
             VALUES ($1, $2, $3, $4, $5, $6, $7) 
             RETURNING id
           )
-          INSERT INTO recipient (message_id, contact_id, phone, index)
+          INSERT INTO recipient (message_id, phone, index)
           SELECT 
             insert_message.id,
-            unnest($8::int[]) as contact_id,
-            unnest($9::text[]) as phone,
-            unnest($10::int[]) as index
+            unnest($8::text[]) as phone,
+            unnest($9::int[]) as index
           FROM insert_message;
         `,
         [
@@ -150,15 +149,13 @@ export async function sendMessage(
           response.ids[0] || null,
 
           // recipient parameters:
-          validRecipients.map((recipient) => recipient.contact?.id || null), // contact_id array
           validRecipients.map((recipient) => recipient.phone), // phone number array
           validRecipients.map((_, index) => index), // for the ordering of the recipient
         ]
       );
     } else {
       console.log(
-        "Updating existing message item with draftId: ",
-        existingDraftId
+        `Updating existing message item with draftId: ${existingDraftId}`
       );
 
       // Update existing message record

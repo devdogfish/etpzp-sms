@@ -120,6 +120,11 @@ const NewMessageForm = React.memo(function ({
 
     setLoading(false);
     setServerState(result);
+    // Update the message context with the result errors, so that they can be persisted between draft re-renders
+    setMessage((m) => ({
+      ...m,
+      serverStateErrors: result.errors,
+    }));
 
     if (result.success) {
       // Message got sent successfully
@@ -130,13 +135,14 @@ const NewMessageForm = React.memo(function ({
             PORTUGUESE_DATE_FORMAT
           )}`
         );
+      } else {
+        toastActionResult(result, t);
       }
-      toastActionResult(result, t);
-      // reset the form
-      formRef.current?.reset();
-      setMessage((prev) => ({ ...prev, recipients: [] }));
+      // reset the form values to be empty
+      setMessage(EMPTY_MESSAGE);
     } else {
       // Something went wrong:
+
       // Display input specific error messages
       const zodErrors = result.errors || {};
       let waitTime = 0;
@@ -178,7 +184,15 @@ const NewMessageForm = React.memo(function ({
     router.push("/sent");
   };
 
-  // Saving editDraft logic
+  function messageIsEmpty() {
+    return (
+      !message.body &&
+      !message.subject &&
+      !message.recipients.length &&
+      message.sender === "ETPZP"
+    );
+  }
+  // Saving draft logic
   useEffect(() => {
     if (!isMounted) return;
 
@@ -213,14 +227,7 @@ const NewMessageForm = React.memo(function ({
       }
     };
 
-    if (
-      !message.body &&
-      !message.subject &&
-      !message.recipients.length &&
-      message.sender === "ETPZP"
-    ) {
-      console.log("MESSAGE FORM IS EMPTY, EMPTY DRAFT BE GONE");
-
+    if (messageIsEmpty()) {
       // Delete the old draft
       discard();
     } else {
@@ -228,7 +235,7 @@ const NewMessageForm = React.memo(function ({
     }
   }, [debouncedSaveDraft]);
   useEffect(() => {
-    // Reapply input focus state (except sender dropdown) - extra logic removed.
+    // Reapply input focus state - sender focusing logic not needed as it is a <Select>.
     if (focusedInput) {
       const inputElement = document.querySelector(
         `[name="${focusedInput}"]`
@@ -258,18 +265,20 @@ const NewMessageForm = React.memo(function ({
       <InsertContactModal contacts={contacts} />
       <CreateContactModal />
 
-      {moreInfoOn && <RecipientInfoModal recipient={moreInfoOn} />}
+      {moreInfoOn && (
+        <RecipientInfoModal recipient={moreInfoOn} allowContactCreation />
+      )}
       {moreInfoOn && !moreInfoOn.contact?.id && (
         <CreateContactFromRecipientModal recipient={moreInfoOn} />
       )}
 
       <PageHeader title={message.subject ? message.subject : t("header")}>
         <p>
-          {message !== EMPTY_MESSAGE
-            ? pendingDraft
-              ? "Saving editDraft..."
-              : "Saved to drafts"
-            : ""}
+          {messageIsEmpty()
+            ? ""
+            : pendingDraft
+            ? t("saving_draft")
+            : t("saved_draft")}
         </p>
         {!onMobile && (
           <Tooltip>
@@ -321,7 +330,7 @@ const NewMessageForm = React.memo(function ({
             <div
               className={cn(
                 "border-b focus-within:border-black",
-                serverState.errors?.sender && "border-red-500"
+                message.serverStateErrors?.sender && "border-red-500"
               )}
             >
               <Select
@@ -344,7 +353,7 @@ const NewMessageForm = React.memo(function ({
 
             <RecipientsInput
               contacts={contacts}
-              error={!!serverState.errors?.recipients}
+              error={!!message.serverStateErrors?.recipients}
               onFocus={() => setFocusedInput("new-recipient")}
               onBlur={() => setFocusedInput(null)}
             />
@@ -366,12 +375,12 @@ const NewMessageForm = React.memo(function ({
               name="body"
               className={cn(
                 "border-none rounded-none h-full p-0 focus-visible:ring-0 shadow-none resize-none placeholder:text-muted-foreground",
-                serverState.errors?.body &&
+                message.serverStateErrors?.body &&
                   "ring-red-500 placeholder:text-red-400"
               )}
               placeholder={
-                serverState.errors?.body
-                  ? t(serverState.errors?.body[0])
+                message.serverStateErrors?.body
+                  ? t(message.serverStateErrors?.body[0])
                   : t("body_placeholder")
               }
               onChange={handleInputChange}

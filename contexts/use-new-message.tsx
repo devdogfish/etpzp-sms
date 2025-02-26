@@ -23,14 +23,22 @@ import {
   rankRecipients,
   validatePhoneNumber,
 } from "@/lib/utils";
-import useIsMounted from "@/hooks/use-mounted";
 import { EMPTY_MESSAGE } from "@/app/[locale]/(root)/(other)/new-message/page";
 import { useContacts } from "./use-contacts";
+import { useTranslation } from "react-i18next";
+
+// This is our biggest state where we store all data related to the active message, that should be persisted during draft saving re-renders
+// MessageState is only used here & for EMPTY_MESSAGE
+export type MessageState = Message & {
+  // This is only for the front end composing of the message and will not be used on the server
+  recipientInput: { value: string; isFocused: boolean; error?: string };
+  serverStateErrors?: { [K in keyof Message]?: string[] };
+};
 
 type MessageContextValues = {
   // Message state
-  message: Message;
-  setMessage: React.Dispatch<React.SetStateAction<Message>>;
+  message: MessageState;
+  setMessage: React.Dispatch<React.SetStateAction<MessageState>>;
 
   // Recipient management
   recipients: NewRecipient[];
@@ -55,14 +63,13 @@ type MessageContextValues = {
   focusedInput: string | null;
   setFocusedInput: React.Dispatch<React.SetStateAction<string | null>>;
 };
-
-const NewMessageContext = createContext<MessageContextValues | null>(null);
-
 type ContextProps = {
   children: React.ReactNode;
   fetchedRecipients: DBRecipient[];
-  initialMessage: Message;
+  initialMessage: MessageState;
 };
+
+const NewMessageContext = createContext<MessageContextValues | null>(null);
 
 export function NewMessageProvider({
   fetchedRecipients,
@@ -70,10 +77,11 @@ export function NewMessageProvider({
   initialMessage,
 }: ContextProps) {
   // Message state
-  const [message, setMessage] = useState<Message>(
+  const [message, setMessage] = useState<MessageState>(
     initialMessage || EMPTY_MESSAGE
   );
   const { contacts } = useContacts();
+  const { t } = useTranslation(["new-messages-page"]);
   // draft id saved here, so that it is persisted on revalidation.
   const recipients =
     // Associate contacts with matching phone numbers  to recipients
@@ -168,46 +176,45 @@ export function NewMessageProvider({
   );
 
   // Recipient management functions
-  const addRecipient = useCallback(
-    (phone: string) => {
-      if (message.recipients.some((item) => item.phone === phone)) {
-        toast.error("Duplicate recipients", {
-          description: "You cannot add the same recipient multiple times",
-        });
-        return;
-      }
+  const addRecipient = (phone: string) => {
+    console.log("trying to add new phone:", phone);
 
-      setMessage((prev) => {
-        const contactDetails = contacts.find(
-          (contact) => contact.phone === phone
-        );
-        const newRecipient = contactDetails
-          ? convertToRecipient(contactDetails)
-          : { phone };
-        return {
-          ...prev,
-          recipients: [...prev.recipients, getValidatedRecipient(newRecipient)],
-        };
+    if (message.recipients.some((item) => item.phone === phone)) {
+      // I know this is not on the server, but I wanted to keep the same format
+      return toast.error(t("server-duplicate_recipients_error"), {
+        description: t("server-duplicate_recipients_error_caption"),
       });
+    }
 
-      // Immediately update suggestedRecipients
-      setSuggestedRecipients((prevSearched) =>
-        getUniques(prevSearched.filter((r) => r.phone !== phone))
+    setMessage((prev) => {
+      const contactDetails = contacts.find(
+        (contact) => contact.phone === phone
       );
+      const newRecipient = contactDetails
+        ? convertToRecipient(contactDetails)
+        : { phone };
+      return {
+        ...prev,
+        recipients: [...prev.recipients, getValidatedRecipient(newRecipient)],
+      };
+    });
 
-      // Update selectedPhone to the next available recipient
-      setSelectedPhone((prevSelected) => {
-        if (prevSelected === phone) {
-          const nextRecipient = suggestedRecipients.find(
-            (r) => r.phone !== phone
-          );
-          return nextRecipient ? nextRecipient.phone : undefined;
-        }
-        return prevSelected;
-      });
-    },
-    [message.recipients, getValidatedRecipient, suggestedRecipients, getUniques]
-  );
+    // Immediately update suggestedRecipients
+    setSuggestedRecipients((prevSearched) =>
+      getUniques(prevSearched.filter((r) => r.phone !== phone))
+    );
+
+    // Update selectedPhone to the next available recipient
+    setSelectedPhone((prevSelected) => {
+      if (prevSelected === phone) {
+        const nextRecipient = suggestedRecipients.find(
+          (r) => r.phone !== phone
+        );
+        return nextRecipient ? nextRecipient.phone : undefined;
+      }
+      return prevSelected;
+    });
+  };
 
   const removeRecipient = useCallback(
     (recipient: NewRecipient, replaceWithRecipient?: NewRecipient) => {
@@ -225,8 +232,14 @@ export function NewMessageProvider({
   // Search and suggestion functions
   const searchRecipients = (rawSearchTerm: string) => {
     const searchTerm = rawSearchTerm.trim().toLowerCase();
+    console.log("searched recipients");
+    if (!suggestedRecipients.length) {
+      // All recipients from the suggested list have already been added! So
+      return setSelectedPhone(undefined);
+    }
 
-    if (searchTerm.length && suggestedRecipients.length) {
+    // There are still suggested recipients that haven't been added yet, so do additional checks
+    if (searchTerm.length) {
       const filteredRecipients = getUniques(
         suggestedRecipients.filter(
           (recipient) =>
@@ -236,7 +249,17 @@ export function NewMessageProvider({
         )
       );
       setSuggestedRecipients(filteredRecipients);
-      setSelectedPhone(filteredRecipients[0]?.phone);
+
+      if (!filteredRecipients.length) {
+        // No recipients found (the suggested panel will be hidden) - deselect the previous phone
+        console.log(
+          "Deselecting SelectedPhone because no filtered recipients were found"
+        );
+
+        setSelectedPhone(undefined);
+      } else {
+        setSelectedPhone(filteredRecipients[0]?.phone);
+      }
     } else {
       setSuggestedRecipients(getUniques(recommendedRecipients));
       setSelectedPhone(recommendedRecipients[0]?.phone);
