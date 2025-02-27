@@ -42,7 +42,7 @@ export default function CreateContactModal({
   const { modal, setModal } = useContactModals();
   const pathname = usePathname();
   const [serverState, action, pending] = useActionState(
-    createContact.bind(null, "/contacts"),
+    createContact.bind(null, pathname),
     initialState
   );
   const { refetchContacts } = useContacts();

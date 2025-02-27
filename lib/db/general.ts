@@ -29,22 +29,43 @@ export async function fetchAmountIndicators() {
 
   try {
     if (!userId) throw new Error("Invalid user id.");
-    const { rows } = await db(
+    const result = await db(
       `
         SELECT
-          CAST(COUNT(CASE WHEN send_time < NOW() AND in_trash = false THEN 1 END) AS INTEGER) AS sent,
-          CAST(COUNT(CASE WHEN status = 'SCHEDULED' AND in_trash = false AND send_time > NOW() THEN 1 END) AS INTEGER) AS scheduled,
-          CAST(COUNT(CASE WHEN status = 'FAILED' AND in_trash = false THEN 1 END) AS INTEGER) AS failed,
-          CAST(COUNT(CASE WHEN status = 'DRAFTED' AND in_trash = false THEN 1 END) AS INTEGER) AS drafts,
-          CAST(COUNT(CASE WHEN in_trash = true THEN 1 END) AS INTEGER) AS trash,
-          CAST((SELECT COUNT(*) FROM contact WHERE contact.user_id = message.user_id) AS INTEGER) AS contacts
-        FROM message
-        WHERE user_id = $1
-        GROUP BY user_id;
+            -- Count of sent messages (in the past and not in trash)
+            CAST(COUNT(CASE WHEN m.send_time < NOW() AND m.in_trash = false THEN 1 END) AS INTEGER) AS sent,
+            
+            -- Count of scheduled messages (in the future and not in trash)
+            CAST(COUNT(CASE WHEN m.status = 'SCHEDULED' AND m.in_trash = false AND m.send_time > NOW() THEN 1 END) AS INTEGER) AS scheduled,
+            
+            -- Count of failed messages (not in trash)
+            CAST(COUNT(CASE WHEN m.status = 'FAILED' AND m.in_trash = false THEN 1 END) AS INTEGER) AS failed,
+            
+            -- Count of drafted messages (not in trash)
+            CAST(COUNT(CASE WHEN m.status = 'DRAFTED' AND m.in_trash = false THEN 1 END) AS INTEGER) AS drafts,
+            
+            -- Count of messages in trash
+            CAST(COUNT(CASE WHEN m.in_trash = true THEN 1 END) AS INTEGER) AS trash,
+            
+            -- Total number of contacts for the user
+            CAST(COUNT(*) AS INTEGER) AS contacts
+        FROM
+            contact c
+        -- Left join to include all contacts, even if no messages exist
+        LEFT JOIN
+            message m ON c.user_id = m.user_id
+        -- Filter for the specified user
+        WHERE
+            c.user_id = $1
+        -- Group results by user_id
+        GROUP BY
+            c.user_id;
+
       `,
       [userId]
     );
+    console.log("Amount Indicators: ", result.rows);
 
-    return rows[0] as AmountIndicators;
+    return result.rows[0] as AmountIndicators;
   } catch (error) {}
 }

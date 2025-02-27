@@ -129,6 +129,14 @@ export function NewMessageProvider({
       console.log(`Recommended recipients in suggested:`);
       console.log([...topRecipients, ...extraContacts]);
 
+      console.log("Recommended recipients");
+      console.log(
+        matchContactsToRecipients(
+          [...topRecipients, ...extraContacts],
+          contacts
+        )
+      );
+
       return matchContactsToRecipients(
         [...topRecipients, ...extraContacts],
         contacts
@@ -233,8 +241,9 @@ export function NewMessageProvider({
   const searchRecipients = (rawSearchTerm: string) => {
     const searchTerm = rawSearchTerm.trim().toLowerCase();
     console.log("searched recipients");
-    if (!suggestedRecipients.length) {
-      // All recipients from the suggested list have already been added! So
+    if (!suggestedRecipients.length && !recommendedRecipients.length) {
+      // Searched suggested- and recommended recipients are empty -
+      // All recipients from the suggested list have already been added!
       return setSelectedPhone(undefined);
     }
 

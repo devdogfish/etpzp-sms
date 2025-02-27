@@ -81,7 +81,6 @@ const NewMessageForm = React.memo(function ({
     setFocusedInput,
   } = useNewMessage();
   const [loading, setLoading] = useState(false);
-  const [serverState, setServerState] = useState(initialState);
   const { isFullscreen, setIsFullscreen } = useLayout();
   const pathname = usePathname();
   const onMobile = useIsMobile();
@@ -119,7 +118,6 @@ const NewMessageForm = React.memo(function ({
     });
 
     setLoading(false);
-    setServerState(result);
     // Update the message context with the result errors, so that they can be persisted between draft re-renders
     setMessage((m) => ({
       ...m,
@@ -376,7 +374,7 @@ const NewMessageForm = React.memo(function ({
               className={cn(
                 "border-none rounded-none h-full p-0 focus-visible:ring-0 shadow-none resize-none placeholder:text-muted-foreground",
                 message.serverStateErrors?.body &&
-                  "ring-red-500 placeholder:text-red-400"
+                  "ring-red-500 placeholder:text-red-400 dark:placeholder:text-red-400"
               )}
               placeholder={
                 message.serverStateErrors?.body

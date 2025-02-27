@@ -27,12 +27,14 @@ import { NewRecipient } from "@/types/recipient";
 import useIsMounted from "@/hooks/use-mounted";
 import { useTranslation } from "react-i18next";
 import { usePathname } from "next/navigation";
+import { useContacts } from "@/contexts/use-contacts";
 
 const initialState: CreateContactResponse = {
   success: false,
   message: [],
 };
 
+// The code below is expecting this modal to only be on the new-message-page
 export default function CreateContactFromRecipientModal({
   recipient,
 }: {
@@ -40,6 +42,7 @@ export default function CreateContactFromRecipientModal({
 }) {
   const isMounted = useIsMounted();
   const { modal, setModal } = useContactModals();
+  const { refetchContacts } = useContacts();
   const pathname = usePathname();
   const [serverState, action, pending] = useActionState(
     createContact.bind(null, pathname),
@@ -49,21 +52,29 @@ export default function CreateContactFromRecipientModal({
   const { t } = useTranslation(["modals"]);
 
   useEffect(() => {
-    if (isMounted) {
-      toastActionResult(serverState, t);
+    console.log("server state changed but not mounted");
 
-      if (serverState.success) {
-        onOpenChange(false);
-        console.log("successfully created from recipient");
+    if (serverState.message.length) toastActionResult(serverState, t);
 
-        if (recipient && serverState.data) {
-          console.log("REPLACING RECIPIENT WITH EXISTING", serverState.data);
+    if (serverState.success) {
+      console.log("successfully created from recipient");
+      // TODO: CONTINUE HERE - FOR SOME REASON THIS CODE DOESN'T GET REACHED. THUS THE CONTACTS DON"T GET REVALIDATED
 
-          // Replacing original recipient with newly created contact
-          const newRecipient = convertToRecipient(serverState.data);
-          removeRecipient(recipient, getValidatedRecipient(newRecipient));
-        }
+      if (recipient && serverState.data) {
+        console.log("REPLACING RECIPIENT WITH EXISTING", serverState.data);
+
+        // Replacing original recipient with newly created contact
+        const newRecipient = convertToRecipient(serverState.data);
+        removeRecipient(recipient, getValidatedRecipient(newRecipient));
       }
+      console.log(
+        "Created contact from recipient success: Refetching contacts"
+      );
+
+      refetchContacts();
+      onOpenChange(false);
+    } else {
+      console.log("something went wrong but ");
     }
   }, [serverState]);
 
