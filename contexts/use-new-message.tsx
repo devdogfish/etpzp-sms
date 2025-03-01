@@ -26,6 +26,7 @@ import {
 import { EMPTY_MESSAGE } from "@/app/[locale]/(root)/(other)/new-message/page";
 import { useContacts } from "./use-contacts";
 import { useTranslation } from "react-i18next";
+import { useContactModals } from "./use-contact-modals";
 
 // This is our biggest state where we store all data related to the active message, that should be persisted during draft saving re-renders
 // MessageState is only used here & for EMPTY_MESSAGE
@@ -89,6 +90,7 @@ export function NewMessageProvider({
 
   // UI state
   const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
+  const { modal, setModal } = useContactModals();
   const [selectedPhone, setSelectedPhone] = useState<string | undefined>();
   const [suggestedRecipients, setSuggestedRecipients] = useState(recipients);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
@@ -295,10 +297,18 @@ export function NewMessageProvider({
 
   useEffect(() => {
     console.log(
-      `Contacts got re-fetched, revalidating recipients with new contacts`
+      `CONTACTS RE-FETCHED, revalidating recipients with new contacts`
     );
     revalidateRecipients();
   }, [contacts]);
+
+  useEffect(() => {
+    // if (modal.create === true) {
+    //   setMoreInfoOn(null);
+    // }
+    console.log(modal);
+    
+  }, [modal]);
 
   return (
     <NewMessageContext.Provider

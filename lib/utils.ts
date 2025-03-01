@@ -151,6 +151,8 @@ export function toastActionResult(
 ) {
   if (!Array.isArray(result.message) || !result.message)
     throw new Error("Toast message must be an array of strings.");
+  if (!result.message.length)
+    return console.log("FAILED TOAST_ACTION_RESULT: message array is empty");
 
   // thankfully, this doesn't throw an error
   if (translate) {

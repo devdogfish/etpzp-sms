@@ -23,7 +23,6 @@ import { Alert, AlertDescription } from "../ui/alert";
 import { useContactModals } from "@/contexts/use-contact-modals";
 import { CreateContactResponse } from "@/types/action";
 import { useTranslation } from "react-i18next";
-import { usePathname } from "next/navigation";
 import { DBContact } from "@/types/contact";
 import { useContacts } from "@/contexts/use-contacts";
 
@@ -34,15 +33,17 @@ const initialState: CreateContactResponse = {
 
 export default function CreateContactModal({
   defaultPhone,
-  onCreateNew,
+  onCreateSuccess,
+  // This is for /new-message, where we keep a state of the recipient you are creating a contact from
+  // onClose,
 }: {
   defaultPhone?: string;
-  onCreateNew?: (contact: DBContact) => void;
+  onCreateSuccess?: (contact: DBContact) => void;
+  // onClose?: () => void;
 }) {
   const { modal, setModal } = useContactModals();
-  const pathname = usePathname();
   const [serverState, action, pending] = useActionState(
-    createContact.bind(null, pathname),
+    createContact,
     initialState
   );
   const { refetchContacts } = useContacts();
@@ -51,9 +52,11 @@ export default function CreateContactModal({
   useEffect(() => {
     if (serverState.success) {
       toastActionResult(serverState, t);
-      onOpenChange(false);
+      // Refetch contacts context after creation.
       refetchContacts();
-      if (onCreateNew && serverState.data) onCreateNew(serverState.data);
+      onOpenChange(false);
+      if (onCreateSuccess && serverState.data)
+        onCreateSuccess(serverState.data);
     }
   }, [serverState]);
 

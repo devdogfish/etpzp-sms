@@ -29,38 +29,46 @@ export async function fetchAmountIndicators() {
 
   try {
     if (!userId) throw new Error("Invalid user id.");
+    // While this seems quite complex, it is the only one that works. The CAST() syntax is just to convert to integers
     const result = await db(
       `
         SELECT
             -- Count of sent messages (in the past and not in trash)
-            CAST(COUNT(CASE WHEN m.send_time < NOW() AND m.in_trash = false THEN 1 END) AS INTEGER) AS sent,
-            
+            CAST(COALESCE(sent_counts.sent, 0) AS INTEGER) AS sent,
+
             -- Count of scheduled messages (in the future and not in trash)
-            CAST(COUNT(CASE WHEN m.status = 'SCHEDULED' AND m.in_trash = false AND m.send_time > NOW() THEN 1 END) AS INTEGER) AS scheduled,
-            
+            CAST(COALESCE(sent_counts.scheduled, 0) AS INTEGER) AS scheduled,
+
             -- Count of failed messages (not in trash)
-            CAST(COUNT(CASE WHEN m.status = 'FAILED' AND m.in_trash = false THEN 1 END) AS INTEGER) AS failed,
-            
+            CAST(COALESCE(sent_counts.failed, 0) AS INTEGER) AS failed,
+
             -- Count of drafted messages (not in trash)
-            CAST(COUNT(CASE WHEN m.status = 'DRAFTED' AND m.in_trash = false THEN 1 END) AS INTEGER) AS drafts,
-            
+            CAST(COALESCE(sent_counts.drafts, 0) AS INTEGER) AS drafts,
+
             -- Count of messages in trash
-            CAST(COUNT(CASE WHEN m.in_trash = true THEN 1 END) AS INTEGER) AS trash,
-            
+            CAST(COALESCE(sent_counts.trash, 0) AS INTEGER) AS trash,
+
             -- Total number of contacts for the user
-            CAST(COUNT(*) AS INTEGER) AS contacts
+            CAST(COUNT(c.id) AS INTEGER) AS contacts
         FROM
             contact c
-        -- Left join to include all contacts, even if no messages exist
-        LEFT JOIN
-            message m ON c.user_id = m.user_id
-        -- Filter for the specified user
+        LEFT JOIN (
+            SELECT
+                user_id,
+                COUNT(CASE WHEN send_time < NOW() AND in_trash = false THEN 1 END) AS sent,
+                COUNT(CASE WHEN status = 'SCHEDULED' AND in_trash = false AND send_time > NOW() THEN 1 END) AS scheduled,
+                COUNT(CASE WHEN status = 'FAILED' AND in_trash = false THEN 1 END) AS failed,
+                COUNT(CASE WHEN status = 'DRAFTED' AND in_trash = false THEN 1 END) AS drafts,
+                COUNT(CASE WHEN in_trash = true THEN 1 END) AS trash
+            FROM
+                message
+            GROUP BY
+                user_id
+        ) AS sent_counts ON c.user_id = sent_counts.user_id
         WHERE
             c.user_id = $1
-        -- Group results by user_id
         GROUP BY
-            c.user_id;
-
+            sent_counts.sent, sent_counts.scheduled, sent_counts.failed, sent_counts.drafts, sent_counts.trash, c.user_id;
       `,
       [userId]
     );

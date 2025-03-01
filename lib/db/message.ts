@@ -62,7 +62,6 @@ export async function fetchSent() {
       `,
       [userId]
     );
-    console.log(result.rows);
 
     return result.rows as DBMessage[];
   } catch (error) {}

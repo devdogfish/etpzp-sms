@@ -21,7 +21,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## UP NEXT - New message page bug fixing and refining error handling
 ## Testing:
 - When adding all suggested and then typing a custom phone number, it says duplicate recipients even though the number is unique
-- WHen the component re-freshes because a draft got saved, we loose the input value of the recipient that the user is currently typing
+- When the component re-freshes because a draft got saved, we loose the input value of the recipient that the user is currently typing
   Latest conversation
 - On draft refresh the server result errors get lost. How should I persist them - should I attach the errors to the message state, or create a separate state
 

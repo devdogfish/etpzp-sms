@@ -10,13 +10,11 @@ import { DatabaseError } from "pg";
 import { ActionResponse, CreateContactResponse } from "@/types/action";
 import { z } from "zod";
 
+// Binding pathname is unnecessary since we re-fetch the context, and contacts won't be re-fetched on revalidation.
 export async function createContact(
-  pathname: string,
   _: CreateContactResponse | null,
   formData: FormData
 ): Promise<CreateContactResponse> {
-  console.log("create contact called, will revalidate:", pathname);
-
   const session = await getSession();
   const userId = session?.user?.id;
 
@@ -48,9 +46,6 @@ export async function createContact(
       [userId, name, validatedPhone, description || null]
     );
     console.log(result.rows[0]);
-
-    // This re-renders the components, but it also causes a database re-fetch
-    revalidatePath(pathname);
 
     return {
       success: true,

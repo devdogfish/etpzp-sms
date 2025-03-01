@@ -56,14 +56,13 @@ function MessageDisplay({
   const { t } = useTranslation(["messages-page"]);
   const pathname = usePathname();
   const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
-  const { modal, setModal } = useContactModals();
+  const { setModal } = useContactModals();
 
   const [recipientsExpanded, setRecipientsExpanded] = useState(false);
   const { contacts, contactFetchError } = useContacts();
   // State to store random colors for each item
   const [profileColors, setProfileColors] = useState<string[]>([]);
   const showInfoAbout = (recipient: NewRecipient) => {
-    console.log(recipient);
     setMoreInfoOn(recipient);
     setModal((prev) => ({ ...prev, info: true }));
   };

@@ -75,7 +75,7 @@ export default function ContactsPage() {
         <PageHeader title={t("header")}>
           {/* Not sure if this is allowed to be here */}
           <CreateContactModal
-            onCreateNew={(contact: DBContact) => setSelected(contact)}
+            onCreateSuccess={(contact: DBContact) => setSelected(contact)}
           />
           <Button size="sm" onClick={showCreateModal}>
             <CirclePlus />

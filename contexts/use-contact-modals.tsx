@@ -12,6 +12,7 @@ const ContactModalsContext = createContext<ContactModalContextValues | null>(
   null
 );
 
+// These are popups used to work with contacts (create, edit, insert into new message, view more info) used on /contacts and /new-message.
 export function ContactModalsProvider({
   children,
 }: {
@@ -22,7 +23,6 @@ export function ContactModalsProvider({
     edit: false,
     insert: false,
     info: false,
-    createFromRecipient: false,
   });
 
   return (

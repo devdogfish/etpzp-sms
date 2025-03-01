@@ -36,7 +36,7 @@ export default function InsertContactModal({
 }) {
   const { modal, setModal } = useContactModals();
   const [selected, setSelected] = useState<DBContact[]>([]);
-  const { addRecipient } = useNewMessage();
+  const { addRecipient, setMoreInfoOn } = useNewMessage();
   const { t } = useTranslation(["modals", "common"]);
 
   const onInsert = () => {
@@ -51,7 +51,10 @@ export default function InsertContactModal({
     setInsertModal(false);
   };
 
-  const showCreateModal = () => setModal((prev) => ({ ...prev, create: true }));
+  const showCreateModal = () => {
+    setMoreInfoOn(null);
+    setModal((prev) => ({ ...prev, create: true }));
+  };
   const setInsertModal = (value: boolean) => {
     setModal((prev) => ({ ...prev, insert: value }));
   };
@@ -68,59 +71,61 @@ export default function InsertContactModal({
             <Button onClick={showCreateModal}>Create new</Button>
           </DialogHeader>
           {contacts.length ? (
-            <Table>
-              {/* <TableCaption>A list of your contacts.</TableCaption> */}
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="flex items-center">
-                    <Checkbox
-                      className="w-6 h-6 rounded-md"
-                      checked={selected.length === contacts.length}
-                      onClick={() => {
-                        selected.length === contacts.length
-                          ? setSelected([])
-                          : setSelected(contacts);
-                      }}
-                    />
-                  </TableHead>
-                  <TableHead>{t("common:name")}</TableHead>
-                  <TableHead>{t("common:phone_number")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {contacts.map((contact) => {
-                  const current = selected.find(
-                    (item) => item.id === contact.id
-                  );
-                  return (
-                    <TableRow key={contact.id}>
-                      <TableCell className="font-medium">
-                        <Checkbox
-                          className="w-6 h-6 rounded-md"
-                          checked={!!current}
-                          onClick={() => {
-                            !!current
-                              ? // it is already checked, so uncheck it:
-                                setSelected((prevSelected) =>
-                                  prevSelected.filter(
-                                    (s) => s.id !== contact.id
+            <div className="max-h-[400px] overflow-auto">
+              <Table>
+                {/* <TableCaption>A list of your contacts.</TableCaption> */}
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="flex items-center">
+                      <Checkbox
+                        className="w-6 h-6 rounded-md"
+                        checked={selected.length === contacts.length}
+                        onClick={() => {
+                          selected.length === contacts.length
+                            ? setSelected([])
+                            : setSelected(contacts);
+                        }}
+                      />
+                    </TableHead>
+                    <TableHead>{t("common:name")}</TableHead>
+                    <TableHead>{t("common:phone_number")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {contacts.map((contact) => {
+                    const current = selected.find(
+                      (item) => item.id === contact.id
+                    );
+                    return (
+                      <TableRow key={contact.id}>
+                        <TableCell className="font-medium">
+                          <Checkbox
+                            className="w-6 h-6 rounded-md"
+                            checked={!!current}
+                            onClick={() => {
+                              !!current
+                                ? // it is already checked, so uncheck it:
+                                  setSelected((prevSelected) =>
+                                    prevSelected.filter(
+                                      (s) => s.id !== contact.id
+                                    )
                                   )
-                                )
-                              : // it is not checked yet, so add it to the selectedArr
-                                setSelected((prevSelected) => [
-                                  ...prevSelected,
-                                  contact,
-                                ]);
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell>{contact.name}</TableCell>
-                      <TableCell>{contact.phone}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                                : // it is not checked yet, so add it to the selectedArr
+                                  setSelected((prevSelected) => [
+                                    ...prevSelected,
+                                    contact,
+                                  ]);
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>{contact.name}</TableCell>
+                        <TableCell>{contact.phone}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
             <div className="flex flex-col items-center gap-4 py-4">
               <DialogDescription className="self-start sm:self-center text-center text-red-400">

@@ -26,7 +26,6 @@ import React, {
 } from "react";
 
 import RecipientsInput from "./recipients-input";
-import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -49,18 +48,12 @@ import { ActionResponse } from "@/types/action";
 import { deleteMessage, saveDraft } from "@/lib/actions/message.actions";
 import useDebounce from "@/hooks/use-debounce";
 import useIsMounted from "@/hooks/use-mounted";
-import CreateContactFromRecipientModal from "./modals/create-contact-from-recipient-modal";
 import CreateContactModal from "./modals/create-contact-modal";
 import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
 import { EMPTY_MESSAGE } from "@/app/[locale]/(root)/(other)/new-message/page";
 import { useContacts } from "@/contexts/use-contacts";
-
-const initialState: ActionResponse<Message> = {
-  success: false,
-  message: [],
-};
 
 // apparently, when something gets revalidated or the url gets updated, this component gets re-rendered, while the new-message-context keeps it's state
 const NewMessageForm = React.memo(function ({
@@ -75,6 +68,7 @@ const NewMessageForm = React.memo(function ({
   const {
     recipients,
     moreInfoOn,
+    setMoreInfoOn,
     setMessage,
     message,
     focusedInput,
@@ -258,16 +252,14 @@ const NewMessageForm = React.memo(function ({
     }
   }, [focusedInput]);
   return (
-    <ContactModalsProvider>
+    <>
       {/* We can only put the modal here, because it carries state */}
       <InsertContactModal contacts={contacts} />
-      <CreateContactModal />
+      {/* This should always be defined as we pass a defaultPhone and may create a contact from scratch. */}
+      <CreateContactModal defaultPhone={moreInfoOn?.phone} />
 
       {moreInfoOn && (
         <RecipientInfoModal recipient={moreInfoOn} allowContactCreation />
-      )}
-      {moreInfoOn && !moreInfoOn.contact?.id && (
-        <CreateContactFromRecipientModal recipient={moreInfoOn} />
       )}
 
       <PageHeader title={message.subject ? message.subject : t("header")}>
@@ -421,7 +413,7 @@ const NewMessageForm = React.memo(function ({
         </div>
       </form>
       {/* <UnloadListener /> */}
-    </ContactModalsProvider>
+    </>
   );
 });
 

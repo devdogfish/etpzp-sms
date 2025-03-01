@@ -45,6 +45,7 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
     if (serverState.success) {
       toastActionResult(serverState, t);
       onOpenChange(false);
+      // Refetch contacts context after mutation.
       refetchContacts();
     }
   }, [serverState]);
