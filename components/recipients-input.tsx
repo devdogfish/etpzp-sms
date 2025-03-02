@@ -21,6 +21,7 @@ import { DBContact } from "@/types/contact";
 import useIsMounted from "@/hooks/use-mounted";
 import ProfilePic from "./profile-pic";
 import { useTranslation } from "react-i18next";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 React.memo(RecipientsInput);
 export default function RecipientsInput({
@@ -30,7 +31,7 @@ export default function RecipientsInput({
   onBlur,
 }: {
   contacts: DBContact[];
-  error?: boolean;
+  error: boolean;
   onFocus: () => void;
   onBlur: () => void;
 }) {
@@ -52,8 +53,7 @@ export default function RecipientsInput({
     updateSelectedPhone,
   } = useNewMessage();
   const { setModal } = useContactModals();
-  const [activeError, setActiveError] = useState<boolean>(false);
-  const { t } = useTranslation();
+  const { t } = useTranslation(["new-message-page"]);
 
   const isMounted = useIsMounted();
 
@@ -120,17 +120,6 @@ export default function RecipientsInput({
     searchRecipients(value);
   };
 
-  useEffect(() => {
-    if (error) {
-      setActiveError(error);
-      // look for errors in recipients to then update the UI
-      const noErrorRecipientFound = recipients.find(
-        (recipient) => recipient.formattedPhone !== undefined
-      );
-      if (noErrorRecipientFound) setActiveError(false);
-    }
-  }, [recipients, error]);
-
   const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
   const showRecipientInfo = (recipient: NewRecipient) => {
     setMoreInfoOn(recipient);
@@ -144,7 +133,7 @@ export default function RecipientsInput({
           className={cn(
             "w-full flex flex-wrap items-center gap-x-1 py-1 h-full border-b px-5 z-50",
             message.recipientInput.isFocused && "border-primary",
-            activeError && "border-red-500"
+            error && "border-red-500"
           )}
         >
           <span className="my-0.5 mr-0.5 px-0 flex items-center text-sm text-muted-foreground">
@@ -156,27 +145,39 @@ export default function RecipientsInput({
               className="flex items-center h-7" /* Height of the row/container */
             >
               <div className="h-6" /* height of the contact chip itself */>
-                <div
-                  className={cn(
-                    "bg-background flex items-center text-xs border rounded-xl hover:bg-muted cursor-pointer whitespace-nowrap h-full hover:shadow-none",
-                    activeError && "error-border-pulse"
-                  )}
-                >
-                  <div
-                    onClick={() => showRecipientInfo(recipient)}
-                    className="h-full content-center rounded-l-xl pl-1.5"
-                  >
-                    {recipient?.contact?.name || recipient.phone}
-                  </div>
-                  <Button
-                    variant="none"
-                    className="h-full py-0 px-1.5 cursor-pointer closeX rounded-l-none rounded-r-xl"
-                    onClick={() => removeRecipient(recipient)}
-                    type="button"
-                  >
-                    <X className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div
+                      className={cn(
+                        "bg-background flex items-center text-xs border rounded-xl hover:bg-muted cursor-pointer whitespace-nowrap h-full hover:shadow-none",
+                        error && "error-border-pulse",
+                        !recipient.isValid && "bg-red-100/70",
+                        recipient.error?.type === "warning" && "bg-yellow-50"
+                      )}
+                    >
+                      <div
+                        onClick={() => showRecipientInfo(recipient)}
+                        className="h-full content-center rounded-l-xl pl-1.5"
+                      >
+                        {recipient?.contact?.name || recipient.phone}
+                      </div>
+
+                      <Button
+                        variant="none"
+                        className="h-full py-0 px-1.5 cursor-pointer closeX rounded-l-none rounded-r-xl"
+                        onClick={() => removeRecipient(recipient)}
+                        type="button"
+                      >
+                        <X className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {t(
+                      recipient.error?.message ? recipient.error?.message : ""
+                    ) || t("tooltip-more_info")}
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
           ))}

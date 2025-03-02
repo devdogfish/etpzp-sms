@@ -31,35 +31,44 @@ export function generateUniqueId() {
   });
 }
 
-export function validatePhoneNumber(input: string): {
-  type: "error" | "warning" | undefined;
-  message: string | undefined;
-  formattedPhone: string | undefined;
-} {
+export function validatePhoneNumber(phone: string): NewRecipient {
   const countryCode: CountryCode = "PT";
 
-  const phoneNumber = parsePhoneNumber(input, countryCode);
-  const formattedPhone = phoneNumber?.formatInternational();
+  const phoneNumber = parsePhoneNumber(phone, countryCode);
 
-  let type: "error" | "warning";
-  let message: string;
+  let properties: {
+    isValid: boolean;
+    formattedPhone?: string;
+    error?: {
+      type: "error" | "warning";
+      message: string;
+    };
+  } = {
+    isValid: false,
+    formattedPhone: phoneNumber?.formatInternational(),
+  };
+
   if (phoneNumber?.isValid()) {
     if (phoneNumber.country === countryCode) {
-      return { type: undefined, message: undefined, formattedPhone: undefined };
+      properties = {
+        isValid: true,
+      };
     } else {
-      type = "warning";
-      message =
-        "Warning: The phone number is valid but not from the specified country.";
+      properties.isValid = true;
+      properties.error = {
+        type: "warning",
+        message:
+          "tooltip-not_portuguese_number",
+      };
     }
   } else {
-    type = "error";
-    message = "The phone number is invalid.";
+    properties.isValid = false;
+    properties.error = {
+      type: "error",
+      message: "tooltip-invalid_phone_number",
+    };
   }
-  return {
-    type,
-    message,
-    formattedPhone,
-  };
+  return { ...properties, phone };
 }
 
 export function searchMessages(
@@ -134,8 +143,9 @@ export function getNameInitials(fullName: string | null | undefined) {
 // Convert contact -> recipient, because `addRecipient` function expects a recipient type of NewRecipient not of contact type.
 export function convertToRecipient(contact: DBContact): NewRecipient {
   const { id, name, phone, description } = contact;
+  const validatedRecipient = validatePhoneNumber(phone);
   return {
-    phone,
+    ...validatedRecipient,
     contact: {
       id,
       name,

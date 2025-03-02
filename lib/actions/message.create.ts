@@ -39,18 +39,19 @@ export async function sendMessage(
     };
   }
 
-  // 3. Validate recipients
+  // 3. Validate recipients - these are not part of the zod schema as I need to the validation myself
   if (!data.recipients.length) {
     return {
       success: false,
       message: ["new-message-page:server-no_recipients_error"],
     };
   }
+
   const { validRecipients, invalidRecipients } = analyzeRawRecipients(
     data.recipients
   );
-
-  if (!validRecipients.length && invalidRecipients.length) {
+  // This is the only place where we return a invalid recipient error / the recipient error handling is not handled in the zod validation
+  if (!validRecipients.length) {
     return {
       success: false,
       message: [`new-message-page:server-invalid_phone_numbers_error`],

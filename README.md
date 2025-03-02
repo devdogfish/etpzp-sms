@@ -19,16 +19,17 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 # TODO
 
 ## UP NEXT - New message page bug fixing and refining error handling
+
 ## Testing:
+
 - When adding all suggested and then typing a custom phone number, it says duplicate recipients even though the number is unique
 - When the component re-freshes because a draft got saved, we loose the input value of the recipient that the user is currently typing
   Latest conversation
 - On draft refresh the server result errors get lost. How should I persist them - should I attach the errors to the message state, or create a separate state
-
-## Up next
 - Add immediate user feedback for invalid recipients, as well as a tooltip that gets triggered 2 seconds after hovering a invalid recipient telling the user why the recipient is invalid.
 
 Latest conversation:
+
 - Maybe add the possibility to upload images for the contact,
 - Maybe add some shades of blue between the different columns, to show a hierarchy
 - Move all messages where an gateway Api error got returned, to **Failed** page, and add an error code so that the user can ask for tech support/help and they can research the error code then.
@@ -58,6 +59,7 @@ Latest conversation:
 - Make sure you don't pass in undefined values into the database, you should always convert them to `null` instead
 - Test the app for bugs
 - Consideration: Add links to a the item you just modified/created and display them in the success toast messages, so that the user can easily view more details
+- Maybe later on, make it so that the insert-recipient-modal gets hidden and shown again after creating a new contact from there
 
 ## Database
 

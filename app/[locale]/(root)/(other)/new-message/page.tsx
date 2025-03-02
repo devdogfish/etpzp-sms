@@ -39,11 +39,12 @@ export default async function Page({ searchParams }: NewMessagePageProps) {
                 subject: fetchedDraft?.subject || EMPTY_MESSAGE.subject,
                 sender: fetchedDraft?.sender || EMPTY_MESSAGE.sender,
                 recipients:
-                  fetchedDraft?.recipients.map((r) => ({
-                    ...r,
-                    error: validatePhoneNumber(r.phone),
-                    formattedPhone: validatePhoneNumber(r.phone).formattedPhone,
-                  })) || EMPTY_MESSAGE.recipients,
+                  fetchedDraft?.recipients.map((r) => {
+                    return {
+                      ...r,
+                      ...validatePhoneNumber(r.phone),
+                    };
+                  }) || EMPTY_MESSAGE.recipients,
                 recipientInput: {
                   value: "",
                   isFocused: false,

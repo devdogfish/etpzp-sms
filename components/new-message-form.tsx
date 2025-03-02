@@ -112,10 +112,13 @@ const NewMessageForm = React.memo(function ({
     });
 
     setLoading(false);
+    console.log("Awaited result: ", result);
+
     // Update the message context with the result errors, so that they can be persisted between draft re-renders
     setMessage((m) => ({
       ...m,
       serverStateErrors: result.errors,
+      invalidRecipients: result.invalidRecipients,
     }));
 
     if (result.success) {
@@ -251,6 +254,7 @@ const NewMessageForm = React.memo(function ({
       }
     }
   }, [focusedInput]);
+
   return (
     <>
       {/* We can only put the modal here, because it carries state */}
@@ -343,7 +347,8 @@ const NewMessageForm = React.memo(function ({
 
             <RecipientsInput
               contacts={contacts}
-              error={!!message.serverStateErrors?.recipients}
+              // Instead of a Zod error, we receive an invalid recipients array for recipient errors.
+              error={!!message.invalidRecipients?.length}
               onFocus={() => setFocusedInput("new-recipient")}
               onBlur={() => setFocusedInput(null)}
             />

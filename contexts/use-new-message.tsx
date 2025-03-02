@@ -27,13 +27,16 @@ import { EMPTY_MESSAGE } from "@/app/[locale]/(root)/(other)/new-message/page";
 import { useContacts } from "./use-contacts";
 import { useTranslation } from "react-i18next";
 import { useContactModals } from "./use-contact-modals";
+import { z } from "zod";
+import { MessageSchema } from "@/lib/form.schemas";
 
 // This is our biggest state where we store all data related to the active message, that should be persisted during draft saving re-renders
 // MessageState is only used here & for EMPTY_MESSAGE
 export type MessageState = Message & {
   // This is only for the front end composing of the message and will not be used on the server
   recipientInput: { value: string; isFocused: boolean; error?: string };
-  serverStateErrors?: { [K in keyof Message]?: string[] };
+  serverStateErrors?: { [K in keyof z.infer<typeof MessageSchema>]?: string[] };
+  invalidRecipients?: NewRecipient[];
 };
 
 type MessageContextValues = {
@@ -48,7 +51,6 @@ type MessageContextValues = {
     recipient: NewRecipient,
     replaceWithRecipient?: NewRecipient
   ) => void;
-  getValidatedRecipient: (recipient: NewRecipient) => NewRecipient;
 
   // Recipient search and suggestions
   searchRecipients: (searchTerm: string) => void;
@@ -82,7 +84,7 @@ export function NewMessageProvider({
     initialMessage || EMPTY_MESSAGE
   );
   const { contacts } = useContacts();
-  const { t } = useTranslation(["new-messages-page"]);
+  const { t } = useTranslation(["new-message-page"]);
   // draft id saved here, so that it is persisted on revalidation.
   const recipients =
     // Associate contacts with matching phone numbers  to recipients
@@ -174,17 +176,6 @@ export function NewMessageProvider({
     }));
   };
 
-  const getValidatedRecipient = useCallback(
-    (recipient: NewRecipient): NewRecipient => {
-      const { type, message, formattedPhone } = validatePhoneNumber(
-        recipient.phone
-      );
-      if (!type) return recipient;
-      return { ...recipient, error: { type, message }, formattedPhone };
-    },
-    []
-  );
-
   // Recipient management functions
   const addRecipient = (phone: string) => {
     console.log("trying to add new phone:", phone);
@@ -197,15 +188,20 @@ export function NewMessageProvider({
     }
 
     setMessage((prev) => {
-      const contactDetails = contacts.find(
-        (contact) => contact.phone === phone
-      );
-      const newRecipient = contactDetails
-        ? convertToRecipient(contactDetails)
-        : { phone };
+      const validatedRecipient = validatePhoneNumber(phone);
+      const foundContact = contacts.find((contact) => contact.phone === phone);
       return {
         ...prev,
-        recipients: [...prev.recipients, getValidatedRecipient(newRecipient)],
+        recipients: [
+          ...prev.recipients,
+          // In case `recipientWithContact` has some old fields
+          {
+            ...validatedRecipient,
+            contact: foundContact
+              ? convertToRecipient(foundContact).contact
+              : undefined,
+          },
+        ],
       };
     });
 
@@ -296,19 +292,23 @@ export function NewMessageProvider({
   );
 
   useEffect(() => {
-    console.log(
-      `CONTACTS RE-FETCHED, revalidating recipients with new contacts`
-    );
+    // Revalidate recipients when contacts get re-fetched
     revalidateRecipients();
   }, [contacts]);
 
+  // When recipients change do this:
   useEffect(() => {
-    // if (modal.create === true) {
-    //   setMoreInfoOn(null);
-    // }
-    console.log(modal);
-    
-  }, [modal]);
+    // If we still freshly have the invalid recipients error
+    if (message.invalidRecipients) {
+      const validRecipientExists = !!message.recipients.find(
+        (r) => r.isValid === true
+      );
+      if (validRecipientExists) {
+        // If the new recipient is valid, we clear the error, allowing error pulsing for more invalid recipients.
+        setMessage((prev) => ({ ...prev, invalidRecipients: undefined }));
+      }
+    }
+  }, [message.recipients]);
 
   return (
     <NewMessageContext.Provider
@@ -320,7 +320,6 @@ export function NewMessageProvider({
         removeRecipient,
         suggestedRecipients,
         searchRecipients,
-        getValidatedRecipient,
         moreInfoOn,
         setMoreInfoOn,
         selectedPhone,
