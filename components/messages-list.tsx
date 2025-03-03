@@ -2,12 +2,11 @@
 
 import { cn, getDateFnsLocale } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ComponentProps } from "react";
+import { ComponentProps, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import { Badge } from "@/components/ui/badge";
 import type { DBMessage } from "@/types";
 import { useTranslation } from "react-i18next";
-import { pt } from "date-fns/locale";
 
 type MessageListProps = {
   messages: DBMessage[];
@@ -21,6 +20,12 @@ export function MessageList({
   setSelected,
 }: MessageListProps) {
   const { t, i18n } = useTranslation(["messages-page"]);
+  useEffect(() => {
+    console.log("MESSAGES:");
+
+    console.log(messages);
+  }, []);
+
   return (
     <ScrollArea className="h-[calc(100vh-var(--header-height)-68px)]">
       <div className="flex flex-col gap-2 p-4 pt-0">
@@ -67,23 +72,21 @@ export function MessageList({
               {item.body.substring(0, 300)}
             </div>
 
-            <div className="flex items-center gap-2">
-              {item.status === "SENT" && (
+            {/* If we are on the trash page, render a badge to show what the message was before it got moved to the trash */}
+            {item.in_trash == true && (
+              <div className="flex items-center gap-2">
                 <Badge variant={getBadgeVariantFromLabel(item.status)}>
-                  Success
+                  {item.status}
                 </Badge>
-              )}
-              {item.status === "FAILED" && (
-                <Badge variant={getBadgeVariantFromLabel(item.status)}>
-                  Failed
-                </Badge>
-              )}
-              {/* {item.sendDelay && (
+
+                {/* I don't know if we need this because scheduled messages would be of status SCHEDULED */}
+                {/* {item.sendDelay && (
                 <Badge variant={getBadgeVariantFromLabel("SCHEDULED")}>
                   Scheduled
                 </Badge>
               )} */}
-            </div>
+              </div>
+            )}
           </button>
         ))}
       </div>

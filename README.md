@@ -36,8 +36,12 @@ Latest conversation:
 - Add badges for message cards only in trash, as sent, scheduled, and failed will always only have that exact type of message and that would leave the user looking through all the messages, if there is one that isn't of that type.
 - Consider adding some contact information to the message item
 
-#### AFTER THAT - SCHEDULED PAGE:
 
+## TODAY
+- badges for trash
+#### AFTER THAT - SCHEDULED PAGE:
+- On new-message, fix the popup bugs, as well as functionality for the buttons in the select dropdown and the schedule now button.
+- Make it so that the form doesn't get automatically submitted, the date should get chosen, and the submit button should change to schedule for...
 - Add the correct date formatting for scheduled messages, and also display scheduled messages in a different way so that it is easier to tell when they will be sent. What should this look like
   - Created at xxxxx
   - Below that When it will be sent

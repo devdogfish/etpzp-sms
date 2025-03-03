@@ -55,7 +55,8 @@ function MessageDisplay({
   const router = useRouter();
   const { t } = useTranslation(["messages-page"]);
   const pathname = usePathname();
-  const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
+  const [moreInfoRecipient, setMoreInfoRecipient] =
+    useState<NewRecipient | null>(null);
   const { setModal } = useContactModals();
 
   const [recipientsExpanded, setRecipientsExpanded] = useState(false);
@@ -63,7 +64,7 @@ function MessageDisplay({
   // State to store random colors for each item
   const [profileColors, setProfileColors] = useState<string[]>([]);
   const showInfoAbout = (recipient: NewRecipient) => {
-    setMoreInfoOn(recipient);
+    setMoreInfoRecipient(recipient);
     setModal((prev) => ({ ...prev, info: true }));
   };
 
@@ -93,6 +94,8 @@ function MessageDisplay({
         // convert DBRecipient to NewRecipient
         recipients: message.recipients.map((r) => ({
           phone: r.phone,
+          // We just assume this is valid, as this had already been validated before
+          isValid: true,
         })),
       });
 
@@ -131,7 +134,7 @@ function MessageDisplay({
       shuffleArray(colors);
 
       setProfileColors(
-        message.recipients.map((item, index) => {
+        message.recipients.map((recipient, index) => {
           // Create a stable color for each item by using the index or item (in case the order doesn't change)
 
           if (colors.length === 0) {
@@ -150,12 +153,13 @@ function MessageDisplay({
 
   return (
     <div className={cn("flex h-full flex-col")}>
-      {moreInfoOn && (
+      {moreInfoRecipient && (
         <RecipientInfoModal
-          recipient={moreInfoOn}
+          recipient={moreInfoRecipient}
           allowContactCreation={false}
         />
       )}
+
       <div className="flex items-center p-2 h-[var(--header-height)] border-b">
         <div className="flex items-center gap-2">
           {onMobile && (
@@ -393,6 +397,8 @@ function MessageDisplay({
                             (contact) =>
                               contact.phone === recipientWithoutContact.phone
                           ),
+                          // We will just assume that the recipient is valid as it is coming from the database
+                          isValid: true,
                         };
                         return (
                           <div key={recipient.id} className="flex">

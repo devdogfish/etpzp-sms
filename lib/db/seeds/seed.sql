@@ -26,6 +26,7 @@ CREATE TABLE "message" (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     send_time TIMESTAMP, -- can be null if the message is a draft
     sms_reference_id BIGINT, -- can be null if the message is not scheduled, failed, or a draft
+    -- A scheduled message will stay scheduled even if the time where it should be sent is reached, so status is the wrong word for this
     status VARCHAR(20) NOT NULL CHECK (status IN ('SENT', 'SCHEDULED', 'FAILED', 'DRAFTED')),
     in_trash BOOLEAN NOT NULL DEFAULT false,
     failure_reason VARCHAR(255)

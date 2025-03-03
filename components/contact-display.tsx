@@ -49,7 +49,7 @@ export default function ContactDisplay({
         recipients: [
           {
             phone: contact.phone,
-            // since this is only passed to the server we just assume this is valid
+            // We just assume this is valid
             isValid: true,
           },
         ],
