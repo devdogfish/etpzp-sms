@@ -21,7 +21,12 @@ import { DBContact } from "@/types/contact";
 import useIsMounted from "@/hooks/use-mounted";
 import ProfilePic from "./profile-pic";
 import { useTranslation } from "react-i18next";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 React.memo(RecipientsInput);
 export default function RecipientsInput({
@@ -68,7 +73,7 @@ export default function RecipientsInput({
         }
       }
 
-      // We don't need to call searchRecipients here
+      // We don't need to call searchRecipient here
     }
   }, [isMounted]);
 
@@ -175,54 +180,56 @@ export default function RecipientsInput({
               className="flex items-center h-7" /* Height of the row/container */
             >
               <div className="h-6" /* height of the contact chip itself */>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div
-                      className={cn(
-                        "bg-background flex items-center text-xs border rounded-xl hover:bg-muted cursor-pointer whitespace-nowrap h-full hover:shadow-none",
-                        error && "error-border-pulse",
-                        recipient.proneForDeletion && "border-destructive",
-                        !recipient.isValid && "bg-red-100/70",
-                        recipient.error?.type === "warning" && "bg-yellow-50"
-                      )}
-                    >
+                <TooltipProvider delayDuration={1000}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
                       <div
-                        onClick={() => showRecipientInfo(recipient)}
-                        className="h-full content-center rounded-l-xl pl-1.5"
+                        className={cn(
+                          "bg-background flex items-center text-xs border rounded-xl hover:bg-muted cursor-pointer whitespace-nowrap h-full hover:shadow-none",
+                          error && "error-border-pulse",
+                          recipient.proneForDeletion && "border-destructive",
+                          !recipient.isValid && "bg-red-100/70",
+                          recipient.error?.type === "warning" && "bg-yellow-50"
+                        )}
                       >
-                        {recipient?.contact?.name || recipient.phone}
-                      </div>
+                        <div
+                          onClick={() => showRecipientInfo(recipient)}
+                          className="h-full content-center rounded-l-xl pl-1.5"
+                        >
+                          {recipient?.contact?.name || recipient.phone}
+                        </div>
 
-                      <Button
-                        variant="none"
-                        className="h-full py-0 px-1.5 cursor-pointer closeX rounded-l-none rounded-r-xl"
-                        onClick={() => removeRecipient(recipient)}
-                        type="button"
-                      >
-                        <X className="h-4 w-4 text-muted-foreground" />
-                      </Button>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {t(
-                      recipient.error?.message ? recipient.error?.message : ""
-                    ) || t("tooltip-more_info")}
-                  </TooltipContent>
-                </Tooltip>
+                        <Button
+                          variant="none"
+                          className="h-full py-0 px-1.5 cursor-pointer closeX rounded-l-none rounded-r-xl"
+                          onClick={() => removeRecipient(recipient)}
+                          type="button"
+                        >
+                          <X className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {t(
+                        recipient.error?.message ? recipient.error?.message : ""
+                      ) || t("tooltip-more_info")}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </div>
           ))}
 
           <div
             className={cn(
-              "h-8 min-w-[200px] flex-1 py-1 my-0.5 ml-3"
+              "h-7 min-w-[200px] flex-1 py-1  ml-3" //my-0
             )} /* we are taking advantage of the default positioning of absolute elements this common parent div */
           >
             <Input
               // this name only used for the focus state, not for submitting any value
               name="new-recipient"
               className={cn(
-                "h-full my-0.5 w-full p-0 ring-0 focus:ring-0 shadow-none rounded-none placeholder:text-muted-foreground"
+                "h-min my-0.5 w-full p-0 ring-0 focus:ring-0 shadow-none rounded-none placeholder:text-muted-foreground"
               )}
               placeholder={
                 message.recipientInput.isFocused ? t("common:phone_number") : ""

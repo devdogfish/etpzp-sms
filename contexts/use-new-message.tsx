@@ -154,7 +154,7 @@ export function NewMessageProvider({
   const DEFAULT_SELECTED_PHONE_INDEX = null;
   // Recipient management functions
   const addRecipient = (phone: string) => {
-    console.log("trying to add new phone:", phone);
+    console.log("Trying to add new phone: ", phone);
 
     if (message.recipients.some((item) => item.phone === phone)) {
       // I know this is not on the server, but I wanted to keep the same format
@@ -181,14 +181,6 @@ export function NewMessageProvider({
       };
     });
 
-    // Immediately update suggestedRecipients
-    setSuggestedRecipients((prevSearched) =>
-      getUniques(
-        message.recipients,
-        prevSearched.filter((r) => r.phone !== phone)
-      )
-    );
-
     // Update selectedPhone to the next available recipient
     setSelectedPhone((prevSelected) => {
       if (prevSelected === phone) {
@@ -199,9 +191,10 @@ export function NewMessageProvider({
       }
       return prevSelected;
     });
-    // Reset the previous prone for deletions:
+    // Reset the input and search:
     setMessage((m) => ({
       ...m,
+      recipientInput: { ...m.recipientInput, value: "" },
       recipients: m.recipients.map((r) => ({
         ...r,
         proneForDeletion: false,
@@ -213,19 +206,19 @@ export function NewMessageProvider({
     (recipient: NewRecipient, replaceWithRecipient?: NewRecipient) => {
       setMessage((prev) => ({
         ...prev,
+        // recipientInput: { ...prev.recipientInput, value: "" },
         recipients: prev.recipients
           .map((r) => (r === recipient ? replaceWithRecipient : r))
           .filter((r) => r !== undefined), // Filter out undefined values
       }));
     },
-    // TESTING: removed searchRecipients("") here
     []
   );
 
   // Search and suggestion functions
   const searchRecipients = (rawSearchTerm: string) => {
+    console.log("Searching recipients...");
     const searchTerm = rawSearchTerm.trim().toLowerCase();
-    console.log("searched recipients");
     if (!suggestedRecipients.length && !recommendedRecipients.length) {
       // Searched suggested- and recommended recipients are empty -
       // All recipients from the suggested list have already been added!
@@ -309,6 +302,9 @@ export function NewMessageProvider({
         setMessage((prev) => ({ ...prev, invalidRecipients: undefined }));
       }
     }
+
+    // Note: Works only correctly here; won't update correctly with add/remove operations.
+    searchRecipients(message.recipientInput.value);
   }, [message.recipients]);
 
   return (
