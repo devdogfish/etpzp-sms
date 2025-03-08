@@ -17,6 +17,7 @@ export type NewRecipient = {
     type?: "error" | "warning";
     message?: string;
   };
+  proneForDeletion: boolean;
 } & BaseRecipient;
 
 export type WithContact = {

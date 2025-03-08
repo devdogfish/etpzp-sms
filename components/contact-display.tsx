@@ -49,8 +49,9 @@ export default function ContactDisplay({
         recipients: [
           {
             phone: contact.phone,
-            // We just assume this is valid
+            // This is a temporary solution. Maybe change the type later to not be NewRecipient[]
             isValid: true,
+            proneForDeletion: false
           },
         ],
       });

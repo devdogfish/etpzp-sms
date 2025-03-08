@@ -69,7 +69,7 @@ export function validatePhoneNumber(phone: string): NewRecipient {
       message: "tooltip-invalid_phone_number",
     };
   }
-  return { ...properties, phone };
+  return { ...properties, phone, proneForDeletion: false };
 }
 
 export function searchMessages(

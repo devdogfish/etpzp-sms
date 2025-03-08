@@ -94,8 +94,9 @@ function MessageDisplay({
         // convert DBRecipient to NewRecipient
         recipients: message.recipients.map((r) => ({
           phone: r.phone,
-          // We just assume this is valid, as this had already been validated before
+          // This is a temporary solution. Maybe change the type later to not be NewRecipient[]
           isValid: true,
+          proneForDeletion: false,
         })),
       });
 
@@ -391,17 +392,18 @@ function MessageDisplay({
 
                     {message.recipients.map(
                       (recipientWithoutContact, index) => {
-                        const recipient = {
+                        const recipient: NewRecipient = {
                           ...recipientWithoutContact,
                           contact: contacts.find(
                             (contact) =>
                               contact.phone === recipientWithoutContact.phone
                           ),
-                          // We will just assume that the recipient is valid as it is coming from the database
+                          // This is a temporary solution. Maybe change the type later to not be NewRecipient[]
                           isValid: true,
+                          proneForDeletion: false,
                         };
                         return (
-                          <div key={recipient.id} className="flex">
+                          <div key={recipient.phone} className="flex">
                             <Button
                               variant="none"
                               onClick={() => showInfoAbout(recipient)}

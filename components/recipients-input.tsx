@@ -108,7 +108,31 @@ export default function RecipientsInput({
     }
 
     if (e.key === "Backspace" && trimmedInput === "" && recipients.length) {
-      removeRecipient(recipients[recipients.length - 1]); // remove last recipient in the array
+      const lastRecipientIndex = recipients.length - 1;
+      const lastRecipient = recipients[lastRecipientIndex];
+      console.log(recipients);
+      console.log("lastREcipient:", lastRecipient);
+      if (lastRecipient && lastRecipient.proneForDeletion) {
+        // Call removeRecipient to remove the last recipient
+        removeRecipient(lastRecipient);
+      } else {
+        setMessage((prev) => {
+          const lastRecipientIndex = prev.recipients.length - 1;
+
+          // Create a new array of recipients with the last recipient marked as prone for deletion
+          const newRecipients = prev.recipients.map((recipient, index) => {
+            if (index === lastRecipientIndex) {
+              return { ...recipient, proneForDeletion: true }; // Mark as prone for deletion
+            }
+            return recipient; // Return the other recipients unchanged
+          });
+
+          // Check if the last recipient is prone for deletion and remove it
+
+          // Return the new state with the last recipient marked as prone for deletion
+          return { ...prev, recipients: newRecipients };
+        });
+      }
     }
   };
 
@@ -157,6 +181,7 @@ export default function RecipientsInput({
                       className={cn(
                         "bg-background flex items-center text-xs border rounded-xl hover:bg-muted cursor-pointer whitespace-nowrap h-full hover:shadow-none",
                         error && "error-border-pulse",
+                        recipient.proneForDeletion && "border-destructive",
                         !recipient.isValid && "bg-red-100/70",
                         recipient.error?.type === "warning" && "bg-yellow-50"
                       )}
@@ -225,6 +250,10 @@ export default function RecipientsInput({
                     ...m.recipientInput,
                     isFocused: false,
                   },
+                  recipients: m.recipients.map((r) => ({
+                    ...r,
+                    proneForDeletion: false,
+                  })),
                 }));
                 setIsDropdownOpen(false);
                 onBlur();

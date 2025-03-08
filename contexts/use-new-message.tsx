@@ -199,6 +199,14 @@ export function NewMessageProvider({
       }
       return prevSelected;
     });
+    // Reset the previous prone for deletions:
+    setMessage((m) => ({
+      ...m,
+      recipients: m.recipients.map((r) => ({
+        ...r,
+        proneForDeletion: false,
+      })),
+    }));
   };
 
   const removeRecipient = useCallback(
