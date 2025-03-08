@@ -30,7 +30,7 @@ export async function fetchAmountIndicators() {
   try {
     if (!userId) throw new Error("Invalid user id.");
     // While this seems quite complex, it is the only one that works. The CAST() syntax is just to convert to integers
-    const result = await db(
+    const { rows } = await db(
       `
         SELECT
             -- Count of sent messages (in the past and not in trash)
@@ -72,8 +72,7 @@ export async function fetchAmountIndicators() {
       `,
       [userId]
     );
-    console.log("Amount Indicators: ", result.rows);
 
-    return result.rows[0] as AmountIndicators;
+    return rows[0] as AmountIndicators;
   } catch (error) {}
 }

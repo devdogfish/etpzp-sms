@@ -339,7 +339,7 @@ const NewMessageForm = React.memo(function ({
                 "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground border-b border-b-border"
               )}
               onChange={handleInputChange}
-              value={message?.body || EMPTY_MESSAGE.body}
+              value={message?.subject || EMPTY_MESSAGE.subject}
               onFocus={() => setFocusedInput("subject")}
               onBlur={() => setFocusedInput(null)}
             />

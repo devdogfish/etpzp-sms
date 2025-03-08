@@ -7,8 +7,10 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import {
   DBRecipient,
+  FetchedRecipient,
   NewRecipient,
-  RecipientWithContact,
+  RankedRecipient,
+  WithContact,
 } from "@/types/recipient";
 import { DBMessage } from "@/types";
 import { ActionResponse } from "@/types/action";
@@ -57,8 +59,7 @@ export function validatePhoneNumber(phone: string): NewRecipient {
       properties.isValid = true;
       properties.error = {
         type: "warning",
-        message:
-          "tooltip-not_portuguese_number",
+        message: "tooltip-not_portuguese_number",
       };
     }
   } else {
@@ -154,6 +155,14 @@ export function convertToRecipient(contact: DBContact): NewRecipient {
     },
   };
 }
+export function getUniques(
+  currentRecipients: NewRecipient[],
+  newRecipients: WithContact[]
+): WithContact[] {
+  return newRecipients.filter(
+    (recipient) => !currentRecipients.some((r) => r.phone === recipient.phone)
+  );
+}
 
 export function toastActionResult(
   result: ActionResponse<any>,
@@ -232,47 +241,46 @@ export function matchContactsToRecipients(
 ) {
   // Return recipients if no data to filter
   if (!rawRecipients.length || !contacts.length)
-    return rawRecipients as RecipientWithContact[];
+    return rawRecipients as WithContact[];
 
   return rawRecipients.map((recipient) => ({
     ...recipient,
     contact: contacts.find((contact) => contact.phone === recipient.phone),
-  })) as RecipientWithContact[];
+  })) as WithContact[];
 }
 
-export function rankRecipients(
-  data: (RecipientWithContact & { last_used: Date })[]
-) {
+export function rankRecipients(data: FetchedRecipient[]): RankedRecipient[] {
+  // Step 1: Create a unique array of recipients with their usage count
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  console.log("Raw recipients:", data);
 
-  const processedData = data.reduce((acc, item) => {
-    if (!acc[item.phone]) {
-      acc[item.phone] = {
+  const processedData: RankedRecipient[] = []; // Initialize an array for processed recipients
+  const recipientMap = new Map<string, RankedRecipient>(); // Use a map to track unique recipients
+
+  data.forEach((item) => {
+    // Check if the recipient already exists in the map
+    if (!recipientMap.has(item.phone)) {
+      recipientMap.set(item.phone, {
         id: item.id,
         phone: item.phone,
-        usage_count: 0,
-      };
+        usageCount: 0, // Initialize usage count
+      });
     }
 
+    // Increment usage count if the last_used date is within the last week
     if (new Date(item.last_used) >= oneWeekAgo) {
-      acc[item.phone].usage_count++;
+      recipientMap.get(item.phone)!.usageCount++; // Increment usage count
     }
+  });
 
-    return acc;
-  }, {} as Record<string, RecipientWithContact & { usage_count: number }>);
+  // Convert the map values to an array
+  processedData.push(...recipientMap.values());
 
-  return Object.values(processedData).sort((a, b) => {
+  // Step 2: Sort the recipients based on usage count
+  return processedData.sort((a, b) => {
     // Sort by usage count (descending)
-    if (b.usage_count !== a.usage_count) {
-      return b.usage_count - a.usage_count;
-    }
-    // Sort by whether they have contact info
-    if (!!b.contact !== !!a.contact) {
-      return b.contact ? 1 : -1;
-    }
-    // Sort alphabetically by contact name or phone
-    return (a.contact?.id || a.phone).localeCompare(b.contact?.id || b.phone);
+    return b.usageCount - a.usageCount;
   });
 }
 

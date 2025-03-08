@@ -2,7 +2,7 @@ import NewMessageForm from "@/components/new-message-form";
 import { MessageState, NewMessageProvider } from "@/contexts/use-new-message";
 import { fetchRecipients } from "@/lib/db/recipients";
 import { fetchDraft } from "@/lib/db/message";
-import { validatePhoneNumber } from "@/lib/utils";
+import { rankRecipients, validatePhoneNumber } from "@/lib/utils";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 
 type NewMessagePageProps = {
@@ -22,14 +22,13 @@ export const EMPTY_MESSAGE: MessageState = {
 
 export default async function Page({ searchParams }: NewMessagePageProps) {
   const rawRecipients = await fetchRecipients();
-
   const draftInUrl = await searchParams;
   const fetchedDraft = await fetchDraft(draftInUrl.editDraft);
 
   return (
     <ContactModalsProvider>
       <NewMessageProvider
-        fetchedRecipients={rawRecipients || []}
+        rankedRecipients={rankRecipients(rawRecipients || []) || []}
         // initialMessage={fetchedDraft || EMPTY_MESSAGE}
         initialMessage={
           fetchedDraft

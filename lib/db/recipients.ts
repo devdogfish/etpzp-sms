@@ -10,7 +10,7 @@ export async function fetchRecipients() {
 
   try {
     if (!userId) throw new Error("Invalid user id.");
-    const result = await db(
+    const { rows } = await db(
       `
         SELECT
           r.id,
@@ -23,6 +23,6 @@ export async function fetchRecipients() {
       [userId]
     );
 
-    return result.rows as (DBRecipient & { last_used: Date })[];
+    return rows as (DBRecipient & { last_used: Date })[];
   } catch (error) {}
 }

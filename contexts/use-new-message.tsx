@@ -15,18 +15,19 @@ import type { DBContact } from "@/types/contact";
 import type {
   DBRecipient,
   NewRecipient,
-  RecipientWithContact,
+  RankedRecipient,
+  WithContact,
 } from "@/types/recipient";
 import {
   convertToRecipient,
+  getUniques,
   matchContactsToRecipients,
-  rankRecipients,
   validatePhoneNumber,
 } from "@/lib/utils";
 import { EMPTY_MESSAGE } from "@/app/[locale]/(root)/(other)/new-message/page";
 import { useContacts } from "./use-contacts";
 import { useTranslation } from "react-i18next";
-import { EMPTY_PATH, z } from "zod";
+import { z } from "zod";
 import { MessageSchema } from "@/lib/form.schemas";
 import InsertContactModal from "@/components/modals/insert-contact-modal";
 import CreateContactModal from "@/components/modals/create-contact-modal";
@@ -56,7 +57,7 @@ type MessageContextValues = {
 
   // Recipient search and suggestions
   searchRecipients: (searchTerm: string) => void;
-  suggestedRecipients: RecipientWithContact[];
+  suggestedRecipients: WithContact[];
 
   // UI state
   showInfoAbout: React.Dispatch<React.SetStateAction<NewRecipient | null>>;
@@ -69,15 +70,15 @@ type MessageContextValues = {
 };
 type ContextProps = {
   children: React.ReactNode;
-  fetchedRecipients: DBRecipient[];
+  rankedRecipients: RankedRecipient[];
   initialMessage?: MessageState;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
 
 export function NewMessageProvider({
-  fetchedRecipients,
   children,
+  rankedRecipients,
   initialMessage,
 }: ContextProps) {
   // Message state
@@ -86,32 +87,30 @@ export function NewMessageProvider({
   );
   const { contacts } = useContacts();
   const { t } = useTranslation(["new-message-page"]);
-  // draft id saved here, so that it is persisted on revalidation.
-  const recipients =
-    // Associate contacts with matching phone numbers  to recipients
-    matchContactsToRecipients(fetchedRecipients, contacts) || [];
+
+  // Associate contacts with matching phone numbers  to recipients
+  const initialRecipients: WithContact[] =
+    matchContactsToRecipients(rankedRecipients, contacts) || [];
 
   // UI state
   const [moreInfoOn, showInfoAbout] = useState<NewRecipient | null>(null);
   const [selectedPhone, setSelectedPhone] = useState<string | undefined>();
-  const [suggestedRecipients, setSuggestedRecipients] = useState(recipients);
+  const [suggestedRecipients, setSuggestedRecipients] =
+    useState(initialRecipients);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
-  const usageRankedRecipients = rankRecipients(
-    recipients as (RecipientWithContact & { last_used: Date })[]
-  );
   // Memoized values
-  const recommendedRecipients: RecipientWithContact[] = useMemo(() => {
+  const recommendedRecipients: WithContact[] = useMemo(() => {
     // adjust this to your liking
     const AMOUNT = 10;
-    const topRecipients = usageRankedRecipients.slice(0, AMOUNT);
+    const topRecipients = initialRecipients.slice(0, AMOUNT);
 
     if (topRecipients.length === AMOUNT) {
       // Check if there are enough topRecipients
-      return matchContactsToRecipients(topRecipients, contacts);
+      return topRecipients;
     } else {
       // If not look for unused contacts to fill the gap
-      const extraContacts = contacts
+      const extraContacts: WithContact[] = contacts
         // 1. Filter out the ones that already exist in the top recipients
         .filter(
           (contact) => !topRecipients.some((top) => top.phone === contact.phone)
@@ -130,36 +129,12 @@ export function NewMessageProvider({
           },
         }));
 
-      console.log(`Recommended recipients in suggested:`);
-      console.log([...topRecipients, ...extraContacts]);
-
-      console.log("Recommended recipients");
-      console.log(
-        matchContactsToRecipients(
-          [...topRecipients, ...extraContacts],
-          contacts
-        )
-      );
-
-      return matchContactsToRecipients(
-        [...topRecipients, ...extraContacts],
-        contacts
-      ) as RecipientWithContact[];
+      return [...topRecipients, ...extraContacts] as WithContact[];
     }
     // TODO: These re-rendering conditions need to be checked
   }, [contacts]);
 
   // Helper functions
-  const getUniques = useCallback(
-    (newRecipients: RecipientWithContact[]): RecipientWithContact[] => {
-      return newRecipients.filter(
-        (recipient) =>
-          !message.recipients.some((r) => r.phone === recipient.phone)
-      );
-    },
-    [message.recipients]
-  );
-
   const revalidateRecipients = () => {
     setMessage((prevMessage) => ({
       // For some reason this inner part gets run twice while the outer function only gets run once
@@ -207,7 +182,10 @@ export function NewMessageProvider({
 
     // Immediately update suggestedRecipients
     setSuggestedRecipients((prevSearched) =>
-      getUniques(prevSearched.filter((r) => r.phone !== phone))
+      getUniques(
+        message.recipients,
+        prevSearched.filter((r) => r.phone !== phone)
+      )
     );
 
     // Update selectedPhone to the next available recipient
@@ -248,7 +226,8 @@ export function NewMessageProvider({
     // There are still suggested recipients that haven't been added yet, so do additional checks
     if (searchTerm.length) {
       const filteredRecipients = getUniques(
-        suggestedRecipients.filter(
+        message.recipients,
+        initialRecipients.filter(
           (recipient) =>
             (recipient.contact?.name?.toLowerCase().includes(searchTerm) ||
               recipient.phone.toLowerCase().includes(searchTerm)) &&
@@ -259,16 +238,14 @@ export function NewMessageProvider({
 
       if (!filteredRecipients.length) {
         // No recipients found (the suggested panel will be hidden) - deselect the previous phone
-        console.log(
-          "Deselecting SelectedPhone because no filtered recipients were found"
-        );
-
         setSelectedPhone(undefined);
       } else {
         setSelectedPhone(filteredRecipients[0]?.phone);
       }
     } else {
-      setSuggestedRecipients(getUniques(recommendedRecipients));
+      setSuggestedRecipients(
+        getUniques(message.recipients, recommendedRecipients)
+      );
       setSelectedPhone(recommendedRecipients[0]?.phone);
     }
   };
@@ -297,7 +274,7 @@ export function NewMessageProvider({
   }, [contacts]);
 
   useEffect(() => {
-    if (!initialMessage) {
+    if (!!initialMessage == false) {
       // If initialMessage is undefined, reset all the controlled inputs to an empty value
       setMessage(EMPTY_MESSAGE);
     }

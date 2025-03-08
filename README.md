@@ -17,11 +17,11 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 # TODO
-- contacts don't show up in suggested.
 - Move all messages where an gateway Api error got returned, to **Failed** page, and add an error code so that the user can ask for tech support/help and they can research the error code then.
+- The default behavior should be no selected recipient and when you press a arrow key the start getting selected
+Testing:
+- contacts don't show up in suggested.
 - When searching and then deleting to then re-searching, we get no search results
-- the default behaviour should be no selected recipient and when you press a arrow key the start getting selected
-
 
 
 #### AFTER THAT - SCHEDULED PAGE:
@@ -39,7 +39,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Make sure when the server components re-refetch because of revalidation, that the contexts update their state values with the newly fetched data!
 
 ## If there is extra time (after deployment in school)
-
 1. \*\* ** Do a test deployment ** \*\*
 
 - Admin Dashboard with statistics and admin settings
@@ -52,16 +51,14 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Maybe add the possibility to upload images for the contact
 - Maybe add some shades of blue between the different columns, to show a hierarchy
 - Consider adding some contact information to the message item in the list
+
 ## Database
-
 #### Deleting all tables
-
 ```sql
 DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```
 
 #### Seed files
-
 On UNIX Operating system
 
 ```psql
