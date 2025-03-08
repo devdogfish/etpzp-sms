@@ -302,7 +302,7 @@ const NewMessageForm = React.memo(function ({
           <div className="flex flex-col px-4 mt-2">
             <div
               className={cn(
-                "border-b focus-within:border-black",
+                "border-b focus-within:border-primary",
                 message.serverStateErrors?.sender && "border-red-500"
               )}
             >

@@ -163,7 +163,7 @@ export default function RecipientsInput({
 
   return (
     <div className="flex-1 py-1 relative z--[1000]">
-      <div className="max-h-24 overflow-auto" ref={container}>
+      <div className="max-h-24 h-[2.75rem] overflow-auto" ref={container}>
         <div
           className={cn(
             "w-full flex flex-wrap items-center gap-x-1 py-1 h-full border-b px-5 z-50",
@@ -324,7 +324,7 @@ export default function RecipientsInput({
           </div>
         </div>
         <Button
-          className="absolute right-2 bottom-[6px] p-2 aspect-1 z-index-0"
+          className="absolute right-2 bottom-[6px] p-2 aspect-1 top-1/2 -translate-y-1/2 z-10"
           variant="ghost"
           type="button"
           onClick={showInsertModal}
