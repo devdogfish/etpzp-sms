@@ -28,7 +28,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
-const OFF_FOCUSED_RECIPIENT_AMOUNT = 3;
+const OFF_FOCUSED_RECIPIENT_AMOUNT = 5;
 React.memo(RecipientsInput);
 export default function RecipientsInput({
   contacts,
