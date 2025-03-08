@@ -46,7 +46,7 @@ export default function RecipientsInput({
     removeRecipient,
     suggestedRecipients,
     searchRecipients,
-    setMoreInfoOn,
+    showInfoAbout,
 
     // Which one in the suggested recipients/contacts is currently selected. You can change the selection with up and down arrow keys.
     selectedPhone,
@@ -122,7 +122,7 @@ export default function RecipientsInput({
 
   const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
   const showRecipientInfo = (recipient: NewRecipient) => {
-    setMoreInfoOn(recipient);
+    showInfoAbout(recipient);
     setModal((prev) => ({ ...prev, info: true }));
   };
 

@@ -3,7 +3,6 @@ import { MessageState, NewMessageProvider } from "@/contexts/use-new-message";
 import { fetchRecipients } from "@/lib/db/recipients";
 import { fetchDraft } from "@/lib/db/message";
 import { validatePhoneNumber } from "@/lib/utils";
-import { Message } from "@/types";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 
 type NewMessagePageProps = {
@@ -51,7 +50,7 @@ export default async function Page({ searchParams }: NewMessagePageProps) {
                   error: undefined,
                 },
               }
-            : EMPTY_MESSAGE
+            : undefined
         }
       >
         <NewMessageForm editDraft={fetchedDraft} />

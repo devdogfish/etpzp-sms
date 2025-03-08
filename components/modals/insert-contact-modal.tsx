@@ -36,7 +36,7 @@ export default function InsertContactModal({
 }) {
   const { modal, setModal } = useContactModals();
   const [selected, setSelected] = useState<DBContact[]>([]);
-  const { addRecipient, setMoreInfoOn } = useNewMessage();
+  const { addRecipient, showInfoAbout } = useNewMessage();
   const { t } = useTranslation(["modals", "common"]);
 
   const onInsert = () => {
@@ -52,7 +52,7 @@ export default function InsertContactModal({
   };
 
   const showCreateModal = () => {
-    setMoreInfoOn(null);
+    showInfoAbout(null);
     setModal((prev) => ({ ...prev, create: true }));
   };
   const setInsertModal = (value: boolean) => {

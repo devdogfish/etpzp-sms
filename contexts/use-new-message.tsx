@@ -26,9 +26,11 @@ import {
 import { EMPTY_MESSAGE } from "@/app/[locale]/(root)/(other)/new-message/page";
 import { useContacts } from "./use-contacts";
 import { useTranslation } from "react-i18next";
-import { useContactModals } from "./use-contact-modals";
-import { z } from "zod";
+import { EMPTY_PATH, z } from "zod";
 import { MessageSchema } from "@/lib/form.schemas";
+import InsertContactModal from "@/components/modals/insert-contact-modal";
+import CreateContactModal from "@/components/modals/create-contact-modal";
+import RecipientInfoModal from "@/components/modals/recipient-info-modal";
 
 // This is our biggest state where we store all data related to the active message, that should be persisted during draft saving re-renders
 // MessageState is only used here & for EMPTY_MESSAGE
@@ -57,8 +59,7 @@ type MessageContextValues = {
   suggestedRecipients: RecipientWithContact[];
 
   // UI state
-  moreInfoOn: NewRecipient | null;
-  setMoreInfoOn: React.Dispatch<React.SetStateAction<NewRecipient | null>>;
+  showInfoAbout: React.Dispatch<React.SetStateAction<NewRecipient | null>>;
   selectedPhone: string | undefined;
   updateSelectedPhone: (direction: "ArrowDown" | "ArrowUp") => void;
 
@@ -69,7 +70,7 @@ type MessageContextValues = {
 type ContextProps = {
   children: React.ReactNode;
   fetchedRecipients: DBRecipient[];
-  initialMessage: MessageState;
+  initialMessage?: MessageState;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
@@ -91,8 +92,7 @@ export function NewMessageProvider({
     matchContactsToRecipients(fetchedRecipients, contacts) || [];
 
   // UI state
-  const [moreInfoOn, setMoreInfoOn] = useState<NewRecipient | null>(null);
-  const { modal, setModal } = useContactModals();
+  const [moreInfoOn, showInfoAbout] = useState<NewRecipient | null>(null);
   const [selectedPhone, setSelectedPhone] = useState<string | undefined>();
   const [suggestedRecipients, setSuggestedRecipients] = useState(recipients);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
@@ -103,7 +103,7 @@ export function NewMessageProvider({
   // Memoized values
   const recommendedRecipients: RecipientWithContact[] = useMemo(() => {
     // adjust this to your liking
-    const AMOUNT = 5;
+    const AMOUNT = 10;
     const topRecipients = usageRankedRecipients.slice(0, AMOUNT);
 
     if (topRecipients.length === AMOUNT) {
@@ -296,6 +296,13 @@ export function NewMessageProvider({
     revalidateRecipients();
   }, [contacts]);
 
+  useEffect(() => {
+    if (!initialMessage) {
+      // If initialMessage is undefined, reset all the controlled inputs to an empty value
+      setMessage(EMPTY_MESSAGE);
+    }
+  }, [initialMessage]);
+
   // When recipients change do this:
   useEffect(() => {
     // If we still freshly have the invalid recipients error
@@ -320,8 +327,8 @@ export function NewMessageProvider({
         removeRecipient,
         suggestedRecipients,
         searchRecipients,
-        moreInfoOn,
-        setMoreInfoOn,
+
+        showInfoAbout,
         selectedPhone,
         updateSelectedPhone,
         revalidateRecipients,
@@ -329,6 +336,25 @@ export function NewMessageProvider({
         setFocusedInput,
       }}
     >
+      {/* We move this here, because this component doesn't re-render when a draft gets saved */}
+      <InsertContactModal contacts={contacts} />
+      {/* This should always be defined as we pass a defaultPhone and may create a contact from scratch. */}
+      <CreateContactModal
+        defaultPhone={moreInfoOn?.phone}
+        onCreateSuccess={(contact) => {
+          // After creating the new contact, replace the old recipient
+          const oldRecipient = message.recipients.find(
+            (r) => r.phone == moreInfoOn?.phone
+          );
+          if (oldRecipient) {
+            removeRecipient(oldRecipient, convertToRecipient(contact));
+          }
+        }}
+      />
+
+      {moreInfoOn && (
+        <RecipientInfoModal recipient={moreInfoOn} allowContactCreation />
+      )}
       {children}
     </NewMessageContext.Provider>
   );

@@ -261,9 +261,13 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             title: t("new_message"),
             icon: Pencil,
             variant: "default",
-            href: "/new-message",
             size: "xl",
             isNewButton: true,
+            action: () => {
+              // We need to manually refresh so all the inputs actually get refreshed
+              router.push("/new-message");
+              router.refresh();
+            },
           },
         ]}
       />

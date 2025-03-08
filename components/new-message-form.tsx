@@ -37,18 +37,13 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { NewRecipient } from "@/types/recipient";
-import { DBContact } from "@/types/contact";
 
-// contact manipulation modals
-import InsertContactModal from "./modals/insert-contact-modal";
-import RecipientInfoModal from "./modals/recipient-info-modal";
 import { useLayout } from "@/contexts/use-layout";
 import type { DBMessage, Message } from "@/types";
 import { ActionResponse } from "@/types/action";
 import { deleteMessage, saveDraft } from "@/lib/actions/message.actions";
 import useDebounce from "@/hooks/use-debounce";
 import useIsMounted from "@/hooks/use-mounted";
-import CreateContactModal from "./modals/create-contact-modal";
 import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
@@ -65,15 +60,8 @@ const NewMessageForm = React.memo(function ({
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation(["new-message-page"]);
   const router = useRouter();
-  const {
-    recipients,
-    moreInfoOn,
-    setMoreInfoOn,
-    setMessage,
-    message,
-    focusedInput,
-    setFocusedInput,
-  } = useNewMessage();
+  const { recipients, setMessage, message, focusedInput, setFocusedInput } =
+    useNewMessage();
   const [loading, setLoading] = useState(false);
   const { isFullscreen, setIsFullscreen } = useLayout();
   const pathname = usePathname();
@@ -257,15 +245,6 @@ const NewMessageForm = React.memo(function ({
 
   return (
     <>
-      {/* We can only put the modal here, because it carries state */}
-      <InsertContactModal contacts={contacts} />
-      {/* This should always be defined as we pass a defaultPhone and may create a contact from scratch. */}
-      <CreateContactModal defaultPhone={moreInfoOn?.phone} />
-
-      {moreInfoOn && (
-        <RecipientInfoModal recipient={moreInfoOn} allowContactCreation />
-      )}
-
       <PageHeader title={message.subject ? message.subject : t("header")}>
         <p>
           {messageIsEmpty()
@@ -360,7 +339,7 @@ const NewMessageForm = React.memo(function ({
                 "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground border-b border-b-border"
               )}
               onChange={handleInputChange}
-              defaultValue={message?.subject || EMPTY_MESSAGE.subject}
+              value={message?.body || EMPTY_MESSAGE.body}
               onFocus={() => setFocusedInput("subject")}
               onBlur={() => setFocusedInput(null)}
             />
@@ -379,7 +358,7 @@ const NewMessageForm = React.memo(function ({
                   : t("body_placeholder")
               }
               onChange={handleInputChange}
-              defaultValue={message?.body || EMPTY_MESSAGE.body}
+              value={message?.body || EMPTY_MESSAGE.body}
               onFocus={() => setFocusedInput("body")}
               onBlur={() => setFocusedInput(null)}
             />
