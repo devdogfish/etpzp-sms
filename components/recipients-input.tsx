@@ -28,6 +28,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
+const OFF_FOCUSED_RECIPIENT_AMOUNT = 3;
 React.memo(RecipientsInput);
 export default function RecipientsInput({
   contacts,
@@ -43,6 +44,8 @@ export default function RecipientsInput({
   const container = useRef<HTMLDivElement | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const searchParams = useSearchParams();
+  const inputElement = useRef<HTMLInputElement | null>(null);
+
   const {
     message,
     setMessage,
@@ -174,58 +177,106 @@ export default function RecipientsInput({
           <span className="my-0.5 mr-0.5 px-0 flex items-center text-sm text-muted-foreground">
             {t("common:to")}
           </span>
-          {recipients.map((recipient) => (
-            <div
-              key={recipient.phone}
-              className="flex items-center h-7" /* Height of the row/container */
-            >
-              <div className="h-6" /* height of the contact chip itself */>
-                <TooltipProvider delayDuration={1000}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div
-                        className={cn(
-                          "bg-background flex items-center text-xs border rounded-xl hover:bg-muted cursor-pointer whitespace-nowrap h-full hover:shadow-none",
-                          error && "error-border-pulse",
-                          recipient.proneForDeletion && "border-destructive",
-                          !recipient.isValid && "bg-red-100/70",
-                          recipient.error?.type === "warning" && "bg-yellow-50"
-                        )}
-                      >
+          {recipients.map((recipient, index) => {
+            // Since we have so many recipients, only some should be shown until the user clicks to see the rest
+            if (
+              index >= OFF_FOCUSED_RECIPIENT_AMOUNT &&
+              !message.recipientInput.isFocused
+            ) {
+              return;
+            }
+            // else, we show all of them
+            return (
+              <div
+                key={recipient.phone}
+                // Height of the row/container
+                className={"flex items-center h-7"}
+              >
+                <div
+                  // Height of the contact chip itself
+                  className={cn("h-6")}
+                >
+                  <TooltipProvider delayDuration={1000}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
                         <div
-                          onClick={() => showRecipientInfo(recipient)}
-                          className="h-full content-center rounded-l-xl pl-1.5"
+                          className={cn(
+                            "bg-background flex items-center text-xs border rounded-xl hover:bg-muted cursor-pointer whitespace-nowrap h-full hover:shadow-none",
+                            error && "error-border-pulse",
+                            recipient.proneForDeletion && "border-destructive",
+                            !recipient.isValid && "bg-red-100/70",
+                            recipient.error?.type === "warning" &&
+                              "bg-yellow-50"
+                          )}
                         >
-                          {recipient?.contact?.name || recipient.phone}
-                        </div>
+                          <div
+                            onClick={() => showRecipientInfo(recipient)}
+                            className="h-full content-center rounded-l-xl pl-1.5"
+                          >
+                            {recipient?.contact?.name || recipient.phone}
+                          </div>
 
-                        <Button
-                          variant="none"
-                          className="h-full py-0 px-1.5 cursor-pointer closeX rounded-l-none rounded-r-xl"
-                          onClick={() => removeRecipient(recipient)}
-                          type="button"
-                        >
-                          <X className="h-4 w-4 text-muted-foreground" />
-                        </Button>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {t(
-                        recipient.error?.message ? recipient.error?.message : ""
-                      ) || t("tooltip-more_info")}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                          <Button
+                            variant="none"
+                            className="h-full py-0 px-1.5 cursor-pointer closeX rounded-l-none rounded-r-xl"
+                            onClick={() => removeRecipient(recipient)}
+                            type="button"
+                          >
+                            <X className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {t(
+                          recipient.error?.message
+                            ? recipient.error?.message
+                            : ""
+                        ) || t("tooltip-more_info")}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
+
+          {/* Button to show all recipients, when it's clicked we also focus the input */}
+          {!message.recipientInput.isFocused &&
+          message.recipients.length > OFF_FOCUSED_RECIPIENT_AMOUNT ? (
+            <Button
+              variant="none"
+              className="p-0 ml-2"
+              type="button"
+              onClick={() => {
+                setMessage((prev) => ({
+                  ...prev,
+                  recipientInput: { ...prev.recipientInput, isFocused: true },
+                }));
+                setTimeout(() => {
+                  if (inputElement.current) {
+                    inputElement.current.focus();
+                  }
+                }, 0);
+              }}
+            >
+              {t("x_more", {
+                x: message.recipients.length - OFF_FOCUSED_RECIPIENT_AMOUNT,
+              })}
+            </Button>
+          ) : (
+            <></>
+          )}
 
           <div
             className={cn(
-              "h-7 min-w-[200px] flex-1 py-1 ml-3" // my-0
+              "h-7 min-w-[200px] flex-1 py-1 ml-3", // my-0
+              !message.recipientInput.isFocused &&
+                message.recipients.length > OFF_FOCUSED_RECIPIENT_AMOUNT &&
+                "hidden"
             )} /* we are taking advantage of the default positioning of absolute elements this common parent div */
           >
             <Input
+              ref={inputElement}
               // this name only used for the focus state, not for submitting any value
               name="new-recipient"
               className={cn(
@@ -263,6 +314,8 @@ export default function RecipientsInput({
                   })),
                 }));
                 setIsDropdownOpen(false);
+                console.log("INPUT GOT BLURREd");
+
                 onBlur();
               }}
             />

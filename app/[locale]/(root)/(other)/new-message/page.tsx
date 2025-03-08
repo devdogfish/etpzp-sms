@@ -17,6 +17,7 @@ export const EMPTY_MESSAGE: MessageState = {
     isFocused: false,
     value: "",
     error: undefined,
+    isHidden: false,
   },
 };
 
@@ -43,11 +44,7 @@ export default async function Page({ searchParams }: NewMessagePageProps) {
                       ...validatePhoneNumber(r.phone),
                     };
                   }) || EMPTY_MESSAGE.recipients,
-                recipientInput: {
-                  value: "",
-                  isFocused: false,
-                  error: undefined,
-                },
+                recipientInput: EMPTY_MESSAGE.recipientInput,
               }
             : undefined
         }

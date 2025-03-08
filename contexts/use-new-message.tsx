@@ -37,7 +37,12 @@ import RecipientInfoModal from "@/components/modals/recipient-info-modal";
 // MessageState is only used here & for EMPTY_MESSAGE
 export type MessageState = Message & {
   // This is only for the front end composing of the message and will not be used on the server
-  recipientInput: { value: string; isFocused: boolean; error?: string };
+  recipientInput: {
+    value: string;
+    isFocused: boolean;
+    error?: string;
+    isHidden: boolean;
+  };
   serverStateErrors?: { [K in keyof z.infer<typeof MessageSchema>]?: string[] };
   invalidRecipients?: NewRecipient[];
 };
