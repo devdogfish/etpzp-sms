@@ -163,10 +163,10 @@ export default function RecipientsInput({
 
   return (
     <div className="flex-1 py-1 relative z--[1000]">
-      <div className="max-h-24 h-[2.75rem] overflow-auto" ref={container}>
+      <div className="max-h-24 overflow-auto" ref={container}>
         <div
           className={cn(
-            "w-full flex flex-wrap items-center gap-x-1 py-1 h-full border-b px-5 z-50",
+            "w-full min-h-[2.75rem] flex flex-wrap items-center gap-x-1 py-1 h-full border-b px-5 z-50",
             message.recipientInput.isFocused && "border-primary",
             error && "border-red-500"
           )}
@@ -222,14 +222,14 @@ export default function RecipientsInput({
 
           <div
             className={cn(
-              "h-7 min-w-[200px] flex-1 py-1  ml-3" //my-0
+              "h-7 min-w-[200px] flex-1 py-1 ml-3" // my-0
             )} /* we are taking advantage of the default positioning of absolute elements this common parent div */
           >
             <Input
               // this name only used for the focus state, not for submitting any value
               name="new-recipient"
               className={cn(
-                "h-min my-0.5 w-full p-0 ring-0 focus:ring-0 shadow-none rounded-none placeholder:text-muted-foreground"
+                "h-min text-sm w-full p-0 ring-0 focus:ring-0 shadow-none rounded-none placeholder:text-muted-foreground" //my-0
               )}
               placeholder={
                 message.recipientInput.isFocused ? t("common:phone_number") : ""
