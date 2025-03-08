@@ -68,10 +68,20 @@ export default function RecipientsInput({
         }
       }
 
-      // Update searched recipients after adding all initial recipients
-      searchRecipients("");
+      // We don't need to call searchRecipients here
     }
   }, [isMounted]);
+
+  // reset the input's value
+  function clearInputValue() {
+    setMessage((m) => ({
+      ...m,
+      recipientInput: {
+        ...m.recipientInput,
+        value: "",
+      },
+    }));
+  }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     setTimeout(() => {
@@ -87,16 +97,11 @@ export default function RecipientsInput({
       e.stopPropagation();
       if (selectedPhone) {
         addRecipient(selectedPhone, contacts);
+        clearInputValue();
       } else if (trimmedInput !== "") {
         addRecipient(trimmedInput, contacts);
-        // reset the input's value
-        setMessage((m) => ({
-          ...m,
-          recipientInput: {
-            ...m.recipientInput,
-            value: "",
-          },
-        }));
+
+        clearInputValue();
       }
     } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       updateSelectedPhone(e.key);
@@ -117,6 +122,7 @@ export default function RecipientsInput({
       },
     }));
     setIsDropdownOpen(true);
+
     searchRecipients(value);
   };
 
@@ -208,6 +214,7 @@ export default function RecipientsInput({
                   },
                 }));
                 setIsDropdownOpen(true);
+
                 searchRecipients(message.recipientInput.value);
                 onFocus();
               }}
@@ -231,9 +238,9 @@ export default function RecipientsInput({
                     className="p-2" /* this is necessary to have a separate container so that the items scroll all the way up to the end of the container */
                   >
                     <h3 className="mb-2 px-2 text-sm font-medium">
-                      {message.recipientInput.value.length === 0
-                        ? "Suggestions"
-                        : "Search results"}
+                      {!message.recipientInput.value.length
+                        ? t("suggestions")
+                        : t("x_found", { x: suggestedRecipients.length })}
                     </h3>
                     <div className="flex flex-col gap-1">
                       {suggestedRecipients.map((recipient) => (
@@ -249,7 +256,6 @@ export default function RecipientsInput({
                             e.preventDefault();
 
                             addRecipient(recipient.phone, contacts);
-                            // reset message.recipientInput value
                             setMessage((m) => ({
                               ...m,
                               recipientInput: {

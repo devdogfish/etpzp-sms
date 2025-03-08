@@ -61,7 +61,7 @@ type MessageContextValues = {
 
   // UI state
   showInfoAbout: React.Dispatch<React.SetStateAction<NewRecipient | null>>;
-  selectedPhone: string | undefined;
+  selectedPhone: string | null;
   updateSelectedPhone: (direction: "ArrowDown" | "ArrowUp") => void;
 
   revalidateRecipients: () => void;
@@ -94,7 +94,7 @@ export function NewMessageProvider({
 
   // UI state
   const [moreInfoOn, showInfoAbout] = useState<NewRecipient | null>(null);
-  const [selectedPhone, setSelectedPhone] = useState<string | undefined>();
+  const [selectedPhone, setSelectedPhone] = useState<string | null>(null);
   const [suggestedRecipients, setSuggestedRecipients] =
     useState(initialRecipients);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
@@ -151,6 +151,7 @@ export function NewMessageProvider({
     }));
   };
 
+  const DEFAULT_SELECTED_PHONE_INDEX = null;
   // Recipient management functions
   const addRecipient = (phone: string) => {
     console.log("trying to add new phone:", phone);
@@ -194,7 +195,7 @@ export function NewMessageProvider({
         const nextRecipient = suggestedRecipients.find(
           (r) => r.phone !== phone
         );
-        return nextRecipient ? nextRecipient.phone : undefined;
+        return nextRecipient ? nextRecipient.phone : null;
       }
       return prevSelected;
     });
@@ -208,8 +209,8 @@ export function NewMessageProvider({
           .map((r) => (r === recipient ? replaceWithRecipient : r))
           .filter((r) => r !== undefined), // Filter out undefined values
       }));
-      searchRecipients("");
     },
+    // TESTING: removed searchRecipients("") here
     []
   );
 
@@ -220,7 +221,7 @@ export function NewMessageProvider({
     if (!suggestedRecipients.length && !recommendedRecipients.length) {
       // Searched suggested- and recommended recipients are empty -
       // All recipients from the suggested list have already been added!
-      return setSelectedPhone(undefined);
+      return setSelectedPhone(null);
     }
 
     // There are still suggested recipients that haven't been added yet, so do additional checks
@@ -238,15 +239,23 @@ export function NewMessageProvider({
 
       if (!filteredRecipients.length) {
         // No recipients found (the suggested panel will be hidden) - deselect the previous phone
-        setSelectedPhone(undefined);
+        setSelectedPhone(null);
       } else {
-        setSelectedPhone(filteredRecipients[0]?.phone);
+        setSelectedPhone(
+          DEFAULT_SELECTED_PHONE_INDEX
+            ? filteredRecipients[DEFAULT_SELECTED_PHONE_INDEX]?.phone
+            : DEFAULT_SELECTED_PHONE_INDEX
+        );
       }
     } else {
       setSuggestedRecipients(
         getUniques(message.recipients, recommendedRecipients)
       );
-      setSelectedPhone(recommendedRecipients[0]?.phone);
+      setSelectedPhone(
+        DEFAULT_SELECTED_PHONE_INDEX
+          ? recommendedRecipients[DEFAULT_SELECTED_PHONE_INDEX]?.phone
+          : DEFAULT_SELECTED_PHONE_INDEX
+      );
     }
   };
 

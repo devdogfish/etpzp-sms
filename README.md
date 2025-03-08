@@ -18,8 +18,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 # TODO
 - Move all messages where an gateway Api error got returned, to **Failed** page, and add an error code so that the user can ask for tech support/help and they can research the error code then.
-- The default behavior should be no selected recipient and when you press a arrow key the start getting selected
 Testing:
+- The default behavior should be no selected recipient and when you press a arrow key the start getting selected
 - contacts don't show up in suggested.
 - When searching and then deleting to then re-searching, we get no search results
 
