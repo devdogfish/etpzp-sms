@@ -7,7 +7,7 @@ RUN apk add --no-cache nodejs npm
 FROM base AS deps
 # set a path to for the following commands to be run on
 WORKDIR /app
-COPY package.json bun.lock ./
+COPY package.json bun.lock db-seed.sql ./
 RUN bun install
 
 # Stage 2: Build the application
