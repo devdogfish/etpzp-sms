@@ -1,9 +1,13 @@
 FROM oven/bun:alpine AS base
 
+# Install Node.js and npm
+RUN apk add --no-cache nodejs npm
+
 # Stage 1: Install dependencies
 FROM base AS deps
+# set a path to for the following commands to be run on
 WORKDIR /app
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 RUN bun install
 
 # Stage 2: Build the application

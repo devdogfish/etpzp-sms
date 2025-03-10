@@ -1,5 +1,9 @@
 import NewMessageForm from "@/components/new-message-form";
-import { MessageState, NewMessageProvider } from "@/contexts/use-new-message";
+import {
+  EMPTY_MESSAGE,
+  MessageState,
+  NewMessageProvider,
+} from "@/contexts/use-new-message";
 import { fetchRecipients } from "@/lib/db/recipients";
 import { fetchDraft } from "@/lib/db/message";
 import { rankRecipients, validatePhoneNumber } from "@/lib/utils";
@@ -7,18 +11,6 @@ import { ContactModalsProvider } from "@/contexts/use-contact-modals";
 
 type NewMessagePageProps = {
   searchParams: Promise<{ editDraft: string }>;
-};
-export const EMPTY_MESSAGE: MessageState = {
-  sender: "ETPZP",
-  subject: "",
-  recipients: [],
-  body: "",
-  recipientInput: {
-    isFocused: false,
-    value: "",
-    error: undefined,
-    isHidden: false,
-  },
 };
 
 export default async function Page({ searchParams }: NewMessagePageProps) {

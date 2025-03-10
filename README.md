@@ -17,14 +17,15 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 # TODO
+
 - Move all messages where an gateway Api error got returned, to **Failed** page, and add an error code so that the user can ask for tech support/help and they can research the error code then.
-Testing:
+  Testing:
 - The default behavior should be no selected recipient and when you press a arrow key the start getting selected
 - contacts don't show up in suggested.
 - When searching and then deleting to then re-searching, we get no search results
 
-
 #### AFTER THAT - SCHEDULED PAGE:
+
 - On new-message, fix the popup bugs, as well as functionality for the buttons in the select dropdown and the schedule now button.
 - Make it so that the form doesn't get automatically submitted, the date should get chosen, and the submit button should change to schedule for...
 - Add the correct date formatting for scheduled messages, and also display scheduled messages in a different way so that it is easier to tell when they will be sent. What should this look like
@@ -39,6 +40,7 @@ Testing:
 - Make sure when the server components re-refetch because of revalidation, that the contexts update their state values with the newly fetched data!
 
 ## If there is extra time (after deployment in school)
+
 1. \*\* ** Do a test deployment ** \*\*
 
 - Admin Dashboard with statistics and admin settings
@@ -53,12 +55,15 @@ Testing:
 - Consider adding some contact information to the message item in the list
 
 ## Database
+
 #### Deleting all tables
+
 ```sql
 DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```
 
 #### Seed files
+
 On UNIX Operating system
 
 ```psql
@@ -70,3 +75,7 @@ On Windows psql shell
 ```psql
 \i /Users/Utilizador/dev/etpzp-sms/lib/db/seeds/seed.sql
 ```
+
+\i /app/lib/db/seeds/seed.sql
+
+ls ./.next

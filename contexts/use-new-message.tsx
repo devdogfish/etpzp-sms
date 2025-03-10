@@ -24,7 +24,6 @@ import {
   matchContactsToRecipients,
   validatePhoneNumber,
 } from "@/lib/utils";
-import { EMPTY_MESSAGE } from "@/app/[locale]/(root)/(other)/new-message/page";
 import { useContacts } from "./use-contacts";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -33,6 +32,18 @@ import InsertContactModal from "@/components/modals/insert-contact-modal";
 import CreateContactModal from "@/components/modals/create-contact-modal";
 import RecipientInfoModal from "@/components/modals/recipient-info-modal";
 
+export const EMPTY_MESSAGE: MessageState = {
+  sender: "ETPZP",
+  subject: "",
+  recipients: [],
+  body: "",
+  recipientInput: {
+    isFocused: false,
+    value: "",
+    error: undefined,
+    isHidden: false,
+  },
+};
 // This is our biggest state where we store all data related to the active message, that should be persisted during draft saving re-renders
 // MessageState is only used here & for EMPTY_MESSAGE
 export type MessageState = Message & {
