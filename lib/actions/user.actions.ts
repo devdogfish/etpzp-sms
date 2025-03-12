@@ -137,6 +137,8 @@ export async function dummySaveUser(
       }
     }
   } catch (error) {
+    console.log("dummy save user error:", error);
+
     return {
       success: false,
       message: ["Error occurred", "Failed to create or fetch user."],

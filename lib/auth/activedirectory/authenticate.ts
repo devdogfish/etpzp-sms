@@ -86,6 +86,8 @@ export async function dummyAuthenticate({
     isAdmin: true,
   };
   const userResult = await dummySaveUser(dummyUser.user as DBUser);
+  console.log("DUmmy authenticate result:", dummyUser);
+
   return {
     user: userResult.success ? userResult.data : undefined,
     isAuthenticated: userResult.success,
