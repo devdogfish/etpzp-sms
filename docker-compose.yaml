@@ -3,12 +3,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file: .env
+    env_file: .env.docker
     ports:
       - "3000:3000"
-    volumes:
-      - ./:/app
-      - server-v-node-modules:/node_modules
     depends_on:
       database:
         condition: service_healthy
@@ -17,7 +14,7 @@ services:
       context: ./lib/db
       dockerfile: Dockerfile
     container_name: postgres
-    env_file: .env
+    env_file: .env.docker
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
@@ -33,7 +30,5 @@ services:
       timeout: 5s
       retries: 5
 volumes:
-  server-v-node-modules:
-    name: "server-v-node-modules"
   database-v:
     name: "database-v"

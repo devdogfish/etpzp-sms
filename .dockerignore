@@ -1,0 +1,6 @@
+# Ignore the .env.docker file
+.env.docker
+
+# Ignore other files and directories
+node_modules
+*.log
