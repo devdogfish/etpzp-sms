@@ -17,15 +17,10 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 # TODO
-
-- Move all messages where an gateway Api error got returned, to **Failed** page, and add an error code so that the user can ask for tech support/help and they can research the error code then.
-  Testing:
-- The default behavior should be no selected recipient and when you press a arrow key the start getting selected
-- contacts don't show up in suggested.
-- When searching and then deleting to then re-searching, we get no search results
-
+1. Move all messages where an gateway Api error got returned, to **Failed** page, and add an error code so that the user can ask for tech support/help and they can research the error code then.
+2. For scheduled messages, it would be better to do polling WHEN THE USER LOGS IN because when our server is not running we might lose callbacks
+  - Create a separate thread to get the delivery status while loading everything else
 #### AFTER THAT - SCHEDULED PAGE:
-
 - On new-message, fix the popup bugs, as well as functionality for the buttons in the select dropdown and the schedule now button.
 - Make it so that the form doesn't get automatically submitted, the date should get chosen, and the submit button should change to schedule for...
 - Add the correct date formatting for scheduled messages, and also display scheduled messages in a different way so that it is easier to tell when they will be sent. What should this look like
@@ -34,13 +29,12 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
   - in the message list, on each message item, have it be the sendTime
   - Have a 5-minute refresh timer for polling scheduled message delivery statuses in the root layout so that the amountIndicators also update
   - Display scheduled messages in a different way so that it is easier to tell when they will be sent
-- SCHEDULED MESSAGES: - For scheduled messages, it would be better to do polling WHEN THE USER LOGS IN because when our server is not running we might lose callbacks
-  - Create a separate thread to get the delivery status while loading everything else
 - Implement `TODO` comments
 - Make sure when the server components re-refetch because of revalidation, that the contexts update their state values with the newly fetched data!
 
 ## If there is extra time (after deployment in school)
-
+- Fix styles for insert modal.
+- Don't save invalid recipients to database (we don't want to suggest invalid ones) or filter them out on the frontend. These recipients belong to drafts so maybe update the query to search for recipients that are not in the drafts or just filter out the invalid ones using javascript
 - Admin Dashboard with statistics and admin settings
   - Should I keep the option to change the sender? This would also influence the message-display component
   - If it's difficult, keep it as ETPZP for everyone. If easy, the admin could specify some select options that would be applied to all users.

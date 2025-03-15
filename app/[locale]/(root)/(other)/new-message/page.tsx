@@ -1,13 +1,10 @@
 import NewMessageForm from "@/components/new-message-form";
-import {
-  EMPTY_MESSAGE,
-  MessageState,
-  NewMessageProvider,
-} from "@/contexts/use-new-message";
+import { MessageState, NewMessageProvider } from "@/contexts/use-new-message";
 import { fetchRecipients } from "@/lib/db/recipients";
 import { fetchDraft } from "@/lib/db/message";
 import { rankRecipients, validatePhoneNumber } from "@/lib/utils";
 import { ContactModalsProvider } from "@/contexts/use-contact-modals";
+import { EMPTY_MESSAGE } from "@/global.config";
 
 type NewMessagePageProps = {
   searchParams: Promise<{ editDraft: string }>;

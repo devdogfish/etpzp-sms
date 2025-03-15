@@ -26,7 +26,7 @@ import React, {
 } from "react";
 
 import RecipientsInput from "./recipients-input";
-import { EMPTY_MESSAGE, useNewMessage } from "@/contexts/use-new-message";
+import { useNewMessage } from "@/contexts/use-new-message";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Select,
@@ -46,7 +46,7 @@ import useDebounce from "@/hooks/use-debounce";
 import useIsMounted from "@/hooks/use-mounted";
 import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
+import { EMPTY_MESSAGE, PORTUGUESE_DATE_FORMAT } from "@/global.config";
 import { useContacts } from "@/contexts/use-contacts";
 
 // apparently, when something gets revalidated or the url gets updated, this component gets re-rendered, while the new-message-context keeps it's state

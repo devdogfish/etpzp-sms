@@ -56,6 +56,8 @@ export default function RecipientsInput({
     searchRecipients,
     showInfoAbout,
 
+    focusedInput,
+
     // Which one in the suggested recipients/contacts is currently selected. You can change the selection with up and down arrow keys.
     selectedPhone,
     updateSelectedPhone,
@@ -164,13 +166,22 @@ export default function RecipientsInput({
     setModal((prev) => ({ ...prev, info: true }));
   };
 
+  useEffect(() => {
+    // automatically collapse the expanded recipients when another input gets selected
+    if (focusedInput !== "new-recipient" && typeof focusedInput == "string") {
+      setMessage((prev) => ({
+        ...prev,
+        recipientInput: { ...prev.recipientInput, recipientsExpanded: false },
+      }));
+    }
+  }, [focusedInput]);
   return (
     <div className="flex-1 py-1 relative z--[1000]">
       <div className="max-h-24 overflow-auto" ref={container}>
         <div
           className={cn(
             "w-full min-h-[2.75rem] flex flex-wrap items-center gap-x-1 py-1 h-full border-b px-5 z-50",
-            message.recipientInput.isFocused && "border-primary",
+            focusedInput === "new-recipient" && "border-primary",
             error && "border-red-500"
           )}
         >
@@ -181,7 +192,7 @@ export default function RecipientsInput({
             // Since we have so many recipients, only some should be shown until the user clicks to see the rest
             if (
               index >= OFF_FOCUSED_RECIPIENT_AMOUNT &&
-              !message.recipientInput.isFocused
+              message.recipientInput.recipientsExpanded === false
             ) {
               return;
             }
@@ -241,8 +252,7 @@ export default function RecipientsInput({
           })}
 
           {/* Button to show all recipients, when it's clicked we also focus the input */}
-          {!message.recipientInput.isFocused &&
-          message.recipients.length > OFF_FOCUSED_RECIPIENT_AMOUNT ? (
+          {message.recipientInput.recipientsExpanded === false ? (
             <Button
               variant="none"
               className="p-0 ml-2"
@@ -250,7 +260,10 @@ export default function RecipientsInput({
               onClick={() => {
                 setMessage((prev) => ({
                   ...prev,
-                  recipientInput: { ...prev.recipientInput, isFocused: true },
+                  recipientInput: {
+                    ...prev.recipientInput,
+                    recipientsExpanded: true,
+                  },
                 }));
                 setTimeout(() => {
                   if (inputElement.current) {
@@ -270,9 +283,7 @@ export default function RecipientsInput({
           <div
             className={cn(
               "h-7 min-w-[200px] flex-1 py-1 ml-3", // my-0
-              !message.recipientInput.isFocused &&
-                message.recipients.length > OFF_FOCUSED_RECIPIENT_AMOUNT &&
-                "hidden"
+              message.recipientInput.recipientsExpanded === false && "hidden"
             )} /* we are taking advantage of the default positioning of absolute elements this common parent div */
           >
             <Input
@@ -283,19 +294,14 @@ export default function RecipientsInput({
                 "h-min text-sm w-full p-0 ring-0 focus:ring-0 shadow-none rounded-none placeholder:text-muted-foreground" //my-0
               )}
               placeholder={
-                message.recipientInput.isFocused ? t("common:phone_number") : ""
+                message.recipientInput.recipientsExpanded
+                  ? t("common:phone_number")
+                  : ""
               }
               value={message.recipientInput.value}
               onChange={onInputChange}
               onKeyDown={handleKeyDown}
               onFocus={() => {
-                setMessage((m) => ({
-                  ...m,
-                  recipientInput: {
-                    ...m.recipientInput,
-                    isFocused: true,
-                  },
-                }));
                 setIsDropdownOpen(true);
 
                 searchRecipients(message.recipientInput.value);
@@ -304,10 +310,6 @@ export default function RecipientsInput({
               onBlur={() => {
                 setMessage((m) => ({
                   ...m,
-                  recipientInput: {
-                    ...m.recipientInput,
-                    isFocused: false,
-                  },
                   recipients: m.recipients.map((r) => ({
                     ...r,
                     proneForDeletion: false,
@@ -345,13 +347,6 @@ export default function RecipientsInput({
                             e.preventDefault();
 
                             addRecipient(recipient.phone, contacts);
-                            setMessage((m) => ({
-                              ...m,
-                              recipientInput: {
-                                ...m.recipientInput,
-                                isFocused: true,
-                              },
-                            }));
                           }}
                         >
                           <ProfilePic

@@ -31,28 +31,17 @@ import { MessageSchema } from "@/lib/form.schemas";
 import InsertContactModal from "@/components/modals/insert-contact-modal";
 import CreateContactModal from "@/components/modals/create-contact-modal";
 import RecipientInfoModal from "@/components/modals/recipient-info-modal";
+import { EMPTY_MESSAGE } from "@/global.config";
 
-export const EMPTY_MESSAGE: MessageState = {
-  sender: "ETPZP",
-  subject: "",
-  recipients: [],
-  body: "",
-  recipientInput: {
-    isFocused: false,
-    value: "",
-    error: undefined,
-    isHidden: false,
-  },
-};
 // This is our biggest state where we store all data related to the active message, that should be persisted during draft saving re-renders
 // MessageState is only used here & for EMPTY_MESSAGE
 export type MessageState = Message & {
   // This is only for the front end composing of the message and will not be used on the server
   recipientInput: {
     value: string;
-    isFocused: boolean;
     error?: string;
     isHidden: boolean;
+    recipientsExpanded: boolean;
   };
   serverStateErrors?: { [K in keyof z.infer<typeof MessageSchema>]?: string[] };
   invalidRecipients?: NewRecipient[];
@@ -322,7 +311,6 @@ export function NewMessageProvider({
     // Note: Works only correctly here; won't update correctly with add/remove operations.
     searchRecipients(message.recipientInput.value);
   }, [message.recipients]);
-
   return (
     <NewMessageContext.Provider
       value={{
