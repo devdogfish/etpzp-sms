@@ -1,7 +1,8 @@
 FROM oven/bun:alpine AS base
 
-# Install Node.js and npm
+# Install Node.js, npm, and i18nexus for translations
 RUN apk add --no-cache nodejs npm
+RUN bun i -g i18nexus-cli
 
 # Stage 1: Install dependencies
 FROM base AS deps

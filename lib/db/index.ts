@@ -10,16 +10,16 @@ const pool = new Pool({
 
 // lib/db.js helper query function
 async function db(query: string, params?: any[]): Promise<QueryResult> {
-  console.log(
-    "Trying to connect to db from db helper function these credentials:",
-    {
-      host: process.env.POSTGRES_HOST,
-      port: Number(process.env.POSTGRES_PORT),
-      user: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB,
-    }
-  );
+  // console.log(
+  //   "Trying to connect to db from db helper function these credentials:",
+  //   {
+  //     host: process.env.POSTGRES_HOST,
+  //     port: Number(process.env.POSTGRES_PORT),
+  //     user: process.env.POSTGRES_USER,
+  //     password: process.env.POSTGRES_PASSWORD,
+  //     database: process.env.POSTGRES_DB,
+  //   }
+  // );
 
   const client = await pool.connect();
   try {
@@ -35,6 +35,7 @@ async function db(query: string, params?: any[]): Promise<QueryResult> {
 
 export default db;
 
-db("SELECT $1::text as message", ["Hello world!"])
-  .then(() => console.log("Connected to Postgres!"))
-  .catch((err) => console.error("Error connecting to Postgres!", err));
+// If you want to test database connections during compiling
+// db("SELECT $1::text as message", ["Hello world!"])
+//   .then(() => console.log("Connected to Postgres!"))
+//   .catch((err) => console.error("Error connecting to Postgres!", err));
