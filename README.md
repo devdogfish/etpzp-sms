@@ -41,8 +41,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## If there is extra time (after deployment in school)
 
-1. \*\* ** Do a test deployment ** \*\*
-
 - Admin Dashboard with statistics and admin settings
   - Should I keep the option to change the sender? This would also influence the message-display component
   - If it's difficult, keep it as ETPZP for everyone. If easy, the admin could specify some select options that would be applied to all users.
@@ -54,28 +52,22 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Maybe add some shades of blue between the different columns, to show a hierarchy
 - Consider adding some contact information to the message item in the list
 
-## Database
-
-#### Deleting all tables
-
+## Important Commands
+Deleting all tables
 ```sql
 DROP TABLE IF EXISTS recipient, contact, message, public.user;
 ```
-
-#### Seed files
-
-On UNIX Operating system
-
-```psql
-\i ~/dev/etpzp-sms/lib/db/seeds/seed.sql
+### On MacOS/UNIX based system:
+Seed the database
+```shell
+\i ~/dev/etpzp-sms/lib/db/seed.sql
 ```
-
-On Windows psql shell
-
-```psql
-\i /Users/Utilizador/dev/etpzp-sms/lib/db/seeds/seed.sql
+Open Nginx config
+```shell
+code /opt/homebrew/etc/nginx/nginx.conf
 ```
-
-\i /app/lib/db/seeds/seed.sql
-
-ls ./.next
+### Windows
+Seed the database
+```shell
+\i /Users/Utilizador/dev/etpzp-sms/lib/db/seed.sql
+```
