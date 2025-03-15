@@ -22,11 +22,15 @@ FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/package.json .
+
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+# If it at some point doesn't work anymore, copy the entire directory
+# COPY --from=builder /app/.next ./.next
+
+# This is for the `start` script, but when replacing the start command with server.js (also part of the build) I can't access the site on localhost
+COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
-# COPY --from=builder /app/.next/standalone ./
-# COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 3000
 CMD ["bun", "run", "start"]
