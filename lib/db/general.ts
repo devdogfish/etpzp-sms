@@ -29,50 +29,37 @@ export async function fetchAmountIndicators() {
 
   try {
     if (!userId) throw new Error("Invalid user id.");
-    // While this seems quite complex, it is the only one that works. The CAST() syntax is just to convert to integers
-    const { rows } = await db(
+    // We need to do two separate queries, because I got issues when trying to merge it into one. Maybe come back to this later and create one query to all of them.
+    const messageCount = await db(
       `
         SELECT
-            -- Count of sent messages (in the past and not in trash)
-            CAST(COALESCE(sent_counts.sent, 0) AS INTEGER) AS sent,
-
-            -- Count of scheduled messages (in the future and not in trash)
-            CAST(COALESCE(sent_counts.scheduled, 0) AS INTEGER) AS scheduled,
-
-            -- Count of failed messages (not in trash)
-            CAST(COALESCE(sent_counts.failed, 0) AS INTEGER) AS failed,
-
-            -- Count of drafted messages (not in trash)
-            CAST(COALESCE(sent_counts.drafts, 0) AS INTEGER) AS drafts,
-
-            -- Count of messages in trash
-            CAST(COALESCE(sent_counts.trash, 0) AS INTEGER) AS trash,
-
-            -- Total number of contacts for the user
-            CAST(COUNT(c.id) AS INTEGER) AS contacts
+            COALESCE(SUM(CASE WHEN send_time < NOW() AND in_trash = false THEN 1 END), 0)::INTEGER AS sent,
+            COALESCE(SUM(CASE WHEN status = 'SCHEDULED' AND in_trash = false AND send_time > NOW() THEN 1 END), 0)::INTEGER AS scheduled,
+            COALESCE(SUM(CASE WHEN status = 'FAILED' AND in_trash = false THEN 1 END), 0)::INTEGER AS failed,
+            COALESCE(SUM(CASE WHEN status = 'DRAFTED' AND in_trash = false THEN 1 END), 0)::INTEGER AS drafts,
+            COALESCE(SUM(CASE WHEN in_trash = true THEN 1 END), 0)::INTEGER AS trash
         FROM
-            contact c
-        LEFT JOIN (
-            SELECT
-                user_id,
-                COUNT(CASE WHEN send_time < NOW() AND in_trash = false THEN 1 END) AS sent,
-                COUNT(CASE WHEN status = 'SCHEDULED' AND in_trash = false AND send_time > NOW() THEN 1 END) AS scheduled,
-                COUNT(CASE WHEN status = 'FAILED' AND in_trash = false THEN 1 END) AS failed,
-                COUNT(CASE WHEN status = 'DRAFTED' AND in_trash = false THEN 1 END) AS drafts,
-                COUNT(CASE WHEN in_trash = true THEN 1 END) AS trash
-            FROM
-                message
-            GROUP BY
-                user_id
-        ) AS sent_counts ON c.user_id = sent_counts.user_id
+            message
         WHERE
-            c.user_id = $1
-        GROUP BY
-            sent_counts.sent, sent_counts.scheduled, sent_counts.failed, sent_counts.drafts, sent_counts.trash, c.user_id;
+            user_id = $1;
       `,
       [userId]
     );
+    const contactsCount = await db(
+      `
+      SELECT
+          CAST(COUNT(c.id) AS INTEGER)
+      FROM
+          contact c
+      WHERE
+          c.user_id = $1;
+    `,
+      [userId]
+    );
 
-    return rows[0] as AmountIndicators;
+    return {
+      ...messageCount.rows[0],
+      contacts: contactsCount.rows[0].count,
+    } as AmountIndicators;
   } catch (error) {}
 }

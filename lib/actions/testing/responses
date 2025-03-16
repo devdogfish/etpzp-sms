@@ -18,7 +18,7 @@ const successResponse = /**Response */ {
   ok: true,
   redirected: false,
   type: "basic",
-  url: "https://gatewayapi.com/rest/mtsms",
+  url: "process.env.GATEWAYAPI_URL/rest/mtsms",
 };
 
 export const errorResponse = /**Response */ {
@@ -40,7 +40,7 @@ export const errorResponse = /**Response */ {
   ok: false,
   redirected: false,
   type: "basic",
-  url: "https://gatewayapi.com/rest/mtsms",
+  url: "process.env.GATEWAYAPI_URL/rest/mtsms",
 };
 
 const errorResponse2 = /**Response */ {
@@ -62,5 +62,5 @@ const errorResponse2 = /**Response */ {
   ok: false,
   redirected: false,
   type: "basic",
-  url: "https://gatewayapi.com/rest/mtsms",
+  url: "process.env.GATEWAYAPI_URL/rest/mtsms",
 };

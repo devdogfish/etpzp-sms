@@ -253,7 +253,6 @@ export function rankRecipients(data: FetchedRecipient[]): RankedRecipient[] {
   // Step 1: Create a unique array of recipients with their usage count
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  console.log("Raw recipients:", data);
 
   const processedData: RankedRecipient[] = []; // Initialize an array for processed recipients
   const recipientMap = new Map<string, RankedRecipient>(); // Use a map to track unique recipients

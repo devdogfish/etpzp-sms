@@ -26,7 +26,9 @@ export type DBMessage = {
   send_time?: Date;
   status: StatusEnums;
   in_trash: boolean;
-  failure_reason?: string | null;
+  api_error: string | null;
+  api_error_code: number | null;
+  api_error_details_json: string | null;
   recipients: DBRecipient[];
   sms_reference_id: string;
 };

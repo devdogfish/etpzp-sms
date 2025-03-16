@@ -29,7 +29,9 @@ CREATE TABLE "message" (
     -- A scheduled message will stay scheduled even if the time where it should be sent is reached, so status is the wrong word for this
     status VARCHAR(20) NOT NULL CHECK (status IN ('SENT', 'SCHEDULED', 'FAILED', 'DRAFTED')),
     in_trash BOOLEAN NOT NULL DEFAULT false,
-    failure_reason VARCHAR(255)
+    api_error VARCHAR(255), -- The translation string that will be plugged into i18nexus
+    api_error_code SMALLINT,
+    api_error_details_json TEXT
 );
 
 -- Create contacts table

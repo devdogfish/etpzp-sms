@@ -252,7 +252,8 @@ export default function RecipientsInput({
           })}
 
           {/* Button to show all recipients, when it's clicked we also focus the input */}
-          {message.recipientInput.recipientsExpanded === false ? (
+          {message.recipients.length > OFF_FOCUSED_RECIPIENT_AMOUNT &&
+          message.recipientInput.recipientsExpanded === false ? (
             <Button
               variant="none"
               className="p-0 ml-2"
@@ -283,7 +284,9 @@ export default function RecipientsInput({
           <div
             className={cn(
               "h-7 min-w-[200px] flex-1 py-1 ml-3", // my-0
-              message.recipientInput.recipientsExpanded === false && "hidden"
+              message.recipients.length > OFF_FOCUSED_RECIPIENT_AMOUNT &&
+                message.recipientInput.recipientsExpanded === false &&
+                "hidden"
             )} /* we are taking advantage of the default positioning of absolute elements this common parent div */
           >
             <Input
@@ -294,6 +297,7 @@ export default function RecipientsInput({
                 "h-min text-sm w-full p-0 ring-0 focus:ring-0 shadow-none rounded-none placeholder:text-muted-foreground" //my-0
               )}
               placeholder={
+                message.recipients.length <= OFF_FOCUSED_RECIPIENT_AMOUNT ||
                 message.recipientInput.recipientsExpanded
                   ? t("common:phone_number")
                   : ""

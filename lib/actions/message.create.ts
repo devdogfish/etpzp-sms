@@ -75,42 +75,75 @@ export async function sendMessage(
       sender: validatedData.data.sender,
       message: validatedData.data.body, // this can be any string
 
-      recipients: validRecipients.map(({ phone }) => ({
+      recipientss: validRecipients.map(({ phone }) => ({
         msisdn: phone,
       })),
 
       destaddr: "DISPLAY", // Flash SMS
 
       // The API is case-sensitive - `sendtime` has to be spelled exactly like this
-      sendtime: isScheduled ? scheduledUnixSeconds : undefined, // Extract the UNIX timestamp for scheduled messages
+      sendTtime: isScheduled ? scheduledUnixSeconds : undefined, // Extract the UNIX timestamp for scheduled messages
     };
 
-    // const networkResponse = await fetch(
-    //   `${process.env.GATEWAYAPI_URL}/rest/mtsms`,
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(payload),
-    //   }
-    // );
-    // const response = await networkResponse.json();
-    // console.log(networkResponse, response);
+    const networkResponse = await fetch(
+      `${process.env.GATEWAYAPI_URL}/rest/mtsms`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    const response = await networkResponse.json();
+    console.log(networkResponse, response);
 
-    const networkResponse = SuccessResponse;
-    const response = { ids: [null] };
+    console.log("WE ARE STILL IN TRY BLOCK");
 
-    if (!networkResponse.ok) {
-      console.log(JSON.stringify(response));
+    // const networkResponse = SuccessResponse;
+    // const response = { ids: [null] };
 
-      throw new Error(
-        "Network response was not ok " + networkResponse?.statusText
-      );
-    }
+    // if (!networkResponse.ok) {
+    //   console.log("Something went wrong:", JSON.stringify(response));
 
-    console.log("SAVING REFERENCE_ID", response.ids[0] || null);
+    //   // throw new Error(
+    //   //   "Network response was not ok " + networkResponse?.statusText
+    //   // );
+    // }
+
+    // console.log("SAVING REFERENCE_ID", response.ids[0] || null);
+
+    const args = [
+      // Message data
+      validatedData.data.subject, // subject
+      validatedData.data.body, // body
+      networkResponse.ok // status
+        ? scheduledUnixSeconds
+          ? "SCHEDULED"
+          : "SENT"
+        : "FAILED",
+      scheduledUnixSeconds // sendtime
+        ? new Date(scheduledUnixSeconds * 1000)
+        : new Date(Date.now()),
+      response?.ids?.length ? response?.ids[0] : null, // sms_reference_id
+
+      // Api errors
+      networkResponse.ok ? null : `api_error_${networkResponse.statusText}`, // api_error translation string
+      networkResponse.ok ? null : networkResponse.statusText, // api_error_code
+      networkResponse.ok ? null : JSON.stringify(response), // api_error_details_json
+     
+      // Recipients
+      validRecipients.map((recipient) => recipient.phone), // phone number array
+      validRecipients.map((_, index) => index), // for the ordering of the recipient
+
+      // Other
+      userId, // user_id
+      existingDraftId, // id of the draft to update
+    ];
+
+    console.log("WE ARE STILL IN TRY BLOCK 2");
+    console.log("BEGIN DATABASE LOGIC");
 
     // -------- BEGIN DATABASE LOGIC --------
     if (typeof existingDraftId === "undefined" || !existingDraftId) {
@@ -118,45 +151,45 @@ export async function sendMessage(
         "The draftId is not defined, creating new message with INSERT query"
       );
 
+      console.log([...args.slice(0, 11)]);
+      
       // Insert new message and recipients
       await db(
         `
           WITH insert_message AS (
-            INSERT INTO message (user_id, subject, body, status, failure_reason, send_time, sms_reference_id) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7) 
+            INSERT INTO message (
+              subject,
+              body,
+              status,
+              send_time,
+              sms_reference_id,
+              api_error,
+              api_error_code,
+              api_error_details_json,
+              user_id
+            ) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $11) 
             RETURNING id
           )
           INSERT INTO recipient (message_id, phone, index)
           SELECT 
             insert_message.id,
-            unnest($8::text[]) as phone,
-            unnest($9::int[]) as index
+            unnest($9::text[]) as phone,
+            unnest($10::int[]) as index
           FROM insert_message;
         `,
-        [
-          // message parameters
-          userId,
-          validatedData.data.subject,
-          validatedData.data.body,
-          networkResponse?.ok
-            ? scheduledUnixSeconds
-              ? "SCHEDULED"
-              : "SENT"
-            : "FAILED", // status here
-          networkResponse?.statusText || null,
-          scheduledUnixSeconds
-            ? new Date(scheduledUnixSeconds * 1000)
-            : new Date(Date.now()),
-          response.ids[0] || null,
-
-          // recipient parameters:
-          validRecipients.map((recipient) => recipient.phone), // phone number array
-          validRecipients.map((_, index) => index), // for the ordering of the recipient
-        ]
+        [...args.slice(0, 11)] // this gets the first 11 items from the array
       );
     } else {
       console.log(
         `Updating existing message item with draftId: ${existingDraftId}`
+      );
+
+      console.log([...args.slice(0, 8), userId, existingDraftId]);
+      console.log(
+        "Supplying ",
+        [...args.slice(0, 8), userId, existingDraftId].length,
+        " arguments."
       );
 
       // Update existing message record
@@ -166,27 +199,15 @@ export async function sendMessage(
           SET subject = $1,
               body = $2,
               status = $3,
-              failure_reason = $4,
-              send_time = $5,
-              sms_reference_id = $6
-          WHERE id = $7
+              send_time = $4,
+              sms_reference_id = $5,
+              api_error = $6,
+              api_error_code = $7,
+              api_error_details_json = $8
+          WHERE user_id = $9 AND id = $10
           RETURNING id;
         `,
-        [
-          validatedData.data.subject,
-          validatedData.data.body,
-          networkResponse?.ok
-            ? scheduledUnixSeconds
-              ? "SCHEDULED"
-              : "SENT"
-            : "FAILED",
-          networkResponse?.statusText || null,
-          scheduledUnixSeconds
-            ? new Date(scheduledUnixSeconds * 1000)
-            : new Date(Date.now()),
-          response.ids[0] || null,
-          existingDraftId,
-        ]
+        [...args.slice(0, 8), userId, existingDraftId]
       );
 
       // In case update didn't match any rows - invalid message id
@@ -231,6 +252,8 @@ export async function sendMessage(
         : undefined,
     };
   } catch (error) {
+    console.log("in catch block:", error);
+
     return {
       success: false,
       message: ["new-message-page:server-unknown_error"],
