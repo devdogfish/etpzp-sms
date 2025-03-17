@@ -38,8 +38,8 @@ import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
 import { useContacts } from "@/contexts/use-contacts";
 import { PRIMARY_COLOR_CSS_NAMES } from "@/lib/theme.colors";
 import React, { useEffect, useMemo, useState } from "react";
-import { useContactModals } from "@/contexts/use-contact-modals";
-import RecipientInfoModal from "./modals/recipient-info-modal";
+import { useModal } from "@/contexts/use-modal";
+import RecipientInfoModal from "./modals/recipient-info";
 
 function MessageDisplay({
   message,
@@ -57,7 +57,7 @@ function MessageDisplay({
   const pathname = usePathname();
   const [moreInfoRecipient, setMoreInfoRecipient] =
     useState<NewRecipient | null>(null);
-  const { setModal } = useContactModals();
+  const { setModal } = useModal();
 
   const [recipientsExpanded, setRecipientsExpanded] = useState(false);
   const { contacts, contactFetchError } = useContacts();
@@ -65,7 +65,7 @@ function MessageDisplay({
   const [profileColors, setProfileColors] = useState<string[]>([]);
   const showInfoAbout = (recipient: NewRecipient) => {
     setMoreInfoRecipient(recipient);
-    setModal((prev) => ({ ...prev, info: true }));
+    setModal((m) => ({ ...m, contact: { ...m.contact, info: true } }));
   };
 
   const handleTrashButtonClick = async () => {

@@ -14,36 +14,28 @@ import {
 import { Button, buttonVariants } from "../ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "../ui/label";
-import { createContact } from "@/lib/actions/contact.actions";
+import { updateContact } from "@/lib/actions/contact.actions";
+import { DBContact } from "@/types/contact";
+import { ContactSchema } from "@/lib/form.schemas";
 import { CircleAlert, Loader2 } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
 import { cn, toastActionResult } from "@/lib/utils";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
-import { useContactModals } from "@/contexts/use-contact-modals";
-import { CreateContactResponse } from "@/types/action";
+import { useModal } from "@/contexts/use-modal";
+import { ActionResponse } from "@/types/action";
 import { useTranslation } from "react-i18next";
-import { DBContact } from "@/types/contact";
 import { useContacts } from "@/contexts/use-contacts";
 
-const initialState: CreateContactResponse = {
+const initialState: ActionResponse<undefined> = {
   success: false,
   message: [],
 };
 
-export default function CreateContactModal({
-  defaultPhone,
-  onCreateSuccess,
-  // This is for /new-message, where we keep a state of the recipient you are creating a contact from
-  // onClose,
-}: {
-  defaultPhone?: string;
-  onCreateSuccess?: (contact: DBContact) => void;
-  // onClose?: () => void;
-}) {
-  const { modal, setModal } = useContactModals();
+export default function EditContactModal({ contact }: { contact: DBContact }) {
+  const { modal, setModal } = useModal();
   const [serverState, action, pending] = useActionState(
-    createContact,
+    updateContact.bind(null, contact.id),
     initialState
   );
   const { refetchContacts } = useContacts();
@@ -52,16 +44,14 @@ export default function CreateContactModal({
   useEffect(() => {
     if (serverState.success) {
       toastActionResult(serverState, t);
-      // Refetch contacts context after creation.
+      handleOpenChange(false);
+      // Refetch contacts context after mutation.
       refetchContacts();
-      onOpenChange(false);
-      if (onCreateSuccess && serverState.data)
-        onCreateSuccess(serverState.data);
     }
   }, [serverState]);
 
-  const onOpenChange = (value: boolean) => {
-    setModal((prev) => ({ ...prev, create: value }));
+  const handleOpenChange = (value: boolean) => {
+    setModal((m) => ({ ...m, contact: { ...m.contact, edit: value } }));
     clearInputs();
   };
   const clearInputs = () => {
@@ -73,14 +63,14 @@ export default function CreateContactModal({
   return (
     <Dialog
       /* We do need these shits unfortunately */
-      open={modal.create}
-      onOpenChange={onOpenChange}
+      open={modal.contact.edit}
+      onOpenChange={handleOpenChange}
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("create_contact-header")}</DialogTitle>
+          <DialogTitle>{t("edit_contact-header")}</DialogTitle>
           <DialogDescription>
-            {t("create_contact-header_caption")}
+            {t("edit_contact-header_caption")}
           </DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-6">
@@ -90,7 +80,7 @@ export default function CreateContactModal({
               name="name"
               id="name"
               placeholder={t("name_placeholder")}
-              defaultValue={serverState.inputs?.name}
+              defaultValue={serverState.inputs?.name || contact.name}
               // required
               // minLength={5}
               // maxLength={100}
@@ -110,7 +100,7 @@ export default function CreateContactModal({
               name="phone"
               id="phone"
               placeholder={t("phone_placeholder")}
-              defaultValue={serverState.inputs?.phone || defaultPhone}
+              defaultValue={serverState.inputs?.phone || contact.phone}
               // required
               // minLength={5}
               // maxLength={100}
@@ -130,7 +120,9 @@ export default function CreateContactModal({
               name="description"
               id="description"
               placeholder={t("description_placeholder")}
-              defaultValue={serverState.inputs?.description}
+              defaultValue={
+                serverState.inputs?.description || contact.description
+              }
               // required
               // minLength={5}
               // maxLength={100}
@@ -150,7 +142,7 @@ export default function CreateContactModal({
             <Alert variant={serverState.success ? "default" : "destructive"}>
               {!serverState.success && <CircleAlert className="w-4 h-4" />}
               <AlertDescription className="relative top-1">
-                {t(serverState.message.join(", "))}
+                {t(serverState.message)}
               </AlertDescription>
             </Alert>
           )}
@@ -164,7 +156,7 @@ export default function CreateContactModal({
             </DialogClose>
             <Button type="submit" disabled={pending}>
               {pending && <Loader2 className="h-4 w-4 animate-spin" />}{" "}
-              {t("common:create")}
+              {t("common:update")}
             </Button>
           </DialogFooter>
         </form>

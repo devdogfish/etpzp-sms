@@ -9,7 +9,7 @@ import {
   DialogFooter,
 } from "../ui/dialog";
 import { DialogClose } from "@/components/ui/dialog";
-import { useContactModals } from "@/contexts/use-contact-modals";
+import { useModal } from "@/contexts/use-modal";
 import { Separator } from "../ui/separator";
 import { CopyButton } from "../shared/copy-button";
 import { Button } from "../ui/button";
@@ -24,21 +24,21 @@ export default function RecipientInfoModal({
   recipient: NewRecipient;
   allowContactCreation: boolean;
 }) {
-  const { modal, setModal } = useContactModals();
+  const { modal, setModal } = useModal();
   const { t } = useTranslation(["modals"]);
 
-  const openCreateContact = () => {
-    setModal((prev) => ({ ...prev, info: false }));
+  const showCreateModal = () => {
+    setModal((m) => ({ ...m, contact: { ...m.contact, info: true } }));
     setTimeout(() => {
-      setModal((prev) => ({ ...prev, create: true }));
+      setModal((m) => ({ ...m, contact: { ...m.contact, create: true } }));
     }, 100);
   };
   return (
     <Dialog
       /* We do need these shits unfortunately */
-      open={modal.info}
+      open={modal.contact.info}
       onOpenChange={(value: boolean) =>
-        setModal((prev) => ({ ...prev, info: value }))
+        setModal((m) => ({ ...m, contact: { ...m.contact, info: value } }))
       }
     >
       <DialogContent>
@@ -92,7 +92,7 @@ export default function RecipientInfoModal({
               </Button>
             </DialogClose>
             {!recipient.contact?.id && (
-              <Button onClick={openCreateContact}>
+              <Button onClick={showCreateModal}>
                 {t("info-button_create_contact")}
               </Button>
             )}

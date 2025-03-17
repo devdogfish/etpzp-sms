@@ -14,28 +14,36 @@ import {
 import { Button, buttonVariants } from "../ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "../ui/label";
-import { updateContact } from "@/lib/actions/contact.actions";
-import { DBContact } from "@/types/contact";
-import { ContactSchema } from "@/lib/form.schemas";
+import { createContact } from "@/lib/actions/contact.actions";
 import { CircleAlert, Loader2 } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
 import { cn, toastActionResult } from "@/lib/utils";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
-import { useContactModals } from "@/contexts/use-contact-modals";
-import { ActionResponse } from "@/types/action";
+import { useModal } from "@/contexts/use-modal";
+import { CreateContactResponse } from "@/types/action";
 import { useTranslation } from "react-i18next";
+import { DBContact } from "@/types/contact";
 import { useContacts } from "@/contexts/use-contacts";
 
-const initialState: ActionResponse<undefined> = {
+const initialState: CreateContactResponse = {
   success: false,
   message: [],
 };
 
-export default function EditContactModal({ contact }: { contact: DBContact }) {
-  const { modal, setModal } = useContactModals();
+export default function CreateContactModal({
+  defaultPhone,
+  onCreateSuccess,
+}: // This is for /new-message, where we keep a state of the recipient you are creating a contact from
+// onClose,
+{
+  defaultPhone?: string;
+  onCreateSuccess?: (contact: DBContact) => void;
+  // onClose?: () => void;
+}) {
+  const { modal, setModal } = useModal();
   const [serverState, action, pending] = useActionState(
-    updateContact.bind(null, contact.id),
+    createContact,
     initialState
   );
   const { refetchContacts } = useContacts();
@@ -44,14 +52,16 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
   useEffect(() => {
     if (serverState.success) {
       toastActionResult(serverState, t);
-      onOpenChange(false);
-      // Refetch contacts context after mutation.
+      // Refetch contacts context after creation.
       refetchContacts();
+      handleOpenChange(false);
+      if (onCreateSuccess && serverState.data)
+        onCreateSuccess(serverState.data);
     }
   }, [serverState]);
 
-  const onOpenChange = (value: boolean) => {
-    setModal((prev) => ({ ...prev, edit: value }));
+  const handleOpenChange = (value: boolean) => {
+    setModal((m) => ({ ...m, contact: { ...m.contact, create: value } }));
     clearInputs();
   };
   const clearInputs = () => {
@@ -63,14 +73,14 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
   return (
     <Dialog
       /* We do need these shits unfortunately */
-      open={modal.edit}
-      onOpenChange={onOpenChange}
+      open={modal.contact.create}
+      onOpenChange={handleOpenChange}
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("edit_contact-header")}</DialogTitle>
+          <DialogTitle>{t("create_contact-header")}</DialogTitle>
           <DialogDescription>
-            {t("edit_contact-header_caption")}
+            {t("create_contact-header_caption")}
           </DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-6">
@@ -80,7 +90,7 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
               name="name"
               id="name"
               placeholder={t("name_placeholder")}
-              defaultValue={serverState.inputs?.name || contact.name}
+              defaultValue={serverState.inputs?.name}
               // required
               // minLength={5}
               // maxLength={100}
@@ -100,7 +110,7 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
               name="phone"
               id="phone"
               placeholder={t("phone_placeholder")}
-              defaultValue={serverState.inputs?.phone || contact.phone}
+              defaultValue={serverState.inputs?.phone || defaultPhone}
               // required
               // minLength={5}
               // maxLength={100}
@@ -120,9 +130,7 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
               name="description"
               id="description"
               placeholder={t("description_placeholder")}
-              defaultValue={
-                serverState.inputs?.description || contact.description
-              }
+              defaultValue={serverState.inputs?.description}
               // required
               // minLength={5}
               // maxLength={100}
@@ -142,7 +150,7 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
             <Alert variant={serverState.success ? "default" : "destructive"}>
               {!serverState.success && <CircleAlert className="w-4 h-4" />}
               <AlertDescription className="relative top-1">
-                {t(serverState.message)}
+                {t(serverState.message.join(", "))}
               </AlertDescription>
             </Alert>
           )}
@@ -156,7 +164,7 @@ export default function EditContactModal({ contact }: { contact: DBContact }) {
             </DialogClose>
             <Button type="submit" disabled={pending}>
               {pending && <Loader2 className="h-4 w-4 animate-spin" />}{" "}
-              {t("common:update")}
+              {t("common:create")}
             </Button>
           </DialogFooter>
         </form>

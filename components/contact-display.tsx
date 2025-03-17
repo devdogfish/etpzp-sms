@@ -14,8 +14,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn, getNameInitials, toastActionResult } from "@/lib/utils";
 import { CopyButton } from "./shared/copy-button";
 import { deleteContact } from "@/lib/actions/contact.actions";
-import { useContactModals } from "@/contexts/use-contact-modals";
-import EditContactModal from "./modals/edit-contact-modal";
+import { useModal } from "@/contexts/use-modal";
+import EditContactModal from "./modals/edit-contact";
 import { useRouter } from "next/navigation";
 import { DBContact } from "@/types/contact";
 import { saveDraft } from "@/lib/actions/message.actions";
@@ -33,8 +33,7 @@ export default function ContactDisplay({
   const onMobile = useIsMobile();
   const router = useRouter();
   const { t } = useTranslation(["contacts-page", "common"]);
-  const { setModal } = useContactModals();
-  const showEditModal = () => setModal((prev) => ({ ...prev, edit: true }));
+  const { setModal } = useModal();
 
   const handleDelete = async () => {
     if (contact) {
@@ -51,7 +50,7 @@ export default function ContactDisplay({
             phone: contact.phone,
             // This is a temporary solution. Maybe change the type later to not be NewRecipient[]
             isValid: true,
-            proneForDeletion: false
+            proneForDeletion: false,
           },
         ],
       });
@@ -116,7 +115,12 @@ export default function ContactDisplay({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={showEditModal}
+                onClick={() =>
+                  setModal((m) => ({
+                    ...m,
+                    contact: { ...m.contact, edit: true },
+                  }))
+                }
                 disabled={!contact}
               >
                 <Edit className="h-4 w-4" />

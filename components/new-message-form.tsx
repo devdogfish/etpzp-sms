@@ -76,8 +76,6 @@ const NewMessageForm = React.memo(function ({
   const previousDraftRef = useRef(message);
   const searchParams = useSearchParams();
 
-  let scheduledTime = 0;
-
   // When the controlled inputs value changes, we update the state
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -89,14 +87,28 @@ const NewMessageForm = React.memo(function ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+
     const formData = new FormData(e.currentTarget);
-    const result = await sendMessage(draft.id, {
+    console.log("Form submitted with values:", {
       sender: formData.get("sender") as string,
       recipients: recipients as NewRecipient[],
       subject: formData.get("subject") as string,
       body: formData.get("body") as string,
-      sendDelay: scheduledTime as number,
+      secondsUntilSend: Math.floor(
+        (message.scheduledDate.getTime() - Date.now()) / 1000
+      ) as number,
     });
+    // DEBUG
+    setLoading(false);
+    return;
+    const result = await sendMessage(draft.id, message);
+    // const result = await sendMessage(draft.id, {
+    //   sender: formData.get("sender") as string,
+    //   recipients: recipients as NewRecipient[],
+    //   subject: formData.get("subject") as string,
+    //   body: formData.get("body") as string,
+    //   secondsUntilSend: scheduledTime as number,
+    // });
 
     setLoading(false);
     console.log("Awaited result: ", result);
@@ -110,10 +122,10 @@ const NewMessageForm = React.memo(function ({
 
     if (result.success) {
       // Message got sent successfully
-      if (result.scheduledDate) {
+      if (result.sendDate) {
         return toast.success(
           `${t(result.message[0])} ${format(
-            new Date(result.scheduledDate),
+            result.sendDate,
             PORTUGUESE_DATE_FORMAT
           )}`
         );

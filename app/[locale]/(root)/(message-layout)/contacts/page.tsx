@@ -1,10 +1,10 @@
 import ContactsPage from "@/components/contacts-page";
-import { ContactModalsProvider } from "@/contexts/use-contact-modals";
+import { ModalProvider } from "@/contexts/use-modal";
 
 export default async function Page() {
   return (
-    <ContactModalsProvider>
+    <ModalProvider>
       <ContactsPage />
-    </ContactModalsProvider>
+    </ModalProvider>
   );
 }

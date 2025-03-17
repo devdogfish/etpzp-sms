@@ -15,7 +15,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Search from "./shared/search";
 import { useSearchParams } from "next/navigation";
 import useIsMounted from "@/hooks/use-mounted";
-import { ContactModalsProvider } from "@/contexts/use-contact-modals";
+import { ModalProvider } from "@/contexts/use-modal";
 
 export default function MessagesPage({
   messages,
@@ -117,13 +117,13 @@ export default function MessagesPage({
         className={cn(onMobile && selected === null && "hidden")}
       >
         {/* If you need other modals somewhere else, move the provider up the component tree. And don't forget to update the skeleton too! */}
-        <ContactModalsProvider>
+        <ModalProvider>
           <MessageDisplay
             message={selected}
             reset={() => setSelected(null)}
             category={category}
           />
-        </ContactModalsProvider>
+        </ModalProvider>
       </ChildrenPanel>
     </>
   );

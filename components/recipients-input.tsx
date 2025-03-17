@@ -13,7 +13,7 @@ import { Key, Search, UserPlus, X } from "lucide-react";
 import { Button, buttonVariants } from "./ui/button";
 import { cn, generateUniqueId, getNameInitials } from "@/lib/utils";
 import { useNewMessage } from "@/contexts/use-new-message";
-import { useContactModals } from "@/contexts/use-contact-modals";
+import { useModal } from "@/contexts/use-modal";
 import { ScrollArea } from "./ui/scroll-area";
 import { useSearchParams } from "next/navigation";
 import { NewRecipient } from "@/types/recipient";
@@ -62,7 +62,7 @@ export default function RecipientsInput({
     selectedPhone,
     updateSelectedPhone,
   } = useNewMessage();
-  const { setModal } = useContactModals();
+  const { setModal } = useModal();
   const { t } = useTranslation(["new-message-page"]);
 
   const isMounted = useIsMounted();
@@ -160,10 +160,9 @@ export default function RecipientsInput({
     searchRecipients(value);
   };
 
-  const showInsertModal = () => setModal((prev) => ({ ...prev, insert: true }));
   const showRecipientInfo = (recipient: NewRecipient) => {
     showInfoAbout(recipient);
-    setModal((prev) => ({ ...prev, info: true }));
+    setModal((m) => ({ ...m, contact: { ...m.contact, info: true } }));
   };
 
   useEffect(() => {
@@ -379,7 +378,9 @@ export default function RecipientsInput({
           className="absolute right-2 bottom-[6px] p-2 aspect-1 top-1/2 -translate-y-1/2 z-10"
           variant="ghost"
           type="button"
-          onClick={showInsertModal}
+          onClick={() =>
+            setModal((m) => ({ ...m, contact: { ...m.contact, insert: true } }))
+          }
         >
           <UserPlus className="h-1 w-1" />
         </Button>

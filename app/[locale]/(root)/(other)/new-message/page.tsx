@@ -3,7 +3,7 @@ import { MessageState, NewMessageProvider } from "@/contexts/use-new-message";
 import { fetchRecipients } from "@/lib/db/recipients";
 import { fetchDraft } from "@/lib/db/message";
 import { rankRecipients, validatePhoneNumber } from "@/lib/utils";
-import { ContactModalsProvider } from "@/contexts/use-contact-modals";
+import { ModalProvider } from "@/contexts/use-modal";
 import { EMPTY_MESSAGE } from "@/global.config";
 
 type NewMessagePageProps = {
@@ -16,7 +16,7 @@ export default async function Page({ searchParams }: NewMessagePageProps) {
   const fetchedDraft = await fetchDraft(draftInUrl.editDraft);
 
   return (
-    <ContactModalsProvider>
+    <ModalProvider>
       <NewMessageProvider
         rankedRecipients={rankRecipients(rawRecipients || []) || []}
         // initialMessage={fetchedDraft || EMPTY_MESSAGE}
@@ -34,12 +34,14 @@ export default async function Page({ searchParams }: NewMessagePageProps) {
                     };
                   }) || EMPTY_MESSAGE.recipients,
                 recipientInput: EMPTY_MESSAGE.recipientInput,
+                scheduledDate:
+                  fetchedDraft.send_time || EMPTY_MESSAGE.scheduledDate,
               }
             : undefined
         }
       >
         <NewMessageForm editDraft={fetchedDraft} />
       </NewMessageProvider>
-    </ContactModalsProvider>
+    </ModalProvider>
   );
 }

@@ -15,7 +15,7 @@ export async function sendMessage(
   data: Message
 ): Promise<
   ActionResponse<Message> & {
-    scheduledDate?: Date;
+    sendDate?: Date;
     invalidRecipients?: NewRecipient[];
     clearForm?: boolean;
   }
@@ -62,12 +62,16 @@ export async function sendMessage(
 
   // Convert the our send time from seconds to milliseconds
   // JavaScript's Date object uses milliseconds, so we multiply by 1000 to turn send time into ms. as well
-  const isScheduled = !!validatedData.data.sendDelay;
+  const isScheduled = !!validatedData.data.secondsUntilSend;
   let scheduledUnixSeconds: number = 0;
-  if (validatedData.data.sendDelay && validatedData.data.sendDelay > 0) {
-    scheduledUnixSeconds = Date.now() / 1000 + validatedData.data.sendDelay;
+  if (
+    validatedData.data.secondsUntilSend &&
+    validatedData.data.secondsUntilSend > 0
+  ) {
+    scheduledUnixSeconds =
+      Date.now() / 1000 + validatedData.data.secondsUntilSend;
     console.log("UNIX EPOCH SECONDS CALCULATED: ", scheduledUnixSeconds);
-    console.log(validatedData.data.sendDelay);
+    console.log(validatedData.data.secondsUntilSend);
   }
 
   try {
@@ -249,7 +253,7 @@ export async function sendMessage(
           ? "new-message-page:server-schedule_success"
           : "new-message-page:server-send_success",
       ],
-      scheduledDate: isScheduled
+      sendDate: isScheduled
         ? new Date(scheduledUnixSeconds * 1000)
         : undefined,
       clearForm: true,

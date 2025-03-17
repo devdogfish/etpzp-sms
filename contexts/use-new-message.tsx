@@ -28,10 +28,11 @@ import { useContacts } from "./use-contacts";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { MessageSchema } from "@/lib/form.schemas";
-import InsertContactModal from "@/components/modals/insert-contact-modal";
-import CreateContactModal from "@/components/modals/create-contact-modal";
-import RecipientInfoModal from "@/components/modals/recipient-info-modal";
+import InsertContactModal from "@/components/modals/insert-contact";
+import CreateContactModal from "@/components/modals/create-contact";
+import RecipientInfoModal from "@/components/modals/recipient-info";
 import { EMPTY_MESSAGE } from "@/global.config";
+import ScheduleMessageModal from "@/components/modals/schedule-message";
 
 // This is our biggest state where we store all data related to the active message, that should be persisted during draft saving re-renders
 // MessageState is only used here & for EMPTY_MESSAGE
@@ -45,6 +46,7 @@ export type MessageState = Message & {
   };
   serverStateErrors?: { [K in keyof z.infer<typeof MessageSchema>]?: string[] };
   invalidRecipients?: NewRecipient[];
+  scheduledDate: Date;
 };
 
 type MessageContextValues = {
@@ -288,7 +290,7 @@ export function NewMessageProvider({
   }, [contacts]);
 
   useEffect(() => {
-    if (!!initialMessage == false) {
+    if (!!initialMessage === false) {
       // If initialMessage is undefined, reset all the controlled inputs to an empty value
       setMessage(EMPTY_MESSAGE);
     }
@@ -331,6 +333,7 @@ export function NewMessageProvider({
     >
       {/* We move this here, because this component doesn't re-render when a draft gets saved */}
       <InsertContactModal contacts={contacts} />
+      <ScheduleMessageModal />
       {/* This should always be defined as we pass a defaultPhone and may create a contact from scratch. */}
       <CreateContactModal
         defaultPhone={moreInfoOn?.phone}

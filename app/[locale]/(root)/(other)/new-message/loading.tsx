@@ -104,7 +104,7 @@ export default function Loading() {
                 disabled
               >
                 <Send className="w-4 h-4" />
-                {t("send")}
+                {t("submit_btn-normal")}
               </Button>
               <div
                 className={cn("flex gap-3 items-center justify-start w-full")}

@@ -11,6 +11,15 @@ export type CategoryEnums =
   | "TRASH";
 
 export type StringBoolMap = { [key: string]: boolean };
+export type Modals = {
+  schedule: boolean;
+  contact: {
+    create: boolean;
+    edit: boolean;
+    info: boolean;
+    insert: boolean;
+  };
+};
 
 export type Message = z.infer<typeof MessageSchema> & {
   recipients: NewRecipient[];

@@ -15,9 +15,9 @@ import Search from "./shared/search";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CirclePlus } from "lucide-react";
 import { Button } from "./ui/button";
-import { useContactModals } from "@/contexts/use-contact-modals";
+import { useModal } from "@/contexts/use-modal";
 import { DBContact } from "@/types/contact";
-import CreateContactModal from "./modals/create-contact-modal";
+import CreateContactModal from "./modals/create-contact";
 import useIsMounted from "@/hooks/use-mounted";
 import { useContacts } from "@/contexts/use-contacts";
 
@@ -57,8 +57,7 @@ export default function ContactsPage() {
     }
   }, [isMounted]);
 
-  const { setModal } = useContactModals();
-  const showCreateModal = () => setModal((prev) => ({ ...prev, create: true }));
+  const { setModal } = useModal();
   return (
     <>
       <ResizablePanel
@@ -77,7 +76,15 @@ export default function ContactsPage() {
           <CreateContactModal
             onCreateSuccess={(contact: DBContact) => setSelected(contact)}
           />
-          <Button size="sm" onClick={showCreateModal}>
+          <Button
+            size="sm"
+            onClick={() =>
+              setModal((m) => ({
+                ...m,
+                contact: { ...m.contact, create: true },
+              }))
+            }
+          >
             <CirclePlus />
             {t("new")}
           </Button>

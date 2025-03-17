@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "../ui/checkbox";
 import { useNewMessage } from "@/contexts/use-new-message";
-import { useContactModals } from "@/contexts/use-contact-modals";
+import { useModal } from "@/contexts/use-modal";
 import { DBContact } from "@/types/contact";
 import { useTranslation } from "react-i18next";
 
@@ -34,7 +34,7 @@ export default function InsertContactModal({
 }: {
   contacts: DBContact[];
 }) {
-  const { modal, setModal } = useContactModals();
+  const { modal, setModal } = useModal();
   const [selected, setSelected] = useState<DBContact[]>([]);
   const { addRecipient, showInfoAbout } = useNewMessage();
   const { t } = useTranslation(["modals", "common"]);
@@ -53,14 +53,14 @@ export default function InsertContactModal({
 
   const showCreateModal = () => {
     showInfoAbout(null);
-    setModal((prev) => ({ ...prev, create: true }));
+    setModal((m) => ({ ...m, contact: { ...m.contact, create: true } }));
   };
   const setInsertModal = (value: boolean) => {
-    setModal((prev) => ({ ...prev, insert: value }));
+    setModal((m) => ({ ...m, contact: { ...m.contact, insert: value } }));
   };
   return (
     <>
-      <Dialog open={modal.insert} onOpenChange={setInsertModal}>
+      <Dialog open={modal.contact.insert} onOpenChange={setInsertModal}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("insert_contact-header")}</DialogTitle>

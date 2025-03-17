@@ -12,27 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-  DialogHeader,
-} from "./ui/dialog";
-import { addDays, addHours, format, nextSaturday } from "date-fns";
-import { Calendar } from "./ui/calendar";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { DialogClose } from "@radix-ui/react-dialog";
 import { useTranslation } from "react-i18next";
+import { format } from "date-fns";
+import { useNewMessage } from "@/contexts/use-new-message";
+import { useModal } from "@/contexts/use-modal";
 
-type DateState = {
-  date: Date;
-  hour: string;
-  minute: string;
-};
 export default function ScheduleMessageDropdown({
   loading,
   submit,
@@ -40,174 +24,91 @@ export default function ScheduleMessageDropdown({
   loading: boolean;
   submit: (seconds: number) => void;
 }) {
-  const [dialog, setDialog] = useState(false);
+  const now = new Date();
+  const { modal, setModal } = useModal();
   const [dropdown, setDropdown] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<DateState>({
-    date: new Date(),
-    hour: format(Date.now(), "HH"),
-    minute: format(Date.now(), "mm"),
-  });
+  const { message, setMessage } = useNewMessage();
+
   const { t } = useTranslation(["messages-page", "modals", "common"]);
 
-  const handleSchedule = () => {
-    console.log("handleSchedule called");
+  function scheduleForTomorrow(hour: number) {
+    // Create a new Date object for the current date
+    const now = new Date();
 
-    if (selectedDate) {
-      console.log("SELECTED DATE:", selectedDate);
+    // Create a new Date object for tomorrow
+    const tomorrow: Date = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
 
-      const scheduledDate = selectedDate.date;
-      scheduledDate.setHours(Number.parseInt(selectedDate.hour, 10));
-      scheduledDate.setMinutes(Number.parseInt(selectedDate.minute, 10));
-      const secondsFromNow = Math.floor(
-        (scheduledDate.getTime() - new Date().getTime()) / 1000
-      );
+    // Set the specified hour and default minutes to 0
+    tomorrow.setHours(hour, 0, 0, 0);
+    const hours = tomorrow.getHours();
 
-      // Close the dialog
-      setDialog(false);
-
-      // Send secondsFromNow to the server
-      submit(secondsFromNow);
-    } else {
-      console.log(
-        "selectedDate is undefined. Can't schedule message on client"
-      );
-    }
-  };
+    setMessage((m) => ({
+      ...m,
+      scheduledDate: tomorrow,
+    }));
+  }
 
   return (
-    <Dialog open={dialog} onOpenChange={setDialog}>
-      <div className="flex">
-        <Button
-          type="submit"
-          className="rounded-tr-none rounded-br-none border-primary-foreground border-r"
-          disabled={loading}
+    <div className="flex">
+      <Button
+        type="submit"
+        className="rounded-tr-none rounded-br-none border-primary-foreground border-r"
+        disabled={loading}
+      >
+        {loading ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          <Send className="w-4 h-4" />
+        )}
+        {message.scheduledDate > now
+          ? t(
+              t("submit_btn-scheduled", {
+                time: `${message.scheduledDate.getHours()}:${message.scheduledDate.getMinutes()}`,
+              })
+            )
+          : t("submit_btn-normal")}
+      </Button>
+      <DropdownMenu onOpenChange={setDropdown}>
+        <DropdownMenuTrigger
+          className={cn("flex gap-3 items-center justify-start w-full")}
+          asChild
         >
-          {loading ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            <Send className="w-4 h-4" />
-          )}
-          {t("send")}
-        </Button>
-        <DropdownMenu onOpenChange={setDropdown}>
-          <DropdownMenuTrigger
-            className={cn("flex gap-3 items-center justify-start w-full")}
-            asChild
+          <Button
+            className="px-[1px] rounded-tl-none rounded-bl-none shadow-none"
+            type="button"
+            disabled={loading}
           >
-            <Button
-              className="px-[1px] rounded-tl-none rounded-bl-none shadow-none"
-              type="button"
-              disabled={loading}
-            >
-              <ChevronDown
-                className={cn(
-                  "h-4 w-4 transition-transform",
-                  dropdown && "rotate-180"
-                )}
-              />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>
-              <h6 className="font-bold">{t("schedule-header")}</h6>
-              <p className="text-muted-foreground font-normal">
-                {t("schedule-header_caption")}
-              </p>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              {t("schedule-tomorrow_morning")}
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              {t("schedule-tomorrow_afternoon")}
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setDialog(true)}>
-              <Clock className="h-4 w-4 mr-2" />
-              <span>{t("schedule-custom")}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <DialogContent className="p-6 min-w-max">
-        <DialogHeader>
-          <DialogTitle>{t("modals:schedule_message-header")}</DialogTitle>
-          <DialogDescription>
-            {t("modals:schedule_message-header_caption")}
-          </DialogDescription>
-        </DialogHeader>
-        <div
-          className="p-0 flex gap-4 h-[325px]" /** This is the exact maximum height of the calendar */
-        >
-          <Calendar
-            mode="single"
-            selected={selectedDate.date}
-            onSelect={(date: Date | undefined) => {
-              if (date) {
-                setSelectedDate((prev) => ({ ...prev, date }));
-              }
-            }}
-            className="rounded-md border"
-          />
-          <div className="flex flex-col justify-between w-full">
-            <div /**className="flex flex-col h-full justify-center" */>
-              <div className="flex flex-col gap-2 mb-3">
-                <Label htmlFor="hour">
-                  {t("modals:schedule_message-hour_label")}
-                </Label>
-                <Input
-                  id="hour"
-                  type="number"
-                  min="0"
-                  max="23"
-                  value={selectedDate.hour}
-                  onChange={(e) =>
-                    setSelectedDate((prev) => ({
-                      minute: prev.minute,
-                      date: new Date(
-                        prev.date.setHours(Number(e.target.value))
-                      ),
-                      hour: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div className="flex flex-col gap-2 mb-3">
-                <Label htmlFor="minute">
-                  {t("modals:schedule_message-minute_label")}
-                </Label>
-                <Input
-                  id="minute"
-                  type="number"
-                  min="0"
-                  max="59"
-                  value={selectedDate.minute}
-                  onChange={(e) =>
-                    setSelectedDate((prev) => ({
-                      hour: prev.hour,
-                      date: new Date(
-                        prev.date.setMinutes(Number(e.target.value))
-                      ),
-                      minute: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-            </div>
-            <div className="flex gap-2 justify-end">
-              <DialogClose
-                className={cn(buttonVariants({ variant: "outline" }), "")}
-              >
-                {t("common:cancel")}
-              </DialogClose>
-              <Button onClick={handleSchedule}>
-                {t("modals:schedule_message-submit", {
-                  time: `${selectedDate.date.getHours()}:${selectedDate.date.getMinutes()}`,
-                })}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 transition-transform",
+                dropdown && "rotate-180"
+              )}
+            />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>
+            <h6 className="font-bold">{t("schedule-header")}</h6>
+            <p className="text-muted-foreground font-normal">
+              {t("schedule-header_caption")}
+            </p>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => scheduleForTomorrow(9)}>
+            {t("schedule-tomorrow_morning")}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => scheduleForTomorrow(15)}>
+            {t("schedule-tomorrow_afternoon")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => setModal((m) => ({ ...m, schedule: true }))}
+          >
+            <Clock className="h-4 w-4 mr-2" />
+            <span>{t("schedule-custom")}</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

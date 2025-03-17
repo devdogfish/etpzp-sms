@@ -1,4 +1,5 @@
 import { MessageState } from "./contexts/use-new-message";
+import { format } from "date-fns";
 
 export const PORTUGUESE_DATE_FORMAT = "dd/MM/yyyy HH:mm";
 
@@ -13,4 +14,5 @@ export const EMPTY_MESSAGE: MessageState = {
     error: undefined,
     isHidden: false,
   },
+  scheduledDate: new Date(),
 };

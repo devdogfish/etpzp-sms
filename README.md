@@ -26,6 +26,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Add scrolling with a fixed header on message-display
 - scheduled canceling doesn't work anymore + add error handling in toasts for buttons that interact with the api such as canceling scheduled messages
 - save the sendtime in the context and keep the scheduled popup open when component re-renders 
+- Failed page should have a retry sending button which will try to send the message again and update that exact message object instead of creating a new one.
 
 ## If there is extra time (after deployment in school)
 - Make it so when recipients input is off focused the value of the input gets added as a recipient
