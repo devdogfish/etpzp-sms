@@ -28,9 +28,11 @@ export async function toggleTrash(
       [inTrash, userId, id]
     );
 
-    // TODO: Make this dynamic (read from the database result to revalidate which path)
-    revalidatePath("/sent");
-    revalidatePath("/failed");
+    revalidatePath("/failed"); // we need this
+
+    // TEST_PRODUCTION: Don't know why it works without the following lines. We need to test this in production and if necessary, uncomment these lines
+    // revalidatePath("/sent");
+    // revalidatePath("/trash");
 
     return {
       success: true,

@@ -73,17 +73,17 @@ export async function sendMessage(
   try {
     const payload = {
       // this shit can only be one full word with no special characters or spaces
-      senders: validatedData.data.sender,
+      sender: validatedData.data.sender,
       message: validatedData.data.body, // this can be any string
 
-      rs: validRecipients.map(({ phone }) => ({
-        msisdns: phone,
+      recipients: validRecipients.map(({ phone }) => ({
+        msisdn: phone,
       })),
 
       destaddr: "DISPLAY", // Flash SMS
 
       // The API is case-sensitive - `sendtime` has to be spelled exactly like this
-      sendTtime: isScheduled ? scheduledUnixSeconds : undefined, // Extract the UNIX timestamp for scheduled messages
+      sendtime: isScheduled ? scheduledUnixSeconds : undefined, // Extract the UNIX timestamp for scheduled messages
     };
 
     const res = await fetch(`${process.env.GATEWAYAPI_URL}/rest/mtsms`, {

@@ -1,7 +1,6 @@
 This is a [Next.js](https://nextjs.org) project
 
 ## Getting Started
-
 First, run the development server:
 
 ```bash
@@ -17,20 +16,16 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 # TODO
-1. Move all messages where an gateway Api error got returned, to **Failed** page, and add an error code so that the user can ask for tech support/help and they can research the error code then.
-2. For scheduled messages, it would be better to do polling WHEN THE USER LOGS IN because when our server is not running we might lose callbacks
+1. For scheduled messages, it would be better to do polling WHEN THE USER LOGS IN because when our server is not running we might lose callbacks
   - Create a separate thread to get the delivery status while loading everything else
 #### AFTER THAT - SCHEDULED PAGE:
 - On new-message, fix the popup bugs, as well as functionality for the buttons in the select dropdown and the schedule now button.
 - Make it so that the form doesn't get automatically submitted, the date should get chosen, and the submit button should change to schedule for...
-- Add the correct date formatting for scheduled messages, and also display scheduled messages in a different way so that it is easier to tell when they will be sent. What should this look like
-  - Created at xxxxx
-  - Below that When it will be sent
-  - in the message list, on each message item, have it be the sendTime
   - Have a 5-minute refresh timer for polling scheduled message delivery statuses in the root layout so that the amountIndicators also update
-  - Display scheduled messages in a different way so that it is easier to tell when they will be sent
-- Implement `TODO` comments
 - Make sure when the server components re-refetch because of revalidation, that the contexts update their state values with the newly fetched data!
+- Add scrolling with a fixed header on message-display
+- scheduled canceling doesn't work anymore + add error handling in toasts for buttons that interact with the api such as canceling scheduled messages
+- save the sendtime in the context and keep the scheduled popup open when component re-renders 
 
 ## If there is extra time (after deployment in school)
 - Make it so when recipients input is off focused the value of the input gets added as a recipient

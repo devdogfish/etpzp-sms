@@ -153,7 +153,11 @@ h6 {
   text-align: center;
   align-content: center;
 }
-
+.flex-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .closeX:hover * {
   color: var(--secondaryForeground);
 }

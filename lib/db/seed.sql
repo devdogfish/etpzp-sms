@@ -70,3 +70,27 @@ CREATE TABLE recipient (
 -- );
 -- ALTER TABLE public.user ALTER COLUMN created_at SET NOT NULL;
 -- ALTER TABLE public.user ALTER COLUMN updated_at SET NOT NULL;
+
+
+-- Insert a scheduled message:
+-- INSERT INTO "message" (
+--     user_id,
+--     sender,
+--     subject,
+--     body,
+--     send_time,
+--     status,
+--     in_trash,
+--     api_error_code,
+--     api_error_details_json
+-- ) VALUES (
+--     1,
+--     'john.doe@example.com',
+--     'Meeting Reminder at 2pm',
+--     'Don"t forget about the meeting tomorrow at 14 AM.',
+--     NOW(),
+--     'SENT',
+--     false,
+--     NULL,
+--     NULL
+-- );

@@ -131,13 +131,15 @@ function MessageDisplay({
   const initialColors = PRIMARY_COLOR_CSS_NAMES;
   let colors = [...initialColors]; // Create a copy of the array by spreading it.
   useEffect(() => {
+    console.log(message);
+    console.log(message?.send_time);
+
     if (message) {
       shuffleArray(colors);
 
       setProfileColors(
         message.recipients.map((recipient, index) => {
           // Create a stable color for each item by using the index or item (in case the order doesn't change)
-
           if (colors.length === 0) {
             // All items have been used
             // Reset the array using the initial array and reshuffle
@@ -440,10 +442,7 @@ function MessageDisplay({
             <p className="text-muted-foreground text-sm mb-4">
               {t("api_error_caption")}
             </p>
-            <pre
-              style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}
-              className="bg-muted border p-4 rounded-lg"
-            >
+            <pre className="max-w-max whitespace-pre-wrap break-words bg-muted border p-4 rounded-lg">
               {message.api_error_details_json
                 ? JSON.stringify(
                     JSON.parse(message.api_error_details_json),

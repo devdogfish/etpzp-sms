@@ -136,7 +136,6 @@ export function NewMessageProvider({
 
       return [...topRecipients, ...extraContacts] as WithContact[];
     }
-    // TODO: These re-rendering conditions need to be checked
   }, [contacts]);
 
   // Helper functions

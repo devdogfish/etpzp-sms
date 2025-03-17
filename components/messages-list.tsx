@@ -7,6 +7,7 @@ import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import { Badge } from "@/components/ui/badge";
 import type { DBMessage } from "@/types";
 import { useTranslation } from "react-i18next";
+import ClockIcon from "./clock-icon";
 
 type MessageListProps = {
   messages: DBMessage[];
@@ -44,8 +45,10 @@ export function MessageList({
                   <div className="font-semibold">
                     {item.subject ? item.subject : t("common:no_subject")}
                   </div>
-                  {item.status === "SCHEDULED" ? (
-                    <span className="flex h-2 w-2 rounded-full bg-yellow-600" />
+                  {item.status === "SCHEDULED" && item.send_time ? (
+                    <ClockIcon
+                      hour={Math.round(item.send_time.getHours() % 12) || 12}
+                    />
                   ) : (
                     item.status === "FAILED" && (
                       <div className="flex items-center gap-1 text-destructive text-xs">
@@ -77,18 +80,14 @@ export function MessageList({
 
             {/* If we are on the trash page, render a badge to show what the message was before it got moved to the trash */}
             {item.in_trash == true && (
-              <div className="flex items-center gap-2">
-                <Badge variant={getBadgeVariantFromLabel(item.status)}>
-                  {item.status}
-                </Badge>
-
-                {/* I don't know if we need this because scheduled messages would be of status SCHEDULED */}
-                {/* {item.sendDelay && (
-                <Badge variant={getBadgeVariantFromLabel("SCHEDULED")}>
-                  Scheduled
-                </Badge>
-              )} */}
-              </div>
+              <Badge
+                variant={"outline"}
+                className="tracking-widest text-xs"
+                style={{ letterSpacing: "3px" }}
+              >
+                {/* Play around with the styles */}
+                {t(`status_${item.status.toLowerCase()}`).toLowerCase()}
+              </Badge>
             )}
           </button>
         ))}
