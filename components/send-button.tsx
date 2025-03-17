@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Button, buttonVariants } from "./ui/button";
 import { ChevronDown, Clock, Loader2, Send } from "lucide-react";
 import {
@@ -16,22 +16,20 @@ import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { useModal } from "@/contexts/use-modal";
+import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
 
 export default function ScheduleMessageDropdown({
   loading,
-  submit,
 }: {
   loading: boolean;
-  submit: (seconds: number) => void;
 }) {
   const now = new Date();
   const { modal, setModal } = useModal();
   const [dropdown, setDropdown] = useState(false);
   const { message, setMessage } = useNewMessage();
-
   const { t } = useTranslation(["messages-page", "modals", "common"]);
 
-  function scheduleForTomorrow(hour: number) {
+  function tomorrowAt(hour: number) {
     // Create a new Date object for the current date
     const now = new Date();
 
@@ -43,10 +41,7 @@ export default function ScheduleMessageDropdown({
     tomorrow.setHours(hour, 0, 0, 0);
     const hours = tomorrow.getHours();
 
-    setMessage((m) => ({
-      ...m,
-      scheduledDate: tomorrow,
-    }));
+    return tomorrow;
   }
 
   return (
@@ -62,11 +57,9 @@ export default function ScheduleMessageDropdown({
           <Send className="w-4 h-4" />
         )}
         {message.scheduledDate > now
-          ? t(
-              t("submit_btn-scheduled", {
-                time: `${message.scheduledDate.getHours()}:${message.scheduledDate.getMinutes()}`,
-              })
-            )
+          ? `${t("submit_btn-scheduled", {
+              time: "",
+            })} ${format(message.scheduledDate, PORTUGUESE_DATE_FORMAT)}`
           : t("submit_btn-normal")}
       </Button>
       <DropdownMenu onOpenChange={setDropdown}>
@@ -89,23 +82,47 @@ export default function ScheduleMessageDropdown({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>
-            <h6 className="font-bold">{t("schedule-header")}</h6>
+            <h6 className="font-bold">{t("schedule_dropdown-header")}</h6>
             <p className="text-muted-foreground font-normal">
-              {t("schedule-header_caption")}
+              {t("schedule_dropdown-header_caption")}
             </p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={() => scheduleForTomorrow(9)}>
-            {t("schedule-tomorrow_morning")}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => scheduleForTomorrow(15)}>
-            {t("schedule-tomorrow_afternoon")}
-          </DropdownMenuItem>
+          {message.scheduledDate > now && (
+            <DropdownMenuItem
+              onSelect={() => setMessage((m) => ({ ...m, scheduledDate: now }))}
+            >
+              {t("schedule_dropdown-reset")}
+            </DropdownMenuItem>
+          )}
+          {message.scheduledDate.getTime() !== tomorrowAt(9).getTime() && (
+            <DropdownMenuItem
+              onSelect={() =>
+                setMessage((m) => ({
+                  ...m,
+                  scheduledDate: tomorrowAt(9),
+                }))
+              }
+            >
+              {t("schedule_dropdown-tomorrow_morning")}
+            </DropdownMenuItem>
+          )}
+          {message.scheduledDate.getTime() !== tomorrowAt(15).getTime() && (
+            <DropdownMenuItem
+              onSelect={() =>
+                setMessage((m) => ({
+                  ...m,
+                  scheduledDate: tomorrowAt(15),
+                }))
+              }
+            >
+              {t("schedule_dropdown-tomorrow_afternoon")}
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             onSelect={() => setModal((m) => ({ ...m, schedule: true }))}
           >
-            <Clock className="h-4 w-4 mr-2" />
-            <span>{t("schedule-custom")}</span>
+            <span>{t("schedule_dropdown-custom")}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

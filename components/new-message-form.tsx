@@ -89,7 +89,8 @@ const NewMessageForm = React.memo(function ({
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    console.log("Form submitted with values:", {
+
+    const result = await sendMessage(draft.id, {
       sender: formData.get("sender") as string,
       recipients: recipients as NewRecipient[],
       subject: formData.get("subject") as string,
@@ -98,17 +99,6 @@ const NewMessageForm = React.memo(function ({
         (message.scheduledDate.getTime() - Date.now()) / 1000
       ) as number,
     });
-    // DEBUG
-    setLoading(false);
-    return;
-    const result = await sendMessage(draft.id, message);
-    // const result = await sendMessage(draft.id, {
-    //   sender: formData.get("sender") as string,
-    //   recipients: recipients as NewRecipient[],
-    //   subject: formData.get("subject") as string,
-    //   body: formData.get("body") as string,
-    //   secondsUntilSend: scheduledTime as number,
-    // });
 
     setLoading(false);
     console.log("Awaited result: ", result);
@@ -390,23 +380,7 @@ const NewMessageForm = React.memo(function ({
               {t("discard")}
             </Button>
 
-            <SendButton
-              loading={loading}
-              submit={(secondsFromNow: number) => {
-                if (formRef.current) {
-                  // IMPORTANT - we call .requestSubmit() instead of .submit() here so that handleSubmit() gets called
-                  // .submit() submits the form using default behavior with form submission, while .requestSubmit() submits the form as if a submit got clicked
-                  scheduledTime = secondsFromNow;
-                  console.log(
-                    `Message will be sent in ${secondsFromNow} seconds or ${Math.floor(
-                      secondsFromNow / 60
-                    )} minutes!`
-                  );
-
-                  formRef.current.requestSubmit();
-                }
-              }}
-            />
+            <SendButton loading={loading} />
           </div>
         </div>
       </form>

@@ -1,5 +1,5 @@
 "use client";
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,11 +19,45 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useModal } from "@/contexts/use-modal";
 import { useNewMessage } from "@/contexts/use-new-message";
+import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
 
 export default function ScheduleMessageModal() {
+  const now = new Date();
   const { t } = useTranslation();
   const { modal, setModal } = useModal();
   const { message, setMessage } = useNewMessage();
+  const [selectedDate, setSelectedDate] = useState(now);
+
+  const handleCancelButtonClick = () => {
+    if (selectedDate > new Date()) {
+      // date is in the future - so reset it to now
+      setSelectedDate(now);
+    } else {
+      setModal((m) => ({ ...m, schedule: false }));
+    }
+  };
+
+  const applySelectedDate = () => {
+    setMessage((m) => ({ ...m, scheduledDate: selectedDate }));
+    setModal((m) => ({ ...m, schedule: false }));
+  };
+
+  const handleKeyPress = (event: KeyboardEvent) => {
+    if (modal.schedule === true && event.key === "Enter") {
+      applySelectedDate();
+    }
+  };
+
+  useEffect(() => {
+    // Add event listener for keydown
+    document.addEventListener("keydown", handleKeyPress);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [modal.schedule]);
+
   return (
     <Dialog
       open={modal.schedule}
@@ -41,14 +75,9 @@ export default function ScheduleMessageModal() {
         >
           <Calendar
             mode="single"
-            selected={message.scheduledDate}
+            selected={selectedDate}
             onSelect={(date: Date | undefined) => {
-              if (date) {
-                setMessage((m) => ({
-                  ...m,
-                  scheduledDate: date,
-                }));
-              }
+              setSelectedDate((prev) => (date ? date : prev));
             }}
             className="rounded-md border"
           />
@@ -58,19 +87,13 @@ export default function ScheduleMessageModal() {
                 <Label htmlFor="hour">
                   {t("modals:schedule_message-hour_label")}
                 </Label>
-                <Input
+                <TimeInput
                   id="hour"
-                  type="number"
-                  min="0"
-                  max="23"
-                  value={message.scheduledDate.getHours()}
-                  onChange={(e) =>
-                    setMessage((m) => ({
-                      ...m,
-                      scheduledDate: new Date(
-                        m.scheduledDate.setHours(Number(e.target.value))
-                      ),
-                    }))
+                  min={0}
+                  max={23}
+                  value={selectedDate.getHours()}
+                  onChange={(value) =>
+                    setSelectedDate((prev) => new Date(prev.setHours(value)))
                   }
                 />
               </div>
@@ -78,38 +101,79 @@ export default function ScheduleMessageModal() {
                 <Label htmlFor="minute">
                   {t("modals:schedule_message-minute_label")}
                 </Label>
-                <Input
+                <TimeInput
                   id="minute"
-                  type="number"
                   min={0}
                   max={59}
-                  value={message.scheduledDate.getMinutes()}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setMessage((m) => ({
-                      ...m,
-                      scheduledDate: new Date(
-                        m.scheduledDate.setMinutes(Number(e.target.value))
-                      ),
-                    }))
+                  value={selectedDate.getMinutes()}
+                  onChange={(value) =>
+                    setSelectedDate((prev) => new Date(prev.setMinutes(value)))
                   }
                 />
               </div>
             </div>
             <div className="flex gap-2 justify-end">
-              <DialogClose
-                className={cn(buttonVariants({ variant: "outline" }), "")}
-              >
-                {t("common:cancel")}
-              </DialogClose>
-              <Button onClick={() => console.log("TODO")}>
-                {t("modals:schedule_message-submit", {
-                  time: `${message.scheduledDate.getHours()}:${message.scheduledDate.getMinutes()}`,
-                })}
+              <Button variant="outline" onClick={handleCancelButtonClick}>
+                {selectedDate > now
+                  ? t("modals:schedule_message-reset")
+                  : t("common:cancel")}
+              </Button>
+              <Button onClick={applySelectedDate}>
+                {selectedDate > now
+                  ? t("modals:schedule_message-submit")
+                  : t("modals:schedule_message-submit_now")}
               </Button>
             </div>
           </div>
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// Define the props type for the TimeInput component
+type TimeInputProps = {
+  id: string;
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
+};
+
+// TimeInput component
+function TimeInput({ id, value, onChange, min, max }: TimeInputProps) {
+  const [displayValue, setDisplayValue] = useState<string>(
+    value < 10 ? `0${value}` : value.toString()
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    setDisplayValue(inputValue);
+
+    const numericValue = Number(inputValue);
+    if (numericValue >= min && numericValue <= max) {
+      onChange(numericValue);
+    }
+  };
+
+  const handleBlur = () => {
+    const numericValue = Number(displayValue);
+    if (numericValue >= min && numericValue <= max) {
+      setDisplayValue(
+        numericValue < 10 ? `0${numericValue}` : numericValue.toString()
+      );
+    }
+  };
+
+  return (
+    <Input
+      id={id}
+      type="number"
+      min={min}
+      max={max}
+      value={displayValue}
+      onChange={handleChange}
+      onBlur={handleBlur} // Add onBlur event handler
+    />
   );
 }
