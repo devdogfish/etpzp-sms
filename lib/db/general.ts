@@ -33,7 +33,7 @@ export async function fetchAmountIndicators() {
     const messageCount = await db(
       `
         SELECT
-            COALESCE(SUM(CASE WHEN send_time < NOW() AND in_trash = false THEN 1 END), 0)::INTEGER AS sent,
+            COALESCE(SUM(CASE WHEN send_time < NOW() AND status = 'SENT' AND in_trash = false THEN 1 END), 0)::INTEGER AS sent,
             COALESCE(SUM(CASE WHEN status = 'SCHEDULED' AND in_trash = false AND send_time > NOW() THEN 1 END), 0)::INTEGER AS scheduled,
             COALESCE(SUM(CASE WHEN status = 'FAILED' AND in_trash = false THEN 1 END), 0)::INTEGER AS failed,
             COALESCE(SUM(CASE WHEN status = 'DRAFTED' AND in_trash = false THEN 1 END), 0)::INTEGER AS drafts,

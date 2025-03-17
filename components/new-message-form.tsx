@@ -120,8 +120,6 @@ const NewMessageForm = React.memo(function ({
       } else {
         toastActionResult(result, t);
       }
-      // reset the form values to be empty
-      setMessage(EMPTY_MESSAGE);
     } else {
       // Something went wrong:
 
@@ -151,6 +149,11 @@ const NewMessageForm = React.memo(function ({
           toastActionResult(result, t);
         }
       }, Object.entries(zodErrors).length * inBetweenTime);
+    }
+
+    if (result.clearForm === true) {
+      // reset the form values to be empty
+      setMessage(EMPTY_MESSAGE);
     }
   };
 

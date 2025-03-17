@@ -56,7 +56,7 @@ export async function fetchSent() {
               ) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
-        WHERE m.user_id = $1 AND m.send_time < NOW() AND m.in_trash = false
+        WHERE m.user_id = $1 AND m.send_time < NOW() AND m.status = 'SENT' AND m.in_trash = false
         GROUP BY m.id
         ORDER BY m.created_at DESC;
       `,

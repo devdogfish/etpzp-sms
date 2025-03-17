@@ -432,30 +432,54 @@ function MessageDisplay({
           {t("none_selected")}
         </div>
       )}
-      {
-        // You can remove the message check if you want to, I like it better that this bottom bar only shows up on selection
-        category === "DRAFTS" && message && (
-          <>
-            <Separator className="mt-auto" />
-            <div className="flex px-4 py-2 justify-end gap-2">
-              <Button
-                variant="default"
-                type="button"
-                className="w-max"
-                disabled={!message}
-                onClick={() =>
-                  message
-                    ? router.push(`/new-message?editDraft=${message.id}`)
-                    : ""
-                }
-              >
-                <Edit className="h-4 w-4" />
-                {t("continue_draft")}
-              </Button>
-            </div>
-          </>
-        )
-      }
+      {message && message.status === "FAILED" && (
+        <>
+          <Separator className="mt-auto" />
+          <div className="flex flex-col px-4 py-2 gap-1">
+            <h2>{t(`api_error_${message.api_error_code}`)}</h2>
+            <p className="text-muted-foreground text-sm mb-4">
+              {t("api_error_caption")}
+            </p>
+            <pre
+              style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}
+              className="bg-muted border p-4 rounded-lg"
+            >
+              {message.api_error_details_json
+                ? JSON.stringify(
+                    JSON.parse(message.api_error_details_json),
+                    null,
+                    2
+                  )
+                : t("no_json_available")}
+            </pre>
+          </div>
+        </>
+      )}
+
+      {/* You can remove the message check if you want to, I like it better that this bottom bar only shows up on selection */}
+      {message && message.status === "DRAFTED" ? (
+        <>
+          <Separator className="mt-auto" />
+          <div className="flex px-4 py-2 justify-end gap-2">
+            <Button
+              variant="default"
+              type="button"
+              className="w-max"
+              disabled={!message}
+              onClick={() =>
+                message
+                  ? router.push(`/new-message?editDraft=${message.id}`)
+                  : ""
+              }
+            >
+              <Edit className="h-4 w-4" />
+              {t("continue_draft")}
+            </Button>
+          </div>
+        </>
+      ) : (
+        ""
+      )}
     </div>
   );
 }

@@ -33,6 +33,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Make sure when the server components re-refetch because of revalidation, that the contexts update their state values with the newly fetched data!
 
 ## If there is extra time (after deployment in school)
+- Make it so when recipients input is off focused the value of the input gets added as a recipient
+- clear the url parameter when a message is sent successfully
 - Fix styles for insert modal.
 - Don't save invalid recipients to database (we don't want to suggest invalid ones) or filter them out on the frontend. These recipients belong to drafts so maybe update the query to search for recipients that are not in the drafts or just filter out the invalid ones using javascript
 - Admin Dashboard with statistics and admin settings

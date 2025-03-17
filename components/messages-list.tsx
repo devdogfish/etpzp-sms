@@ -38,8 +38,8 @@ export function MessageList({
             )}
             onClick={() => setSelected(item)}
           >
-            <div className="flex w-full flex-col gap-1">
-              <div className="flex items-center">
+            <div className="flex w-full flex-col">
+              <div className="flex items-center gap-1">
                 <div className="flex items-center gap-2">
                   <div className="font-semibold">
                     {item.subject ? item.subject : t("common:no_subject")}
@@ -48,7 +48,10 @@ export function MessageList({
                     <span className="flex h-2 w-2 rounded-full bg-yellow-600" />
                   ) : (
                     item.status === "FAILED" && (
-                      <span className="flex h-2 w-2 rounded-full bg-red-600" />
+                      <div className="flex items-center gap-1 text-destructive text-xs">
+                        <div className="flex h-2 w-2 rounded-full bg-destructive" />
+                        {item.api_error_code}
+                      </div>
                     )
                   )}
                 </div>

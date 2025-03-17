@@ -88,9 +88,9 @@ export async function cancelCurrentlyScheduled(
 
   try {
     if (!userId) throw new Error("Invalid user id.");
-    console.log("CANCELING SHCEDULED MESSGAGE");
+    console.log("CANCELING SCHEDULED MESSGAGE");
 
-    const networkResponse = await fetch(
+    const res = await fetch(
       `${process.env.GATEWAYAPI_URL}/rest/mtsms/${sms_reference_id}`,
       {
         method: "DELETE",
@@ -101,21 +101,21 @@ export async function cancelCurrentlyScheduled(
       }
     );
 
-    const response = await networkResponse.json();
-    console.log(networkResponse);
-    console.log(response);
+    const resJson = await res.json();
+    console.log(res);
+    console.log(resJson);
 
-    if (!networkResponse.ok) {
+    if (!res.ok) {
       return {
         success: false,
-        message: [`api_error_${networkResponse.status.toString()}`],
+        message: [`api_error_${res.status.toString()}`],
       };
     }
 
     const result = await db(
       `
         UPDATE message
-        SET status = 'FAILED', api_error = 'api_error_409', api_error_code = '409'
+        SET status = 'FAILED', api_error_code = 409
         WHERE user_id = $1 AND sms_reference_id = $2;
       `,
       [userId, sms_reference_id]

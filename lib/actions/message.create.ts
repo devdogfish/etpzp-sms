@@ -17,6 +17,7 @@ export async function sendMessage(
   ActionResponse<Message> & {
     scheduledDate?: Date;
     invalidRecipients?: NewRecipient[];
+    clearForm?: boolean;
   }
 > {
   // 1. Check authentication
@@ -72,11 +73,11 @@ export async function sendMessage(
   try {
     const payload = {
       // this shit can only be one full word with no special characters or spaces
-      sender: validatedData.data.sender,
+      senders: validatedData.data.sender,
       message: validatedData.data.body, // this can be any string
 
-      recipientss: validRecipients.map(({ phone }) => ({
-        msisdn: phone,
+      rs: validRecipients.map(({ phone }) => ({
+        msisdns: phone,
       })),
 
       destaddr: "DISPLAY", // Flash SMS
@@ -85,40 +86,37 @@ export async function sendMessage(
       sendTtime: isScheduled ? scheduledUnixSeconds : undefined, // Extract the UNIX timestamp for scheduled messages
     };
 
-    const networkResponse = await fetch(
-      `${process.env.GATEWAYAPI_URL}/rest/mtsms`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-    const response = await networkResponse.json();
-    console.log(networkResponse, response);
+    const res = await fetch(`${process.env.GATEWAYAPI_URL}/rest/mtsms`, {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const resJson = await res.json();
+    console.log(res, resJson);
 
     console.log("WE ARE STILL IN TRY BLOCK");
 
-    // const networkResponse = SuccessResponse;
-    // const response = { ids: [null] };
+    // const res = SuccessResponse;
+    // const resJson = { ids: [null] };
 
-    // if (!networkResponse.ok) {
-    //   console.log("Something went wrong:", JSON.stringify(response));
+    // if (!res.ok) {
+    //   console.log("Something went wrong:", JSON.stringify(resJson));
 
     //   // throw new Error(
-    //   //   "Network response was not ok " + networkResponse?.statusText
+    //   //   "Network resJson was not ok " + res?.statusText
     //   // );
     // }
 
-    // console.log("SAVING REFERENCE_ID", response.ids[0] || null);
+    // console.log("SAVING REFERENCE_ID", resJson.ids[0] || null);
 
     const args = [
       // Message data
       validatedData.data.subject, // subject
       validatedData.data.body, // body
-      networkResponse.ok // status
+      res.ok // status
         ? scheduledUnixSeconds
           ? "SCHEDULED"
           : "SENT"
@@ -126,13 +124,12 @@ export async function sendMessage(
       scheduledUnixSeconds // sendtime
         ? new Date(scheduledUnixSeconds * 1000)
         : new Date(Date.now()),
-      response?.ids?.length ? response?.ids[0] : null, // sms_reference_id
+      resJson?.ids?.length ? resJson?.ids[0] : null, // sms_reference_id
 
       // Api errors
-      networkResponse.ok ? null : `api_error_${networkResponse.statusText}`, // api_error translation string
-      networkResponse.ok ? null : networkResponse.statusText, // api_error_code
-      networkResponse.ok ? null : JSON.stringify(response), // api_error_details_json
-     
+      res.ok ? null : res.status, // api_error_code
+      res.ok ? null : JSON.stringify(resJson), // api_error_details_json
+
       // Recipients
       validRecipients.map((recipient) => recipient.phone), // phone number array
       validRecipients.map((_, index) => index), // for the ordering of the recipient
@@ -151,8 +148,8 @@ export async function sendMessage(
         "The draftId is not defined, creating new message with INSERT query"
       );
 
-      console.log([...args.slice(0, 11)]);
-      
+      console.log([...args.slice(0, 10)]);
+
       // Insert new message and recipients
       await db(
         `
@@ -163,32 +160,31 @@ export async function sendMessage(
               status,
               send_time,
               sms_reference_id,
-              api_error,
               api_error_code,
               api_error_details_json,
               user_id
             ) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $11) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $10) 
             RETURNING id
           )
           INSERT INTO recipient (message_id, phone, index)
           SELECT 
             insert_message.id,
-            unnest($9::text[]) as phone,
-            unnest($10::int[]) as index
+            unnest($8::text[]) as phone,
+            unnest($9::int[]) as index
           FROM insert_message;
         `,
-        [...args.slice(0, 11)] // this gets the first 11 items from the array
+        [...args.slice(0, 10)] // this gets the first 11 items from the array
       );
     } else {
       console.log(
         `Updating existing message item with draftId: ${existingDraftId}`
       );
 
-      console.log([...args.slice(0, 8), userId, existingDraftId]);
+      console.log([...args.slice(0, 7), userId, existingDraftId]);
       console.log(
         "Supplying ",
-        [...args.slice(0, 8), userId, existingDraftId].length,
+        [...args.slice(0, 7), userId, existingDraftId].length,
         " arguments."
       );
 
@@ -201,13 +197,12 @@ export async function sendMessage(
               status = $3,
               send_time = $4,
               sms_reference_id = $5,
-              api_error = $6,
-              api_error_code = $7,
-              api_error_details_json = $8
-          WHERE user_id = $9 AND id = $10
+              api_error_code = $6,
+              api_error_details_json = $7
+          WHERE user_id = $8 AND id = $9
           RETURNING id;
         `,
-        [...args.slice(0, 8), userId, existingDraftId]
+        [...args.slice(0, 7), userId, existingDraftId]
       );
 
       // In case update didn't match any rows - invalid message id
@@ -236,10 +231,17 @@ export async function sendMessage(
     }
     // -------- END DATABASE LOGIC --------
 
-    console.log("All operations executed without errors \n------\n\n");
-
     // Update the amount indicators in the nav panel
     revalidatePath("/new-message");
+
+    if (!res.ok)
+      return {
+        success: false,
+        message: ["server-some_api_error"],
+        clearForm: true,
+      };
+
+    console.log("All operations executed without errors \n------\n\n");
     return {
       success: true,
       message: [
@@ -250,6 +252,7 @@ export async function sendMessage(
       scheduledDate: isScheduled
         ? new Date(scheduledUnixSeconds * 1000)
         : undefined,
+      clearForm: true,
     };
   } catch (error) {
     console.log("in catch block:", error);
