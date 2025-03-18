@@ -27,16 +27,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import { useContacts } from "@/contexts/use-contacts";
 
 const OFF_FOCUSED_RECIPIENT_AMOUNT = 5;
 React.memo(RecipientsInput);
 export default function RecipientsInput({
-  contacts,
   error,
   onFocus,
   onBlur,
 }: {
-  contacts: DBContact[];
   error: boolean;
   onFocus: () => void;
   onBlur: () => void;
@@ -45,6 +44,7 @@ export default function RecipientsInput({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const searchParams = useSearchParams();
   const inputElement = useRef<HTMLInputElement | null>(null);
+  const { contacts } = useContacts();
 
   const {
     message,

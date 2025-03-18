@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -28,25 +28,54 @@ import { useNewMessage } from "@/contexts/use-new-message";
 import { useModal } from "@/contexts/use-modal";
 import { DBContact } from "@/types/contact";
 import { useTranslation } from "react-i18next";
+import { useContacts } from "@/contexts/use-contacts";
 
-export default function InsertContactModal({
-  contacts,
-}: {
-  contacts: DBContact[];
-}) {
+export default function InsertContactModal() {
+  const { contacts } = useContacts();
   const { modal, setModal } = useModal();
-  const [selected, setSelected] = useState<DBContact[]>([]);
-  const { addRecipient, showInfoAbout } = useNewMessage();
+  const { addRecipient, showInfoAbout, message, removeRecipient } =
+    useNewMessage();
+  const initialSelected: DBContact[] = [];
+  message.recipients.forEach((r) => {
+    const contactInMessage = contacts.find((c) => c.phone === r.phone);
+    if (contactInMessage) initialSelected.push(contactInMessage);
+  });
+
+  const [selected, setSelected] = useState<DBContact[]>(initialSelected);
   const { t } = useTranslation(["modals", "common"]);
 
+  // Only those contacts that are selected here should be inside the message object
   const onInsert = () => {
-    selected.forEach((contact: DBContact) => {
-      // pass add each selected contact to the recipients context
-      addRecipient(contact.phone, contacts);
+    // 1. Remove the ones from the message that were deselected here
+    const deselectedContacts = contacts.filter(
+      (contact) =>
+        !selected.some((selectedContact) => selectedContact === contact)
+    );
+    message.recipients.map((recipient) => {
+      if (deselectedContacts.find((c) => c.phone === recipient.phone)) {
+        removeRecipient(recipient);
+      }
     });
 
-    // reset the selected table in this modal (deselect the selected ones)
-    setSelected([]);
+    // 2. Add the ones that don't exist yet.
+    const contactsNotInMessage = contacts.filter(
+      (contact) =>
+        !message.recipients.some(
+          (messageContact) => messageContact.phone === contact.phone
+        )
+    );
+
+    selected.forEach((selectedContact: DBContact) => {
+      // pass add each selected selectedContact to the recipients context
+      if (
+        contactsNotInMessage.find(
+          (notContact) => notContact.phone === selectedContact.phone
+        )
+      ) {
+        addRecipient(selectedContact.phone, contacts);
+      }
+    });
+
     // close the modal
     setInsertModal(false);
   };
@@ -58,6 +87,10 @@ export default function InsertContactModal({
   const setInsertModal = (value: boolean) => {
     setModal((m) => ({ ...m, contact: { ...m.contact, insert: value } }));
   };
+
+  useEffect(() => {
+    if (modal.contact.insert) setSelected(initialSelected);
+  }, [modal.contact.insert]);
   return (
     <>
       <Dialog open={modal.contact.insert} onOpenChange={setInsertModal}>
@@ -68,7 +101,7 @@ export default function InsertContactModal({
               {t("insert_contact-header_caption")}
             </DialogDescription>
             {/* DEBUG */}
-            <Button onClick={showCreateModal}>Create new</Button>
+            {/* <Button onClick={showCreateModal}>Create new</Button> */}
           </DialogHeader>
           {contacts.length ? (
             <div className="max-h-[400px] overflow-auto">

@@ -345,7 +345,6 @@ const NewMessageForm = React.memo(function ({
             </div>
 
             <RecipientsInput
-              contacts={contacts}
               // Instead of a Zod error, we receive an invalid recipients array for recipient errors.
               error={!!message.invalidRecipients?.length}
               onFocus={() => setFocusedInput("new-recipient")}

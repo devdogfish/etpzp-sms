@@ -332,7 +332,7 @@ export function NewMessageProvider({
       }}
     >
       {/* We move this here, because this component doesn't re-render when a draft gets saved */}
-      <InsertContactModal contacts={contacts} />
+      <InsertContactModal />
       <ScheduleMessageModal />
       {/* This should always be defined as we pass a defaultPhone and may create a contact from scratch. */}
       <CreateContactModal
