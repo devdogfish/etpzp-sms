@@ -20,6 +20,8 @@ export async function sendMessage(
     clearForm?: boolean;
   }
 > {
+  console.log("\n\n\n\n\nReceived data on server", data);
+
   // 1. Check authentication
   const { isAuthenticated, user } = await getSession();
   const userId = user?.id;
@@ -62,11 +64,13 @@ export async function sendMessage(
 
   // Convert the our send time from seconds to milliseconds
   // JavaScript's Date object uses milliseconds, so we multiply by 1000 to turn send time into ms. as well
-  const isScheduled = !!validatedData.data.secondsUntilSend;
+  const isScheduled =
+    !!validatedData.data.secondsUntilSend &&
+    validatedData.data.secondsUntilSend > 2; // api requires a minimum of 2
   let scheduledUnixSeconds: number = 0;
   if (
     validatedData.data.secondsUntilSend &&
-    validatedData.data.secondsUntilSend > 0
+    validatedData.data.secondsUntilSend > 2
   ) {
     scheduledUnixSeconds =
       Date.now() / 1000 + validatedData.data.secondsUntilSend;
@@ -89,6 +93,8 @@ export async function sendMessage(
       // The API is case-sensitive - `sendtime` has to be spelled exactly like this
       sendtime: isScheduled ? scheduledUnixSeconds : undefined, // Extract the UNIX timestamp for scheduled messages
     };
+
+    console.log("Calling fetch with this body:", payload);
 
     const res = await fetch(`${process.env.GATEWAYAPI_URL}/rest/mtsms`, {
       method: "POST",
@@ -253,9 +259,7 @@ export async function sendMessage(
           ? "new-message-page:server-schedule_success"
           : "new-message-page:server-send_success",
       ],
-      sendDate: isScheduled
-        ? new Date(scheduledUnixSeconds * 1000)
-        : undefined,
+      sendDate: isScheduled ? new Date(scheduledUnixSeconds * 1000) : undefined,
       clearForm: true,
     };
   } catch (error) {

@@ -90,14 +90,30 @@ const NewMessageForm = React.memo(function ({
 
     const formData = new FormData(e.currentTarget);
 
+    console.log("SEnding message with values:", {
+      sender: formData.get("sender") as string,
+      recipients: recipients as NewRecipient[],
+      subject: formData.get("subject") as string,
+      body: formData.get("body") as string,
+      secondsUntilSend:
+        message.scheduledDate.getTime() > new Date().getTime()
+          ? (Math.floor(
+              (message.scheduledDate.getTime() - Date.now()) / 1000
+            ) as number)
+          : undefined,
+    });
+
     const result = await sendMessage(draft.id, {
       sender: formData.get("sender") as string,
       recipients: recipients as NewRecipient[],
       subject: formData.get("subject") as string,
       body: formData.get("body") as string,
-      secondsUntilSend: Math.floor(
-        (message.scheduledDate.getTime() - Date.now()) / 1000
-      ) as number,
+      secondsUntilSend:
+        message.scheduledDate.getTime() > new Date().getTime()
+          ? (Math.floor(
+              (message.scheduledDate.getTime() - Date.now()) / 1000
+            ) as number)
+          : undefined,
     });
 
     setLoading(false);

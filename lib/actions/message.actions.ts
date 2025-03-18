@@ -102,6 +102,7 @@ export async function cancelCurrentlyScheduled(
         },
       }
     );
+    console.log("AFTER FETCH BLOCK");
 
     const resJson = await res.json();
     console.log(res);
@@ -128,6 +129,8 @@ export async function cancelCurrentlyScheduled(
       data: result.rows[0],
     };
   } catch (error) {
+    console.log(error);
+
     return {
       success: false,
       message: ["messages-page:server-cancel_scheduled_unknown_error"],
