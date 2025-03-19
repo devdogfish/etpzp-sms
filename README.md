@@ -18,15 +18,14 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 # TODO
 1. For scheduled messages, it would be better to do polling WHEN THE USER LOGS IN because when our server is not running we might lose callbacks
   - Create a separate thread to get the delivery status while loading everything else
+2. Add scrolling with a fixed header on message-display
+
 #### AFTER THAT - SCHEDULED PAGE:
-- On new-message, fix the popup bugs, as well as functionality for the buttons in the select dropdown and the schedule now button.
-- Make it so that the form doesn't get automatically submitted, the date should get chosen, and the submit button should change to schedule for...
-  - Have a 5-minute refresh timer for polling scheduled message delivery statuses in the root layout so that the amountIndicators also update
-- Make sure when the server components re-refetch because of revalidation, that the contexts update their state values with the newly fetched data!
-- Add scrolling with a fixed header on message-display
-- scheduled canceling doesn't work anymore + add error handling in toasts for buttons that interact with the api such as canceling scheduled messages
+- Have a 5-minute refresh timer for polling scheduled message delivery statuses in the root layout so that the amountIndicators also update
+- add error handling in toasts for buttons that interact with the api such as canceling scheduled messages
 - save the sendtime in the context and keep the scheduled popup open when component re-renders 
 - Failed page should have a retry sending button which will try to send the message again and update that exact message object instead of creating a new one.
+
 ### ADMIN DASHBOARD
 - ADMIN_DASHBOARD: Choose a period to filter results, see per user sms sending stats
 - Admin Dashboard with statistics and admin settings

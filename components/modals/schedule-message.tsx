@@ -26,7 +26,7 @@ export default function ScheduleMessageModal() {
   const { t } = useTranslation();
   const { modal, setModal } = useModal();
   const { message, setMessage } = useNewMessage();
-  const [selectedDate, setSelectedDate] = useState(now);
+  const [selectedDate, setSelectedDate] = useState(message.scheduledDate);
 
   const handleCancelButtonClick = () => {
     if (selectedDate > new Date()) {
@@ -145,6 +145,7 @@ function TimeInput({ id, value, onChange, min, max }: TimeInputProps) {
   const [displayValue, setDisplayValue] = useState<string>(
     value < 10 ? `0${value}` : value.toString()
   );
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -157,6 +158,7 @@ function TimeInput({ id, value, onChange, min, max }: TimeInputProps) {
   };
 
   const handleBlur = () => {
+    setIsFocused(false);
     const numericValue = Number(displayValue);
     if (numericValue >= min && numericValue <= max) {
       setDisplayValue(
@@ -164,6 +166,13 @@ function TimeInput({ id, value, onChange, min, max }: TimeInputProps) {
       );
     }
   };
+
+  useEffect(() => {
+    // reflect the current date object in the inputs whenever they change
+    if (isFocused === false) {
+      setDisplayValue(value < 10 ? `0${value}` : value.toString());
+    }
+  }, [value]);
 
   return (
     <Input
@@ -174,6 +183,7 @@ function TimeInput({ id, value, onChange, min, max }: TimeInputProps) {
       value={displayValue}
       onChange={handleChange}
       onBlur={handleBlur} // Add onBlur event handler
+      onFocus={() => setIsFocused(true)}
     />
   );
 }

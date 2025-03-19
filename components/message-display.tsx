@@ -40,6 +40,7 @@ import { PRIMARY_COLOR_CSS_NAMES } from "@/lib/theme.colors";
 import React, { useEffect, useMemo, useState } from "react";
 import { useModal } from "@/contexts/use-modal";
 import RecipientInfoModal from "./modals/recipient-info";
+import { ScrollArea } from "./ui/scroll-area";
 
 function MessageDisplay({
   message,
@@ -162,7 +163,7 @@ function MessageDisplay({
           allowContactCreation={false}
         />
       )}
-
+      {/* Begin top bar with action buttons */}
       <div className="flex items-center p-2 h-[var(--header-height)] border-b">
         <div className="flex items-center gap-2">
           {onMobile && (
@@ -295,190 +296,198 @@ function MessageDisplay({
           </Tooltip>
         </div>
       </div>
+      {/* env top bar */}
       {/* <Separator /> */}
-      {message ? (
-        <div className="flex flex-1 flex-col">
-          <div className="flex justify-between p-4">
-            <div className="flex gap-4 text-sm w-full">
-              <div className="flex relative min-w-[50px] min-h-[50px] h-[50px]">
-                {message.recipients.map((recipient: DBRecipient, index) => {
-                  if (index >= 5) return; // Max recipients reached; remaining will be shown as a single picture with count
+      {/* Begin message content */}
+      <ScrollArea>
+        <div className="flex flex-col h-[calc(100vh-52px)]">
+          {message ? (
+            <div className="flex flex-1 flex-col">
+              <div className="flex justify-between p-4">
+                <div className="flex gap-4 text-sm w-full">
+                  <div className="flex relative min-w-[50px] min-h-[50px] h-[50px]">
+                    {message.recipients.map((recipient: DBRecipient, index) => {
+                      if (index >= 5) return; // Max recipients reached; remaining will be shown as a single picture with count
 
-                  let foundContactName: string | undefined = undefined;
+                      let foundContactName: string | undefined = undefined;
 
-                  foundContactName = contacts.find(
-                    (contact) => contact.phone === recipient.phone
-                  )?.name;
+                      foundContactName = contacts.find(
+                        (contact) => contact.phone === recipient.phone
+                      )?.name;
 
-                  if (index == 4) {
-                    // the fifth recipient should be the number of missing recipients
-                    const missingRecipients = message.recipients.length - index;
-                    if (missingRecipients > 1) {
-                      // if there are many missing recipients,
-                      foundContactName = `+ ${missingRecipients}`;
-                    }
-                  }
-
-                  return (
-                    <ProfilePic
-                      key={index}
-                      // size={10}
-                      customSize
-                      name={foundContactName}
-                      className={cn(
-                        styles["profile-absolute"],
-                        index === 0 &&
-                          cn("center-absolute", styles["profile-big"]),
-                        index === 1 && styles["profile-top-left"],
-                        index === 2 && styles["profile-bottom-left"],
-                        index === 3 && styles["profile-top-right"],
-                        index === 4 && styles["profile-bottom-right"]
-                      )}
-                      // The dynamically generated class `bg-${chosenColor}` won't work because Tailwind purges unused classes in production, and it doesn't recognize dynamically created class names.
-                      style={{
-                        // Only show color for saved contacts
-                        backgroundColor: foundContactName
-                          ? profileColors[index]
-                          : "",
-                      }}
-                    />
-                  );
-                })}
-              </div>
-              <div className="flex flex-col gap-1 grow overflow-hidden">
-                <div className="flex justify-between items-center relative">
-                  <span className="font-semibold ellipsis">
-                    {message.subject || t("no_subject")}
-                  </span>
-                  {message.send_time && (
-                    <span
-                      className="text-xs text-muted-foreground relative whitespace-nowrap"
-                      style={{ top: "1px" }}
-                    >
-                      {format(
-                        new Date(message.send_time),
-                        PORTUGUESE_DATE_FORMAT
-                      )}
-                    </span>
-                  )}
-                  <Button
-                    onClick={() =>
-                      setRecipientsExpanded((prevExpanded) => !prevExpanded)
-                    }
-                    variant="none"
-                    className="p-0 pl-1 h-min absolute right-0 bottom-[-20px] bg-background z-10 rounded-none"
-                  >
-                    <ChevronDown
-                      className={cn(
-                        "duration-200",
-                        !recipientsExpanded && "rotate-90"
-                      )}
-                    />
-                  </Button>
-                </div>
-                <div className={cn("flex text-xs gap-1 relative")}>
-                  {!recipientsExpanded && (
-                    <div
-                      // Have a div cover the recipients so that the user has to expand the recipients first to be able to view more info
-                      className="container-overlay"
-                      onClick={() => setRecipientsExpanded(true)}
-                    />
-                  )}
-                  <div
-                    className={cn(
-                      "flex gap-1",
-                      recipientsExpanded ? "flex-wrap mr-5" : ""
-                    )}
-                  >
-                    <div className="font-medium">{t("common:to")}:</div>
-
-                    {message.recipients.map(
-                      (recipientWithoutContact, index) => {
-                        const recipient: NewRecipient = {
-                          ...recipientWithoutContact,
-                          contact: contacts.find(
-                            (contact) =>
-                              contact.phone === recipientWithoutContact.phone
-                          ),
-                          // This is a temporary solution. Maybe change the type later to not be NewRecipient[]
-                          isValid: true,
-                          proneForDeletion: false,
-                        };
-                        return (
-                          <div key={recipient.phone} className="flex">
-                            <Button
-                              variant="none"
-                              onClick={() => showInfoAbout(recipient)}
-                              className="whitespace-nowrap p-0 text-xs h-min hover:bg-muted px-[2px]"
-                            >
-                              {recipient.contact?.name || recipient.phone}
-                            </Button>
-                            {index < message.recipients.length - 1 && ", "}
-                          </div>
-                        );
+                      if (index == 4) {
+                        // the fifth recipient should be the number of missing recipients
+                        const missingRecipients =
+                          message.recipients.length - index;
+                        if (missingRecipients > 1) {
+                          // if there are many missing recipients,
+                          foundContactName = `+ ${missingRecipients}`;
+                        }
                       }
-                    )}
+
+                      return (
+                        <ProfilePic
+                          key={index}
+                          // size={10}
+                          customSize
+                          name={foundContactName}
+                          className={cn(
+                            styles["profile-absolute"],
+                            index === 0 &&
+                              cn("center-absolute", styles["profile-big"]),
+                            index === 1 && styles["profile-top-left"],
+                            index === 2 && styles["profile-bottom-left"],
+                            index === 3 && styles["profile-top-right"],
+                            index === 4 && styles["profile-bottom-right"]
+                          )}
+                          // The dynamically generated class `bg-${chosenColor}` won't work because Tailwind purges unused classes in production, and it doesn't recognize dynamically created class names.
+                          style={{
+                            // Only show color for saved contacts
+                            backgroundColor: foundContactName
+                              ? profileColors[index]
+                              : "",
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                  <div className="flex flex-col gap-1 grow overflow-hidden">
+                    <div className="flex justify-between items-center relative">
+                      <span className="font-semibold ellipsis">
+                        {message.subject || t("no_subject")}
+                      </span>
+                      {message.send_time && (
+                        <span
+                          className="text-xs text-muted-foreground relative whitespace-nowrap"
+                          style={{ top: "1px" }}
+                        >
+                          {format(
+                            new Date(message.send_time),
+                            PORTUGUESE_DATE_FORMAT
+                          )}
+                        </span>
+                      )}
+                      <Button
+                        onClick={() =>
+                          setRecipientsExpanded((prevExpanded) => !prevExpanded)
+                        }
+                        variant="none"
+                        className="p-0 pl-1 h-min absolute right-0 bottom-[-20px] bg-background z-10 rounded-none"
+                      >
+                        <ChevronDown
+                          className={cn(
+                            "duration-200",
+                            !recipientsExpanded && "rotate-90"
+                          )}
+                        />
+                      </Button>
+                    </div>
+                    <div className={cn("flex text-xs gap-1 relative")}>
+                      {!recipientsExpanded && (
+                        <div
+                          // Have a div cover the recipients so that the user has to expand the recipients first to be able to view more info
+                          className="container-overlay"
+                          onClick={() => setRecipientsExpanded(true)}
+                        />
+                      )}
+                      <div
+                        className={cn(
+                          "flex gap-1",
+                          recipientsExpanded ? "flex-wrap mr-5" : ""
+                        )}
+                      >
+                        <div className="font-medium">{t("common:to")}:</div>
+
+                        {message.recipients.map(
+                          (recipientWithoutContact, index) => {
+                            const recipient: NewRecipient = {
+                              ...recipientWithoutContact,
+                              contact: contacts.find(
+                                (contact) =>
+                                  contact.phone ===
+                                  recipientWithoutContact.phone
+                              ),
+                              // This is a temporary solution. Maybe change the type later to not be NewRecipient[]
+                              isValid: true,
+                              proneForDeletion: false,
+                            };
+                            return (
+                              <div key={recipient.phone} className="flex">
+                                <Button
+                                  variant="none"
+                                  onClick={() => showInfoAbout(recipient)}
+                                  className="whitespace-nowrap p-0 text-xs h-min hover:bg-muted px-[2px]"
+                                >
+                                  {recipient.contact?.name || recipient.phone}
+                                </Button>
+                                {index < message.recipients.length - 1 && ", "}
+                              </div>
+                            );
+                          }
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              <Separator />
+              <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
+                {message.body}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="p-8 text-center text-muted-foreground">
+              {t("none_selected")}
+            </div>
+          )}
+          {message && message.status === "FAILED" && (
+            <>
+              <Separator className="mt-auto" />
+              <div className="flex flex-col px-4 py-2 gap-1">
+                <h2>{t(`api_error_${message.api_error_code}`)}</h2>
+                <p className="text-muted-foreground text-sm mb-4">
+                  {t("api_error_caption")}
+                </p>
+                <pre className="max-w-max whitespace-pre-wrap break-words bg-muted border p-4 rounded-lg">
+                  {message.api_error_details_json
+                    ? JSON.stringify(
+                        JSON.parse(message.api_error_details_json),
+                        null,
+                        2
+                      )
+                    : t("no_json_available")}
+                </pre>
+              </div>
+            </>
+          )}
 
-          <Separator />
-          <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
-            {message.body}
-          </div>
+          {/* You can remove the message check if you want to, I like it better that this bottom bar only shows up on selection */}
+          {message && message.status === "DRAFTED" ? (
+            <>
+              <Separator className="mt-auto" />
+              <div className="flex px-4 py-2 justify-end gap-2">
+                <Button
+                  variant="default"
+                  type="button"
+                  className="w-max"
+                  disabled={!message}
+                  onClick={() =>
+                    message
+                      ? router.push(`/new-message?editDraft=${message.id}`)
+                      : ""
+                  }
+                >
+                  <Edit className="h-4 w-4" />
+                  {t("continue_draft")}
+                </Button>
+              </div>
+            </>
+          ) : (
+            ""
+          )}
         </div>
-      ) : (
-        <div className="p-8 text-center text-muted-foreground">
-          {t("none_selected")}
-        </div>
-      )}
-      {message && message.status === "FAILED" && (
-        <>
-          <Separator className="mt-auto" />
-          <div className="flex flex-col px-4 py-2 gap-1">
-            <h2>{t(`api_error_${message.api_error_code}`)}</h2>
-            <p className="text-muted-foreground text-sm mb-4">
-              {t("api_error_caption")}
-            </p>
-            <pre className="max-w-max whitespace-pre-wrap break-words bg-muted border p-4 rounded-lg">
-              {message.api_error_details_json
-                ? JSON.stringify(
-                    JSON.parse(message.api_error_details_json),
-                    null,
-                    2
-                  )
-                : t("no_json_available")}
-            </pre>
-          </div>
-        </>
-      )}
-
-      {/* You can remove the message check if you want to, I like it better that this bottom bar only shows up on selection */}
-      {message && message.status === "DRAFTED" ? (
-        <>
-          <Separator className="mt-auto" />
-          <div className="flex px-4 py-2 justify-end gap-2">
-            <Button
-              variant="default"
-              type="button"
-              className="w-max"
-              disabled={!message}
-              onClick={() =>
-                message
-                  ? router.push(`/new-message?editDraft=${message.id}`)
-                  : ""
-              }
-            >
-              <Edit className="h-4 w-4" />
-              {t("continue_draft")}
-            </Button>
-          </div>
-        </>
-      ) : (
-        ""
-      )}
+      </ScrollArea>
     </div>
   );
 }

@@ -90,17 +90,6 @@ export async function cancelCurrentlyScheduled(
 
   try {
     if (!userId) throw new Error("Invalid user id.");
-    console.log(
-      "CANCELING SCHEDULED MESSAGE",
-      `${process.env.GATEWAYAPI_URL}/rest/mtsms/${sms_reference_id}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
 
     const res = await fetch(
       `${process.env.GATEWAYAPI_URL}/rest/mtsms/${sms_reference_id}`,
@@ -112,19 +101,9 @@ export async function cancelCurrentlyScheduled(
         },
       }
     );
-    console.log("AFTER FETCH BLOCK");
-
     console.log(res);
-    // const resJson = await res.json();
-    // console.log(resJson);
 
-    if (!res.ok) {
-      return {
-        success: false,
-        message: [`api_error_${res.status.toString()}`],
-      };
-    }
-
+    // TEST_PRODUCTION: This didn't work with the 2 conditions on Windows
     const result = await db(
       `
         UPDATE message
@@ -133,6 +112,13 @@ export async function cancelCurrentlyScheduled(
       `,
       [userId, sms_reference_id]
     );
+    if (!res.ok) {
+      return {
+        success: false,
+        message: [`api_error_${res.status}`],
+      };
+    }
+
     return {
       success: true,
       message: ["messages-page:server-cancel_scheduled_success"],
