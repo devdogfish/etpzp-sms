@@ -55,7 +55,6 @@ const NewMessageForm = React.memo(function ({
 }: {
   editDraft?: DBMessage;
 }) {
-  const { contacts } = useContacts();
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation(["new-message-page"]);
   const router = useRouter();
@@ -129,7 +128,7 @@ const NewMessageForm = React.memo(function ({
     if (result.success) {
       // Message got sent successfully
       if (result.sendDate) {
-        return toast.success(
+        toast.success(
           `${t(result.message[0])} ${format(
             result.sendDate,
             PORTUGUESE_DATE_FORMAT
@@ -139,9 +138,8 @@ const NewMessageForm = React.memo(function ({
         toastActionResult(result, t);
       }
     } else {
-      // Something went wrong:
-
-      // Display input specific error messages
+      // Unable to send message due to an error:
+      // 1. Display input specific error messages
       const zodErrors = result.errors || {};
       let waitTime = 0;
       const inBetweenTime = 300;
@@ -155,7 +153,7 @@ const NewMessageForm = React.memo(function ({
           }, index * inBetweenTime) // Increase delay by 50ms for each error
       );
 
-      // Display general error message
+      // 2. Display general error message
       setTimeout(() => {
         if (result.invalidRecipients) {
           toast.error(
@@ -168,10 +166,14 @@ const NewMessageForm = React.memo(function ({
         }
       }, Object.entries(zodErrors).length * inBetweenTime);
     }
+    console.log("before clear form block");
 
     if (result.clearForm === true) {
-      // reset the form values to be empty
-      setMessage(EMPTY_MESSAGE);
+      console.log("clearing form");
+
+      // 3. Reset the form
+      setMessage(EMPTY_MESSAGE); // technically this isn't even needed
+      router.push("/new-message");
     }
   };
 

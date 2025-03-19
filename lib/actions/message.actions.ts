@@ -103,7 +103,14 @@ export async function cancelCurrentlyScheduled(
     );
     console.log(res);
 
-    // TEST_PRODUCTION: This didn't work with the 2 conditions on Windows
+    if (!res.ok) {
+      return {
+        success: false,
+        message: [`api_error_${res.status}`],
+      };
+    }
+
+    // TEST_PRODUCTION: This didn't work with the 2 WHERE conditions on the dev server on Windows
     const result = await db(
       `
         UPDATE message
@@ -112,13 +119,8 @@ export async function cancelCurrentlyScheduled(
       `,
       [userId, sms_reference_id]
     );
-    if (!res.ok) {
-      return {
-        success: false,
-        message: [`api_error_${res.status}`],
-      };
-    }
 
+    revalidatePath("/scheduled");
     return {
       success: true,
       message: ["messages-page:server-cancel_scheduled_success"],

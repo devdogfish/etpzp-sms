@@ -74,7 +74,7 @@ export default function RecipientsInput({
       if (contactId) {
         const contact = contacts.find((contact) => contact.id == contactId);
         if (contact) {
-          addRecipient(contact.phone, contacts);
+          addRecipient(contact.phone);
         }
       }
 
@@ -106,10 +106,10 @@ export default function RecipientsInput({
       e.preventDefault();
       e.stopPropagation();
       if (selectedPhone) {
-        addRecipient(selectedPhone, contacts);
+        addRecipient(selectedPhone);
         clearInputValue();
       } else if (trimmedInput !== "") {
-        addRecipient(trimmedInput, contacts);
+        addRecipient(trimmedInput);
 
         clearInputValue();
       }
@@ -120,10 +120,8 @@ export default function RecipientsInput({
     if (e.key === "Backspace" && trimmedInput === "" && recipients.length) {
       const lastRecipientIndex = recipients.length - 1;
       const lastRecipient = recipients[lastRecipientIndex];
-      console.log(recipients);
-      console.log("lastREcipient:", lastRecipient);
       if (lastRecipient && lastRecipient.proneForDeletion) {
-        // Call removeRecipient to remove the last recipient
+        // Remove the last recipient if it is already prone for deletion
         removeRecipient(lastRecipient);
       } else {
         setMessage((prev) => {
@@ -136,8 +134,6 @@ export default function RecipientsInput({
             }
             return recipient; // Return the other recipients unchanged
           });
-
-          // Check if the last recipient is prone for deletion and remove it
 
           // Return the new state with the last recipient marked as prone for deletion
           return { ...prev, recipients: newRecipients };
@@ -319,12 +315,17 @@ export default function RecipientsInput({
                   })),
                 }));
                 setIsDropdownOpen(false);
-                console.log("INPUT GOT BLURREd");
+
+                // Create recipient from input value on blur if not empty
+                if (message.recipientInput.value.trim() !== "") {
+                  addRecipient(message.recipientInput.value);
+                }
 
                 onBlur();
               }}
             />
 
+            {/* Begin suggested recipients dropdown */}
             {isDropdownOpen && suggestedRecipients.length !== 0 && (
               <div className="absolute top-[85%] bg-background border rounded-lg">
                 <ScrollArea className="w-[300px] h-[330px]">
@@ -349,7 +350,7 @@ export default function RecipientsInput({
                           onMouseDown={(e) => {
                             e.preventDefault();
 
-                            addRecipient(recipient.phone, contacts);
+                            addRecipient(recipient.phone);
                           }}
                         >
                           <ProfilePic

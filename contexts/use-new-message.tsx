@@ -56,7 +56,7 @@ type MessageContextValues = {
 
   // Recipient management
   recipients: NewRecipient[];
-  addRecipient: (phone: string, contacts: DBContact[]) => void;
+  addRecipient: (phone: string) => void;
   removeRecipient: (
     recipient: NewRecipient,
     replaceWithRecipient?: NewRecipient

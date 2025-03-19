@@ -132,9 +132,6 @@ function MessageDisplay({
   const initialColors = PRIMARY_COLOR_CSS_NAMES;
   let colors = [...initialColors]; // Create a copy of the array by spreading it.
   useEffect(() => {
-    console.log(message);
-    console.log(message?.send_time);
-
     if (message) {
       shuffleArray(colors);
 

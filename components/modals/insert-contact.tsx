@@ -72,7 +72,7 @@ export default function InsertContactModal() {
           (notContact) => notContact.phone === selectedContact.phone
         )
       ) {
-        addRecipient(selectedContact.phone, contacts);
+        addRecipient(selectedContact.phone);
       }
     });
 
@@ -131,9 +131,12 @@ export default function InsertContactModal() {
                     );
                     return (
                       <TableRow key={contact.id} className="h-6 max-h-6">
-                        <TableCell className="font-medium">
+                        <TableCell
+                          // This fixes the layout shifting
+                          className="flex items-center h-[36.5px] font-medium"
+                        >
                           <Checkbox
-                            className="w-6 h-6 rounded-md"
+                            className=" h-6 w-6 rounded-md"
                             style={{
                               height: "24px !important",
                               width: "24px !important",
@@ -190,7 +193,11 @@ export default function InsertContactModal() {
                 {t("common:cancel")}
               </DialogClose>
               {contacts.length !== 0 && (
-                <Button disabled={!selected.length} onClick={onInsert}>
+                <Button
+                  onClick={onInsert} 
+                  /* uncomment this if you prefer
+                  disabled={!selected.length} */
+                >
                   {selected.length === 1
                     ? t("insert_contact-button_insert_one")
                     : t("insert_contact-button_insert_x", {
