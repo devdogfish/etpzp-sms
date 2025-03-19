@@ -90,7 +90,17 @@ export async function cancelCurrentlyScheduled(
 
   try {
     if (!userId) throw new Error("Invalid user id.");
-    console.log("CANCELING SCHEDULED MESSGAGE");
+    console.log(
+      "CANCELING SCHEDULED MESSAGE",
+      `${process.env.GATEWAYAPI_URL}/rest/mtsms/${sms_reference_id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const res = await fetch(
       `${process.env.GATEWAYAPI_URL}/rest/mtsms/${sms_reference_id}`,
@@ -104,9 +114,9 @@ export async function cancelCurrentlyScheduled(
     );
     console.log("AFTER FETCH BLOCK");
 
-    const resJson = await res.json();
     console.log(res);
-    console.log(resJson);
+    // const resJson = await res.json();
+    // console.log(resJson);
 
     if (!res.ok) {
       return {

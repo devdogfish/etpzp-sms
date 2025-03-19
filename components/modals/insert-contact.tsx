@@ -130,10 +130,14 @@ export default function InsertContactModal() {
                       (item) => item.id === contact.id
                     );
                     return (
-                      <TableRow key={contact.id}>
+                      <TableRow key={contact.id} className="h-6 max-h-6">
                         <TableCell className="font-medium">
                           <Checkbox
                             className="w-6 h-6 rounded-md"
+                            style={{
+                              height: "24px !important",
+                              width: "24px !important",
+                            }}
                             checked={!!current}
                             onClick={() => {
                               !!current

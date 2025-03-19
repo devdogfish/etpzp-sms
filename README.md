@@ -27,15 +27,16 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - scheduled canceling doesn't work anymore + add error handling in toasts for buttons that interact with the api such as canceling scheduled messages
 - save the sendtime in the context and keep the scheduled popup open when component re-renders 
 - Failed page should have a retry sending button which will try to send the message again and update that exact message object instead of creating a new one.
-
+### ADMIN DASHBOARD
+- ADMIN_DASHBOARD: Choose a period to filter results, see per user sms sending stats
+- Admin Dashboard with statistics and admin settings
+  - Should I keep the option to change the sender? This would also influence the message-display component
+  - If it's difficult, keep it as ETPZP for everyone. If easy, the admin could specify some select options that would be applied to all users.
 ## If there is extra time (after deployment in school)
 - Make it so when recipients input is off focused the value of the input gets added as a recipient
 - clear the url parameter when a message is sent successfully
 - Fix styles for insert modal.
 - Don't save invalid recipients to database (we don't want to suggest invalid ones) or filter them out on the frontend. These recipients belong to drafts so maybe update the query to search for recipients that are not in the drafts or just filter out the invalid ones using javascript
-- Admin Dashboard with statistics and admin settings
-  - Should I keep the option to change the sender? This would also influence the message-display component
-  - If it's difficult, keep it as ETPZP for everyone. If easy, the admin could specify some select options that would be applied to all users.
 - Make sure you don't pass in undefined values into the database, you should always convert them to `null` instead
 - Test the app for bugs
 - Maybe add links to a the item you just modified/created in the success toast messages, so that the user can easily view more details
@@ -43,6 +44,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Maybe add the possibility to upload images for the contact
 - Maybe add some shades of blue between the different columns, to show a hierarchy
 - Consider adding some contact information to the message item in the list
+
+### Latest Conversation
+- For Domain name, we will use a dynamic IP service called No-IP. This is a program that you need to run on the server which will open a connection to their server. Their server will accept requests on that domain name, and will redirect that traffic to my server. Since the connection is established from inside to outside of our network, it won't require any router traffic forwarding.
+
 
 ## Important Commands
 Deleting all tables
