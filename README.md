@@ -22,18 +22,19 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 
 
-- Maybe make it so that the insert-recipient-modal gets hidden and shown again after creating a new contact from there
+
 - Failed page should have a retry sending button which will try to send the message again and update that exact message object instead of creating a new one.
-
-
+  - Rename the search parameter to be `message_id` instead of `editDraft` to be true also for FAILED messages.
 
 - Don't save invalid recipients to database (we don't want to suggest invalid ones) or filter them out on the frontend. These recipients belong to drafts so maybe update the query to search for recipients that are not in the drafts or just filter out the invalid ones using javascript
-
+- Create application Logo. Add meta data like tab image and title
+- Implement DNS
 
 #### SCHEDULED PAGE:
-- !!IMPORTANT!!: Save the sendtime in the context and keep the scheduled popup open when component re-renders 
+- !!IMPORTANT!!: Save the sendtime in the context and keep the scheduled popup open when component re-renders as well as schedule dropdown. Think about how I can prevent mis-clicks on the submit button with the intention to schedule the message (ask people for suggestions).
 - Have a 5-minute refresh timer for polling scheduled message delivery statuses in the root layout so that the amountIndicators also update
-- add error handling in toasts for buttons that interact with the api such as canceling scheduled messages
+- Add error handling in toasts for buttons that interact with the api such as canceling scheduled messages
+- Ask gatewayApi support if they recommend to refetch for message status to make sure the message arrived or they never have any issues.
 
 ### ADMIN DASHBOARD
 - ADMIN_DASHBOARD: Choose a period to filter results, see per user sms sending stats

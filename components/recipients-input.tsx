@@ -67,16 +67,12 @@ export default function RecipientsInput({
 
   const isMounted = useIsMounted();
 
+  // PRODUCTION_DELETE:
   useEffect(() => {
     if (isMounted) {
       // Add initial recipients parsed from URL if present
-      const contactId = searchParams.get("contactId");
-      if (contactId) {
-        const contact = contacts.find((contact) => contact.id == contactId);
-        if (contact) {
-          addRecipient(contact.phone);
-        }
-      }
+      // we used to parse contacts passed through contactId search parameter, but instead we just create a draft for everything. 
+      // This draft is parsed early on in the top level server component
 
       // We don't need to call searchRecipient here
     }

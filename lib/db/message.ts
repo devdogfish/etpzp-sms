@@ -152,7 +152,7 @@ export async function fetchDraft(id?: string) {
               ) AS recipients
         FROM message m
         LEFT JOIN recipient r ON m.id = r.message_id
-        WHERE m.user_id = $1 AND m.id = $2 AND m.status = 'DRAFTED'
+        WHERE m.user_id = $1 AND m.id = $2 AND (m.status = 'DRAFTED' OR m.status = 'FAILED') -- Add the ability to edit FAILED messages from the new-message-page later on
         GROUP BY m.id;
       `,
       [userId, id]

@@ -43,6 +43,7 @@ export default function InsertContactModal() {
 
   const [selected, setSelected] = useState<DBContact[]>(initialSelected);
   const { t } = useTranslation(["modals", "common"]);
+  const [watchCreateModalClose, setWatchCreateModalClose] = useState(false);
 
   // Only those contacts that are selected here should be inside the message object
   const onInsert = () => {
@@ -82,15 +83,21 @@ export default function InsertContactModal() {
 
   const showCreateModal = () => {
     showInfoAbout(null);
+    setInsertModal(false);
     setModal((m) => ({ ...m, contact: { ...m.contact, create: true } }));
+    setWatchCreateModalClose(true);
   };
   const setInsertModal = (value: boolean) => {
     setModal((m) => ({ ...m, contact: { ...m.contact, insert: value } }));
   };
 
   useEffect(() => {
+    if (watchCreateModalClose && modal.contact.create === false) {
+      setWatchCreateModalClose(false);
+      setInsertModal(true);
+    }
     if (modal.contact.insert) setSelected(initialSelected);
-  }, [modal.contact.insert]);
+  }, [modal.contact]);
   return (
     <>
       <Dialog open={modal.contact.insert} onOpenChange={setInsertModal}>
@@ -194,7 +201,7 @@ export default function InsertContactModal() {
               </DialogClose>
               {contacts.length !== 0 && (
                 <Button
-                  onClick={onInsert} 
+                  onClick={onInsert}
                   /* uncomment this if you prefer
                   disabled={!selected.length} */
                 >
