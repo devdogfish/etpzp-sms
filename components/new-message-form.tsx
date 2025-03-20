@@ -94,16 +94,20 @@ const NewMessageForm = React.memo(function ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(message.scheduledDate.getTime(), Date.now());
 
     // Smaller than (<) means it is in the past, while larger than (>) means in the future
-    if (message.scheduledDateModified && message.scheduledDate < new Date()) {
+    if (
+      message.scheduledDateModified &&
+      message.scheduledDateConfirmed === false &&
+      message.scheduledDate.getTime() < Date.now()
+    ) {
+      // Prevent the rest of the code of getting executed if the invalid date has not been confirmed yet.
       return setModal((m) => ({ ...m, scheduleAlert: true }));
-    } else {
-      // DEBUG / CONTINUE_HERE
-      return console.log("Condition not met");
     }
 
     setLoading(true);
+    setMessage((m) => ({ ...m, scheduledDateConfirmed: false }));
 
     const formData = new FormData(e.currentTarget);
 
@@ -285,10 +289,10 @@ const NewMessageForm = React.memo(function ({
 
   useEffect(() => {
     if (formRef.current) {
-      console.log(
-        "Form re-rendered. Re-setting form element:",
-        formRef.current
-      );
+      // console.log(
+      //   "Form re-rendered. Re-setting form element:",
+      //   formRef.current
+      // );
 
       setForm(formRef.current);
     }

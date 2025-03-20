@@ -51,6 +51,7 @@ export type MessageState = Message & {
 
   scheduledDate: Date;
   scheduledDateModified: boolean;
+  scheduledDateConfirmed: boolean;
 };
 
 type MessageContextValues = {
@@ -79,7 +80,6 @@ type MessageContextValues = {
   focusedInput: string | null;
   setFocusedInput: React.Dispatch<React.SetStateAction<string | null>>;
 
-  // DEBUG / CONTINUE_HERE
   form: HTMLFormElement | null;
   setForm: React.Dispatch<React.SetStateAction<HTMLFormElement | null>>;
 };

@@ -15,4 +15,5 @@ export const EMPTY_MESSAGE: MessageState = {
   },
   scheduledDate: new Date(),
   scheduledDateModified: false,
+  scheduledDateConfirmed: false,
 };

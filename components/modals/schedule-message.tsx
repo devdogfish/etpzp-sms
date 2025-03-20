@@ -46,13 +46,12 @@ export default function ScheduleMessageModal() {
   };
 
   const applySelectedDate = () => {
-    if (selectedDate.getTime() !== message.scheduledDate.getTime()) {
-      // When a date is specified by the user, we set a flag to true.
-      // We do it like this, because message.scheduledDate could be in the past due to retrieved database value.
-      setMessage((m) => ({ ...m, scheduledDateModified: true }));
-    }
+    setMessage((m) => ({
+      ...m,
+      scheduledDate: selectedDate,
+      scheduledDateModified: true,
+    }));
 
-    setMessage((m) => ({ ...m, scheduledDate: selectedDate }));
     setModal((m) => ({ ...m, schedule: false }));
   };
 
@@ -71,6 +70,9 @@ export default function ScheduleMessageModal() {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [modal.schedule]);
+  useEffect(() => {
+    console.log("message changed", message);
+  }, [message]);
 
   return (
     <Dialog
@@ -106,9 +108,11 @@ export default function ScheduleMessageModal() {
                   min={0}
                   max={23}
                   value={selectedDate.getHours()}
-                  onChange={(value) =>
-                    setSelectedDate((prev) => new Date(prev.setHours(value)))
-                  }
+                  onChange={(value) => {
+                    console.log("changing hours");
+
+                    setSelectedDate((prev) => new Date(prev.setHours(value)));
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-2 mb-3">
@@ -146,13 +150,22 @@ export default function ScheduleMessageModal() {
 }
 
 export function ScheduleAlertModal() {
+  const [shouldSubmit, setShouldSubmit] = useState(false);
   const { modal, setModal } = useModal();
   const { form } = useNewMessage();
   const { t } = useTranslation();
+  const { setMessage } = useNewMessage();
 
+  useEffect(() => {
+    if (shouldSubmit) {
+      // Check if the form ref is set and then call requestSubmit
+      form?.requestSubmit();
+      setShouldSubmit(false); // Reset the flag after submission
+    }
+  }, [shouldSubmit]); // This effect runs when shouldSubmit changes
   return (
     <>
-      {/* "Confirm Logout" dialog */}
+      {/* "Confirm Invalid Date" dialog */}
       <AlertDialog
         open={modal.scheduleAlert}
         onOpenChange={(value) =>
@@ -172,9 +185,9 @@ export function ScheduleAlertModal() {
             <AlertDialogCancel>{t("common:cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                console.log("Requesting submit from form", form);
-                // DEBUG / CONTINUE_HERE
-                form?.submit();
+                setMessage((m) => ({ ...m, scheduledDateConfirmed: true }));
+                // Can't submit directly from here, because we need to wait for the scheduleDateConfirmed flag to be set
+                setShouldSubmit(true);
               }}
             >
               {t("common:continue")}
