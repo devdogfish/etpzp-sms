@@ -36,6 +36,7 @@ export default async function Page({ searchParams }: NewMessagePageProps) {
                 recipientInput: EMPTY_MESSAGE.recipientInput,
                 scheduledDate:
                   fetchedDraft.send_time || EMPTY_MESSAGE.scheduledDate,
+                scheduledDateModified: EMPTY_MESSAGE.scheduledDateModified,
               }
             : undefined
         }

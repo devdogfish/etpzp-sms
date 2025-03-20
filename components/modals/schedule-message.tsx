@@ -1,4 +1,5 @@
 "use client";
+
 import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   Dialog,
@@ -9,17 +10,24 @@ import {
   DialogDescription,
   DialogHeader,
 } from "../ui/dialog";
-import { addDays, addHours, format, nextSaturday } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Calendar } from "../ui/calendar";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { DialogClose } from "@radix-ui/react-dialog";
 import { Button, buttonVariants } from "../ui/button";
-import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useModal } from "@/contexts/use-modal";
 import { useNewMessage } from "@/contexts/use-new-message";
-import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
 
 export default function ScheduleMessageModal() {
   const now = new Date();
@@ -38,6 +46,12 @@ export default function ScheduleMessageModal() {
   };
 
   const applySelectedDate = () => {
+    if (selectedDate.getTime() !== message.scheduledDate.getTime()) {
+      // When a date is specified by the user, we set a flag to true.
+      // We do it like this, because message.scheduledDate could be in the past due to retrieved database value.
+      setMessage((m) => ({ ...m, scheduledDateModified: true }));
+    }
+
     setMessage((m) => ({ ...m, scheduledDate: selectedDate }));
     setModal((m) => ({ ...m, schedule: false }));
   };
@@ -128,6 +142,47 @@ export default function ScheduleMessageModal() {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+export function ScheduleAlertModal() {
+  const { modal, setModal } = useModal();
+  const { form } = useNewMessage();
+  const { t } = useTranslation();
+
+  return (
+    <>
+      {/* "Confirm Logout" dialog */}
+      <AlertDialog
+        open={modal.scheduleAlert}
+        onOpenChange={(value) =>
+          setModal((m) => ({ ...m, scheduleAlert: value }))
+        }
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("modals:schedule_alert-header")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("modals:schedule_alert-header_caption")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common:cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                console.log("Requesting submit from form", form);
+                // DEBUG / CONTINUE_HERE
+                form?.submit();
+              }}
+            >
+              {t("common:continue")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 

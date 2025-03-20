@@ -22,6 +22,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 
 - Add a alert warning dialog, if the user selects a date and it is in the past, when he clicks send. This should ask the user if he wants to continue, and if he does, the message will be sent now
+- There is a bug on the scheduled page where you can't delete a message immediately (you have to press and reload the page and click the delete again.). I discovered something else, when you hit close and select the message again you can delete it without refresh
 
 
 - Create application Logo. Add meta data like tab image and title

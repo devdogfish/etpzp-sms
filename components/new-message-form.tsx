@@ -48,6 +48,7 @@ import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EMPTY_MESSAGE, PORTUGUESE_DATE_FORMAT } from "@/global.config";
 import { useContacts } from "@/contexts/use-contacts";
+import { useModal } from "@/contexts/use-modal";
 
 // apparently, when something gets revalidated or the url gets updated, this component gets re-rendered, while the new-message-context keeps it's state
 const NewMessageForm = React.memo(function ({
@@ -58,8 +59,16 @@ const NewMessageForm = React.memo(function ({
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation(["new-message-page"]);
   const router = useRouter();
-  const { recipients, setMessage, message, focusedInput, setFocusedInput } =
-    useNewMessage();
+  const {
+    recipients,
+    setMessage,
+    message,
+    focusedInput,
+    setFocusedInput,
+    form,
+    setForm,
+  } = useNewMessage();
+  const { setModal } = useModal();
   const [loading, setLoading] = useState(false);
   const { isFullscreen, setIsFullscreen } = useLayout();
   const pathname = usePathname();
@@ -85,6 +94,15 @@ const NewMessageForm = React.memo(function ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Smaller than (<) means it is in the past, while larger than (>) means in the future
+    if (message.scheduledDateModified && message.scheduledDate < new Date()) {
+      return setModal((m) => ({ ...m, scheduleAlert: true }));
+    } else {
+      // DEBUG / CONTINUE_HERE
+      return console.log("Condition not met");
+    }
+
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
@@ -265,6 +283,16 @@ const NewMessageForm = React.memo(function ({
     }
   }, [focusedInput]);
 
+  useEffect(() => {
+    if (formRef.current) {
+      console.log(
+        "Form re-rendered. Re-setting form element:",
+        formRef.current
+      );
+
+      setForm(formRef.current);
+    }
+  }, [formRef]);
   return (
     <>
       <PageHeader title={message.subject ? message.subject : t("header")}>

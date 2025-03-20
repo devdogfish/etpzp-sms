@@ -18,11 +18,7 @@ import { useNewMessage } from "@/contexts/use-new-message";
 import { useModal } from "@/contexts/use-modal";
 import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
 
-export default function ScheduleMessageDropdown({
-  loading,
-}: {
-  loading: boolean;
-}) {
+export default function SendButton({ loading }: { loading: boolean }) {
   const now = new Date();
   const { modal, setModal } = useModal();
   const [dropdown, setDropdown] = useState(false);
@@ -39,7 +35,6 @@ export default function ScheduleMessageDropdown({
 
     // Set the specified hour and default minutes to 0
     tomorrow.setHours(hour, 0, 0, 0);
-    const hours = tomorrow.getHours();
 
     return tomorrow;
   }
@@ -58,7 +53,7 @@ export default function ScheduleMessageDropdown({
         )}
         {message.scheduledDate > now
           ? `${t("submit_btn-scheduled", {
-              time: "",
+              time: "", // i18n messes up the output when passing it in like this
             })} ${format(message.scheduledDate, PORTUGUESE_DATE_FORMAT)}`
           : t("submit_btn-normal")}
       </Button>

@@ -32,7 +32,9 @@ import InsertContactModal from "@/components/modals/insert-contact";
 import CreateContactModal from "@/components/modals/create-contact";
 import RecipientInfoModal from "@/components/modals/recipient-info";
 import { EMPTY_MESSAGE } from "@/global.config";
-import ScheduleMessageModal from "@/components/modals/schedule-message";
+import ScheduleMessageModal, {
+  ScheduleAlertModal,
+} from "@/components/modals/schedule-message";
 
 // This is our biggest state where we store all data related to the active message, that should be persisted during draft saving re-renders
 // MessageState is only used here & for EMPTY_MESSAGE
@@ -46,7 +48,9 @@ export type MessageState = Message & {
   };
   serverStateErrors?: { [K in keyof z.infer<typeof MessageSchema>]?: string[] };
   invalidRecipients?: NewRecipient[];
+
   scheduledDate: Date;
+  scheduledDateModified: boolean;
 };
 
 type MessageContextValues = {
@@ -74,6 +78,10 @@ type MessageContextValues = {
   revalidateRecipients: () => void;
   focusedInput: string | null;
   setFocusedInput: React.Dispatch<React.SetStateAction<string | null>>;
+
+  // DEBUG / CONTINUE_HERE
+  form: HTMLFormElement | null;
+  setForm: React.Dispatch<React.SetStateAction<HTMLFormElement | null>>;
 };
 type ContextProps = {
   children: React.ReactNode;
@@ -105,6 +113,7 @@ export function NewMessageProvider({
   const [suggestedRecipients, setSuggestedRecipients] =
     useState(initialRecipients);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
+  const [form, setForm] = useState<HTMLFormElement | null>(null);
 
   // Memoized values
   const recommendedRecipients: WithContact[] = useMemo(() => {
@@ -329,11 +338,15 @@ export function NewMessageProvider({
         revalidateRecipients,
         focusedInput,
         setFocusedInput,
+
+        form,
+        setForm,
       }}
     >
       {/* We move modals here, because unlike the form component, this doesn't re-render when a draft gets saved */}
       <InsertContactModal />
       <ScheduleMessageModal />
+      <ScheduleAlertModal />
       {/* This should always be defined as we pass a defaultPhone and may create a contact from scratch. */}
       <CreateContactModal
         defaultPhone={moreInfoOn?.phone}

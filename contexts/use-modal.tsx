@@ -16,6 +16,7 @@ export function ModalProvider({
 }) {
   const [modal, setModal] = useState<Modals>({
     schedule: false,
+    scheduleAlert: false,
     contact: { create: false, edit: false, insert: false, info: false },
   });
 

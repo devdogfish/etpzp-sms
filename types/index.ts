@@ -13,6 +13,7 @@ export type CategoryEnums =
 export type StringBoolMap = { [key: string]: boolean };
 export type Modals = {
   schedule: boolean;
+  scheduleAlert: boolean;
   contact: {
     create: boolean;
     edit: boolean;

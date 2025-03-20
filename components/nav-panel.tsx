@@ -390,7 +390,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
               ]}
             />
 
-            {/* Confirm logout dialog */}
+            {/* "Confirm Logout" dialog */}
             <AlertDialog
               open={confirmLogoutOpen}
               onOpenChange={setConfirmLogoutOpen}
