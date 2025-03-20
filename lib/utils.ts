@@ -257,25 +257,26 @@ export function rankRecipients(data: FetchedRecipient[]): RankedRecipient[] {
   const processedData: RankedRecipient[] = []; // Initialize an array for processed recipients
   const recipientMap = new Map<string, RankedRecipient>(); // Use a map to track unique recipients
 
-  data.forEach((item) => {
-    // TODO: Do all the filtering here before it enters the system, instead of working with bad data which won't be used anyway
-    const { isValid } = validatePhoneNumber(item.phone);
+  data.forEach((recipient) => {
+    // Filter out invalid data before processing to avoid unnecessary work.
+    const { isValid } = validatePhoneNumber(recipient.phone);
     if (!isValid) {
-      // do something
+      // Exit the current iteration if the recipient is invalid
+      return;
     }
 
     // Check if the recipient already exists in the map
-    if (!recipientMap.has(item.phone)) {
-      recipientMap.set(item.phone, {
-        id: item.id,
-        phone: item.phone,
+    if (!recipientMap.has(recipient.phone)) {
+      recipientMap.set(recipient.phone, {
+        id: recipient.id,
+        phone: recipient.phone,
         usageCount: 0, // Initialize usage count
       });
     }
 
     // Increment usage count if the last_used date is within the last week
-    if (new Date(item.last_used) >= oneWeekAgo) {
-      recipientMap.get(item.phone)!.usageCount++; // Increment usage count
+    if (new Date(recipient.last_used) >= oneWeekAgo) {
+      recipientMap.get(recipient.phone)!.usageCount++; // Increment usage count
     }
   });
 

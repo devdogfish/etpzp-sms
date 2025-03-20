@@ -223,7 +223,6 @@ export function NewMessageProvider({
 
   // Search and suggestion functions
   const searchRecipients = (rawSearchTerm: string) => {
-    console.log("Searching recipients...");
     const searchTerm = rawSearchTerm.trim().toLowerCase();
     if (!suggestedRecipients.length && !recommendedRecipients.length) {
       // Searched suggested- and recommended recipients are empty -
