@@ -51,9 +51,9 @@ import { useContacts } from "@/contexts/use-contacts";
 
 // apparently, when something gets revalidated or the url gets updated, this component gets re-rendered, while the new-message-context keeps it's state
 const NewMessageForm = React.memo(function ({
-  editDraft,
+  message_id,
 }: {
-  editDraft?: DBMessage;
+  message_id?: DBMessage;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation(["new-message-page"]);
@@ -66,7 +66,7 @@ const NewMessageForm = React.memo(function ({
   const onMobile = useIsMobile();
   const [pendingDraft, setPendingDraft] = useState(false);
   const [draft, setDraft] = useState({
-    id: editDraft?.id || null,
+    id: message_id?.id || null,
     pending: false,
   });
 
@@ -214,7 +214,7 @@ const NewMessageForm = React.memo(function ({
           setDraft((prev) => ({ ...prev, id: draftId || null }));
           // Updating the URL revalidates the server (including fetching amount indicators) and re-renders the component.
           const params = new URLSearchParams(searchParams.toString());
-          params.set("editDraft", draftId);
+          params.set("message_id", draftId);
           router.replace(pathname + "?" + params.toString());
         }
       }
@@ -227,7 +227,7 @@ const NewMessageForm = React.memo(function ({
 
         // Updating the URL revalidates the server (including fetching amount indicators) and re-renders the component.
         const params = new URLSearchParams(searchParams.toString());
-        params.delete("editDraft");
+        params.delete("message_id");
         router.replace(pathname + "?" + params.toString());
       }
     };
@@ -330,7 +330,7 @@ const NewMessageForm = React.memo(function ({
             >
               <Select
                 name="sender"
-                defaultValue={editDraft?.sender || "ETPZP"}
+                defaultValue={message_id?.sender || "ETPZP"}
                 onValueChange={(value) => {
                   setMessage((prev) => ({ ...prev, sender: value }));
                 }}

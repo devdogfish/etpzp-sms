@@ -258,6 +258,12 @@ export function rankRecipients(data: FetchedRecipient[]): RankedRecipient[] {
   const recipientMap = new Map<string, RankedRecipient>(); // Use a map to track unique recipients
 
   data.forEach((item) => {
+    // TODO: Do all the filtering here before it enters the system, instead of working with bad data which won't be used anyway
+    const { isValid } = validatePhoneNumber(item.phone);
+    if (!isValid) {
+      // do something
+    }
+
     // Check if the recipient already exists in the map
     if (!recipientMap.has(item.phone)) {
       recipientMap.set(item.phone, {

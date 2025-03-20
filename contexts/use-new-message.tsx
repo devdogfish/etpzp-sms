@@ -287,6 +287,7 @@ export function NewMessageProvider({
   useEffect(() => {
     // Revalidate recipients when contacts get re-fetched
     revalidateRecipients();
+    console.log(suggestedRecipients);
   }, [contacts]);
 
   useEffect(() => {
@@ -331,7 +332,7 @@ export function NewMessageProvider({
         setFocusedInput,
       }}
     >
-      {/* We move this here, because this component doesn't re-render when a draft gets saved */}
+      {/* We move modals here, because unlike the form component, this doesn't re-render when a draft gets saved */}
       <InsertContactModal />
       <ScheduleMessageModal />
       {/* This should always be defined as we pass a defaultPhone and may create a contact from scratch. */}

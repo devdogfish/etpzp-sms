@@ -102,8 +102,13 @@ function MessageDisplay({
       });
 
       if (newDraft.draftId) {
-        router.push(`/new-message?editDraft=${newDraft.draftId}`);
+        router.push(`/new-message?message_id=${newDraft.draftId}`);
       }
+    }
+  };
+  const retry = () => {
+    if (message) {
+      router.push(`/new-message?message_id=${message.id}`);
     }
   };
 
@@ -210,10 +215,10 @@ function MessageDisplay({
                   onClick={cancelSend}
                 >
                   <MessageCircleX className="w-4 h-4" />
-                  <span className="sr-only">{t("cancel_scheduled")}</span>
+                  <span className="sr-only">{t("btn-cancel_scheduled")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t("cancel_scheduled")}</TooltipContent>
+              <TooltipContent>{t("btn-cancel_scheduled")}</TooltipContent>
             </Tooltip>
           )}
 
@@ -228,15 +233,15 @@ function MessageDisplay({
                   onClick={putBack}
                 >
                   <ArchiveRestore className="w-4 h-4" />
-                  <span className="sr-only">{t("restore")}</span>
+                  <span className="sr-only">{t("btn-restore")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t("restore")}</TooltipContent>
+              <TooltipContent>{t("btn-restore")}</TooltipContent>
             </Tooltip>
           )}
 
           {/* Reply to all recipients in the message */}
-          {category !== "DRAFTS" && (
+          {category !== "DRAFTS" && category !== "FAILED" && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -246,10 +251,27 @@ function MessageDisplay({
                   disabled={!message}
                 >
                   <Send className="h-4 w-4" />
-                  <span className="sr-only">{t("resend")}</span>
+                  <span className="sr-only">{t("btn-resend")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t("resend")}</TooltipContent>
+              <TooltipContent>{t("btn-resend")}</TooltipContent>
+            </Tooltip>
+          )}
+          {/* On Failed page we want a retry button */}
+          {category === "FAILED" && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={retry}
+                  disabled={!message}
+                >
+                  <Send className="h-4 w-4" />
+                  <span className="sr-only">{t("btn-retry")}</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t("btn-retry")}</TooltipContent>
             </Tooltip>
           )}
 
@@ -262,16 +284,16 @@ function MessageDisplay({
                   size="icon"
                   onClick={() =>
                     message
-                      ? router.push(`/new-message?editDraft=${message.id}`)
+                      ? router.push(`/new-message?message_id=${message.id}`)
                       : ""
                   }
                   disabled={!message}
                 >
                   <Edit className="h-4 w-4" />
-                  <span className="sr-only">{t("continue_draft")}</span>
+                  <span className="sr-only">{t("btn-continue_draft")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t("continue_draft")}</TooltipContent>
+              <TooltipContent>{t("btn-continue_draft")}</TooltipContent>
             </Tooltip>
           )}
         </div>
@@ -471,12 +493,12 @@ function MessageDisplay({
                   disabled={!message}
                   onClick={() =>
                     message
-                      ? router.push(`/new-message?editDraft=${message.id}`)
+                      ? router.push(`/new-message?message_id=${message.id}`)
                       : ""
                   }
                 >
                   <Edit className="h-4 w-4" />
-                  {t("continue_draft")}
+                  {t("btn-continue_draft")}
                 </Button>
               </div>
             </>

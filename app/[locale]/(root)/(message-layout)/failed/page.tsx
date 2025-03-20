@@ -3,6 +3,7 @@ import { fetchMessagesByStatus } from "@/lib/db/message";
 
 export default async function Page() {
   const messages = await fetchMessagesByStatus("FAILED");
+  console.log(messages);
 
   return (
     <MessagesPage

@@ -23,8 +23,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 
 
-- Failed page should have a retry sending button which will try to send the message again and update that exact message object instead of creating a new one.
-  - Rename the search parameter to be `message_id` instead of `editDraft` to be true also for FAILED messages.
+
+- Add a alert warning dialog, if the user selects a date and it is in the past, when he clicks send. This should ask the user if he wants to continue, and if he does, the message will be sent now
 
 - Don't save invalid recipients to database (we don't want to suggest invalid ones) or filter them out on the frontend. These recipients belong to drafts so maybe update the query to search for recipients that are not in the drafts or just filter out the invalid ones using javascript
 - Create application Logo. Add meta data like tab image and title

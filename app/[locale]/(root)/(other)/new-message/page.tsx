@@ -7,13 +7,13 @@ import { ModalProvider } from "@/contexts/use-modal";
 import { EMPTY_MESSAGE } from "@/global.config";
 
 type NewMessagePageProps = {
-  searchParams: Promise<{ editDraft: string }>;
+  searchParams: Promise<{ message_id: string }>;
 };
 
 export default async function Page({ searchParams }: NewMessagePageProps) {
   const rawRecipients = await fetchRecipients();
   const draftInUrl = await searchParams;
-  const fetchedDraft = await fetchDraft(draftInUrl.editDraft);
+  const fetchedDraft = await fetchDraft(draftInUrl.message_id);
 
   return (
     <ModalProvider>
@@ -40,7 +40,7 @@ export default async function Page({ searchParams }: NewMessagePageProps) {
             : undefined
         }
       >
-        <NewMessageForm editDraft={fetchedDraft} />
+        <NewMessageForm message_id={fetchedDraft} />
       </NewMessageProvider>
     </ModalProvider>
   );
