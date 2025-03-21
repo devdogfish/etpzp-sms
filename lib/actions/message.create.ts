@@ -78,9 +78,6 @@ export async function sendMessage(
     console.log(validatedData.data.secondsUntilSend);
   }
 
-  // __ BEGIN DEBUG __
-  // __ END   DEBUG __
-
   try {
     const payload = {
       // this shit can only be one full word with no special characters or spaces

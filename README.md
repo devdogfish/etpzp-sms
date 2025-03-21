@@ -17,27 +17,24 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 # TODO
 ## In Progress
-1. For scheduled messages, it would be better to do polling WHEN THE USER LOGS IN because when our server is not running we might lose callbacks
-  - Create a separate thread to get the delivery status while loading everything else
-
-
-- There is a bug on the scheduled page where you can't delete a message immediately (you have to press and reload the page and click the delete again.). I discovered something else, when you hit close and select the message again you can delete it without refresh
-
 
 - Create application Logo. Add meta data like tab image and title
 - Implement DNS
 
-#### SCHEDULED PAGE:
-- !!IMPORTANT!!: Save the sendtime in the context and keep the scheduled popup open when component re-renders as well as schedule dropdown. Think about how I can prevent mis-clicks on the submit button with the intention to schedule the message (ask people for suggestions).
+#### MESSAGE POLLING AND DELIVERY STATUSes:
+- The database field `status` should always be true
+  - Do message polling to update it conditionally. When?
+    - Do it right after sending the message, and for scheduled set a timeout to fetch the status after it got sent
+    - On User Login, check all the messages for confirmed_delivery flag.
+  - Add delivery errors to individual recipients
+  - Maybe add another field like was_scheduled or scheduled_send to show how the message was sent
 - Have a 5-minute refresh timer for polling scheduled message delivery statuses in the root layout so that the amountIndicators also update
 - Add error handling in toasts for buttons that interact with the api such as canceling scheduled messages
-- Ask gatewayApi support if they recommend to refetch for message status to make sure the message arrived or they never have any issues.
 
 ### ADMIN DASHBOARD
-- ADMIN_DASHBOARD: Choose a period to filter results, see per user sms sending stats
-- Admin Dashboard with statistics and admin settings
-  - Should I keep the option to change the sender? This would also influence the message-display component
-    - If it's difficult, keep it as ETPZP for everyone. If easy, the admin could specify some select options that would be applied to all users.
+- Choose a period to filter results, see per user sms sending stats
+- Should I keep the option to change the sender? This would also influence the message-display component
+  - If it's difficult, keep it as ETPZP for everyone. If easy, the admin could specify some select options that would be applied to all users.
 
 ### Latest Conversation
 - For Domain name, we will use a dynamic IP service called No-IP. This is a program that you need to run on the server which will open a connection to their server. Their server will accept requests on that domain name, and will redirect that traffic to my server. Since the connection is established from inside to outside of our network, it won't require any router traffic forwarding.

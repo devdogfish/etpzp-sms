@@ -30,67 +30,79 @@ export function MessageList({
   return (
     <ScrollArea className="h-[calc(100vh-var(--header-height)-68px)]">
       <div className="flex flex-col gap-2 p-4 pt-0">
-        {messages.map((item) => (
-          <button
-            key={item.id}
-            className={cn(
-              "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-              selectedMessageId === item.id && "bg-muted"
-            )}
-            onClick={() => setSelected(item)}
-          >
-            <div className="flex w-full flex-col">
-              <div className="flex items-center gap-1">
-                <div className="flex items-center gap-2">
-                  <div className="font-semibold">
-                    {item.subject ? item.subject : t("common:no_subject")}
-                  </div>
-                  {item.status === "SCHEDULED" && item.send_time ? (
-                    <ClockIcon
-                      hour={Math.round(item.send_time.getHours() % 12) || 12}
-                    />
-                  ) : (
-                    item.status === "FAILED" && (
+        {messages.map((message) => {
+          const sendInFuture = message.send_time.getTime() > Date.now();
+          const statusTranslationString = (
+            message.status !== "SCHEDULED"
+              ? message.status
+              : sendInFuture
+              ? "SCHEDULED"
+              : "SENT"
+          ).toLowerCase();
+          return (
+            <button
+              key={message.id}
+              className={cn(
+                "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
+                selectedMessageId === message.id && "bg-muted"
+              )}
+              onClick={() => setSelected(message)}
+            >
+              <div className="flex w-full flex-col">
+                <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
+                    <div className="font-semibold">
+                      {message.subject
+                        ? message.subject
+                        : t("common:no_subject")}
+                    </div>
+                    {sendInFuture && message.status === "SCHEDULED" && (
+                      <ClockIcon
+                        hour={
+                          Math.round(message.send_time.getHours() % 12) || 12
+                        }
+                      />
+                    )}
+                    {message.status === "FAILED" && (
                       <div className="flex items-center gap-1 text-destructive text-xs">
                         <div className="flex h-2 w-2 rounded-full bg-destructive" />
-                        {item.api_error_code}
+                        {message.api_error_code}
                       </div>
-                    )
-                  )}
-                </div>
-                <div
-                  className={cn(
-                    "ml-auto text-xs",
-                    selectedMessageId === item.id
-                      ? "text-foreground"
-                      : "text-muted-foreground"
-                  )}
-                >
-                  {item.send_time &&
-                    formatDistanceToNow(new Date(item.send_time), {
+                    )}
+                  </div>
+                  <div
+                    className={cn(
+                      "ml-auto text-xs",
+                      selectedMessageId === message.id
+                        ? "text-foreground"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    {formatDistanceToNow(new Date(message.send_time), {
                       addSuffix: true,
                       locale: getDateFnsLocale(i18n.language),
                     })}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="line-clamp-2 text-xs text-muted-foreground">
-              {item.body.substring(0, 300)}
-            </div>
+              <div className="line-clamp-2 text-xs text-muted-foreground">
+                {message.body.substring(0, 300)}
+              </div>
 
-            {/* If we are on the trash page, render a badge to show what the message was before it got moved to the trash */}
-            {item.in_trash == true && (
-              <Badge
-                variant={"outline"}
-                className="tracking-widest text-xs"
-                style={{ letterSpacing: "3px" }}
-              >
-                {/* Play around with the styles */}
-                {t(`status_${item.status.toLowerCase()}`).toLowerCase()}
-              </Badge>
-            )}
-          </button>
-        ))}
+              {/* If we are on the trash page, render a badge to show what the message was before it got moved to the trash */}
+              {message.in_trash == true && (
+                <Badge
+                  variant="outline"
+                  className="tracking-widest text-xs text-muted-foreground"
+                  style={{ letterSpacing: "1px" }}
+                >
+                  {/* Play around with the styles */}
+                  {t(`status_${statusTranslationString}`).toUpperCase()}
+                </Badge>
+              )}
+            </button>
+          );
+        })}
       </div>
     </ScrollArea>
   );

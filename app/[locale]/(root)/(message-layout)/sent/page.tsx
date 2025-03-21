@@ -1,8 +1,8 @@
 import MessagesPage from "@/components/messages-page";
-import { fetchSent } from "@/lib/db/message";
+import { fetchSentIn } from "@/lib/db/message";
 
 export default async function Page() {
-  const messages = await fetchSent();
+  const messages = await fetchSentIn("PAST");
 
   console.log(messages);
 

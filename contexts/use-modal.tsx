@@ -1,11 +1,20 @@
 "use client";
 
 import { Modals, StringBoolMap } from "@/types";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 const ModalContext = createContext<{
   modal: Modals;
-  setModal: React.Dispatch<React.SetStateAction<Modals>>;
+  setModal: Dispatch<SetStateAction<Modals>>;
+  scheduleDropdown: boolean;
+  setScheduleDropdown: Dispatch<SetStateAction<boolean>>;
 } | null>(null);
 
 // These are popups used to work with contacts (create, edit, insert into new message, view more info) used on /contacts and /new-message.
@@ -19,13 +28,16 @@ export function ModalProvider({
     scheduleAlert: false,
     contact: { create: false, edit: false, insert: false, info: false },
   });
+  const [scheduleDropdown, setScheduleDropdown] = useState(false);
 
   // useEffect(() => {
   //   console.log(modal);
   // }, [modal]);
 
   return (
-    <ModalContext.Provider value={{ modal, setModal }}>
+    <ModalContext.Provider
+      value={{ modal, setModal, scheduleDropdown, setScheduleDropdown }}
+    >
       {children}
     </ModalContext.Provider>
   );

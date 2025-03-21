@@ -20,7 +20,7 @@ import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
 
 export default function SendButton({ loading }: { loading: boolean }) {
   const now = new Date();
-  const { modal, setModal } = useModal();
+  const { modal, setModal, scheduleDropdown, setScheduleDropdown } = useModal();
   const [dropdown, setDropdown] = useState(false);
   const { message, setMessage } = useNewMessage();
   const { t } = useTranslation(["messages-page", "modals", "common"]);
@@ -57,7 +57,7 @@ export default function SendButton({ loading }: { loading: boolean }) {
             })} ${format(message.scheduledDate, PORTUGUESE_DATE_FORMAT)}`
           : t("submit_btn-normal")}
       </Button>
-      <DropdownMenu onOpenChange={setDropdown}>
+      <DropdownMenu open={scheduleDropdown} onOpenChange={setScheduleDropdown}>
         <DropdownMenuTrigger
           className={cn("flex gap-3 items-center justify-start w-full")}
           asChild

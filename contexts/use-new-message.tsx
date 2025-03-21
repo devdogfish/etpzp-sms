@@ -35,6 +35,7 @@ import { EMPTY_MESSAGE } from "@/global.config";
 import ScheduleMessageModal, {
   ScheduleAlertModal,
 } from "@/components/modals/schedule-message";
+import useIsMounted from "@/hooks/use-mounted";
 
 // This is our biggest state where we store all data related to the active message, that should be persisted during draft saving re-renders
 // MessageState is only used here & for EMPTY_MESSAGE
