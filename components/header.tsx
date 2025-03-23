@@ -10,11 +10,17 @@ import Skeleton from "react-loading-skeleton";
 
 type PageHeaderProps = {
   title: string;
-  children?: React.ReactNode;
   skeleton?: boolean;
+  marginRight?: boolean;
+  children?: React.ReactNode;
 };
 
-export function PageHeader({ title, children, skeleton }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  skeleton,
+  marginRight = true,
+  children,
+}: PageHeaderProps) {
   const onMobile = useIsMobile();
   const { setMobileNavPanel } = useLayout();
   return (
@@ -40,7 +46,7 @@ export function PageHeader({ title, children, skeleton }: PageHeaderProps) {
             containerClassName="mr-auto w-[30%]"
           />
         ) : (
-          <h2 className="mr-auto">{title}</h2>
+          <h2 className={marginRight ? "mr-auto" : ""}>{title}</h2>
         )}
         {children}
       </div>

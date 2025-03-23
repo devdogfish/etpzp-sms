@@ -30,7 +30,9 @@ CREATE TABLE "message" (
     status VARCHAR(20) NOT NULL CHECK (status IN ('SENT', 'SCHEDULED', 'FAILED', 'DRAFTED')),
     in_trash BOOLEAN NOT NULL DEFAULT false,
     api_error_code SMALLINT, -- This is the http status code which is saved when an error occurs
-    api_error_details_json TEXT
+    api_error_details_json TEXT,
+    cost NUMERIC(6, 4), -- 6 total digits, 4 digits after the decimal
+    cost_currency VARCHAR(10)
 );
 
 -- Create contacts table

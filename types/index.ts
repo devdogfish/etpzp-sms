@@ -40,6 +40,8 @@ export type DBMessage = {
   api_error_details_json: string | null;
   recipients: DBRecipient[];
   sms_reference_id: string;
+  cost: number | null;
+  cost_currency: string | null;
 };
 
 export type AmountIndicators = {

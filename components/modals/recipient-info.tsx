@@ -16,6 +16,7 @@ import { Button } from "../ui/button";
 import { NewRecipient } from "@/types/recipient";
 import { useTranslation } from "react-i18next";
 import ProfilePic from "../profile-pic";
+import { useEffect, useState } from "react";
 
 export default function RecipientInfoModal({
   recipient,
@@ -26,13 +27,19 @@ export default function RecipientInfoModal({
 }) {
   const { modal, setModal } = useModal();
   const { t } = useTranslation(["modals"]);
+  const [watchCreateModalClose, setWatchCreateModalClose] = useState(false);
 
   const showCreateModal = () => {
-    setModal((m) => ({ ...m, contact: { ...m.contact, info: true } }));
-    setTimeout(() => {
-      setModal((m) => ({ ...m, contact: { ...m.contact, create: true } }));
-    }, 100);
+    setModal((m) => ({ ...m, contact: { ...m.contact, info: false } }));
+    setModal((m) => ({ ...m, contact: { ...m.contact, create: true } }));
+    setWatchCreateModalClose(true);
   };
+  useEffect(() => {
+    if (watchCreateModalClose && modal.contact.create === false) {
+      setWatchCreateModalClose(false);
+      setModal((m) => ({ ...m, contact: { ...m.contact, info: true } }));
+    }
+  }, [modal.contact]);
   return (
     <Dialog
       /* We do need these shits unfortunately */

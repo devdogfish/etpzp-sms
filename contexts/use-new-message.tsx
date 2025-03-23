@@ -356,8 +356,10 @@ export function NewMessageProvider({
           const oldRecipient = message.recipients.find(
             (r) => r.phone == moreInfoOn?.phone
           );
+          const newRecipient = convertToRecipient(contact);
+          showInfoAbout(newRecipient);
           if (oldRecipient) {
-            removeRecipient(oldRecipient, convertToRecipient(contact));
+            removeRecipient(oldRecipient, newRecipient);
           }
         }}
       />

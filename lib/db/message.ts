@@ -94,7 +94,7 @@ export async function fetchSentIn(time: "FUTURE" | "PAST") {
           m.status NOT IN ('FAILED', 'DRAFTED') AND
           m.send_time ${time === "PAST" ? "<=" : ">"} NOW() 
         GROUP BY m.id
-        ORDER BY m.created_at DESC;
+        ORDER BY m.send_time ${time === "FUTURE" ? "ASC" : "DESC"};
       `,
       [userId]
     );

@@ -122,33 +122,6 @@ export async function sendMessage(
 
     // console.log("SAVING REFERENCE_ID", resJson.ids[0] || null);
 
-    const args = [
-      // Message data
-      validatedData.data.subject, // subject
-      validatedData.data.body, // body
-      res.ok // status
-        ? scheduledUnixSeconds
-          ? "SCHEDULED"
-          : "SENT"
-        : "FAILED",
-      scheduledUnixSeconds // sendtime
-        ? new Date(scheduledUnixSeconds * 1000)
-        : new Date(Date.now()),
-      resJson?.ids?.length ? resJson?.ids[0] : null, // sms_reference_id
-
-      // Api errors
-      res.ok ? null : res.status, // api_error_code
-      res.ok ? null : JSON.stringify(resJson), // api_error_details_json
-
-      // Recipients
-      validRecipients.map((recipient) => recipient.phone), // phone number array
-      validRecipients.map((_, index) => index), // for the ordering of the recipient
-
-      // Other
-      userId, // user_id
-      existingDraftId, // id of the draft to update
-    ];
-
     console.log("WE ARE STILL IN TRY BLOCK 2");
     console.log("BEGIN DATABASE LOGIC");
 
@@ -157,8 +130,6 @@ export async function sendMessage(
       console.log(
         "The draftId is not defined, creating new message with INSERT query"
       );
-
-      console.log([...args.slice(0, 10)]);
 
       // Insert new message and recipients
       await db(
@@ -172,31 +143,56 @@ export async function sendMessage(
               sms_reference_id,
               api_error_code,
               api_error_details_json,
+              cost,
+              cost_currency,
               user_id
             ) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $10) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9 $10) 
             RETURNING id
           )
           INSERT INTO recipient (message_id, phone, index)
           SELECT 
             insert_message.id,
-            unnest($8::text[]) as phone,
-            unnest($9::int[]) as index
+            unnest($11::text[]) as phone,
+            unnest($12::int[]) as index
           FROM insert_message;
         `,
-        [...args.slice(0, 10)] // this gets the first 11 items from the array
+        [
+          // Message data
+          validatedData.data.subject, // subject
+          validatedData.data.body, // body
+          res.ok // status
+            ? scheduledUnixSeconds
+              ? "SCHEDULED"
+              : "SENT"
+            : "FAILED",
+          scheduledUnixSeconds // sendtime
+            ? new Date(scheduledUnixSeconds * 1000)
+            : new Date(Date.now()),
+          resJson?.ids?.length ? resJson?.ids[0] : null, // sms_reference_id
+
+          // Api errors
+          res.ok ? null : res.status, // api_error_code
+          res.ok ? null : JSON.stringify(resJson), // api_error_details_json
+
+          // for the ordering of the recipient
+
+          resJson.usage.total_cost,
+          resJson.usage.currency,
+
+          userId, // user_id
+
+          // Recipients
+          validRecipients.map((recipient) => recipient.phone), // phone number array
+          validRecipients.map((_, index) => index),
+        ]
       );
     } else {
       console.log(
         `Updating existing message item with draftId: ${existingDraftId}`
       );
 
-      console.log([...args.slice(0, 7), userId, existingDraftId]);
-      console.log(
-        "Supplying ",
-        [...args.slice(0, 7), userId, existingDraftId].length,
-        " arguments."
-      );
+      console.log();
 
       // Update existing message record
       const result = await db(
@@ -208,11 +204,37 @@ export async function sendMessage(
               send_time = $4,
               sms_reference_id = $5,
               api_error_code = $6,
-              api_error_details_json = $7
-          WHERE user_id = $8 AND id = $9
+              api_error_details_json = $7,
+              cost = $8,
+              cost_currency = $9
+          WHERE user_id = $10 AND id = $11
           RETURNING id;
         `,
-        [...args.slice(0, 7), userId, existingDraftId]
+        [
+          // Message data
+          validatedData.data.subject, // subject
+          validatedData.data.body, // body
+          res.ok // status
+            ? scheduledUnixSeconds
+              ? "SCHEDULED"
+              : "SENT"
+            : "FAILED",
+          scheduledUnixSeconds // sendtime
+            ? new Date(scheduledUnixSeconds * 1000)
+            : new Date(Date.now()),
+          resJson?.ids?.length ? resJson?.ids[0] : null, // sms_reference_id
+
+          // Api errors
+          res.ok ? null : res.status, // api_error_code
+          res.ok ? null : JSON.stringify(resJson), // api_error_details_json
+
+          resJson.usage.total_cost,
+          resJson.usage.currency,
+
+          // Other
+          userId, // user_id
+          existingDraftId, // id of the draft to update
+        ]
       );
 
       // In case update didn't match any rows - invalid message id
