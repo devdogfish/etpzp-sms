@@ -4,6 +4,7 @@ import { i18nConfig } from "@/i18n.config";
 import { fetchUserSettings } from "@/lib/db/general";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme as useNextTheme } from "next-themes";
+import { useLayout } from "@/contexts/use-layout";
 
 type SettingsContext = {
   updateLanguageCookie: (newLocale: string) => void;
@@ -19,6 +20,7 @@ export default function useSettings(currentLocale: string): SettingsContext {
   const currentPathname = usePathname();
   const { setThemeColor } = useThemeContext();
   const { setTheme } = useNextTheme();
+  const { setLayoutType } = useLayout();
 
   // Helper function to normalize paths
   function normalizePath(path: string) {
@@ -79,6 +81,7 @@ export default function useSettings(currentLocale: string): SettingsContext {
         dark_mode,
         primary_color_id,
         lang,
+        appearance_layout,
       } = settings;
       // Profile
       localStorage.setItem("profile_color_id", profile_color_id.toString());
@@ -87,6 +90,8 @@ export default function useSettings(currentLocale: string): SettingsContext {
       // Appearance
       setTheme(dark_mode === true ? "dark" : "light"); // theme is stored as strings because we are using next-themes
       setThemeColor(primary_color_id);
+      localStorage.setItem("appearance_layout", appearance_layout);
+      setLayoutType(appearance_layout);
 
       // Language - this comes last because it will refresh the page, which might cause issues
       updateLanguageCookie(lang);

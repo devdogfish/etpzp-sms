@@ -1,3 +1,15 @@
+export const validSettingNames = [
+  "lang",
+  "display_name",
+  "profile_color_id",
+
+  "primary_color_id",
+  "appearance_layout",
+  "dark_mode",
+];
+
+export const appearanceLayoutValues = ["MODERN", "SIMPLE"] as const; // this is needed for zod
+export type LayoutType = (typeof appearanceLayoutValues)[number];
 export type UserSettings = {
   lang: string;
 
@@ -6,6 +18,7 @@ export type UserSettings = {
 
   dark_mode: boolean;
   primary_color_id: number;
+  appearance_layout: LayoutType;
 };
 
 export type User = {
@@ -17,15 +30,17 @@ export type User = {
 };
 
 // All user fields
-export type DBUser = User & UserSettings & {
-  role: "USER" | "ADMIN";
-  created_at?: Date;
-  updated_at?: Date;
-};
+export type DBUser = User &
+  UserSettings & {
+    role: "USER" | "ADMIN";
+    created_at?: Date;
+    updated_at?: Date;
+  };
 
 export type SettingName =
   | "lang"
   | "profile_color_id"
   | "display_name"
-  | "dark_mode"
-  | "primary_color_id";
+  | "primary_color_id"
+  | "appearance_layout"
+  | "dark_mode";

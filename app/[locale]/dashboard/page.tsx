@@ -13,7 +13,6 @@ import { cn, getPercentageChange } from "@/lib/utils";
 import { DBMessage } from "@/types";
 import { format } from "date-fns";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
 
 export default async function Dashboard({
   params,
@@ -34,11 +33,6 @@ export default async function Dashboard({
   const users = await fetchUsers();
   const messageCounts = countMessages(messages || []);
 
-  if (messages) {
-    console.log("messages", messages);
-
-    console.log("chart data:", transformMessagesToChartData(messages));
-  }
 
   const res = await fetch(`${process.env.GATEWAYAPI_URL}/api/usage/labels`, {
     method: "POST",
@@ -53,8 +47,8 @@ export default async function Dashboard({
     }),
   });
   const resJson = await res.json();
-  console.log(res);
-  console.log(resJson);
+  // console.log(res);
+  // console.log(resJson);
 
   return (
     <div className="flex flex-col">

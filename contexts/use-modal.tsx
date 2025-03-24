@@ -1,6 +1,6 @@
 "use client";
 
-import { Modals, StringBoolMap } from "@/types";
+import { Modals } from "@/types";
 import React, {
   createContext,
   Dispatch,

@@ -10,7 +10,7 @@ export type CategoryEnums =
   | "DRAFTS"
   | "TRASH";
 
-export type StringBoolMap = { [key: string]: boolean };
+// export type StringBoolMap = { [key: string]: boolean };
 export type Modals = {
   schedule: boolean;
   scheduleAlert: boolean;

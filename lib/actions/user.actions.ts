@@ -4,13 +4,14 @@ import type { DBUser, SettingName, User } from "@/types/user";
 import db from "../db";
 import ActiveDirectory from "activedirectory2";
 import { z } from "zod";
-import { UpdateSettingSchema, validSettingNames } from "../form.schemas";
+import { UpdateSettingSchema } from "../form.schemas";
 import {
   ActionResponse,
   DataActionResponse,
   UpdateSettingResponse,
 } from "@/types/action";
 import { getSession } from "../auth/sessions";
+import { validSettingNames } from "@/types/user";
 
 // These are guaranteed properties when you find the user using A.D.
 type userResult = {
@@ -181,7 +182,7 @@ export async function updateSetting(
     );
 
     const { rows } = await db(
-      `UPDATE public.user SET ${parsedData.name} = $2, updated_at = NOW() WHERE id = $1 RETURNING lang, profile_color_id, display_name, dark_mode, primary_color_id;`,
+      `UPDATE public.user SET ${parsedData.name} = $2, updated_at = NOW() WHERE id = $1 RETURNING *;`,
       [userId, parsedData.value]
     );
 

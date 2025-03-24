@@ -223,14 +223,16 @@ export const createSelectItems = (data: any[], theme: string | undefined) => {
   return data.map(({ name, light, dark, value }) => (
     <SelectItem key={value} value={value || name}>
       <div className="flex gap-2">
-        <div
-          className={cn(
-            "w-[20px]",
-            "h-[20px]",
-            "rounded-full",
-            theme === "light" ? light : dark
-          )}
-        ></div>
+        {light && dark && (
+          <div
+            className={cn(
+              "w-[20px]",
+              "h-[20px]",
+              "rounded-full",
+              theme === "light" ? light : dark
+            )}
+          />
+        )}
         <div className="text-sm">{name}</div>
       </div>
     </SelectItem>

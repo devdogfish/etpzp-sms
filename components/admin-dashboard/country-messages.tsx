@@ -12,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getCountryData, TCountryCode } from "countries-list";
 import { useTranslation } from "react-i18next";
 import { capitalize } from "@/lib/utils";
 

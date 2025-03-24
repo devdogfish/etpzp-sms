@@ -8,12 +8,14 @@ CREATE TABLE "user" (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
-    -- User settings: all have defaults except display name, which defaults to the user's AD name when they first sign up.
+    -- User settings: 
+    -- Defaults for all except display name, which defaults to the user's AD name when they first sign up.
     lang VARCHAR(2) NOT NULL DEFAULT 'pt', -- ISO 639-1 language code
     profile_color_id SMALLINT NOT NULL DEFAULT 1,
     display_name VARCHAR(50) NOT NULL,
-    dark_mode BOOLEAN NOT NULL DEFAULT false,
-    primary_color_id SMALLINT NOT NULL DEFAULT 1
+    primary_color_id SMALLINT NOT NULL DEFAULT 1,
+    appearance_layout VARCHAR(20) CHECK (appearance_layout IN ('MODERN', 'SIMPLE')) NOT NULL DEFAULT 'MODERN',
+    dark_mode BOOLEAN NOT NULL DEFAULT false
 );
 
 -- Create message table

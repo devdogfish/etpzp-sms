@@ -32,6 +32,7 @@ export default function Settings() {
     },
     appearance: {
       darkMode: theme,
+      layout: localStorage.getItem("appearance_layout") || "MODERN",
     },
   };
   return (
@@ -167,6 +168,48 @@ export default function Settings() {
                 isPending={isPending}
               />
             )}
+          />
+          <SettingItem
+            name="appearance_layout" // this might need to be the exact database field
+            label={t("appearance-layout_label")}
+            caption={t("appearance-layout_label_caption")}
+            renderInput={({ value, onChange, onBlur, id, isPending }) => {
+              const layouts = [
+                {
+                  value: "MODERN",
+                  name: "Modern",
+                },
+                {
+                  value: "SIMPLE",
+                  name: "Simple",
+                },
+              ];
+              return (
+                <Select
+                  defaultValue={initialValues.appearance.layout}
+                  onValueChange={(value) => {
+                    onChange(value);
+                    setTimeout(() => {
+                      onBlur(undefined, value);
+                    }, 200);
+                  }}
+                  disabled={isPending}
+                >
+                  <SelectTrigger
+                    id={id}
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "w-[200px] appearance-none font-normal justify-between"
+                    )}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {createSelectItems(layouts, theme)}
+                  </SelectContent>
+                </Select>
+              );
+            }}
           />
           <SettingItem
             name="dark_mode"

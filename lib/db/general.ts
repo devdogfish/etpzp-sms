@@ -14,7 +14,7 @@ export async function fetchUserSettings() {
     if (!userId) throw new Error("Invalid user id.");
     const { rows } = await db(
       `
-      SELECT lang, profile_color_id, display_name, dark_mode, primary_color_id 
+      SELECT lang, profile_color_id, display_name, dark_mode, primary_color_id, appearance_layout
       FROM public.user WHERE id = $1;
     `,
       [userId]

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
+import { appearanceLayoutValues } from "@/types/user";
 
 const CustomString = (options?: { message: string }) => {
   return z.string({
@@ -50,13 +51,6 @@ export const ContactSchema = z.object({
     .optional(),
 });
 
-export const validSettingNames = [
-  "lang",
-  "profile_color_id",
-  "display_name",
-  "dark_mode",
-  "primary_color_id",
-];
 // Create a schema that handles each setting separately
 export const UpdateSettingSchema = z.discriminatedUnion("name", [
   // For the language setting (“lang”) we expect a 2‑character string (ISO 639‑1 code)
@@ -98,6 +92,11 @@ export const UpdateSettingSchema = z.discriminatedUnion("name", [
       .string()
       .nonempty("Display name cannot be empty")
       .max(50, "Display name cannot exceed 50 characters"),
+  }),
+  // For Application layout we have a string enum defined in a type file
+  z.object({
+    name: z.literal("appearance_layout"),
+    value: z.enum(appearanceLayoutValues),
   }),
   // For dark_mode, convert the string "true"/"false" to a boolean.
   z.object({

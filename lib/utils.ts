@@ -1,5 +1,4 @@
 import { DBContact } from "./../types/contact";
-import countries, { getCountryData } from "countries-list";
 import parsePhoneNumber, {
   CountryCode,
   parsePhoneNumberFromString,
@@ -300,12 +299,9 @@ export function shuffleArray(arr: any[]) {
 }
 
 export function getPercentageChange(newValue: number, oldValue: number) {
+  if (oldValue === 0) {
+    // Old value is zero so we will have a 100% change if the newValue is not zero
+    return newValue === 0 ? 0 : newValue > 0 ? 100 : -100;
+  }
   return Math.floor(((newValue - oldValue) / oldValue) * 100);
 }
-
-// function getCountryName(countryCode: string) {
-//   console.log();
-
-//   const country = countries.countries[countryCode];
-//   return country ? country.name : null;
-// }

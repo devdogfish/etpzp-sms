@@ -68,7 +68,13 @@ export function SettingItem({
 
     if (onUpdate) onUpdate(value);
 
-    if (name === "display_name" || name === "profile_color_id") {
+    if (
+      name === "display_name" ||
+      name === "profile_color_id" ||
+      name === "appearance_layout"
+    ) {
+      console.log("updating localstorage...", );
+
       localStorage.setItem(name, result.data || initialValue);
 
       // Dispatch a custom event to update other components that display settings stored in localstorage
