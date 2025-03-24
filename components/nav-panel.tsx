@@ -51,6 +51,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import useSettings from "@/hooks/use-settings";
 import Account from "./shared/account";
+import Image from "next/image";
 
 export default function NavPanel() {
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout, isFullscreen } =
@@ -178,7 +179,22 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   }, []);
   return (
     <>
-      <Account hideNameRole={isCollapsed} />
+      {/* <Account hideNameRole={isCollapsed} /> */}
+      <div
+        className={cn(
+          "h-[var(--header-height)] border-b flex items-center gap-2",
+          !isCollapsed && "px-2",
+          isCollapsed && "justify-center"
+        )}
+      >
+        <Image
+          src="/etpzp_sms-logo.png"
+          alt="Application logo"
+          width={48}
+          height={48}
+        />
+        {!isCollapsed && <h2>ETPZP SMS</h2>}
+      </div>
       {/* <Separator /> */}
       <NavLinks
         isCollapsed={isCollapsed}

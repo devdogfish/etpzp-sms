@@ -53,13 +53,15 @@ export default function LoginForm() {
     <form onSubmit={handleSubmit}>
       <Card className="mx-auto max-w-sm">
         <CardHeader>
-          <div className="relative w-[60%] h-10 overflow-hidden mb-2">
+          <div className="relative w-[60%] overflow-hidden mb-2">
             {/* Set a height for the parent */}
             <Image
-              src="/microsoft-logo.png"
+              src="/etpzp_sms-logo.png"
+              width={80}
+              height={80}
               alt="Microsoft logo"
-              layout="fill" // This makes the image fill the parent container
-              objectFit="cover" // This will crop the image to fill the container
+              // layout="fill" // This makes the image fill the parent container
+              // objectFit="cover" // This will crop the image to fill the container
               quality={100}
             />
           </div>
