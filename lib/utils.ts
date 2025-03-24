@@ -1,4 +1,5 @@
 import { DBContact } from "./../types/contact";
+import countries, { getCountryData } from "countries-list";
 import parsePhoneNumber, {
   CountryCode,
   parsePhoneNumberFromString,
@@ -212,7 +213,7 @@ export function getComplexObjectFromCookie(cookieName: string) {
   return null;
 }
 
-export function capitalizeFirstLetter(string: string) {
+export function capitalize(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
@@ -297,3 +298,14 @@ export function shuffleArray(arr: any[]) {
     [arr[i], arr[j]] = [arr[j], arr[i]]; // Swap elements
   }
 }
+
+export function getPercentageChange(newValue: number, oldValue: number) {
+  return Math.floor(((newValue - oldValue) / oldValue) * 100);
+}
+
+// function getCountryName(countryCode: string) {
+//   console.log();
+
+//   const country = countries.countries[countryCode];
+//   return country ? country.name : null;
+// }

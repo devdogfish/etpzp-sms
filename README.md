@@ -17,24 +17,18 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 # TODO
 ## In Progress
-
 - Create application Logo. Add meta data like tab image and title
 - Implement DNS
+- Do the welcome page (get inspired by Next.js) with a created by page
+- Create new layout and add a setting to reset it
+- 
 
-#### MESSAGE POLLING AND DELIVERY STATUSes:
-- The database field `status` should always be true
-  - Do message polling to update it conditionally. When?
-    - Do it right after sending the message, and for scheduled set a timeout to fetch the status after it got sent
-    - On User Login, check all the messages for confirmed_delivery flag.
-  - Add delivery errors to individual recipients
-  - Maybe add another field like was_scheduled or scheduled_send to show how the message was sent
-- Have a 5-minute refresh timer for polling scheduled message delivery statuses in the root layout so that the amountIndicators also update
-- Add error handling in toasts for buttons that interact with the api such as canceling scheduled messages
+### Admin dashboard
+- Ask for feedback
+- For the account dropdown, should I have the profile picture on the left or right, on the admin dashboard?
+- Check if admin dashboard statistics are all correct! There is a bug on the first text_card (I see a NaN)
+- Maybe add links to the GatewayApi sign in
 
-### ADMIN DASHBOARD
-- Choose a period to filter results, see per user sms sending stats
-- Should I keep the option to change the sender? This would also influence the message-display component
-  - If it's difficult, keep it as ETPZP for everyone. If easy, the admin could specify some select options that would be applied to all users.
 
 ### Latest Conversation
 - For Domain name, we will use a dynamic IP service called No-IP. This is a program that you need to run on the server which will open a connection to their server. Their server will accept requests on that domain name, and will redirect that traffic to my server. Since the connection is established from inside to outside of our network, it won't require any router traffic forwarding.
@@ -46,6 +40,17 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Consider adding some contact information to the message item in the list
 - Maybe add the possibility to upload images for the contact
 - Make sure you don't pass in undefined values into the database, you should always convert them to `null` instead
+- Should I keep the option to change the sender? This would also influence the message-display component
+  - If it's difficult, keep it as ETPZP for everyone. If easy, the admin could specify some select options that would be applied to all users.
+#### MESSAGE POLLING AND DELIVERY STATUSes:
+- The database field `status` should always be true
+  - Do message polling to update it conditionally. When?
+    - Do it right after sending the message, and for scheduled set a timeout to fetch the status after it got sent
+    - On User Login, check all the messages for confirmed_delivery flag.
+  - Add delivery errors to individual recipients
+  - Maybe add another field like was_scheduled or scheduled_send to show how the message was sent
+- Have a 5-minute refresh timer for polling scheduled message delivery statuses in the root layout so that the amountIndicators also update
+- Add error handling in toasts for buttons that interact with the api such as canceling scheduled messages
 
 ## Important Commands
 Deleting all tables

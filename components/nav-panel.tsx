@@ -34,15 +34,6 @@ import { useLayout } from "@/contexts/use-layout";
 import { ScrollArea } from "./ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 import { useSession } from "@/hooks/use-session";
 import { logout } from "@/lib/auth";
 import { toast } from "sonner";
@@ -59,6 +50,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import useSettings from "@/hooks/use-settings";
+import Account from "./shared/account";
 
 export default function NavPanel() {
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout, isFullscreen } =
@@ -162,10 +154,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
     if (success) {
       resetLocalSettings();
       router.push("/login");
-    } else
-      toast.error("Error occurred", {
-        description: "You weren't logged out because of an error.",
-      });
+    }
   };
 
   // Update components when localstorage settings change
@@ -189,70 +178,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   }, []);
   return (
     <>
-      <div
-        className={cn(
-          "flex h-[var(--header-height)] border-b items-center justify-center",
-          !isCollapsed && "px-2"
-        )}
-      >
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className={cn(
-              "flex gap-3 items-center justify-start w-full",
-              isCollapsed && "w-9 h-9"
-            )}
-          >
-            <ProfilePic
-              size={9}
-              name={displayName}
-              colorId={colorId}
-              loading={loading}
-            />
-            <div
-              className={cn(
-                "flex flex-col items-start",
-                isCollapsed && "hidden"
-              )}
-            >
-              <p className="font-semibold mb-[-3px]">
-                {displayName || t("common:no_name")}
-              </p>
-              <span className="text-xs text-muted-foreground">
-                {session?.isAdmin ? t("common:admin") : t("common:user")}
-              </span>
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="z-[1000]">
-            <DropdownMenuGroup>
-              <Link href="/settings#profile">
-                <DropdownMenuItem>
-                  <UserRoundPen />
-                  {t("common:edit_profile")}
-                </DropdownMenuItem>
-              </Link>
-              <Link href="/settings">
-                <DropdownMenuItem>
-                  <Settings />
-                  {t("settings")}
-                </DropdownMenuItem>
-              </Link>
-              {session?.isAdmin && (
-                <Link href="/dashboard">
-                  <DropdownMenuItem>
-                    <MonitorCog />
-                    {t("dashboard")}
-                  </DropdownMenuItem>
-                </Link>
-              )}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut />
-              {t("common:log_out")}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <Account hideNameRole={isCollapsed} />
       {/* <Separator /> */}
       <NavLinks
         isCollapsed={isCollapsed}
@@ -381,7 +307,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
               isCollapsed={isCollapsed}
               links={[
                 {
-                  title: t("common:log_out"),
+                  title: t("log_out"),
                   label: "",
                   icon: LogOut,
                   variant: "ghost",

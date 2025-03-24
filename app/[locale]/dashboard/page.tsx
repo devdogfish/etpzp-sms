@@ -1,3 +1,4 @@
+import initTranslations from "@/app/i18n";
 import UnauthorizedPage from "@/components/403";
 import CountryMessagesChart from "@/components/admin-dashboard/country-messages";
 import MessageHistoryChart from "@/components/admin-dashboard/message-history";
@@ -6,19 +7,28 @@ import { PageHeader } from "@/components/header";
 import Account from "@/components/shared/account";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { getSession } from "@/lib/auth/sessions";
 import { fetchMessages, fetchUsers } from "@/lib/db/dashboard";
-import { fetchSentIn } from "@/lib/db/message";
-import { cn } from "@/lib/utils";
+import { cn, getPercentageChange } from "@/lib/utils";
 import { DBMessage } from "@/types";
 import { format } from "date-fns";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
-export default async function Dashboard() {
+export default async function Dashboard({
+  params,
+}: {
+  params: { locale: string };
+}) {
   const session = await getSession();
-  // Prevent non-admins from viewing the admin-dashboard and display an authorization message.
   if (!session?.isAdmin) return <UnauthorizedPage />;
+  // Prevent non-admins from viewing the admin-dashboard and display an authorization message.
+  const { locale } = await params;
+  const { t } = await initTranslations(locale, [
+    "dashboard-page",
+    "errors",
+    "common",
+  ]);
 
   const messages = await fetchMessages();
   const users = await fetchUsers();
@@ -49,26 +59,100 @@ export default async function Dashboard() {
   return (
     <div className="flex flex-col">
       <PageHeader
-        title={`Welcome to the Dashboard, ${session.user?.first_name}`}
+        title={t("header", {
+          first_name: session.user?.first_name || t("user"),
+        })}
         marginRight={false}
       >
         <Link
           href="/"
           className={cn(buttonVariants({ variant: "outline" }), "ml-4 mr-auto")}
         >
-          Back to Application
+          {t("back_to_app")}
         </Link>
-        <Account />
+        <Account profilePicPosition="RIGHT" />
       </PageHeader>
       <div className="p-4">
         <div className="grid grid-cols-3 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sent Today</CardTitle>
-            </CardHeader>
-            <CardContent>{messageCounts.today}</CardContent>
-          </Card>
-          <Card>
+          <TextCard
+            label={t("text_card_1-title")}
+            value={messageCounts.today}
+            caption={
+              getPercentageChange(
+                messageCounts.today,
+                messageCounts.todayBefore
+              ) < 0
+                ? // Negative change (lower than before)
+                  t("text_card_1-caption_lower", {
+                    percentage: `${
+                      getPercentageChange(
+                        messageCounts.today,
+                        messageCounts.todayBefore
+                      ) * -1
+                    }%`,
+                  })
+                : // Positive change (higher than before)
+                  t("text_card_1-caption_higher", {
+                    percentage: `${getPercentageChange(
+                      messageCounts.today,
+                      messageCounts.todayBefore
+                    )}%`,
+                  })
+            }
+          />
+          <TextCard
+            label={t("text_card_2-title")}
+            value={messageCounts.last7Days}
+            caption={
+              getPercentageChange(
+                messageCounts.last7Days,
+                messageCounts.last7DaysBefore
+              ) < 0
+                ? // Negative change (lower than before)
+                  t("text_card_2-caption_lower", {
+                    percentage: `${
+                      getPercentageChange(
+                        messageCounts.last7Days,
+                        messageCounts.last7DaysBefore
+                      ) * -1
+                    }%`,
+                  })
+                : // Positive change (higher than before)
+                  t("text_card_2-caption_higher", {
+                    percentage: `${getPercentageChange(
+                      messageCounts.last7Days,
+                      messageCounts.last7DaysBefore
+                    )}%`,
+                  })
+            }
+          />
+          <TextCard
+            label={t("text_card_3-title")}
+            value={messageCounts.lastMonth}
+            caption={
+              getPercentageChange(
+                messageCounts.lastMonth,
+                messageCounts.lastMonthBefore
+              ) < 0
+                ? // Negative change (lower than before)
+                  t("text_card_3-caption_lower", {
+                    percentage: `${
+                      getPercentageChange(
+                        messageCounts.lastMonth,
+                        messageCounts.lastMonthBefore
+                      ) * -1
+                    }%`,
+                  })
+                : // Positive change (higher than before)
+                  t("text_card_3-caption_higher", {
+                    percentage: `${getPercentageChange(
+                      messageCounts.lastMonth,
+                      messageCounts.lastMonthBefore
+                    )}%`,
+                  })
+            }
+          />
+          {/* <Card>
             <CardHeader>
               <CardTitle>Sent This week</CardTitle>
             </CardHeader>
@@ -79,7 +163,7 @@ export default async function Dashboard() {
               <CardTitle>Sent This Month</CardTitle>
             </CardHeader>
             <CardContent>{messageCounts.last3Months}</CardContent>
-          </Card>
+          </Card> */}
           <div className="col-span-3">
             <div className="h-min">
               <MessageHistoryChart
@@ -91,39 +175,47 @@ export default async function Dashboard() {
             <UserRanking users={users || []} messages={messages || []} />
           </div>
           <CountryMessagesChart
-          // data={resJson
-          //   .filter(
-          //     (country: { label: string | null }) => country.label === null
-          //   )
-          //   .map(
-          //     (item: {
-          //       amount: number;
-          //       cost: number;
-          //       country: string;
-          //       currency: string;
-          //       label: null;
-          //     }) => ({
-          //       country: item.country,
-          //       cost: item.cost,
-          //       amount: item.amount,
-          //     })
-          //   )}
-          // data={[
-          //   {
-          //     amount: 116,
-          //     cost: 7.4472,
-          //     country: "DE",
-          //   },
-          //   {
-          //     amount: 7,
-          //     cost: 0.147,
-          //     country: "PT",
-          //   },
-          // ]}
+            data={resJson
+              .filter(
+                (country: { label: string | null }) => country.label === null
+              )
+              .map(
+                (item: {
+                  amount: number;
+                  cost: number;
+                  country: string;
+                  currency: string;
+                  label: null;
+                }) => ({
+                  country: item.country,
+                  cost: item.cost,
+                  amount: item.amount,
+                })
+              )}
           />
         </div>
       </div>
     </div>
+  );
+}
+
+function TextCard({
+  label,
+  value,
+  caption,
+}: {
+  label: string;
+  value: string | number;
+  caption: string;
+}) {
+  return (
+    <Card className="min-h-min">
+      <CardContent className="p-6 flex flex-col gap">
+        <p className="text-sm font-semibold text-foreground">{label}</p>
+        <h1 className="leading-tight">{value}</h1>
+        <p className="text-sm text-muted-foreground">{caption}</p>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -168,15 +260,29 @@ const transformMessagesToChartData = (
 function countMessages(messages: DBMessage[]) {
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterdayStart = new Date(todayStart);
+  yesterdayStart.setDate(todayStart.getDate() - 1);
+  const yesterdayEnd = new Date(todayStart);
+  yesterdayEnd.setDate(todayStart.getDate() - 1);
+  yesterdayEnd.setHours(23, 59, 59, 999); // End of yesterday
+
   const sevenDaysAgo = new Date(now);
   sevenDaysAgo.setDate(now.getDate() - 7);
-  const threeMonthsAgo = new Date(now);
-  threeMonthsAgo.setMonth(now.getMonth() - 3);
+  const weekBeforeStart = new Date(sevenDaysAgo);
+  weekBeforeStart.setDate(sevenDaysAgo.getDate() - 7); // Start of the week before last 7 days
+
+  const oneMonthAgo = new Date(now);
+  oneMonthAgo.setMonth(now.getMonth() - 1);
+  const oneMonthBeforeStart = new Date(oneMonthAgo);
+  oneMonthBeforeStart.setMonth(oneMonthAgo.getMonth() - 1); // Start of the 3 months before last 3 months
 
   const counts = {
     today: 0,
+    todayBefore: 0,
     last7Days: 0,
-    last3Months: 0,
+    last7DaysBefore: 0, // New property for the week before last 7 days
+    lastMonth: 0,
+    lastMonthBefore: 0, // New property for the 3 months before last 3 months
   };
 
   messages.forEach((message) => {
@@ -186,17 +292,33 @@ function countMessages(messages: DBMessage[]) {
     if (sentAt >= todayStart) {
       counts.today++;
     }
+    // Count messages sent yesterday
+    if (sentAt >= yesterdayStart && sentAt <= yesterdayEnd) {
+      counts.todayBefore++;
+    }
 
     // Count messages sent in the last 7 days
     if (sentAt >= sevenDaysAgo) {
       counts.last7Days++;
     }
+    // Count messages sent in the week before the last 7 days
+    if (sentAt >= weekBeforeStart && sentAt < sevenDaysAgo) {
+      counts.last7DaysBefore++;
+    }
 
     // Count messages sent in the last 3 months
-    if (sentAt >= threeMonthsAgo) {
-      counts.last3Months++;
+    if (sentAt >= oneMonthAgo) {
+      counts.lastMonth++;
+    }
+    // Count messages sent in the 3 months before the last 3 months
+    if (sentAt >= oneMonthBeforeStart && sentAt < oneMonthAgo) {
+      counts.lastMonthBefore++;
     }
   });
+  console.log("Counts", counts);
+
+  const todayChange = getPercentageChange(counts.today, counts.todayBefore);
+  console.log("Today compared to yesterday ", todayChange, "%");
 
   return counts;
 }

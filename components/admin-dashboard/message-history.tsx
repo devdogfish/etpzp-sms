@@ -26,19 +26,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { format } from "date-fns";
-import { getDateFnsLocale } from "@/lib/utils";
+import { capitalize, getDateFnsLocale } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
 const chartColors = ["#309BF4", "#FEBE06", "#25A544", "#0279FE"];
-const chartConfig = {
-  amount: {
-    label: "Messages",
-  },
-  price: {
-    label: "Price",
-    color: "var(--chart1)",
-  },
-} satisfies ChartConfig;
 
 export default function MessageHistoryChart({
   data,
@@ -46,8 +37,16 @@ export default function MessageHistoryChart({
   data: { date: string; amount: number; price: number }[];
 }) {
   const [timeRange, setTimeRange] = React.useState("90d");
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
 
+  const chartConfig = {
+    amount: {
+      label: capitalize(t("messages")),
+    },
+    price: {
+      label: t("area_chart-price"),
+    },
+  } satisfies ChartConfig;
   const filteredData =
     timeRange === "ALL"
       ? data
@@ -69,30 +68,28 @@ export default function MessageHistoryChart({
     <Card>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1 text-center sm:text-left">
-          <CardTitle>Area Chart - Interactive</CardTitle>
-          <CardDescription>
-            Showing total visitors for the last 3 months
-          </CardDescription>
+          <CardTitle>{t("area_chart-title")}</CardTitle>
+          <CardDescription>{t("area_chart-title_caption")}</CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger
             className="w-[160px] rounded-lg sm:ml-auto"
-            aria-label="Select a value"
+            aria-label={t("common:aria_label-select")}
           >
-            <SelectValue placeholder="Last 3 months" />
+            <SelectValue placeholder={t("area_chart-3_months")} />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
             <SelectItem value="ALL" className="rounded-lg">
-              All time
+              {t("area_chart-all_time")}
             </SelectItem>
             <SelectItem value="90d" className="rounded-lg">
-              Last 3 months
+              {t("area_chart-3_months")}
             </SelectItem>
             <SelectItem value="30d" className="rounded-lg">
-              Last 30 days
+              {t("area_chart-month")}
             </SelectItem>
             <SelectItem value="7d" className="rounded-lg">
-              Last 7 days
+              {t("area_chart-week")}
             </SelectItem>
           </SelectContent>
         </Select>

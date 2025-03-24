@@ -1,9 +1,5 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,23 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+
 import { DBUser } from "@/types/user";
 import { DBMessage } from "@/types";
-import { getNameInitials } from "@/lib/utils";
 import ProfilePic from "../profile-pic";
+import { useTranslation } from "react-i18next";
 
 export default function UserRanking({
   users,
@@ -36,17 +20,16 @@ export default function UserRanking({
   users: DBUser[];
   messages: DBMessage[];
 }) {
+  const { t } = useTranslation();
   return (
     <Card className="">
       <CardHeader>
-        <CardTitle>Users</CardTitle>
-        <CardDescription>
-          Currently signed up users and their messages
-        </CardDescription>
+        <CardTitle>{t("users_table-title")}</CardTitle>
+        <CardDescription>{t("users_table-title_caption")}</CardDescription>
       </CardHeader>
       <CardContent className="">
         <div className="max-h-[300px] overflow-auto">
-          <table className="">
+          <table className="w-full">
             <tbody>
               {users
                 .map((user) => ({
@@ -76,7 +59,7 @@ export default function UserRanking({
                         </p>
                       </div>
                     </td>
-                    <td className="w-1/12 p-2 font-semibold">
+                    <td className="w-1/12 p-2 text-sm font-semibold">
                       {messages.filter((m) => m.user_id == user.id).length}
                     </td>
                   </tr>

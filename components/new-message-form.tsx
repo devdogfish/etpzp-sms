@@ -4,7 +4,7 @@ import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
 import { Maximize2, Minimize2, Trash2, X } from "lucide-react";
 import SendButton from "./send-button";
-import { capitalizeFirstLetter, cn, toastActionResult } from "@/lib/utils";
+import { capitalize, cn, toastActionResult } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { PageHeader } from "./header";
 import { sendMessage } from "@/lib/actions/message.create";
@@ -168,7 +168,7 @@ const NewMessageForm = React.memo(function ({
       Object.entries(zodErrors).forEach(
         ([input, errorArray], index) =>
           setTimeout(() => {
-            toast.error(capitalizeFirstLetter(input), {
+            toast.error(capitalize(input), {
               description: errorArray.map((error) => t(error)).join(", "),
             });
             waitTime += index * inBetweenTime;

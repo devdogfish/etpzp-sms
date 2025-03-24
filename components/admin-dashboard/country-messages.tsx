@@ -12,38 +12,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-// Sample data
-const sampleData = [
-  {
-    amount: 116,
-    cost: 7.4472,
-    country: "DE",
-  },
-  {
-    amount: 7,
-    cost: 0.147,
-    country: "PT",
-  },
-];
+import { getCountryData, TCountryCode } from "countries-list";
+import { useTranslation } from "react-i18next";
+import { capitalize } from "@/lib/utils";
 
 // Colors
 const COLORS = ["#309BF4", "#FEBE06"];
 
-// Country name mapping
-const COUNTRY_NAMES = {
-  DE: "Germany",
-  PT: "Portugal",
-};
-
 export default function CountryMessagesChart({
-  data = sampleData,
+  data,
 }: {
-  data?: { country: string; amount: number; cost: number }[];
+  data: { country: string; amount: number; cost: number }[];
 }) {
   const totalMessages = React.useMemo(() => {
     return data.reduce((acc, curr) => acc + curr.amount, 0);
   }, [data]);
+  const { t } = useTranslation();
 
   const totalCost = React.useMemo(() => {
     return data.reduce((acc, curr) => acc + curr.cost, 0).toFixed(2);
@@ -77,7 +61,7 @@ export default function CountryMessagesChart({
           dominantBaseline="central"
           className="text-sm"
         >
-          Messages
+          {capitalize(t("messages"))}
         </text>
       </g>
     );
@@ -86,18 +70,15 @@ export default function CountryMessagesChart({
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Country Messages</CardTitle>
-        <CardDescription>Message distribution by country</CardDescription>
+        <CardTitle>{t("pie_chart-title")}</CardTitle>
+        <CardDescription>{t("pie_chart-title_caption")}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0 h-[300px]">
         <div className="mx-auto aspect-square h-full max-w-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Tooltip
-                formatter={(value, name) => [
-                  `${value} messages`,
-                  COUNTRY_NAMES[name as keyof typeof COUNTRY_NAMES] || name,
-                ]}
+                formatter={(value, name) => [`${value} ${t("messages")}`, name]}
               />
               <Pie
                 data={data}
@@ -106,7 +87,8 @@ export default function CountryMessagesChart({
                 labelLine={false}
                 label={renderCustomLabel}
                 innerRadius={60}
-                outerRadius={100}
+                // outerRadius={100}
+                strokeWidth={1}
                 fill="#8884d8"
                 dataKey="amount"
                 nameKey="country"
@@ -127,16 +109,16 @@ export default function CountryMessagesChart({
         <div className="flex items-center gap-2 font-medium leading-none">
           {topCountry && (
             <>
-              {COUNTRY_NAMES[
-                topCountry.country as keyof typeof COUNTRY_NAMES
-              ] || topCountry.country}{" "}
-              leads with {topCountry.amount} messages
+              {t("pie_chart-leading_country", {
+                country: topCountry.country,
+                amount: topCountry.amount,
+              })}
               <TrendingUp className="h-4 w-4" />
             </>
           )}
         </div>
         <div className="leading-none text-muted-foreground">
-          Total cost: ${totalCost}
+          {t("pie_chart-total_cost")} ${totalCost}
         </div>
       </CardFooter>
     </Card>

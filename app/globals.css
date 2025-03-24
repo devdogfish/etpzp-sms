@@ -123,6 +123,9 @@ main {
   flex-direction: column; */
 }
 
+h1 {
+  @apply text-[40px] font-bold;
+}
 h2 {
   @apply text-xl font-bold;
 }
