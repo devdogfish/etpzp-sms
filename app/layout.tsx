@@ -10,14 +10,9 @@ import { LayoutProvider } from "@/contexts/use-layout";
 import { Toaster } from "sonner";
 import { fetchAmountIndicators } from "@/lib/db/general";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
+export const disketMonoRegular = localFont({
+  src: "./fonts/Disket-Mono-Bold.ttf",
+  variable: "--font-disket-mono-regular",
   weight: "100 900",
 });
 
@@ -54,7 +49,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen`}
+        className={`${disketMonoRegular.variable} ${disketMonoRegular.variable} antialiased flex flex-col h-screen`}
       >
         <NextThemesProvider
           attribute="class"

@@ -352,7 +352,14 @@ const NewMessageForm = React.memo(function ({
         onSubmit={handleSubmit}
         className="h-screen flex flex-col"
       >
-        <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
+        <div
+          className={cn(
+            "flex flex-col",
+            isFullscreen === true
+              ? "h-[calc(100vh-var(--simple-header-height))]"
+              : "h-[calc(100vh-var(--header-height))]"
+          )}
+        >
           <div className="flex flex-col px-4 mt-2">
             <div
               className={cn(

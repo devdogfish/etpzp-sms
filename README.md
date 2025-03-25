@@ -17,17 +17,14 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 # TODO
 ## In Progress
-- Create application Logo. Add meta data like tab image and title
+- Add meta data like tab image and title
 - Implement DNS
-- Do the welcome page (get inspired by Next.js) with a created by page
-- Create new layout and add a setting to reset it
-- 
 
 ### Admin dashboard
-- Ask for feedback
 - For the account dropdown, should I have the profile picture on the left or right, on the admin dashboard?
-- Check if admin dashboard statistics are all correct! There is a bug on the first text_card (I see a NaN)
+- Check if admin dashboard statistics are all correct!
 - Maybe add links to the GatewayApi sign in
+- IMPORTANT add synchronized time updating with value from area chart `<Select />`
 
 
 ### Latest Conversation

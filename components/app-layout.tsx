@@ -30,6 +30,7 @@ export default function AppLayout({
   const { theme } = useNextTheme();
   const { settings, syncWithDB, hasLanguageCookie } = useSettings();
   const onMobile = useIsMobile();
+  const { isFullscreen } = useLayout();
 
   useEffect(() => {
     if (isMounted) {
@@ -51,7 +52,8 @@ export default function AppLayout({
       baseColor={theme === "dark" ? "#2a2a2a" : undefined}
       highlightColor={theme === "dark" ? "#3a3a3a" : undefined}
     >
-      {settings.layout === "MODERN" && (
+      {/* Modern layout bar here */}
+      {settings.layout === "MODERN" && !isFullscreen && (
         <TranslationsProvider
           resources={resources}
           locale={locale}

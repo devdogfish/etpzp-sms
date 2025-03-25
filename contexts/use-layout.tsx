@@ -50,7 +50,7 @@ export function LayoutProvider({
   const [amountIndicators, setAmountIndicators] = useState(
     initialAmountIndicators
   );
-  // as simple state to keep track of whether the mobile nav panel is open
+  // Simple state to keep track of whether the mobile nav panel is open
   const [mobileNavPanel, setMobileNavPanel] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
