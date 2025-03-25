@@ -9,7 +9,10 @@
     --simple-header-height: 52px;
     /* header-height on the other hand is dynamic */
     --header-height: 52px;
+    --color-start: yellow; /* Starting color */
+    --color-end: orange; /* Ending color */
   }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 20 14.3% 4.1%;
@@ -147,6 +150,15 @@ h6 {
   box-sizing: border-box;
 }
 
+.gradient-text {
+  font-weight: bold; /* Make the text bold */
+  /* background: linear-gradient(135deg, var(--border), orange); /* Diagonal gradient */
+  background: linear-gradient(135deg, hsl(var(--primary)), yellow);
+  -webkit-background-clip: text; /* Clip the background to the text */
+  -webkit-text-fill-color: transparent; /* Make the text color transparent */
+  display: inline-block; /* Ensure the gradient applies correctly */
+}
+
 .user-select-none {
   user-select: none; /* Prevent text selection */
 }
@@ -168,7 +180,7 @@ h6 {
   justify-content: center;
 }
 .closeX:hover * {
-  color: var(--secondaryForeground);
+  color: var(--background);
 }
 
 .error-border-pulse {

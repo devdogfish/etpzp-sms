@@ -32,6 +32,16 @@ const nextConfig: NextConfig = {
   // Optional: override the default (1 year) `stale-while-revalidate`
   // header time for static pages
   // swrDelta: 3600 // seconds
+
+  // Add the ability to dynamically alter the props of local SVGs
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    });
+    return config;
+  },
+
 };
 
 export default nextConfig;

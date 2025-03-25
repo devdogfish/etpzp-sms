@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+// import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { dir } from "i18next";
@@ -16,10 +16,11 @@ export const disketMonoRegular = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
-  title: "SMS app",
-  description: "Created by me",
-};
+// I commented this out because it might be blocking other shits
+// export const metadata: Metadata = {
+//   title: "SMS app",
+//   description: "Created by me",
+// };
 
 export default async function RootLayout({
   children,

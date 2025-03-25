@@ -12,7 +12,13 @@ import { fetchMessages, fetchUsers } from "@/lib/db/dashboard";
 import { cn, getPercentageChange } from "@/lib/utils";
 import { DBMessage } from "@/types";
 import { format } from "date-fns";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: `${process.env.APP_NAME} - Admin dashboard`,
+  description: "Login in to ETPZP-SMS with your active directory account.",
+};
 
 export default async function Dashboard({
   params,
@@ -32,7 +38,6 @@ export default async function Dashboard({
   const messages = await fetchMessages();
   const users = await fetchUsers();
   const messageCounts = countMessages(messages || []);
-
 
   const res = await fetch(`${process.env.GATEWAYAPI_URL}/api/usage/labels`, {
     method: "POST",
