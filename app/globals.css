@@ -4,7 +4,10 @@
 
 @layer base {
   :root {
-    /* Custom variables */
+    /* Custom variables here */
+    /* --simple-header-height is a constant for the SIMPLE layout, used as a reference for other layouts. */
+    --simple-header-height: 52px;
+    /* header-height on the other hand is dynamic */
     --header-height: 52px;
   }
   :root {

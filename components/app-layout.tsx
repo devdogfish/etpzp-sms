@@ -7,8 +7,11 @@ import { SkeletonTheme } from "react-loading-skeleton";
 import { useLayout } from "@/contexts/use-layout";
 import { useEffect } from "react";
 import useIsMounted from "@/hooks/use-mounted";
-import useSettings from "@/hooks/use-settings";
+import { useSettings } from "@/contexts/use-settings";
 import TranslationsProvider from "@/contexts/translations-provider";
+import Logo from "./logo";
+import { useIsMobile } from "@/hooks/use-mobile";
+import Account from "./shared/account";
 
 type LayoutProps = Readonly<{
   children: React.ReactNode;
@@ -25,7 +28,8 @@ export default function AppLayout({
 }: LayoutProps) {
   const isMounted = useIsMounted();
   const { theme } = useNextTheme();
-  const { syncWithDB, hasLanguageCookie } = useSettings(locale);
+  const { settings, syncWithDB, hasLanguageCookie } = useSettings();
+  const onMobile = useIsMobile();
 
   useEffect(() => {
     if (isMounted) {
@@ -47,6 +51,23 @@ export default function AppLayout({
       baseColor={theme === "dark" ? "#2a2a2a" : undefined}
       highlightColor={theme === "dark" ? "#3a3a3a" : undefined}
     >
+      {settings.layout === "MODERN" && (
+        <TranslationsProvider
+          resources={resources}
+          locale={locale}
+          /* Currently account only needs navigation and common namespaces */
+          namespaces={["navigation", "common"]}
+        >
+          <div className="w-full min-h-[var(--simple-header-height)] flex justify-between items-center border-b px-2">
+            <div className="flex items-center gap-2">
+              <Logo isCollapsed={onMobile} />
+            </div>
+            <div className="">
+              <Account profilePicPosition="RIGHT" />
+            </div>
+          </div>
+        </TranslationsProvider>
+      )}
       <ResizablePanelWrapper>
         <TranslationsProvider
           /* Only wrap what's necessary with the TranslationsProvider */

@@ -12,6 +12,7 @@ import {
   useEffect,
 } from "react";
 import type { UpdateSettingResponse } from "@/types/action";
+import { useSettings } from "@/contexts/use-settings";
 
 export type RenderInputArgs = {
   value: string;
@@ -52,10 +53,10 @@ export function SettingItem({
   const [value, setValue] = useState<string>(initialValue);
   const [isPending, setIsPending] = useState<boolean>(false);
   const [serverState, setServerState] = useState(initialState);
+  const { setSettings } = useSettings();
 
   async function handleSubmit(e?: FormEvent, submittedValue?: string) {
     if (e) e.preventDefault();
-
     setIsPending(true);
 
     const formData = new FormData();
@@ -64,21 +65,25 @@ export function SettingItem({
 
     const result = await updateSetting(formData);
     setServerState(result);
-    console.log(result);
-
     if (onUpdate) onUpdate(value);
 
-    if (
-      name === "display_name" ||
-      name === "profile_color_id" ||
-      name === "appearance_layout"
-    ) {
-      console.log("updating localstorage...", );
-
+    // these are currently the settings that we store in localstorage as well as state
+    const stateSettingNames = [
+      "display_name",
+      "profile_color_id",
+      "appearance_layout",
+    ];
+    if (stateSettingNames.includes(name)) {
+      // 1. Update localstorage itself
       localStorage.setItem(name, result.data || initialValue);
 
-      // Dispatch a custom event to update other components that display settings stored in localstorage
-      window.dispatchEvent(new Event("settingsUpdated"));
+      // 2. Update state since localStorage changes don't trigger re-renders.
+      setSettings((prev) => ({
+        displayName: name === "display_name" ? result.data : prev.displayName,
+        profileColorId:
+          name === "profile_color_id" ? result.data : prev.profileColorId,
+        layout: name === "appearance_layout" ? result.data : prev.layout,
+      }));
     }
     setIsPending(false);
   }

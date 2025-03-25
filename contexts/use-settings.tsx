@@ -4,9 +4,25 @@ import { i18nConfig } from "@/i18n.config";
 import { fetchUserSettings } from "@/lib/db/general";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme as useNextTheme } from "next-themes";
-import { useLayout } from "@/contexts/use-layout";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { LayoutType } from "@/types/user";
+
+type SettingsState = {
+  displayName?: string;
+  profileColorId?: number;
+  layout?: LayoutType;
+};
 
 type SettingsContext = {
+  settings: SettingsState;
+  setSettings: Dispatch<SetStateAction<SettingsState>>;
   updateLanguageCookie: (newLocale: string) => void;
   normalizePath: (path: string) => string;
   hasLanguageCookie: () => boolean;
@@ -14,13 +30,31 @@ type SettingsContext = {
   resetLocalSettings: () => void;
 };
 
-// Helper functions for updating, reading, or deleting settings stored in cookies or localstorage.
-export default function useSettings(currentLocale: string): SettingsContext {
+const SettingsContext = createContext<SettingsContext | null>(null);
+
+export function SettingsProvider({
+  children,
+  currentLocale,
+}: {
+  children: Readonly<React.ReactNode>;
+  currentLocale: string;
+}) {
+  // Localstorage state without theme color (primary_color) and theme mode because those are handled internally by our packages
+  const [settings, setSettings] = useState<SettingsState>({
+    displayName: localStorage.getItem("display_name") || undefined,
+    profileColorId:
+      Number(localStorage.getItem("profile_color_id")) || undefined,
+    layout: "MODERN" as LayoutType,
+
+    //(localStorage.getItem(
+    //   "appearance_layout"
+    // ) as (typeof appearanceLayoutValues)[number]) ||
+  });
+
   const router = useRouter();
   const currentPathname = usePathname();
   const { setThemeColor } = useThemeContext();
   const { setTheme } = useNextTheme();
-  const { setLayoutType } = useLayout();
 
   // Helper function to normalize paths
   function normalizePath(path: string) {
@@ -91,13 +125,16 @@ export default function useSettings(currentLocale: string): SettingsContext {
       setTheme(dark_mode === true ? "dark" : "light"); // theme is stored as strings because we are using next-themes
       setThemeColor(primary_color_id);
       localStorage.setItem("appearance_layout", appearance_layout);
-      setLayoutType(appearance_layout);
 
       // Language - this comes last because it will refresh the page, which might cause issues
       updateLanguageCookie(lang);
 
-      // dispatch event so that components which use settings data get updated
-      window.dispatchEvent(new Event("settingsUpdated"));
+      // Update components when localstorage settings change
+      setSettings({
+        displayName: display_name,
+        profileColorId: profile_color_id,
+        layout: appearance_layout,
+      });
     } else {
       console.log(
         "An error during the settings fetch from the database occurred."
@@ -112,11 +149,49 @@ export default function useSettings(currentLocale: string): SettingsContext {
     updateLanguageCookie(i18nConfig.defaultLocale);
   };
 
-  return {
-    updateLanguageCookie,
-    normalizePath,
-    hasLanguageCookie,
-    syncWithDB,
-    resetLocalSettings,
-  };
+  useEffect(() => {
+    const referenceHeaderHeight = parseInt(
+      getComputedStyle(document.documentElement).getPropertyValue(
+        "--simple-header-height"
+      ),
+      10 // base 10 integer
+    );
+    if (settings.layout === "MODERN") {
+      console.log("css property value", referenceHeaderHeight);
+
+      document.documentElement.style.setProperty(
+        "--header-height",
+        `${referenceHeaderHeight * 2}px`
+      );
+    } else if (settings.layout === "SIMPLE") {
+      document.documentElement.style.setProperty(
+        "--header-height",
+        `${referenceHeaderHeight}px`
+      );
+    }
+    console.log("settings state updated", settings);
+  }, [settings.layout]);
+  return (
+    <SettingsContext.Provider
+      value={{
+        settings,
+        setSettings,
+        updateLanguageCookie,
+        normalizePath,
+        hasLanguageCookie,
+        syncWithDB,
+        resetLocalSettings,
+      }}
+    >
+      {children}
+    </SettingsContext.Provider>
+  );
+}
+
+export function useSettings() {
+  const context = useContext(SettingsContext);
+  if (!context) {
+    throw new Error("SettingsContext must be within SettingsProvider");
+  }
+  return context;
 }

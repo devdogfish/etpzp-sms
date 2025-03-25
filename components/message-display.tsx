@@ -166,7 +166,7 @@ function MessageDisplay({
         />
       )}
       {/* Begin top bar with action buttons */}
-      <div className="flex items-center p-2 h-[var(--header-height)] border-b">
+      <div className="flex items-center p-2 h-[var(--simple-header-height)] border-b">
         <div className="flex items-center gap-2">
           {onMobile && (
             <Tooltip>
@@ -319,7 +319,7 @@ function MessageDisplay({
       {/* <Separator /> */}
       {/* Begin message content */}
       <ScrollArea>
-        <div className="flex flex-col h-[calc(100vh-52px)]">
+        <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
           {message ? (
             <div className="flex flex-1 flex-col">
               <div className="flex justify-between p-4">

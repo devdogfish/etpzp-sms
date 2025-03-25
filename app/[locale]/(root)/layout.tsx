@@ -1,5 +1,6 @@
 import initTranslations from "@/app/i18n";
 import AppLayout from "@/components/app-layout";
+import { SettingsProvider } from "@/contexts/use-settings";
 
 type LayoutProps = Readonly<{
   children: React.ReactNode;
@@ -16,13 +17,15 @@ export default async function NavPanelLayout({
   const { resources } = await initTranslations(locale, i18nNamespaces);
 
   return (
-    <AppLayout
-      /* This is a client layout component containing the translation provider for the nav panel */
-      resources={resources}
-      locale={locale}
-      namespaces={i18nNamespaces}
-    >
-      {children}
-    </AppLayout>
+    <SettingsProvider currentLocale={locale}>
+      <AppLayout
+        /* This is a client layout component containing the translation provider for the nav panel */
+        resources={resources}
+        locale={locale}
+        namespaces={i18nNamespaces}
+      >
+        {children}
+      </AppLayout>
+    </SettingsProvider>
   );
 }

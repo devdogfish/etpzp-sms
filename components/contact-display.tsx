@@ -65,7 +65,7 @@ export default function ContactDisplay({
   return (
     <div className={cn("flex h-full flex-col")}>
       {contact && <EditContactModal contact={contact} />}
-      <div className="flex items-center p-2 h-[var(--header-height)] border-b">
+      <div className="flex items-center p-2 h-[var(--simple-header-height)] border-b">
         <div className="flex items-center gap-2">
           {onMobile && (
             <Tooltip>

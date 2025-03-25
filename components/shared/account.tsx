@@ -16,26 +16,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { LogOut, MonitorCog, Settings, UserRoundPen } from "lucide-react";
-import useSettings from "@/hooks/use-settings";
+import { useSettings } from "@/contexts/use-settings";
 import { logout } from "@/lib/auth";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function Account({
   hideNameRole = false,
   profilePicPosition = "LEFT",
+  className,
 }: {
   hideNameRole?: boolean;
   profilePicPosition?: "LEFT" | "RIGHT";
+  className?: string;
 }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { session, loading } = useSession();
-  const [{ displayName, colorId }, setSettings] = useState({
-    displayName: localStorage.getItem("display_name") || undefined,
-    colorId: Number(localStorage.getItem("profile_color_id")) || undefined,
-  });
+
   const pathname = usePathname();
   const router = useRouter();
-  const { resetLocalSettings } = useSettings(i18n.language);
+  const { settings, resetLocalSettings } = useSettings();
   const onMobile = useIsMobile();
 
   const handleLogout = async () => {
@@ -48,8 +47,9 @@ export default function Account({
   return (
     <div
       className={cn(
-        "flex h-[var(--header-height)] border-b items-center justify-center",
-        !hideNameRole && "px-2"
+        "flex h-[var(--header-header-height)] items-center justify-center", //border-b
+        // !hideNameRole && "px-2"
+        className
       )}
     >
       <DropdownMenu>
@@ -62,15 +62,18 @@ export default function Account({
         >
           <ProfilePic
             size={9}
-            name={displayName}
-            colorId={colorId}
+            name={settings.displayName}
+            colorId={settings.profileColorId}
             loading={loading}
           />
           <div
-            className={cn("flex flex-col items-start", hideNameRole && "hidden")}
+            className={cn(
+              "flex flex-col items-start",
+              hideNameRole && "hidden"
+            )}
           >
             <p className="font-semibold mb-[-3px]">
-              {displayName || t("common:account-no_name")}
+              {settings.displayName || t("common:account-no_name")}
             </p>
             <span className="text-xs text-muted-foreground">
               {session?.isAdmin ? t("common:admin") : t("common:user")}

@@ -19,7 +19,7 @@ import { ActionResponse } from "@/types/action";
 import { Login } from "@/lib/auth/config";
 import SubmitButton from "./shared/submit-button";
 import { Eye, Router } from "lucide-react";
-import useSettings from "@/hooks/use-settings";
+import { useSettings } from "@/contexts/use-settings";
 import { useTranslation } from "react-i18next";
 import { toastActionResult } from "@/lib/utils";
 
@@ -31,7 +31,7 @@ export default function LoginForm() {
   const { i18n } = useTranslation();
   const [passInputType, setPassInputType] = useState("password");
   const [serverState, setServerState] = useState(initialState);
-  const { syncWithDB } = useSettings(i18n.language);
+  const { syncWithDB } = useSettings();
   const router = useRouter();
   const { t } = useTranslation(["login-page", "common"]);
 

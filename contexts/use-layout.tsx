@@ -2,7 +2,6 @@
 
 import { fetchAmountIndicators } from "@/lib/db/general";
 import { AmountIndicators } from "@/types";
-import { appearanceLayoutValues, LayoutType } from "@/types/user";
 import {
   createContext,
   Dispatch,
@@ -29,9 +28,6 @@ type LayoutContextType = {
   setIsFullscreen: Dispatch<SetStateAction<boolean>>;
 
   refetchAmountIndicators: () => void;
-
-  layoutType: LayoutType;
-  setLayoutType: Dispatch<SetStateAction<LayoutType>>;
 };
 
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
@@ -57,12 +53,6 @@ export function LayoutProvider({
   // as simple state to keep track of whether the mobile nav panel is open
   const [mobileNavPanel, setMobileNavPanel] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [layoutType, setLayoutType] = useState<LayoutType>(
-    //(localStorage.getItem(
-    //   "appearance_layout"
-    // ) as (typeof appearanceLayoutValues)[number]) ||
-    "MODERN"
-  );
 
   const refetchAmountIndicators = async () => {
     const amountIndicators = await fetchAmountIndicators();
@@ -71,10 +61,10 @@ export function LayoutProvider({
       setAmountIndicators(amountIndicators);
     }
   };
+
   useEffect(() => {
     setAmountIndicators(initialAmountIndicators);
   }, [initialAmountIndicators]);
-
   return (
     <LayoutContext.Provider
       value={{
@@ -89,8 +79,6 @@ export function LayoutProvider({
         isFullscreen,
         setIsFullscreen,
         refetchAmountIndicators,
-        layoutType,
-        setLayoutType,
       }}
     >
       {children}

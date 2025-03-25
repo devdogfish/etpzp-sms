@@ -49,9 +49,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import useSettings from "@/hooks/use-settings";
+import { useSettings } from "@/contexts/use-settings";
 import Account from "./shared/account";
 import Image from "next/image";
+import Logo from "./logo";
 
 export default function NavPanel() {
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout, isFullscreen } =
@@ -138,11 +139,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   const { amountIndicators } = useLayout();
   const router = useRouter();
   const { session, loading } = useSession();
-  const [{ displayName, colorId }, setSettings] = useState({
-    displayName: localStorage.getItem("display_name") || undefined,
-    colorId: Number(localStorage.getItem("profile_color_id")) || undefined,
-  });
-  const { resetLocalSettings } = useSettings(i18n.language);
+  const { settings, resetLocalSettings } = useSettings();
 
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   const showAlertDialog = () => {
@@ -158,43 +155,20 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
     }
   };
 
-  // Update components when localstorage settings change
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const storedProfileColorId =
-        Number(localStorage.getItem("profile_color_id")) || undefined;
-      setSettings({
-        displayName: localStorage.getItem("display_name") || undefined,
-        colorId: storedProfileColorId,
-      });
-    };
-
-    // Listen for our custom event settings update event
-    window.addEventListener("settingsUpdated", handleStorageChange);
-
-    // Cleanup the event listener on component unmount
-    return () => {
-      window.removeEventListener("settingsUpdated", handleStorageChange);
-    };
-  }, []);
   return (
     <>
-      {/* <Account hideNameRole={isCollapsed} /> */}
-      <div
-        className={cn(
-          "h-[var(--header-height)] border-b flex items-center gap-2",
-          !isCollapsed && "px-2",
-          isCollapsed && "justify-center"
-        )}
-      >
-        <Image
-          src="/etpzp_sms-logo.png"
-          alt="Application logo"
-          width={48}
-          height={48}
-        />
-        {!isCollapsed && <h2>ETPZP SMS</h2>}
-      </div>
+      {settings.layout === "SIMPLE" && (
+        <div
+          className={cn(
+            "h-[var(--header-height)] border-b flex items-center gap-2",
+            !isCollapsed && "px-2",
+            isCollapsed && "justify-center"
+          )}
+        >
+          <Logo isCollapsed={isCollapsed} />
+        </div>
+      )}
+
       {/* <Separator /> */}
       <NavLinks
         isCollapsed={isCollapsed}
@@ -218,14 +192,15 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
       /* Maybe we need a fixed height here, but if everything works, all good. */
       >
         <div
+          className="flex flex-col"
           // In tailwind, this doesn't work, and I don't know why
           style={{
-            height: `calc(100vh - var(--header-height) - 56px${
+            // 56 is the new-message button
+            height: `calc(100vh - var(--simple-header-height) - 56px${
               isCollapsed ? " - 8px" : ""
             })`,
             width: "100%",
           }}
-          className="flex flex-col"
         >
           <div className="grow">
             <NavLinks
@@ -318,42 +293,50 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
           </div>
 
           <Separator />
-          <div className="shrink h-[var(--header-height)] flex flex-col justify-center">
-            <NavLinks
-              isCollapsed={isCollapsed}
-              links={[
-                {
-                  title: t("log_out"),
-                  label: "",
-                  icon: LogOut,
-                  variant: "ghost",
-                  action: showAlertDialog,
-                },
-              ]}
-            />
+          <div className="shrink h-[var(--simple-header-height)] flex flex-col justify-center">
+            {settings.layout === "SIMPLE" ? (
+              <Account hideNameRole={isCollapsed} className="px-2" />
+            ) : (
+              <>
+                <NavLinks
+                  isCollapsed={isCollapsed}
+                  links={[
+                    {
+                      title: t("log_out"),
+                      label: "",
+                      icon: LogOut,
+                      variant: "ghost",
+                      action: showAlertDialog,
+                    },
+                  ]}
+                />
 
-            {/* "Confirm Logout" dialog */}
-            <AlertDialog
-              open={confirmLogoutOpen}
-              onOpenChange={setConfirmLogoutOpen}
-            >
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    {t("modals:logout-header")}
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {t("modals:logout-header_caption")}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>{t("common:cancel")}</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleLogout}>
-                    {t("common:continue")}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                {/* "Confirm Logout" dialog */}
+                <AlertDialog
+                  open={confirmLogoutOpen}
+                  onOpenChange={setConfirmLogoutOpen}
+                >
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        {t("modals:logout-header")}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t("modals:logout-header_caption")}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>
+                        {t("common:cancel")}
+                      </AlertDialogCancel>
+                      <AlertDialogAction onClick={handleLogout}>
+                        {t("common:continue")}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
+            )}
           </div>
         </div>
       </ScrollArea>
