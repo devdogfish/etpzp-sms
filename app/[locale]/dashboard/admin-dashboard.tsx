@@ -11,19 +11,15 @@ import { useSettings } from "@/contexts/use-settings";
 import { cn, extractFirstWord, getPercentageChange } from "@/lib/utils";
 import { DBMessage } from "@/types";
 import { DBUser } from "@/types/user";
-import { Metadata } from "next";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CountryStat } from "./page";
+import { LightDBMessage } from "@/types/dashboard";
 
 export type TimeRange = {
   from: Date;
   to: Date;
-};
-export const metadata: Metadata = {
-  title: `${process.env.APP_NAME} - Admin dashboard`,
-  description: "Login in to ETPZP-SMS with your active directory account.",
 };
 
 export default function AdminDashboard({
@@ -31,7 +27,7 @@ export default function AdminDashboard({
   users,
   countryStats,
 }: {
-  messages: DBMessage[];
+  messages: LightDBMessage[];
   users: DBUser[];
   countryStats: CountryStat[];
 }) {
@@ -39,10 +35,6 @@ export default function AdminDashboard({
   const { t } = useTranslation(["dashboard-page", "errors", "common"]);
   const messageCounts = countMessages(messages);
   const { settings } = useSettings();
-  const [timeRange, setTimeRange] = useState<TimeRange>({
-    from: new Date("2025-01-01"),
-    to: new Date(),
-  });
 
   return (
     <div className="flex flex-col">
@@ -189,7 +181,7 @@ function TextCard({
   );
 }
 
-function countMessages(messages: DBMessage[]) {
+function countMessages(messages: LightDBMessage[]) {
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterdayStart = new Date(todayStart);

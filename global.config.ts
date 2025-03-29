@@ -1,7 +1,9 @@
 import { MessageState } from "./contexts/use-new-message";
 
 export const PORTUGUESE_DATE_FORMAT = "dd/MM/yyyy HH:mm";
+export const PORTUGUESE_DATE_FORMAT_NO_TIME = "dd/MM/yyyy";
 export const ISO8601_DATE_FORMAT = "yyyy-MM-dd";
+export const DEFAULT_START_DATE = "2025-01-01";
 
 export const EMPTY_MESSAGE: MessageState = {
   sender: "ETPZP",

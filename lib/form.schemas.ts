@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { appearanceLayoutValues } from "@/types/user";
+import { parseISO, isValid } from "date-fns";
 
 const CustomString = (options?: { message: string }) => {
   return z.string({
@@ -111,3 +112,20 @@ export const UpdateSettingSchema = z.discriminatedUnion("name", [
     }, z.boolean({ invalid_type_error: "Dark mode must be a boolean value" })),
   }),
 ]);
+
+// Admin dashboard page schemas
+export const zodISODate = z.string().refine(
+  (date) => {
+    // Check if the date is a valid ISO 8601 date string
+    const parsedDate = parseISO(date);
+    return isValid(parsedDate);
+  },
+  {
+    message: "Invalid date format. Expected ISO 8601 format.",
+  }
+);
+
+export const DateRangeSchema = z.object({
+  startDate: zodISODate.optional(),
+  endDate: zodISODate.optional(),
+});

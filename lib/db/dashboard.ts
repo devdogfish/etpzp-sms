@@ -1,30 +1,42 @@
 import { getSession } from "../auth/sessions";
 import db from ".";
-import { DBMessage } from "@/types";
 import { DBUser } from "@/types/user";
 import { format } from "date-fns";
 import { CountryStat } from "@/app/[locale]/dashboard/page";
 import { ISO8601_DATE_FORMAT as API_DATE_FORMAT } from "@/global.config";
+import { LightDBMessage } from "@/types/dashboard";
+import { DateRangeSchema } from "../form.schemas";
 
-export async function fetchMessages() {
+export async function fetchMessagesInDateRange(input: {
+  startDate: string;
+  endDate: string;
+}) {
   const session = await getSession();
 
   console.log(`Fetching sent messages...`);
   try {
-    if (!session?.isAdmin) throw new Error("User is not an admin.");
+    if (!session?.isAdmin || !session?.isAuthenticated)
+      throw new Error("User is not an admin or not authenticated.");
+
+    // Validate input using Zod
+    const validatedDates = DateRangeSchema.parse(input);
+    const { startDate, endDate } = validatedDates;
+    console.log("validatedDates", validatedDates);
+
     const result = await db(
       `
-          SELECT * FROM message m
+          SELECT id, user_id, send_time, cost FROM message m
           WHERE 
             m.in_trash = false AND 
-            m.status NOT IN ('FAILED', 'DRAFTED')
-            -- m.send_time ${"PAST" === "PAST" ? "<=" : ">"} NOW() 
-          GROUP BY m.id
-          ORDER BY m.send_time ASC;
-        `
+            m.status NOT IN ('FAILED', 'DRAFTED') AND
+            m.send_time BETWEEN $1 AND $2
+          ORDER BY send_time ASC;
+        `,
+      [startDate, endDate]
     );
+    console.log("Light messages: ", result.rows.slice(0, 20));
 
-    return result.rows as DBMessage[];
+    return result.rows as LightDBMessage[];
   } catch (error) {}
 }
 
@@ -41,8 +53,8 @@ export async function fetchUsers() {
 }
 
 export async function fetchCountryStats(input: {
-  startDate: string | undefined;
-  endDate: string | undefined;
+  startDate: string;
+  endDate: string;
 }): Promise<CountryStat[] | undefined> {
   if (!input.startDate) return undefined;
   try {

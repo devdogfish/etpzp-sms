@@ -14,8 +14,6 @@ import {
 } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
 import { capitalize } from "@/lib/utils";
-import { TimeRange } from "@/app/[locale]/dashboard/admin-dashboard";
-import { format } from "date-fns";
 import { CountryStat } from "@/app/[locale]/dashboard/page";
 
 const COLORS = ["#309BF4", "#FEBE06"];

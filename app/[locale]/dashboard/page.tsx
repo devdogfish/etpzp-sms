@@ -1,11 +1,12 @@
 import {
   fetchCountryStats,
-  fetchMessages,
+  fetchMessagesInDateRange,
   fetchUsers,
 } from "@/lib/db/dashboard";
 import { format } from "date-fns";
 import { Metadata } from "next";
 import AdminDashboard from "./admin-dashboard";
+import { DEFAULT_START_DATE, ISO8601_DATE_FORMAT } from "@/global.config";
 
 export type CountryStat = { country: string; amount: number; cost: number };
 export const metadata: Metadata = {
@@ -22,14 +23,15 @@ export default async function Dashboard({
     end_date?: string;
   }>;
 }) {
-  const _searchParams = await searchParams;
-  const messages = await fetchMessages();
+  const s = await searchParams;
+  const dateRange = {
+    startDate: s?.start_date || format(DEFAULT_START_DATE, ISO8601_DATE_FORMAT),
+    endDate: s?.end_date || format(new Date(), ISO8601_DATE_FORMAT),
+  };
+  const messages = await fetchMessagesInDateRange(dateRange);
   const users = await fetchUsers();
-  const countryData = await fetchCountryStats({
-    startDate: _searchParams?.start_date,
-    endDate: _searchParams?.end_date,
-  });
-  console.log("re-rendered Dashboard server!!", _searchParams);
+  const countryData = await fetchCountryStats(dateRange);
+  console.log("re-rendered Dashboard server!!", s);
 
   return (
     <AdminDashboard

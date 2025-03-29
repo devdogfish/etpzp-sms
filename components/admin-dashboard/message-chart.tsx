@@ -25,30 +25,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format, subDays } from "date-fns";
+import { format, parseISO, subDays } from "date-fns";
 import { capitalize, getDateFnsLocale } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { DBMessage } from "@/types";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ISO8601_DATE_FORMAT } from "@/global.config";
+import {
+  DEFAULT_START_DATE,
+  ISO8601_DATE_FORMAT,
+  PORTUGUESE_DATE_FORMAT_NO_TIME,
+} from "@/global.config";
+import { LightDBMessage } from "@/types/dashboard";
+import { zodISODate } from "@/lib/form.schemas";
 
 const chartColors = ["#309BF4", "#FEBE06", "#25A544", "#0279FE"];
-const ALL_TIME_DATE = "2025-01-01";
 
 export default function MessageHistoryChart({
   messages,
 }: {
-  messages: DBMessage[];
+  messages: LightDBMessage[];
 }) {
   const now = new Date();
-  const { i18n, t } = useTranslation();
+  const { i18n, t } = useTranslation(["dashboard-page"]);
   const data = toChartData(messages);
   const router = useRouter();
   const pathname = usePathname();
-  const { replace } = useRouter();
   const searchParams = useSearchParams();
-  const startDateString = searchParams.get("start_date");
-  const selectValues = [
+  // This should get updated by re-renders, if not, turn it into a useState that gets set by a useEffect
+  const selectedStartDate = {
+    ISO_date: searchParams.get("start_date"),
+    isValid: zodISODate.safeParse(searchParams.get("start_date")).success,
+  };
+
+  function toISO(date: Date) {
+    return format(date, ISO8601_DATE_FORMAT);
+  }
+  const selectItems = [
     {
       label: t("area_chart-week"),
       date: subDays(now, 7), // Subtract 7 days
@@ -63,57 +74,44 @@ export default function MessageHistoryChart({
     },
     {
       label: t("area_chart-all_time"),
-      date: new Date(ALL_TIME_DATE),
+      date: new Date(DEFAULT_START_DATE),
     },
   ];
 
   const chartConfig = {
     amount: {
       label: capitalize(t("messages")),
+      // color: "hsl(var(--chart-1))", // TODO: Learn how to customize colors
     },
     price: {
       label: t("area_chart-price"),
+      // color: "hsl(var(--chart-2))", // TODO: Learn how to customize colors
     },
   } satisfies ChartConfig;
-  const filteredData = useMemo(() => {
-    const now = new Date(); // Ensure 'now' is defined
-    const startDate = startDateString
-      ? new Date(startDateString)
-      : new Date(ALL_TIME_DATE); // Default to all time if not defined
-
-    return data.filter((item) => {
-      const messageDate = new Date(item.date);
-
-      return (
-        messageDate >= startDate && messageDate <= now // Check if messageDate is between startDate and now
-      );
-    });
-  }, [data, startDateString]);
-
-  useEffect(() => {
-    console.log("startDate changed successfullY!", startDateString);
-  }, [startDateString]);
 
   return (
     <Card>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1 text-center sm:text-left">
-          <CardTitle>{t("area_chart-title")} ({filteredData.length})</CardTitle>
+          <CardTitle>
+            {t("area_chart-title")} ({data.length})
+          </CardTitle>
           <CardDescription>{t("area_chart-title_caption")}</CardDescription>
         </div>
         <Select
-          defaultValue={
-            searchParams.get("start_date") ||
-            format(ALL_TIME_DATE, ISO8601_DATE_FORMAT)
-          }
+          defaultValue={searchParams.get("start_date") || DEFAULT_START_DATE}
           onValueChange={(value) => {
             const params = new URLSearchParams(searchParams);
+
             if (value) {
               params.set("start_date", value);
             } else {
               params.delete("start_date");
             }
-            replace(`${pathname}?${params.toString()}`, { scroll: false });
+            if (params.has("end_date")) params.delete("end_date");
+            router.replace(`${pathname}?${params.toString()}`, {
+              scroll: false, // persist current scroll for better ux
+            });
           }}
         >
           <SelectTrigger
@@ -123,15 +121,32 @@ export default function MessageHistoryChart({
             <SelectValue placeholder={t("area_chart-3_months")} />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            {selectValues.map((item) => (
+            {selectItems.map((item) => (
               <SelectItem
-                key={item.date.getDate()}
-                value={format(item.date, ISO8601_DATE_FORMAT)}
+                key={item.date.getTime()}
+                value={toISO(item.date)}
                 className="rounded-lg"
               >
                 {item.label}
               </SelectItem>
             ))}
+            {selectedStartDate.ISO_date &&
+              !selectItems.some(
+                (item) => toISO(item.date) === selectedStartDate.ISO_date
+              ) && (
+                <SelectItem
+                  value={selectedStartDate.ISO_date}
+                  disabled
+                  className="rounded-lg"
+                >
+                  {selectedStartDate.isValid
+                    ? format(
+                        new Date(selectedStartDate.ISO_date),
+                        PORTUGUESE_DATE_FORMAT_NO_TIME
+                      )
+                    : selectedStartDate.ISO_date}
+                </SelectItem>
+              )}
           </SelectContent>
         </Select>
       </CardHeader>
@@ -141,7 +156,7 @@ export default function MessageHistoryChart({
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"
         >
-          <AreaChart data={filteredData}>
+          <AreaChart data={data}>
             <defs>
               <linearGradient id="fillPrice" x1="0" y1="0" x2="0" y2="1">
                 <stop
@@ -185,10 +200,14 @@ export default function MessageHistoryChart({
               cursor={false}
               content={
                 <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    return format(new Date(value), "MMM d, yyyy", {
-                      locale: getDateFnsLocale(i18n.language),
-                    });
+                  labelFormatter={(dateString: string) => {
+                    // The error we were having is that between state updates and re-renders, sometimes the label date was not a valid date, so we need to handle the date formatting gracefully to prevent a thrown error from format
+                    const parsedDate = parseISO(dateString);
+                    return isNaN(parsedDate.getTime()) // check if the date is valid before trying to format it
+                      ? t("invalid_date")
+                      : format(parsedDate, "MMM d, yyyy", {
+                          locale: getDateFnsLocale(i18n.language),
+                        });
                   }}
                   indicator="dot"
                 />
@@ -217,7 +236,7 @@ export default function MessageHistoryChart({
 }
 
 const toChartData = (
-  messages: DBMessage[]
+  messages: LightDBMessage[]
 ): { date: string; price: number; amount: number }[] => {
   const chartDataMap: {
     [key: string]: { totalCost: number; messageCount: number };

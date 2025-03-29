@@ -24,25 +24,23 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Admin dashboard
 - For the account dropdown, should I have the profile picture on the left or right, on the admin dashboard?
-- Check if admin dashboard statistics are all correct!
-- Maybe add links to the GatewayApi sign in
-- IMPORTANT add synchronized time updating with value from area chart `<Select />`
-  - Update database query to take the searchParams as params
-  - Make the Users table be accurate
-  - Add error handling for charts
-  - maybe add an end_time field for more precise filtering
+- Add error handling for charts
+
 
 ### Project Regrets
 - No uniform way to name functions or rules for type names
 - No snippets for repeatable code
+- Using safeParse instead of parse with zod causing error handling code to live in the try block which doesn't adhere to separation of concerns
+- Not having clear/consistent naming conventions for schemas, and especially types 
 
 ### Latest Conversation
-- For Domain name, we will use a dynamic IP service called No-IP. This is a program that you need to run on the server which will open a connection to their server. Their server will accept requests on that domain name, and will redirect that traffic to my server. Since the connection is established from inside to outside of our network, it won't require any router traffic forwarding.
+- For Domain name, we will use a dynamic IP service called No-IP. This is a program that you need to run on the server which will open a connection to their server. Their server will accept requests on that domain name, and will redirect that traffic to my server.
 
 ## Low Priority
 - Medium Priority: Maybe add links to a the item you just modified/created in the success toast messages, so that the user can easily view more details
 - Test the app for bugs
 - Maybe add some shades of blue between the different columns, to show a hierarchy
+- Maybe add links to the GatewayApi sign in to admin dashboard cards
 - Consider adding some contact information to the message item in the list
 - Maybe add the possibility to upload images for the contact
 - Make sure you don't pass in undefined values into the database, you should always convert them to `null` instead

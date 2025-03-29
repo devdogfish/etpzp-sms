@@ -7,20 +7,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { DBUser } from "@/types/user";
 import { DBMessage } from "@/types";
 import ProfilePic from "../profile-pic";
 import { useTranslation } from "react-i18next";
+import { useMemo } from "react";
+import { LightDBMessage } from "@/types/dashboard";
 
 export default function UserRanking({
   users,
   messages,
 }: {
   users: DBUser[];
-  messages: DBMessage[];
+  messages: LightDBMessage[];
 }) {
   const { t } = useTranslation();
+  const usersWithMessageCounts = useMemo(() => {
+    return users
+      .map((user) => ({
+        ...user,
+        messageCount: messages.filter((m) => m.user_id === user.id).length,
+      }))
+      .sort((a, b) => b.messageCount - a.messageCount);
+  }, [users, messages]);
+
   return (
     <Card className="h-full">
       <CardHeader>
@@ -31,39 +41,32 @@ export default function UserRanking({
         <div className="max-h-[300px] overflow-auto">
           <table className="w-full">
             <tbody>
-              {users
-                .map((user) => ({
-                  ...user,
-                  messageCount: messages.filter((m) => m.user_id === user.id)
-                    .length,
-                }))
-                .sort((a, b) => b.messageCount - a.messageCount)
-                .map((user, index) => (
-                  <tr key={user.id || index} className="text-left">
-                    <td className="w-1/12 p-2">
-                      {/* First column for index */}
-                      <p>{index + 1}.</p>
-                    </td>
-                    <td className="w-1/12 p-2">
-                      {/* Second column for profile picture */}
-                      <ProfilePic name={user.name} />
-                    </td>
-                    <td className="p-2">
-                      {/* Last column for user details */}
-                      <div className="flex flex-col">
-                        <p className="text-sm font-medium leading-none">
-                          {user.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="w-1/12 p-2 text-sm font-semibold">
-                      {messages.filter((m) => m.user_id == user.id).length}
-                    </td>
-                  </tr>
-                ))}
+              {usersWithMessageCounts.map((user, index) => (
+                <tr key={user.id || index} className="text-left">
+                  <td className="w-1/12 p-2">
+                    {/* First column for index */}
+                    <p>{index + 1}.</p>
+                  </td>
+                  <td className="w-1/12 p-2">
+                    {/* Second column for profile picture */}
+                    <ProfilePic name={user.name} />
+                  </td>
+                  <td className="p-2">
+                    {/* Last column for user details */}
+                    <div className="flex flex-col">
+                      <p className="text-sm font-medium leading-none">
+                        {user.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </td>
+                  <td className="w-1/12 p-2 text-sm font-semibold">
+                    {messages.filter((m) => m.user_id == user.id).length}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
