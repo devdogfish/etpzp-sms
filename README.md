@@ -20,12 +20,21 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Add meta data like tab image and title
 - Implement DNS
 - Figure out why I get layout shift between welcome page and other pages
+- Fix colors for dark mode
 
 ### Admin dashboard
 - For the account dropdown, should I have the profile picture on the left or right, on the admin dashboard?
 - Check if admin dashboard statistics are all correct!
 - Maybe add links to the GatewayApi sign in
 - IMPORTANT add synchronized time updating with value from area chart `<Select />`
+  - Update database query to take the searchParams as params
+  - Make the Users table be accurate
+  - Add error handling for charts
+  - maybe add an end_time field for more precise filtering
+
+### Project Regrets
+- No uniform way to name functions or rules for type names
+- No snippets for repeatable code
 
 ### Latest Conversation
 - For Domain name, we will use a dynamic IP service called No-IP. This is a program that you need to run on the server which will open a connection to their server. Their server will accept requests on that domain name, and will redirect that traffic to my server. Since the connection is established from inside to outside of our network, it won't require any router traffic forwarding.
@@ -53,6 +62,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 Deleting all tables
 ```sql
 DROP TABLE IF EXISTS recipient, contact, message, public.user;
+```
+Simple messages query
+```sql
+SELECT COUNT(*) FROM message WHERE send_time >= CURRENT_DATE - INTERVAL '1 months' AND in_trash = false AND status NOT IN ('FAILED', 'DRAFTED');
 ```
 ### On MacOS/UNIX based system:
 Seed the database

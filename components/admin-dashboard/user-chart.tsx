@@ -22,7 +22,7 @@ export default function UserRanking({
 }) {
   const { t } = useTranslation();
   return (
-    <Card className="">
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>{t("users_table-title")}</CardTitle>
         <CardDescription>{t("users_table-title_caption")}</CardDescription>

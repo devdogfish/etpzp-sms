@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState, useEffect, useMemo } from "react";
 import { TrendingUp } from "lucide-react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
@@ -14,26 +14,28 @@ import {
 } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
 import { capitalize } from "@/lib/utils";
+import { TimeRange } from "@/app/[locale]/dashboard/admin-dashboard";
+import { format } from "date-fns";
+import { CountryStat } from "@/app/[locale]/dashboard/page";
 
-// Colors
 const COLORS = ["#309BF4", "#FEBE06"];
 
 export default function CountryMessagesChart({
   data,
 }: {
-  data: { country: string; amount: number; cost: number }[];
+  data: CountryStat[];
 }) {
-  const totalMessages = React.useMemo(() => {
+  const totalMessages = useMemo(() => {
     return data.reduce((acc, curr) => acc + curr.amount, 0);
   }, [data]);
   const { t } = useTranslation();
 
-  const totalCost = React.useMemo(() => {
+  const totalCost = useMemo(() => {
     return data.reduce((acc, curr) => acc + curr.cost, 0).toFixed(2);
   }, [data]);
 
   // Find the country with the most messages
-  const topCountry = React.useMemo(() => {
+  const topCountry = useMemo(() => {
     if (data.length === 0) return null;
     return data.reduce((max, curr) => (max.amount > curr.amount ? max : curr));
   }, [data]);
@@ -67,7 +69,7 @@ export default function CountryMessagesChart({
   };
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col min-h-[400px]">
       <CardHeader className="items-center pb-0">
         <CardTitle>{t("pie_chart-title")}</CardTitle>
         <CardDescription>{t("pie_chart-title_caption")}</CardDescription>

@@ -305,3 +305,10 @@ export function getPercentageChange(newValue: number, oldValue: number) {
   }
   return Math.floor(((newValue - oldValue) / oldValue) * 100);
 }
+
+export function extractFirstWord(sentence: string) {
+  // Split the sentence into words
+  const words = sentence.split(" ");
+  // Return the first word if it exists, otherwise return null
+  return words.length > 0 ? words[0] : null;
+}

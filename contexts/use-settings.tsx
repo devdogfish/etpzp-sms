@@ -149,6 +149,7 @@ export function SettingsProvider({
     updateLanguageCookie(i18nConfig.defaultLocale);
   };
 
+  // This will also get triggered on load
   useEffect(() => {
     const referenceHeaderHeight = parseInt(
       getComputedStyle(document.documentElement).getPropertyValue(
@@ -169,7 +170,6 @@ export function SettingsProvider({
         `${referenceHeaderHeight}px`
       );
     }
-    console.log("settings state updated", settings);
   }, [settings.layout]);
   return (
     <SettingsContext.Provider
