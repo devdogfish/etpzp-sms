@@ -57,15 +57,8 @@ export async function fetchCountryStats(input: {
   endDate: string;
 }): Promise<CountryStat[] | undefined> {
   if (!input.startDate) return undefined;
-  try {
-    // console.log(
-    //   "sending fetch with these body:",
-    //   JSON.stringify({
-    //     from: format(timeRange.from, API_DATE_FORMAT),
-    //     to: format(timeRange.to, API_DATE_FORMAT),
-    //   })
-    // );
 
+  try {
     const res = await fetch(`${process.env.GATEWAYAPI_URL}/api/usage/labels`, {
       method: "POST",
       headers: {
@@ -101,6 +94,6 @@ export async function fetchCountryStats(input: {
         })
       );
   } catch (error) {
-    console.log("error occurred", error);
+    console.error(error);
   }
 }

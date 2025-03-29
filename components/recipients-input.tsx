@@ -71,9 +71,8 @@ export default function RecipientsInput({
   useEffect(() => {
     if (isMounted) {
       // Add initial recipients parsed from URL if present
-      // we used to parse contacts passed through contactId search parameter, but instead we just create a draft for everything. 
+      // we used to parse contacts passed through contactId search parameter, but instead we just create a draft for everything.
       // This draft is parsed early on in the top level server component
-
       // We don't need to call searchRecipient here
     }
   }, [isMounted]);
@@ -323,7 +322,7 @@ export default function RecipientsInput({
 
             {/* Begin suggested recipients dropdown */}
             {isDropdownOpen && suggestedRecipients.length !== 0 && (
-              <div className="absolute top-[85%] bg-background border rounded-lg">
+              <div className="absolute top-[85%] bg-background rounded-lg border shadow-md">
                 <ScrollArea className="w-[300px] h-[330px]">
                   <div
                     className="p-2" /* this is necessary to have a separate container so that the items scroll all the way up to the end of the container */

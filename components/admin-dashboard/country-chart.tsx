@@ -21,21 +21,21 @@ const COLORS = ["#309BF4", "#FEBE06"];
 export default function CountryMessagesChart({
   data,
 }: {
-  data: CountryStat[];
+  data: CountryStat[] | undefined;
 }) {
   const totalMessages = useMemo(() => {
-    return data.reduce((acc, curr) => acc + curr.amount, 0);
+    return data?.reduce((acc, curr) => acc + curr.amount, 0);
   }, [data]);
   const { t } = useTranslation();
 
   const totalCost = useMemo(() => {
-    return data.reduce((acc, curr) => acc + curr.cost, 0).toFixed(2);
+    return data?.reduce((acc, curr) => acc + curr.cost, 0).toFixed(2);
   }, [data]);
 
   // Find the country with the most messages
   const topCountry = useMemo(() => {
-    if (data.length === 0) return null;
-    return data.reduce((max, curr) => (max.amount > curr.amount ? max : curr));
+    if (data?.length === 0) return null;
+    return data?.reduce((max, curr) => (max.amount > curr.amount ? max : curr));
   }, [data]);
 
   // Custom center label renderer
@@ -68,59 +68,81 @@ export default function CountryMessagesChart({
 
   return (
     <Card className="flex flex-col min-h-[400px]">
-      <CardHeader className="items-center pb-0">
+      <CardHeader className="items-center md:items-start pb-0">
         <CardTitle>{t("pie_chart-title")}</CardTitle>
         <CardDescription>{t("pie_chart-title_caption")}</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0 h-[300px]">
-        <div className="mx-auto aspect-square h-full max-w-[300px]">
-          {/* <ChartContainer config={{}}> */}
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Tooltip content={<CustomTooltip />} />
 
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={renderCustomLabel}
-                innerRadius={60}
-                // outerRadius={100}
-                strokeWidth={1}
-                fill="#8884d8"
-                dataKey="amount"
-                nameKey="country"
-              >
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                    strokeWidth={5}
-                  />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-          {/* </ChartContainer> */}
-        </div>
-      </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm pt-4">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          {topCountry && (
-            <>
-              {t("pie_chart-leading_country", {
-                country: topCountry.country,
-                amount: topCountry.amount,
-              })}
-              <TrendingUp className="h-4 w-4" />
-            </>
+      {/* Error case */}
+      {!data || !data.length ? (
+        <CardContent className="h-full">
+          {data === undefined ? (
+            <p className="h-full centered text-destructive">
+              {t("pie_chart-error")}
+            </p>
+          ) : (
+            data?.length === 0 && (
+              <p className="h-full centered">
+                {/* No data case */}
+                {t("pie_chart-no_data")}
+              </p>
+            )
           )}
-        </div>
-        <div className="leading-none text-muted-foreground">
-          {t("pie_chart-total_cost")} ${totalCost}
-        </div>
-      </CardFooter>
+        </CardContent>
+      ) : (
+        <>
+          {/* Content gets rendered in all other conditions */}
+          <CardContent className="flex-1 pb-0 h-[300px]">
+            <div className="mx-auto aspect-square h-full max-w-[300px]">
+              {/* <ChartContainer config={{}}> */}
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Tooltip content={<CustomTooltip />} />
+
+                  <Pie
+                    data={data}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={renderCustomLabel}
+                    innerRadius={60}
+                    // outerRadius={100}
+                    strokeWidth={1}
+                    fill="#8884d8"
+                    dataKey="amount"
+                    nameKey="country"
+                  >
+                    {data.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                        strokeWidth={5}
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              {/* </ChartContainer> */}
+            </div>
+          </CardContent>
+          <CardFooter className="flex-col gap-2 text-sm pt-4">
+            <div className="flex items-center gap-2 font-medium leading-none">
+              {topCountry && (
+                <>
+                  {t("pie_chart-leading_country", {
+                    country: topCountry.country,
+                    amount: topCountry.amount,
+                  })}
+                  <TrendingUp className="h-4 w-4" />
+                </>
+              )}
+            </div>
+            <div className="leading-none text-muted-foreground">
+              {t("pie_chart-total_cost")} ${totalCost}
+            </div>
+          </CardFooter>
+        </>
+      )}
     </Card>
   );
 }

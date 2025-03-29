@@ -21,11 +21,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Implement DNS
 - Figure out why I get layout shift between welcome page and other pages
 - Fix colors for dark mode
+- Fix mobile issues with nav panel and shit
 
 ### Admin dashboard
 - For the account dropdown, should I have the profile picture on the left or right, on the admin dashboard?
-- Add error handling for charts
-
+- Remove borders from profile pics
 
 ### Project Regrets
 - No uniform way to name functions or rules for type names

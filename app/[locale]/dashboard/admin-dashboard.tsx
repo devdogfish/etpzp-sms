@@ -29,7 +29,7 @@ export default function AdminDashboard({
 }: {
   messages: LightDBMessage[];
   users: DBUser[];
-  countryStats: CountryStat[];
+  countryStats: CountryStat[] | undefined;
 }) {
   // Prevent non-admins from viewing the admin-dashboard and display an authorization message.
   const { t } = useTranslation(["dashboard-page", "errors", "common"]);

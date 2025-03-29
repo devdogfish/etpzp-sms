@@ -37,7 +37,7 @@ export default async function Dashboard({
     <AdminDashboard
       messages={messages || []}
       users={users || []}
-      countryStats={countryData || []}
+      countryStats={countryData}
     />
   );
 }
