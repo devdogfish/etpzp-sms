@@ -32,6 +32,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - No snippets for repeatable code
 - Using safeParse instead of parse with zod causing error handling code to live in the try block which doesn't adhere to separation of concerns
 - Not having clear/consistent naming conventions for schemas, and especially types 
+- Not use all the features provided by i18next, and i18nexus with plural and translation branching
 
 ### Latest Conversation
 - For Domain name, we will use a dynamic IP service called No-IP. This is a program that you need to run on the server which will open a connection to their server. Their server will accept requests on that domain name, and will redirect that traffic to my server.

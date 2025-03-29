@@ -80,11 +80,11 @@ export default function MessageHistoryChart({
 
   const chartConfig = {
     amount: {
-      label: capitalize(t("messages")),
+      label: t("messages_amount"),
       // color: "hsl(var(--chart-1))", // TODO: Learn how to customize colors
     },
     price: {
-      label: t("area_chart-price"),
+      label: t("cost"),
       // color: "hsl(var(--chart-2))", // TODO: Learn how to customize colors
     },
   } satisfies ChartConfig;
@@ -198,8 +198,10 @@ export default function MessageHistoryChart({
             />
             <ChartTooltip
               cursor={false}
+              wrapperClassName="z-80"
               content={
                 <ChartTooltipContent
+                  className="z-80"
                   labelFormatter={(dateString: string) => {
                     // The error we were having is that between state updates and re-renders, sometimes the label date was not a valid date, so we need to handle the date formatting gracefully to prevent a thrown error from format
                     const parsedDate = parseISO(dateString);

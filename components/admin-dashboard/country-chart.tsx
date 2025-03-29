@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
-import { capitalize } from "@/lib/utils";
+import { capitalize, cn } from "@/lib/utils";
 import { CountryStat } from "@/app/[locale]/dashboard/page";
 
 const COLORS = ["#309BF4", "#FEBE06"];
@@ -60,7 +60,7 @@ export default function CountryMessagesChart({
           dominantBaseline="central"
           className="text-sm"
         >
-          {capitalize(t("messages"))}
+          {t("messages_amount")}
         </text>
       </g>
     );
@@ -74,11 +74,11 @@ export default function CountryMessagesChart({
       </CardHeader>
       <CardContent className="flex-1 pb-0 h-[300px]">
         <div className="mx-auto aspect-square h-full max-w-[300px]">
+          {/* <ChartContainer config={{}}> */}
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Tooltip
-                formatter={(value, name) => [`${value} ${t("messages")}`, name]}
-              />
+              <Tooltip content={<CustomTooltip />} />
+
               <Pie
                 data={data}
                 cx="50%"
@@ -102,6 +102,7 @@ export default function CountryMessagesChart({
               </Pie>
             </PieChart>
           </ResponsiveContainer>
+          {/* </ChartContainer> */}
         </div>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm pt-4">
@@ -121,5 +122,79 @@ export default function CountryMessagesChart({
         </div>
       </CardFooter>
     </Card>
+  );
+}
+
+function CustomTooltip({ active, payload }: any) {
+  const { t } = useTranslation();
+  if (active && payload && payload.length) {
+    return (
+      <div
+        className={cn(
+          "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-slate-200 border-slate-200/50 bg-white px-2.5 py-1.5 text-xs shadow-xl dark:border-slate-800 dark:border-slate-800/50 dark:bg-slate-950"
+        )}
+      >
+        <div className="grid gap-1.5">
+          {payload.map((item: any, index: number) => {
+            const key = item.name || item.dataKey || "value";
+            // const itemConfig = getPayloadConfigFromPayload(
+            //   config,
+            //   item,
+            //   key
+            // );
+            const indicatorColor = item.payload.fill || item.color;
+
+            return (
+              <div
+                key={item.dataKey}
+                className={cn("flex w-full flex-col items-stretch gap-2 ")} //[&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-slate-500 dark:[&>svg]:text-slate-400
+              >
+                <div className="flex items-center gap-1">
+                  <div
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 2,
+                      backgroundColor: indicatorColor,
+                    }}
+                  />
+                  <div className="font-medium">{item.name}</div>
+                </div>
+
+                {/* Key value pairs */}
+                <KeyValueInTooltip name={t("cost")} value={item.payload.cost} />
+                <KeyValueInTooltip
+                  name={t("messages_amount")}
+                  value={item.payload.amount}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+function KeyValueInTooltip({
+  name,
+  value,
+}: {
+  name: string;
+  value?: string | number;
+}) {
+  return (
+    <div className={cn("flex flex-1 justify-between leading-none")}>
+      <div className="grid gap-1.5">
+        <span className="text-slate-500 dark:text-slate-400">{name}</span>
+      </div>
+      {value && (
+        <span className="font-mono font-medium tabular-nums text-slate-950 dark:text-slate-50">
+          {value}
+        </span>
+      )}
+    </div>
   );
 }
