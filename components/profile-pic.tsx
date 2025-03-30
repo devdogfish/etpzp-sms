@@ -3,10 +3,11 @@ import React from "react";
 import { cn, getNameInitials } from "@/lib/utils";
 import { CircleUser, CircleUserRound, UserRound } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
+import { ThemeProperties } from "@/types/theme";
 
 type ProfilePicProps = {
   size?: number;
-  colorId?: number;
+  colorProperties?: ThemeProperties;
   name?: string;
   loading?: boolean;
   customSize?: boolean;
@@ -17,7 +18,7 @@ type ProfilePicProps = {
 export default function ProfilePic({
   size = 9,
   name,
-  colorId,
+  colorProperties,
   loading,
   fill = true,
   customSize = false,
@@ -33,6 +34,7 @@ export default function ProfilePic({
         containerClassName={cn("flex", className)}
       />
     );
+
   const sizeStyling =
     customSize === true
       ? {}
@@ -41,28 +43,19 @@ export default function ProfilePic({
     <div
       className={cn(
         `flex justify-center items-center rounded-full`, // border border-muted-foreground - Don't like this
-        colorId
-          ? `bg-chart-${colorId}`
-          : fill
-          ? `bg-muted`
-          : "border border-muted-foreground",
+
         className // add additional passed in classNames
       )}
       // For some reason we need to use inline styles for this, as it seems to get overridden
-      style={sizeStyling}
+      style={{
+        ...sizeStyling,
+        backgroundColor: `hsl(${colorProperties?.primary})`,
+        color: `hsl(${colorProperties?.primaryForeground})`,
+      }}
       {...props}
     >
       {name ? (
-        <p
-          className={cn(
-            "text-sm text-accent-foreground",
-            // For dark purple, we want the text to be white for readability
-            colorId == 5 && "text-background dark:text-foreground",
-            colorId && colorId > 1 && colorId < 5 && "dark:text-background"
-          )}
-        >
-          {getNameInitials(name)}
-        </p>
+        <p className={cn("text-sm")}>{getNameInitials(name)}</p>
       ) : (
         <UserRound
           className="height-full text-accent-foreground"

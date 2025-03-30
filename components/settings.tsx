@@ -25,7 +25,7 @@ export function LanguageChanger({
 }: RenderInputArgs) {
   const { t, i18n } = useTranslation();
   const currentLocale = i18n.language;
-  const { updateLanguageCookie } = useSettings(currentLocale);
+  const { updateLanguageCookie } = useSettings();
   const [isPending, setIsPending] = useState<boolean>(false);
 
   const handleChange = async (newLocale: string) => {
@@ -67,7 +67,7 @@ export function LanguageChanger({
   );
 }
 
-const colors = [
+const COLORS = [
   {
     value: "1",
     name: "Zinc",
@@ -97,6 +97,12 @@ const colors = [
     name: "Orange",
     light: "bg-orange-500",
     dark: "bg-orange-700",
+  },
+  {
+    value: "6",
+    name: "Yellow",
+    light: "bg-yellow-300",
+    dark: "bg-yellow-500",
   },
 ];
 export function ThemeColorChanger({
@@ -133,7 +139,40 @@ export function ThemeColorChanger({
       >
         <SelectValue />
       </SelectTrigger>
-      <SelectContent>{createSelectItems(colors, theme)}</SelectContent>
+      <SelectContent>{createSelectItems(COLORS, theme)}</SelectContent>
+    </Select>
+  );
+}
+export function ColorDropdown({
+  onValueChange,
+  id,
+  isPending,
+  onChange,
+  onBlur,
+  initialValue,
+}: RenderInputArgs & { onValueChange: (value: string) => void }) {
+  const { theme } = useNextTheme();
+
+  return (
+    <Select
+      defaultValue={initialValue}
+      onValueChange={(colorIndex) => {
+        onValueChange(colorIndex);
+        onChange(colorIndex);
+        onBlur(undefined, colorIndex);
+      }}
+      disabled={isPending}
+    >
+      <SelectTrigger
+        id={id}
+        className={cn(
+          buttonVariants({ variant: "outline" }),
+          "w-[200px] appearance-none font-normal justify-between"
+        )}
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>{createSelectItems(COLORS, theme)}</SelectContent>
     </Select>
   );
 }

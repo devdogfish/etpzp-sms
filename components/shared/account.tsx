@@ -19,6 +19,9 @@ import { LogOut, MonitorCog, Settings, UserRoundPen } from "lucide-react";
 import { useSettings } from "@/contexts/use-settings";
 import { logout } from "@/lib/auth";
 import { usePathname, useRouter } from "next/navigation";
+import { getThemeByIndex, themes } from "@/lib/theme.colors";
+import { useTheme as useNextTheme } from "next-themes";
+import { ThemeMode } from "@/types/theme";
 
 export default function Account({
   hideNameRole = false,
@@ -31,6 +34,7 @@ export default function Account({
 }) {
   const { t } = useTranslation();
   const { session, loading } = useSession();
+  const { theme } = useNextTheme();
 
   const pathname = usePathname();
   const router = useRouter();
@@ -62,7 +66,9 @@ export default function Account({
           <ProfilePic
             size={9}
             name={settings.displayName}
-            colorId={settings.profileColorId}
+            colorProperties={
+              getThemeByIndex(settings.profileColorId || 1, theme as ThemeMode)
+            }
             loading={loading}
             className={cn(profilePicPosition === "RIGHT" && "order-2")}
           />

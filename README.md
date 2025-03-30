@@ -23,16 +23,13 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Fix colors for dark mode
 - Fix mobile issues with nav panel and shit
 
-### Admin dashboard
-- For the account dropdown, should I have the profile picture on the left or right, on the admin dashboard?
-- Remove borders from profile pics
-
 ### Project Regrets
 - No uniform way to name functions or rules for type names
 - No snippets for repeatable code
 - Using safeParse instead of parse with zod causing error handling code to live in the try block which doesn't adhere to separation of concerns
 - Not having clear/consistent naming conventions for schemas, and especially types 
 - Not use all the features provided by i18next, and i18nexus with plural and translation branching
+- No really uniform way to handle errors in server actions
 
 ### Latest Conversation
 - For Domain name, we will use a dynamic IP service called No-IP. This is a program that you need to run on the server which will open a connection to their server. Their server will accept requests on that domain name, and will redirect that traffic to my server.

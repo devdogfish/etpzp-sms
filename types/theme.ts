@@ -33,3 +33,5 @@ export type Themes = {
 };
 
 export type ThemeColors = keyof typeof themes; // This will be 'Orange' | 'Blue' | 'Green' | 'Rose' | 'Zinc'
+
+export type ThemeMode = "light" | "dark";

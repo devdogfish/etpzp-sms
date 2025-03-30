@@ -184,6 +184,7 @@ export function SettingsProvider({
       }
     }
   }, [isMounted]);
+
   return (
     <SettingsContext.Provider
       value={{

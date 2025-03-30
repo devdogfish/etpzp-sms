@@ -6,6 +6,7 @@ import {
   ThemeToggle,
   ThemeColorChanger,
   createSelectItems,
+  ColorDropdown,
 } from "@/components/settings";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -19,10 +20,12 @@ import { useTranslation } from "react-i18next";
 import SettingItem from "../../../../../components/settings-item";
 import { cn, getComplexObjectFromCookie } from "@/lib/utils";
 import { useTheme as useNextTheme } from "next-themes";
+import { useThemeContext } from "@/contexts/theme-data-provider";
 
 export default function Settings() {
   const { t } = useTranslation();
   const { theme } = useNextTheme();
+  const { themeColor, setThemeColor } = useThemeContext();
 
   const initialValues = {
     profile: {
@@ -33,6 +36,7 @@ export default function Settings() {
     appearance: {
       darkMode: theme,
       layout: localStorage.getItem("appearance_layout") || "MODERN",
+      primaryColor: themeColor.toString(),
     },
   };
 
@@ -82,65 +86,18 @@ export default function Settings() {
             name="profile_color_id" // this might need to be the exact database field
             label={t("profile-color_label")}
             caption={t("profile-color_label_caption")}
-            renderInput={({ value, onChange, onBlur, id, isPending }) => {
-              const profileColors = [
-                {
-                  value: "1",
-                  name: "Blue",
-                  light: "bg-chart-1",
-                  dark: "bg-chart-1",
-                },
-                {
-                  value: "2",
-                  name: "Green",
-                  light: "bg-chart-2",
-                  dark: "bg-chart-2",
-                },
-                {
-                  value: "3",
-                  name: "Yellow",
-                  light: "bg-chart-3",
-                  dark: "bg-chart-3",
-                },
-                {
-                  value: "4",
-                  name: "Orange",
-                  light: "bg-chart-4",
-                  dark: "bg-chart-4",
-                },
-                {
-                  value: "5",
-                  name: "Purple",
-                  light: "bg-chart-5",
-                  dark: "bg-chart-5",
-                },
-              ];
-              return (
-                <Select
-                  defaultValue={initialValues.profile.colorId}
-                  onValueChange={(value) => {
-                    onChange(value);
-                    setTimeout(() => {
-                      onBlur(undefined, value);
-                    }, 200);
-                  }}
-                  disabled={isPending}
-                >
-                  <SelectTrigger
-                    id={id}
-                    className={cn(
-                      buttonVariants({ variant: "outline" }),
-                      "w-[200px] appearance-none font-normal justify-between"
-                    )}
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {createSelectItems(profileColors, theme)}
-                  </SelectContent>
-                </Select>
-              );
-            }}
+            renderInput={({ value, onChange, onBlur, id, isPending }) => (
+              <ColorDropdown
+                initialValue={initialValues.profile.colorId}
+                id={id}
+                value={value}
+                isPending={isPending}
+                // We need to do nothing here because the this type of setting is handled internally (in settings-item)
+                onValueChange={(colorIndex: string) => {}}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
+            )}
           />
           <SettingItem
             name="display_name"
@@ -160,16 +117,22 @@ export default function Settings() {
             label={t("appearance-primary_color_label")}
             caption={t("appearance-primary_color_label_caption")}
             renderInput={({ value, onChange, onBlur, id, isPending }) => (
-              <ThemeColorChanger
+              <ColorDropdown
+                initialValue={initialValues.appearance.primaryColor}
                 // Initial value handled internally
                 id={id}
                 value={value}
+                isPending={isPending}
+                onValueChange={(colorIndex: string) =>
+                  setThemeColor(Number(colorIndex))
+                }
+                // we call these in onValueChange
                 onChange={onChange}
                 onBlur={onBlur}
-                isPending={isPending}
               />
             )}
           />
+
           <SettingItem
             name="appearance_layout" // this might need to be the exact database field
             label={t("appearance-layout_label")}

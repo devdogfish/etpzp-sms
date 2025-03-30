@@ -98,7 +98,6 @@ export const themes: Themes = {
       background: "0 0% 100%",
       foreground: "222.2 84% 4.9%",
       card: "0 0% 100%",
-
       cardForeground: "222.2 84% 4.9%",
       popover: "0 0% 100%",
       popoverForeground: "222.2 84% 4.9%",
@@ -232,10 +231,59 @@ export const themes: Themes = {
       radius: "0.5rem",
     },
   },
+  Yellow: {
+    light: {
+      background: "0 0% 100%",
+      foreground: "48 14.3% 4.1%",
+      card: "0 0% 100%",
+      cardForeground: "48 14.3% 4.1%",
+      popover: "0 0% 100%",
+      popoverForeground: "48 14.3% 4.1%",
+      primary: "51 100% 50%",
+      primaryForeground: "60 9.1% 97.8%",
+      secondary: "60 4.8% 95.9%",
+      secondaryForeground: "48 9.8% 10%",
+      muted: "60 4.8% 95.9%",
+      mutedForeground: "50 5.3% 44.7%",
+      accent: "60 4.8% 95.9%",
+      accentForeground: "48 9.8% 10%",
+      destructive: "0 84.2% 60.2%",
+      destructiveForeground: "60 9.1% 97.8%",
+      border: "48 5.9% 90%",
+      input: "48 5.9% 90%",
+      ring: "51 100% 50%",
+      radius: "0.5rem",
+    },
+    dark: {
+      background: "48 14.3% 4.1%",
+      foreground: "60 9.1% 97.8%",
+      card: "48 9.8% 10%",
+      cardForeground: "60 9.1% 97.8%",
+      popover: "48 14.3% 4.1%",
+      popoverForeground: "60 9.1% 97.8%",
+      primary: "51 100% 50%",
+      primaryForeground: "240 5.9% 10%",
+      secondary: "48 6.5% 15.1%",
+      secondaryForeground: "60 9.1% 97.8%",
+      muted: "48 6.5% 15.1%",
+      mutedForeground: "50 5.4% 63.9%",
+      accent: "48 6.5% 15.1%",
+      accentForeground: "60 9.1% 97.8%",
+      destructive: "0 72.2% 50.6%",
+      destructiveForeground: "60 9.1% 97.8%",
+      border: "48 6.5% 15.1%",
+      input: "48 6.5% 15.1%",
+      ring: "51 100% 50%",
+      radius: "0.5rem",
+    },
+  },
 };
 
 // Function to get theme by index
-function getThemeByIndex(index: number, themeMode: "light" | "dark") {
+export function getThemeByIndex(
+  index: number,
+  themeMode: "light" | "dark" | undefined = "light"
+) {
   const theme = themesArray.find((theme) => theme.index === index);
 
   return theme?.value[themeMode] as ThemeProperties | undefined; // Return the theme value or undefined if not found
