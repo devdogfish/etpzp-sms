@@ -45,7 +45,8 @@ export async function fetchUsers() {
 
   console.log(`Fetching sent messages...`);
   try {
-    if (!session?.isAdmin) throw new Error("User is not an admin.");
+    if (!session?.isAdmin || !session?.isAuthenticated)
+      throw new Error("User is not an admin or not authenticated.");
     const result = await db(`SELECT * FROM public.user;`);
 
     return result.rows as DBUser[];
@@ -57,8 +58,19 @@ export async function fetchCountryStats(input: {
   endDate: string;
 }): Promise<CountryStat[] | undefined> {
   if (!input.startDate) return undefined;
+  const session = await getSession();
 
   try {
+    if (!session?.isAdmin || !session?.isAuthenticated)
+      throw new Error("User is not an admin or not authenticated.");
+
+    // Validate input using Zod
+    const validatedDates = DateRangeSchema.safeParse(input);
+    if (!validatedDates.success || validatedDates.data.startDate == undefined)
+      throw new Error("Invalid input.");
+    const { startDate, endDate } = validatedDates.data;
+    console.log("validatedDates", validatedDates);
+
     const res = await fetch(`${process.env.GATEWAYAPI_URL}/api/usage/labels`, {
       method: "POST",
       headers: {
@@ -67,17 +79,17 @@ export async function fetchCountryStats(input: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: format(input.startDate, API_DATE_FORMAT),
-        to: format(input.endDate || new Date(), API_DATE_FORMAT),
+        from: format(startDate, API_DATE_FORMAT),
+        to: format(endDate || new Date(), API_DATE_FORMAT),
       }),
     });
-    console.log(res);
+    if (!res.ok) {
+      throw new Error("Network response was not ok");
+    }
     const resJson = await res.json();
-    console.log(res.headers.get("Content-Type"));
+    console.log(res);
     console.log(resJson);
-    // if (!response.ok) {
-    //   throw new Error("Network response was not ok");
-    // }
+
     return resJson
       .filter((country: { label: string | null }) => country.label === null)
       .map(
@@ -94,6 +106,6 @@ export async function fetchCountryStats(input: {
         })
       );
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }

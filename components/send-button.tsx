@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { useModal } from "@/contexts/use-modal";
-import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
+import { PT_DATE_FORMAT } from "@/global.config";
 
 export default function SendButton({ loading }: { loading: boolean }) {
   const now = new Date();
@@ -54,7 +54,7 @@ export default function SendButton({ loading }: { loading: boolean }) {
         {message.scheduledDate > now
           ? `${t("submit_btn-scheduled", {
               time: "", // i18n messes up the output when passing it in like this
-            })} ${format(message.scheduledDate, PORTUGUESE_DATE_FORMAT)}`
+            })} ${format(message.scheduledDate, PT_DATE_FORMAT)}`
           : t("submit_btn-normal")}
       </Button>
       <DropdownMenu open={scheduleDropdown} onOpenChange={setScheduleDropdown}>

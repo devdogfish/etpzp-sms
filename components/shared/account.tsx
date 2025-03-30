@@ -56,8 +56,7 @@ export default function Account({
         <DropdownMenuTrigger
           className={cn(
             "flex gap-3 items-center justify-start w-full",
-            hideNameRole && "w-9 h-9",
-            profilePicPosition === "RIGHT" && "flex-row-reverse"
+            hideNameRole && "w-9 h-9"
           )}
         >
           <ProfilePic
@@ -65,19 +64,21 @@ export default function Account({
             name={settings.displayName}
             colorId={settings.profileColorId}
             loading={loading}
+            className={cn(profilePicPosition === "RIGHT" && "order-2")}
           />
           <div
             className={cn(
-              "flex flex-col items-start",
-              hideNameRole && "hidden"
+              "flex flex-col ",
+              profilePicPosition === "RIGHT" && "items-end", // align the text to the right depending on layout
+              (hideNameRole || loading) && "hidden"
             )}
           >
             <p className="font-semibold mb-[-3px]">
               {settings.displayName || t("common:account-no_name")}
             </p>
-            <span className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground text-start">
               {session?.isAdmin ? t("common:admin") : t("common:user")}
-            </span>
+            </p>
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent

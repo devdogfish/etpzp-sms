@@ -16,8 +16,11 @@ export const defaultSession: SessionData = {
 };
 
 export const sessionOptions: SessionOptions = {
-  cookieName: "my-app-session", // anything you want
+  cookieName: "my-etpzp-app-session", // anything you want
   password: process.env.SESSION_SECRET!, // TypeScript non-null assertion operator
+
+  // Optional fields
+  ttl: 60 * 60 * 24, // cookie expiration from now in seconds (we want 24h)
   cookieOptions: {
     // prevent client side js from accessing the cookie
     httpOnly: true,

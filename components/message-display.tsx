@@ -34,7 +34,7 @@ import { usePathname, useRouter } from "next/navigation";
 import ProfilePic from "./profile-pic";
 import { DBRecipient, NewRecipient } from "@/types/recipient";
 import { useTranslation } from "react-i18next";
-import { PORTUGUESE_DATE_FORMAT } from "@/global.config";
+import { PT_DATE_FORMAT } from "@/global.config";
 import { useContacts } from "@/contexts/use-contacts";
 import { PRIMARY_COLOR_CSS_NAMES } from "@/lib/theme.colors";
 import React, { useEffect, useMemo, useState } from "react";
@@ -380,10 +380,7 @@ function MessageDisplay({
                           className="text-xs text-muted-foreground relative whitespace-nowrap"
                           style={{ top: "1px" }}
                         >
-                          {format(
-                            new Date(message.send_time),
-                            PORTUGUESE_DATE_FORMAT
-                          )}
+                          {format(new Date(message.send_time), PT_DATE_FORMAT)}
                         </span>
                       )}
                       <Button

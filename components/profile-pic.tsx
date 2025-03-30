@@ -2,6 +2,7 @@
 import React from "react";
 import { cn, getNameInitials } from "@/lib/utils";
 import { CircleUser, CircleUserRound, UserRound } from "lucide-react";
+import Skeleton from "react-loading-skeleton";
 
 type ProfilePicProps = {
   size?: number;
@@ -23,7 +24,15 @@ export default function ProfilePic({
   className,
   ...props
 }: ProfilePicProps) {
-  if (loading) return <h2 className="text-sm">Loading...</h2>;
+  if (loading)
+    return (
+      <Skeleton
+        width={36}
+        height={36}
+        circle
+        containerClassName={cn("flex", className)}
+      />
+    );
   const sizeStyling =
     customSize === true
       ? {}
@@ -31,7 +40,7 @@ export default function ProfilePic({
   return (
     <div
       className={cn(
-        `flex justify-center items-center rounded-full border border-muted-foreground`,
+        `flex justify-center items-center rounded-full`, // border border-muted-foreground - Don't like this
         colorId
           ? `bg-chart-${colorId}`
           : fill

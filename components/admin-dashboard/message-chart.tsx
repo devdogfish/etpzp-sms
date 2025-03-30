@@ -32,7 +32,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   DEFAULT_START_DATE,
   ISO8601_DATE_FORMAT,
-  PORTUGUESE_DATE_FORMAT_NO_TIME,
+  PT_DATE_FORMAT_NO_TIME,
 } from "@/global.config";
 import { LightDBMessage } from "@/types/dashboard";
 import { zodISODate } from "@/lib/form.schemas";
@@ -142,7 +142,7 @@ export default function MessageHistoryChart({
                   {selectedStartDate.isValid
                     ? format(
                         new Date(selectedStartDate.ISO_date),
-                        PORTUGUESE_DATE_FORMAT_NO_TIME
+                        PT_DATE_FORMAT_NO_TIME
                       )
                     : selectedStartDate.ISO_date}
                 </SelectItem>

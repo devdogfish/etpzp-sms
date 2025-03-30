@@ -1,4 +1,5 @@
 "use client";
+
 import { useThemeContext } from "@/contexts/theme-data-provider";
 import { i18nConfig } from "@/i18n.config";
 import { fetchUserSettings } from "@/lib/db/general";
@@ -13,11 +14,12 @@ import {
   useState,
 } from "react";
 import { LayoutType } from "@/types/user";
+import useIsMounted from "@/hooks/use-mounted";
 
 type SettingsState = {
   displayName?: string;
   profileColorId?: number;
-  layout?: LayoutType;
+  layout: LayoutType | undefined;
 };
 
 type SettingsContext = {
@@ -25,7 +27,7 @@ type SettingsContext = {
   setSettings: Dispatch<SetStateAction<SettingsState>>;
   updateLanguageCookie: (newLocale: string) => void;
   normalizePath: (path: string) => string;
-  hasLanguageCookie: () => boolean;
+  // hasLanguageCookie: () => boolean; not used outside as of now
   syncWithDB: () => Promise<void>;
   resetLocalSettings: () => void;
 };
@@ -39,16 +41,14 @@ export function SettingsProvider({
   children: Readonly<React.ReactNode>;
   currentLocale: string;
 }) {
+  const isMounted = useIsMounted();
   // Localstorage state without theme color (primary_color) and theme mode because those are handled internally by our packages
   const [settings, setSettings] = useState<SettingsState>({
     displayName: localStorage.getItem("display_name") || undefined,
     profileColorId:
       Number(localStorage.getItem("profile_color_id")) || undefined,
-    layout: "MODERN" as LayoutType,
-
-    //(localStorage.getItem(
-    //   "appearance_layout"
-    // ) as (typeof appearanceLayoutValues)[number]) ||
+    layout:
+      (localStorage.getItem("appearance_layout") as LayoutType) || undefined,
   });
 
   const router = useRouter();
@@ -171,6 +171,19 @@ export function SettingsProvider({
       );
     }
   }, [settings.layout]);
+  useEffect(() => {
+    if (isMounted) {
+      if (
+        localStorage.getItem("profile_color_id") == null ||
+        localStorage.getItem("display_name") == null ||
+        localStorage.getItem("primary_color_id") == null ||
+        localStorage.getItem("theme") == null ||
+        hasLanguageCookie() === false
+      ) {
+        syncWithDB();
+      }
+    }
+  }, [isMounted]);
   return (
     <SettingsContext.Provider
       value={{
@@ -178,7 +191,7 @@ export function SettingsProvider({
         setSettings,
         updateLanguageCookie,
         normalizePath,
-        hasLanguageCookie,
+        // hasLanguageCookie,
         syncWithDB,
         resetLocalSettings,
       }}

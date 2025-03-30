@@ -35,6 +35,7 @@ export default function Settings() {
       layout: localStorage.getItem("appearance_layout") || "MODERN",
     },
   };
+
   return (
     <>
       <PageHeader title={t("header")} />

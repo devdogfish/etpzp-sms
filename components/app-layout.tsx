@@ -5,13 +5,12 @@ import NavPanel, { MobileNavPanel } from "@/components/nav-panel";
 import { useTheme as useNextTheme } from "next-themes";
 import { SkeletonTheme } from "react-loading-skeleton";
 import { useLayout } from "@/contexts/use-layout";
-import { useEffect } from "react";
-import useIsMounted from "@/hooks/use-mounted";
 import { useSettings } from "@/contexts/use-settings";
 import TranslationsProvider from "@/contexts/translations-provider";
 import Logo from "./logo";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Account from "./shared/account";
+import { useEffect } from "react";
 
 type LayoutProps = Readonly<{
   children: React.ReactNode;
@@ -26,25 +25,21 @@ export default function AppLayout({
   locale,
   namespaces,
 }: LayoutProps) {
-  const isMounted = useIsMounted();
   const { theme } = useNextTheme();
-  const { settings, syncWithDB, hasLanguageCookie } = useSettings();
+  const { settings } = useSettings();
   const onMobile = useIsMobile();
   const { isFullscreen } = useLayout();
 
   useEffect(() => {
-    if (isMounted) {
-      if (
-        localStorage.getItem("profile_color_id") == null ||
-        localStorage.getItem("display_name") == null ||
-        localStorage.getItem("primary_color_id") == null ||
-        localStorage.getItem("theme") == null ||
-        hasLanguageCookie() === false
-      ) {
-        syncWithDB();
+    // Check if there's a hash in the URL
+    if (window.location.hash) {
+      // Scroll to the anchor
+      const anchor = document.querySelector(window.location.hash);
+      if (anchor) {
+        anchor.scrollIntoView({ behavior: "smooth" });
       }
     }
-  }, [isMounted]);
+  }, []); // Empty dependency array to run only on mount
 
   return (
     <SkeletonTheme

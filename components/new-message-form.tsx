@@ -46,7 +46,7 @@ import useDebounce from "@/hooks/use-debounce";
 import useIsMounted from "@/hooks/use-mounted";
 import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { EMPTY_MESSAGE, PORTUGUESE_DATE_FORMAT } from "@/global.config";
+import { EMPTY_MESSAGE, PT_DATE_FORMAT } from "@/global.config";
 import { useContacts } from "@/contexts/use-contacts";
 import { useModal } from "@/contexts/use-modal";
 
@@ -151,10 +151,7 @@ const NewMessageForm = React.memo(function ({
       // Message got sent successfully
       if (result.sendDate) {
         toast.success(
-          `${t(result.message[0])} ${format(
-            result.sendDate,
-            PORTUGUESE_DATE_FORMAT
-          )}`
+          `${t(result.message[0])} ${format(result.sendDate, PT_DATE_FORMAT)}`
         );
       } else {
         toastActionResult(result, t);

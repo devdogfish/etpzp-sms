@@ -9,8 +9,6 @@
     --simple-header-height: 52px;
     /* header-height on the other hand is dynamic */
     --header-height: 52px;
-    --color-start: yellow; /* Starting color */
-    --color-end: orange; /* Ending color */
   }
 
   :root {
@@ -120,13 +118,6 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--border)) transparent;
   }
-}
-
-main {
-  /* display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column; */
 }
 
 h1 {
