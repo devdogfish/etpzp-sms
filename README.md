@@ -19,13 +19,19 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## In Progress
 - Add meta data like tab image and title
 - Implement DNS
-- Figure out why I get layout shift between welcome page and other pages
+- Pop ups on mobile
+
+## In progress:
 - Fix colors for dark mode
+  - Primary color in calendar
+  - Input in settings dark mode display name
+- Sender Select only valid for ETPZP sms
 - Fix mobile issues with nav panel and shit
+- make it possible to select a row in the insert contacts modal, to select the contact instead of just the checkbox
 
 ### Project Regrets
 - No uniform way to name functions or rules for type names
-- No snippets for repeatable code
+- No snippets for repetitive code
 - Using safeParse instead of parse with zod causing error handling code to live in the try block which doesn't adhere to separation of concerns
 - Not having clear/consistent naming conventions for schemas, and especially types 
 - Not use all the features provided by i18next, and i18nexus with plural and translation branching
@@ -44,6 +50,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Make sure you don't pass in undefined values into the database, you should always convert them to `null` instead
 - Should I keep the option to change the sender? This would also influence the message-display component
   - If it's difficult, keep it as ETPZP for everyone. If easy, the admin could specify some select options that would be applied to all users.
+- Auth cookie max-age setting for admins
+- Option back up and restore database from admin panel
+
 #### MESSAGE POLLING AND DELIVERY STATUSes:
 - The database field `status` should always be true
   - Do message polling to update it conditionally. When?

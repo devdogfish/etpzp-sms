@@ -21,15 +21,18 @@ export default function ChildrenPanel({
     : fallbackLayout[0];
 
   //debug
-  // if (!Array.isArray(layout)) {
-  //   console.error("Could not parse layout from cookies");
-  // } else {
-  //   console.log(
-  //     "rendering childrenLayout with a width of ",
-  //     hasMiddleBar ? middleBarWidth : fallbackWidth,
-  //     "%"
-  //   );
-  // }
+  if (!Array.isArray(layout)) {
+    console.error("Could not parse layout from cookies");
+  } else {
+    console.log(
+      "rendering childrenLayout with a width of ",
+      hasMiddleBar ? middleBarWidth : fallbackWidth,
+      "%"
+    );
+    console.log(`Used ${hasMiddleBar ? "middle bar width" : "fallbackWidth"}`);
+    console.log(layout);
+    
+  }
   return (
     <ResizablePanel
       // width at null means don't specify any width, if it has a value use that, else use fallback

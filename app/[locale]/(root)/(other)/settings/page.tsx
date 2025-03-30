@@ -114,8 +114,8 @@ export default function Settings() {
         >
           <SettingItem
             name="primary_color_id" // this might need to be the exact database field
-            label={t("appearance-primary_color_label")}
-            caption={t("appearance-primary_color_label_caption")}
+            label={t("appearance-color_label")}
+            caption={t("appearance-color_label_caption")}
             renderInput={({ value, onChange, onBlur, id, isPending }) => (
               <ColorDropdown
                 initialValue={initialValues.appearance.primaryColor}

@@ -393,7 +393,8 @@ const NewMessageForm = React.memo(function ({
               name="subject"
               placeholder={t("subject_placeholder")}
               className={cn(
-                "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground border-b border-b-border"
+                "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground border-b  focus:border-primary",
+                
               )}
               onChange={handleInputChange}
               value={message?.subject || EMPTY_MESSAGE.subject}

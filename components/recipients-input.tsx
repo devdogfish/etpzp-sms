@@ -42,9 +42,7 @@ export default function RecipientsInput({
 }) {
   const container = useRef<HTMLDivElement | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const searchParams = useSearchParams();
   const inputElement = useRef<HTMLInputElement | null>(null);
-  const { contacts } = useContacts();
 
   const {
     message,
@@ -178,6 +176,7 @@ export default function RecipientsInput({
           <span className="my-0.5 mr-0.5 px-0 flex items-center text-sm text-muted-foreground">
             {t("common:to")}
           </span>
+          {/* Recipient chips */}
           {recipients.map((recipient, index) => {
             // Since we have so many recipients, only some should be shown until the user clicks to see the rest
             if (
@@ -202,12 +201,13 @@ export default function RecipientsInput({
                       <TooltipTrigger asChild>
                         <div
                           className={cn(
-                            "bg-background flex items-center text-xs border rounded-xl hover:bg-muted cursor-pointer whitespace-nowrap h-full hover:shadow-none",
+                            "bg-background flex items-center text-xs border rounded-xl hover:bg-muted dark:hover:bg-muted cursor-pointer whitespace-nowrap h-full hover:shadow-none",
                             error && "error-border-pulse",
                             recipient.proneForDeletion && "border-destructive",
-                            !recipient.isValid && "bg-red-100/70",
+                            !recipient.isValid &&
+                              "bg-red-100/70 dark:bg-red-900/50",
                             recipient.error?.type === "warning" &&
-                              "bg-yellow-50"
+                              "bg-yellow-50 dark:bg-yellow-400/50"
                           )}
                         >
                           <div
@@ -322,7 +322,7 @@ export default function RecipientsInput({
 
             {/* Begin suggested recipients dropdown */}
             {isDropdownOpen && suggestedRecipients.length !== 0 && (
-              <div className="absolute top-[85%] bg-background rounded-lg border shadow-md">
+              <div className="absolute top-[85%] bg-background rounded-lg border shadow-md dark:shadow-lg-light">
                 <ScrollArea className="w-[300px] h-[330px]">
                   <div
                     className="p-2" /* this is necessary to have a separate container so that the items scroll all the way up to the end of the container */

@@ -158,8 +158,6 @@ export function SettingsProvider({
       10 // base 10 integer
     );
     if (settings.layout === "MODERN") {
-      console.log("css property value", referenceHeaderHeight);
-
       document.documentElement.style.setProperty(
         "--header-height",
         `${referenceHeaderHeight * 2}px`

@@ -240,7 +240,7 @@ export const themes: Themes = {
       popover: "0 0% 100%",
       popoverForeground: "48 14.3% 4.1%",
       primary: "51 100% 50%",
-      primaryForeground: "60 9.1% 97.8%",
+      primaryForeground: "0 0% 98%", // Maybe make this dark, or make the  primary color darker to increase contrast
       secondary: "60 4.8% 95.9%",
       secondaryForeground: "48 9.8% 10%",
       muted: "60 4.8% 95.9%",

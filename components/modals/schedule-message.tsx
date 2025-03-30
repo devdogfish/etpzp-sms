@@ -70,9 +70,6 @@ export default function ScheduleMessageModal() {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [modal.schedule]);
-  useEffect(() => {
-    console.log("message changed", message);
-  }, [message]);
 
   return (
     <Dialog

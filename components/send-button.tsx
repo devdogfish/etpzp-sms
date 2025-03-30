@@ -21,7 +21,6 @@ import { PT_DATE_FORMAT } from "@/global.config";
 export default function SendButton({ loading }: { loading: boolean }) {
   const now = new Date();
   const { modal, setModal, scheduleDropdown, setScheduleDropdown } = useModal();
-  const [dropdown, setDropdown] = useState(false);
   const { message, setMessage } = useNewMessage();
   const { t } = useTranslation(["messages-page", "modals", "common"]);
 
@@ -63,14 +62,17 @@ export default function SendButton({ loading }: { loading: boolean }) {
           asChild
         >
           <Button
-            className="px-[1px] rounded-tl-none rounded-bl-none shadow-none"
+            className={cn(
+              "px-[1px] rounded-tl-none rounded-bl-none shadow-none",
+              scheduleDropdown && "bg-primary/90"
+            )}
             type="button"
             disabled={loading}
           >
             <ChevronDown
               className={cn(
-                "h-4 w-4 transition-transform",
-                dropdown && "rotate-180"
+                "h-4 w-4 transition-transform duration-300",
+                scheduleDropdown && "rotate-180"
               )}
             />
           </Button>

@@ -35,7 +35,6 @@ import { EMPTY_MESSAGE } from "@/global.config";
 import ScheduleMessageModal, {
   ScheduleAlertModal,
 } from "@/components/modals/schedule-message";
-import useIsMounted from "@/hooks/use-mounted";
 
 // This is our biggest state where we store all data related to the active message, that should be persisted during draft saving re-renders
 // MessageState is only used here & for EMPTY_MESSAGE
@@ -170,8 +169,6 @@ export function NewMessageProvider({
   const DEFAULT_SELECTED_PHONE_INDEX = null;
   // Recipient management functions
   const addRecipient = (phone: string) => {
-    console.log("Trying to add new phone: ", phone);
-
     if (message.recipients.some((item) => item.phone === phone)) {
       // I know this is not on the server, but I wanted to keep the same format
       return toast.error(t("server-duplicate_recipients_error"), {

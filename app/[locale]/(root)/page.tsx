@@ -19,7 +19,6 @@ export const metaData: Metadata = {
 export default function WelcomePage() {
   const { amountIndicators } = useLayout();
   const { themeColor } = useThemeContext();
-  console.log(themeColor);
 
   const { t, i18n } = useTranslation(["welcome-page"]);
   const gradientStyle = {
@@ -31,54 +30,55 @@ export default function WelcomePage() {
     display: "inline-block", // Ensure the gradient applies correctly
   };
   return (
-    <ChildrenPanel
-      className="h-full flex flex-col p-4" /**max-h-[100vh-var(--header-height)] */
-    >
-      <div className="flex-1 flex flex-col items-center justify-center gap-5">
-        {/* <PageHeader title="Welcome to the Etpzp SMS App!" /> */}
-        <h1 className="text-center">
-          <Trans i18nKey="welcome-page:welcome_message" i18n={i18n}>
-            Welcome to the
-            <div className="text-6xl _gradient-text">ETPZP-SMS</div>
-            app!
-          </Trans>
-        </h1>
-        {/*  */}
-        <div className="flex grid-cols-2 gap-2 w-full justify-center items-center">
-          <LinkCard
-            href="/contacts"
-            heroValue={amountIndicators?.contacts || 0}
-            Icon={Contact}
-            title={t("card_1-title")}
-          />
-          <LinkCard
-            href="/sent"
-            heroValue={
-              (amountIndicators?.sent || 0) + (amountIndicators?.scheduled || 0)
-            }
-            Icon={Envelope}
-            title={t("card_2-title")}
-          />
+    <ChildrenPanel>
+      <div className="h-full flex flex-col p-4">
+        <div className="flex-1 flex flex-col items-center justify-center gap-5">
+          {/* <PageHeader title="Welcome to the Etpzp SMS App!" /> */}
+          <h1 className="text-center">
+            <Trans i18nKey="welcome-page:welcome_message" i18n={i18n}>
+              Welcome to the
+              <div className="text-6xl _gradient-text">ETPZP-SMS</div>
+              app
+            </Trans>
+          </h1>
+          {/*  */}
+          <div className="flex grid-cols-2 gap-2 w-full justify-center items-center">
+            <LinkCard
+              href="/contacts"
+              heroValue={amountIndicators?.contacts || 0}
+              Icon={Contact}
+              title={t("card_1-title")}
+            />
+            <LinkCard
+              href="/sent"
+              heroValue={
+                (amountIndicators?.sent || 0) +
+                (amountIndicators?.scheduled || 0)
+              }
+              Icon={Envelope}
+              title={t("card_2-title")}
+            />
 
-          {/* <div className="flex-1">Send a message</div>
+            {/* <div className="flex-1">Send a message</div>
         <div className="flex-1">Create a contact</div>
         <div className="flex-1">3</div> */}
+          </div>
         </div>
-      </div>
 
-      <p className="text-sm text-center my-8" /**mb-12 */>
-        {t("developer_credit")}{" "}
-        <Link
-          href="https://github.com/devdogfish"
-          className={cn(
-            buttonVariants({ variant: "link" }),
-            "p-0"
-            // "underline hover:no-underline"
-          )}
-        >
-          Luigi Girke
-        </Link>
-      </p>
+        <p className="text-sm text-center my-8" /**mb-12 */>
+          {t("developer_credit")}{" "}
+          <Link
+            href="https://github.com/devdogfish"
+            className={cn(
+              buttonVariants({ variant: "link" }),
+              "p-0"
+              // "underline hover:no-underline"
+            )}
+          >
+            Luigi Girke
+          </Link>
+        </p>
+      </div>
     </ChildrenPanel>
   );
 }
