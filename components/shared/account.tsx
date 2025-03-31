@@ -41,7 +41,6 @@ export default function Account({
   const pathname = usePathname();
   const router = useRouter();
   const { settings, resetLocalSettings } = useSettings();
-  const onMobile = useIsMobile();
 
   const handleLogout = async () => {
     const { success } = await logout();
@@ -50,11 +49,12 @@ export default function Account({
       router.push("/login");
     }
   };
+
   return (
     <div
+      // className={className}
       className={cn(
-        "flex h-[var(--header-header-height)] items-center justify-center", //border-b
-        // !hideNameRole && "px-2"
+        "flex h-[var(--header-header-height)] items-center justify-center ", // border-b
         className
       )}
     >

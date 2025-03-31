@@ -2,13 +2,15 @@
 
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Menu } from "lucide-react";
-import { Button } from "./ui/button";
+import { ArrowLeft, Menu } from "lucide-react";
+import { Button, buttonVariants } from "./ui/button";
 import { useLayout } from "@/contexts/use-layout";
 import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
 import { cn } from "@/lib/utils";
 import Account from "./shared/account";
+import { usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 type PageHeaderProps = {
   title?: string;
@@ -24,6 +26,8 @@ export function PageHeader({
   children,
 }: PageHeaderProps) {
   const onMobile = useIsMobile();
+  const pathname = usePathname();
+
   return (
     <>
       <div
@@ -32,7 +36,17 @@ export function PageHeader({
           title && "border-b"
         )}
       >
-        <MobileHamburgerButton />
+        {onMobile &&
+          (pathname.includes("/dashboard") ? (
+            <Link
+              href="/"
+              className={buttonVariants({ variant: "ghost", size: "icon" })}
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+          ) : (
+            <MobileHamburgerButton />
+          ))}
         {skeleton ? (
           <Skeleton
             // Consider to set this to 158 later which is the width of `New Message` title
@@ -78,19 +92,17 @@ export function SectionHeader({
 }
 
 export function MobileHamburgerButton() {
-  const onMobile = useIsMobile();
   const { setMobileNavPanel } = useLayout();
-  if (onMobile)
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="md:hidden"
-        type="button"
-        onClick={() => setMobileNavPanel(true)}
-      >
-        <Menu className="h-5 w-5" />
-        <span className="sr-only">Toggle mobile menu</span>
-      </Button>
-    );
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="md:hidden"
+      type="button"
+      onClick={() => setMobileNavPanel(true)}
+    >
+      <Menu className="h-5 w-5" />
+      <span className="sr-only">Toggle mobile menu</span>
+    </Button>
+  );
 }

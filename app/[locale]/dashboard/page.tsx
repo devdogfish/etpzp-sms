@@ -5,13 +5,14 @@ import {
 } from "@/lib/db/dashboard";
 import { format } from "date-fns";
 import { Metadata } from "next";
-import AdminDashboard from "./admin-dashboard";
+import AdminDashboard from "@/components/admin-dashboard";
 import { DEFAULT_START_DATE, ISO8601_DATE_FORMAT } from "@/global.config";
 
 export type CountryStat = { country: string; amount: number; cost: number };
 export const metadata: Metadata = {
   title: `${process.env.APP_NAME} - Admin dashboard`,
-  description: "Login in to ETPZP-SMS with your active directory account.",
+  description:
+    "View statistics on message traffic and costs, along with user and country data related to sent messages in the Admin Dashboard.",
 };
 
 export default async function Dashboard({
@@ -31,7 +32,6 @@ export default async function Dashboard({
   const messages = await fetchMessagesInDateRange(dateRange);
   const users = await fetchUsers();
   const countryData = await fetchCountryStats(dateRange);
-  console.log("re-rendered Dashboard server!!", s);
 
   return (
     <AdminDashboard

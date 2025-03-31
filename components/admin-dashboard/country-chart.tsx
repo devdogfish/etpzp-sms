@@ -45,7 +45,7 @@ export default function CountryMessagesChart({
         <text
           x={cx}
           y={cy}
-          fill="var(--foreground)"
+          fill="hsl(var(--foreground))"
           textAnchor="middle"
           dominantBaseline="central"
           className="text-3xl font-bold"
@@ -55,10 +55,10 @@ export default function CountryMessagesChart({
         <text
           x={cx}
           y={cy + 24}
-          fill="var(--muted-foreground)"
+          fill="hsl(var(--foreground))"
           textAnchor="middle"
           dominantBaseline="central"
-          className="text-sm"
+          className="text-sm text-muted-foreground opacity-75"
         >
           {t("messages_amount")}
         </text>
@@ -93,10 +93,14 @@ export default function CountryMessagesChart({
         <>
           {/* Content gets rendered in all other conditions */}
           <CardContent className="flex-1 pb-0 h-[300px]">
-            <div className="mx-auto aspect-square h-full max-w-[300px]">
-              {/* <ChartContainer config={{}}> */}
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+            <div className="mx-auto aspect-square h-full max-w-[300px] flex justify-center">
+              <ResponsiveContainer
+                width={250}
+                aspect={
+                  1
+                } /* Docs say percentages, but numerical values work better */
+              >
+                <PieChart className="">
                   <Tooltip content={<CustomTooltip />} />
 
                   <Pie
@@ -106,9 +110,8 @@ export default function CountryMessagesChart({
                     labelLine={false}
                     label={renderCustomLabel}
                     innerRadius={60}
-                    // outerRadius={100}
-                    strokeWidth={1}
-                    fill="#8884d8"
+                    outerRadius={105}
+                    // strokeWidth={3}
                     dataKey="amount"
                     nameKey="country"
                   >
@@ -116,7 +119,10 @@ export default function CountryMessagesChart({
                       <Cell
                         key={`cell-${index}`}
                         fill={COLORS[index % COLORS.length]}
-                        strokeWidth={5}
+                        // Adjust these values
+                        strokeWidth={1.8}
+                        stroke="hsl(var(--background))"
+                        // strokeOpacity={0.3}
                       />
                     ))}
                   </Pie>

@@ -320,12 +320,11 @@ function MessageDisplay({
       {/* Begin message content */}
       <ScrollArea>
         <div
-          className={cn(
-            "flex flex-col",
+          className={
             onMobile
               ? `h-[calc(100vh-var(--simple-header-height))]`
               : `h-[calc(100vh-var(--header-height))]`
-          )}
+          }
         >
           {message ? (
             <div className="flex flex-1 flex-col">

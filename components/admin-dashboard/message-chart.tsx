@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { format, parseISO, subDays } from "date-fns";
-import { capitalize, getDateFnsLocale } from "@/lib/utils";
+import { capitalize, cn, getDateFnsLocale } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -36,8 +36,10 @@ import {
 } from "@/global.config";
 import { LightDBMessage } from "@/types/dashboard";
 import { zodISODate } from "@/lib/form.schemas";
+import { buttonVariants } from "../ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-const chartColors = ["#309BF4", "#FEBE06", "#25A544", "#0279FE"];
+const CHART_COLORS = ["#FEBE06", "#309BF4", "#25A544", "#0279FE"];
 
 export default function MessageHistoryChart({
   messages,
@@ -49,6 +51,7 @@ export default function MessageHistoryChart({
   const data = toChartData(messages);
   const router = useRouter();
   const pathname = usePathname();
+  const onMobile = useIsMobile();
   const searchParams = useSearchParams();
   // This should get updated by re-renders, if not, turn it into a useState that gets set by a useEffect
   const selectedStartDate = {
@@ -115,18 +118,18 @@ export default function MessageHistoryChart({
           }}
         >
           <SelectTrigger
-            className="w-[160px] rounded-lg sm:ml-auto"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "w-min appearance-none font-normal justify-between"
+            )}
+            // className="w-[160px] rounded-lg sm:ml-auto"
             aria-label={t("common:aria_label-select")}
           >
             <SelectValue placeholder={t("area_chart-3_months")} />
           </SelectTrigger>
-          <SelectContent className="rounded-xl">
+          <SelectContent align={onMobile ? "center" : "end"}>
             {selectItems.map((item) => (
-              <SelectItem
-                key={item.date.getTime()}
-                value={toISO(item.date)}
-                className="rounded-lg"
-              >
+              <SelectItem key={item.date.getTime()} value={toISO(item.date)}>
                 {item.label}
               </SelectItem>
             ))}
@@ -134,11 +137,7 @@ export default function MessageHistoryChart({
               !selectItems.some(
                 (item) => toISO(item.date) === selectedStartDate.ISO_date
               ) && (
-                <SelectItem
-                  value={selectedStartDate.ISO_date}
-                  disabled
-                  className="rounded-lg"
-                >
+                <SelectItem value={selectedStartDate.ISO_date} disabled>
                   {selectedStartDate.isValid
                     ? format(
                         new Date(selectedStartDate.ISO_date),
@@ -161,24 +160,24 @@ export default function MessageHistoryChart({
               <linearGradient id="fillPrice" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor={chartColors[0]}
+                  stopColor={CHART_COLORS[0]}
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor={chartColors[0]}
+                  stopColor={CHART_COLORS[0]}
                   stopOpacity={0.1}
                 />
               </linearGradient>
               <linearGradient id="fillAmount" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor={chartColors[1]}
+                  stopColor={CHART_COLORS[1]}
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor={chartColors[1]}
+                  stopColor={CHART_COLORS[1]}
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -219,14 +218,14 @@ export default function MessageHistoryChart({
               dataKey="price"
               type="natural"
               fill="url(#fillPrice)"
-              stroke={chartColors[0]}
+              stroke={CHART_COLORS[0]}
               stackId="a"
             />
             <Area
               dataKey="amount"
               type="natural"
               fill="url(#fillAmount)"
-              stroke={chartColors[1]}
+              stroke={CHART_COLORS[1]}
               stackId="a"
             />
             <ChartLegend content={<ChartLegendContent />} />
