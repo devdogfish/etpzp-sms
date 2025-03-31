@@ -26,7 +26,6 @@ import {
 } from "lucide-react";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { cn } from "@/lib/utils";
-import ProfilePic from "./profile-pic";
 import { Separator } from "./ui/separator";
 import NavLinks from "./nav-links";
 import { useTranslation } from "react-i18next";
@@ -36,8 +35,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "@/hooks/use-session";
 import { logout } from "@/lib/auth";
-import { toast } from "sonner";
-import Link from "next/link";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -103,6 +100,9 @@ export function MobileNavPanel() {
   useEffect(() => {
     setMobileNavPanel(false);
   }, [router]);
+  useEffect(() => {
+    console.log(mobileNavPanel);
+  }, [mobileNavPanel]);
 
   // add a click event listener to the nav element
   const handleNavClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
@@ -120,7 +120,7 @@ export function MobileNavPanel() {
       /* You can change the animation duration inside the shadCn component (easiest way) */
     >
       <SheetContent side="left" className="w-[300px] p-0">
-        <SheetTitle className="sr-only">navigation Menu</SheetTitle>
+        <SheetTitle className="sr-only">Navigation menu</SheetTitle>
         <nav onClick={handleNavClick}>
           <NavPanelContent
             isCollapsed={false} // on mobile it will never be collapsed
@@ -140,6 +140,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
   const router = useRouter();
   const { session, loading } = useSession();
   const { settings, resetLocalSettings } = useSettings();
+  const onMobile = useIsMobile();
 
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   const showAlertDialog = () => {
@@ -157,10 +158,10 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
 
   return (
     <>
-      {settings.layout === "SIMPLE" && (
+      {(onMobile || settings.layout === "SIMPLE") && (
         <div
           className={cn(
-            "h-[var(--header-height)] border-b flex items-center gap-2",
+            "h-[var(--simple-header-height)] border-b flex items-center gap-2",
             !isCollapsed && "px-2",
             isCollapsed && "justify-center"
           )}
@@ -188,9 +189,8 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
         ]}
       />
 
-      <ScrollArea
-      /* Maybe we need a fixed height here, but if everything works, all good. */
-      >
+      {/* Maybe we need a fixed height here, but if everything works, all good. */}
+      <ScrollArea>
         <div
           className="flex flex-col"
           // In tailwind, this doesn't work, and I don't know why
@@ -294,7 +294,8 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
 
           <Separator />
           <div className="shrink h-[var(--simple-header-height)] flex flex-col justify-center">
-            {settings.layout === "SIMPLE" ? (
+            {/* Also show logout button in the mobile sheet, regardless of the current layout */}
+            {!onMobile && settings.layout === "SIMPLE" ? (
               <Account hideNameRole={isCollapsed} className="px-2" />
             ) : (
               <>

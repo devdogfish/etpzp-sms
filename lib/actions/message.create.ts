@@ -6,7 +6,6 @@ import { Message } from "@/types";
 import { getSession } from "../auth/sessions";
 import { formatPhone } from "../utils";
 import { NewRecipient } from "@/types/recipient";
-import { SuccessResponse } from "./testing/default-response";
 import { ActionResponse } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
@@ -80,8 +79,9 @@ export async function sendMessage(
 
   try {
     const payload = {
-      // this shit can only be one full word with no special characters or spaces
-      sender: validatedData.data.sender,
+      // This shit can only be one full word with no special characters or spaces
+      sender: /**validatedData.data.sender */ "ETPZP", // Hardcode this for now
+
       message: validatedData.data.body, // this can be any string
 
       recipients: validRecipients.map(({ phone }) => ({

@@ -22,6 +22,7 @@ import { saveDraft } from "@/lib/actions/message.actions";
 import { useTranslation } from "react-i18next";
 import ProfilePic from "./profile-pic";
 import { PT_DATE_FORMAT } from "@/global.config";
+import { ScrollArea } from "./ui/scroll-area";
 
 export default function ContactDisplay({
   contact,
@@ -144,51 +145,67 @@ export default function ContactDisplay({
           )}
         </div>
       </div>
+      {/* End top bar */}
       {/* <Separator /> */}
 
-      {contact ? (
-        <div className="flex flex-1 flex-col">
-          <div className="flex items-start p-4">
-            <div className="flex items-center gap-4 text-sm">
-              <ProfilePic name={contact.name} size={9} />
-              <h2>{contact.name}</h2>
-            </div>
+      <ScrollArea>
+        <div
+          className={cn(
+            "flex flex-col",
+            onMobile
+              ? `h-[calc(100vh-var(--simple-header-height))]`
+              : `h-[calc(100vh-var(--header-height))]`
+          )}
+        >
+          {contact ? (
+            <div className="flex flex-1 flex-col">
+              <div className="flex items-start p-4">
+                <div className="flex items-center gap-4 text-sm">
+                  <ProfilePic name={contact.name} size={9} />
+                  <h2>{contact.name}</h2>
+                </div>
 
-            {contact.created_at && (
-              <div className="ml-auto text-xs text-muted-foreground">
-                {`${t("common:created_on")} ${format(
-                  new Date(contact.created_at),
-                  PT_DATE_FORMAT
-                )}`}
+                {contact.created_at && (
+                  <div className="ml-auto text-xs text-muted-foreground">
+                    {`${t("common:created_on")} ${format(
+                      new Date(contact.created_at),
+                      PT_DATE_FORMAT
+                    )}`}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          <Separator />
-          <div className="flex gap-4 justify-between items-center p-4 text-sm">
-            <p>{t("common:phone_number")}</p>
-            <div className="flex">
-              <CopyButton text={contact.phone} variant="none" />
-              <Button variant="link" className="p-0" onClick={messageContact}>
-                {contact.phone}
-              </Button>
-            </div>
-          </div>
-          <Separator />
-          <div className="flex gap-4 justify-between p-4 text-sm">
-            <p>{t("common:description")}</p>
+              <Separator />
+              <div className="flex gap-4 justify-between items-center p-4 text-sm">
+                <p>{t("common:phone_number")}</p>
+                <div className="flex">
+                  <CopyButton text={contact.phone} variant="none" />
+                  <Button
+                    variant="link"
+                    className="p-0"
+                    onClick={messageContact}
+                  >
+                    {contact.phone}
+                  </Button>
+                </div>
+              </div>
+              <Separator />
+              <div className="flex gap-4 justify-between p-4 text-sm">
+                <p>{t("common:description")}</p>
 
-            {contact.description?.trim() ? (
-              <p>{contact.description}</p>
-            ) : (
-              <p className="italic">{t("common:no_description")}</p>
-            )}
-          </div>
+                {contact.description?.trim() ? (
+                  <p>{contact.description}</p>
+                ) : (
+                  <p className="italic">{t("common:no_description")}</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="p-8 text-center text-muted-foreground">
+              {t("none_selected")}
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="p-8 text-center text-muted-foreground">
-          {t("none_selected")}
-        </div>
-      )}
+      </ScrollArea>
     </div>
   );
 }

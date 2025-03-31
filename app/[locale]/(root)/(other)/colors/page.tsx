@@ -1,6 +1,6 @@
 import initTranslations from "@/app/i18n";
 import ColorPalette from "@/components/color-palette";
-import { PageHeader } from "@/components/header";
+import { PageHeader } from "@/components/headers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 

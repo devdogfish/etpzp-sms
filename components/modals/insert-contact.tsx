@@ -81,6 +81,16 @@ export default function InsertContactModal() {
     setInsertModal(false);
   };
 
+  const onSelect = (contact: DBContact) => {
+    const isSelected = !!selected.find((item) => item.id === contact.id);
+    isSelected
+      ? // it is already checked, so uncheck it:
+        setSelected((prevSelected) =>
+          prevSelected.filter((s) => s.id !== contact.id)
+        )
+      : // it is not checked yet, so add it to the selectedArr
+        setSelected((prevSelected) => [...prevSelected, contact]);
+  };
   const showCreateModal = () => {
     showInfoAbout(null);
     setInsertModal(false);
@@ -133,36 +143,27 @@ export default function InsertContactModal() {
                 </TableHeader>
                 <TableBody>
                   {contacts.map((contact) => {
-                    const current = selected.find(
+                    const isSelected = !!selected.find(
                       (item) => item.id === contact.id
                     );
                     return (
-                      <TableRow key={contact.id} className="h-6 max-h-6">
+                      <TableRow
+                        key={contact.id}
+                        className="h-6 max-h-6 cursor-pointer"
+                        onClick={() => onSelect(contact)}
+                      >
                         <TableCell
                           // This fixes the layout shifting
                           className="flex items-center h-[36.5px] font-medium"
                         >
                           <Checkbox
-                            className=" h-6 w-6 rounded-md"
+                            className="h-6 w-6 rounded-md mb-1"
                             style={{
                               height: "24px !important",
                               width: "24px !important",
                             }}
-                            checked={!!current}
-                            onClick={() => {
-                              !!current
-                                ? // it is already checked, so uncheck it:
-                                  setSelected((prevSelected) =>
-                                    prevSelected.filter(
-                                      (s) => s.id !== contact.id
-                                    )
-                                  )
-                                : // it is not checked yet, so add it to the selectedArr
-                                  setSelected((prevSelected) => [
-                                    ...prevSelected,
-                                    contact,
-                                  ]);
-                            }}
+                            checked={isSelected}
+                            onClick={() => onSelect(contact)}
                           />
                         </TableCell>
                         <TableCell>{contact.name}</TableCell>

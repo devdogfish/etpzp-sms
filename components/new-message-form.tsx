@@ -6,7 +6,7 @@ import { Maximize2, Minimize2, Trash2, X } from "lucide-react";
 import SendButton from "./send-button";
 import { capitalize, cn, toastActionResult } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { PageHeader } from "./header";
+import { PageHeader } from "./headers";
 import { sendMessage } from "@/lib/actions/message.create";
 import {
   Tooltip,
@@ -47,7 +47,6 @@ import useIsMounted from "@/hooks/use-mounted";
 import { format } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EMPTY_MESSAGE, PT_DATE_FORMAT } from "@/global.config";
-import { useContacts } from "@/contexts/use-contacts";
 import { useModal } from "@/contexts/use-modal";
 
 // apparently, when something gets revalidated or the url gets updated, this component gets re-rendered, while the new-message-context keeps it's state
@@ -110,20 +109,6 @@ const NewMessageForm = React.memo(function ({
     setMessage((m) => ({ ...m, scheduledDateConfirmed: false }));
 
     const formData = new FormData(e.currentTarget);
-
-    console.log("SEnding message with values:", {
-      sender: formData.get("sender") as string,
-      recipients: recipients as NewRecipient[],
-      subject: formData.get("subject") as string,
-      body: formData.get("body") as string,
-      secondsUntilSend:
-        message.scheduledDate.getTime() > new Date().getTime()
-          ? (Math.floor(
-              (message.scheduledDate.getTime() - Date.now()) / 1000
-            ) as number)
-          : undefined,
-    });
-
     const result = await sendMessage(draft.id, {
       sender: formData.get("sender") as string,
       recipients: recipients as NewRecipient[],
@@ -185,11 +170,8 @@ const NewMessageForm = React.memo(function ({
         }
       }, Object.entries(zodErrors).length * inBetweenTime);
     }
-    console.log("before clear form block");
 
     if (result.clearForm === true) {
-      console.log("clearing form");
-
       // 3. Reset the form
       setMessage(EMPTY_MESSAGE); // technically this isn't even needed
       router.push("/new-message");
@@ -366,10 +348,11 @@ const NewMessageForm = React.memo(function ({
             >
               <Select
                 name="sender"
-                defaultValue={message_id?.sender || "ETPZP"}
+                defaultValue={/**message_id?.sender || */ "ETPZP"}
                 onValueChange={(value) => {
                   setMessage((prev) => ({ ...prev, sender: value }));
                 }}
+                disabled
               >
                 {/** It defaults to the first SelectItem */}
                 <SelectTrigger className="w-full rounded-none border-none shadow-none focus:ring-0 px-5 py-1 h-11">
@@ -393,8 +376,7 @@ const NewMessageForm = React.memo(function ({
               name="subject"
               placeholder={t("subject_placeholder")}
               className={cn(
-                "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground border-b  focus:border-primary",
-                
+                "new-message-input focus-visible:ring-0 placeholder:text-muted-foreground border-b  focus:border-primary"
               )}
               onChange={handleInputChange}
               value={message?.subject || EMPTY_MESSAGE.subject}

@@ -315,11 +315,18 @@ function MessageDisplay({
           </Tooltip>
         </div>
       </div>
-      {/* env top bar */}
+      {/* End top bar */}
       {/* <Separator /> */}
       {/* Begin message content */}
       <ScrollArea>
-        <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
+        <div
+          className={cn(
+            "flex flex-col",
+            onMobile
+              ? `h-[calc(100vh-var(--simple-header-height))]`
+              : `h-[calc(100vh-var(--header-height))]`
+          )}
+        >
           {message ? (
             <div className="flex flex-1 flex-col">
               <div className="flex justify-between p-4">

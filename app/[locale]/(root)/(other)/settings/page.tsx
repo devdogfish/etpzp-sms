@@ -1,6 +1,6 @@
 "use client";
 
-import { PageHeader, SectionHeader } from "@/components/header";
+import { PageHeader, SectionHeader } from "@/components/headers";
 import {
   LanguageChanger,
   ThemeToggle,

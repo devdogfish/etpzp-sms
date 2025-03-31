@@ -1,5 +1,5 @@
 import initTranslations from "@/app/i18n";
-import { PageHeader } from "@/components/header";
+import { PageHeader } from "@/components/headers";
 import { Button } from "@/components/ui/button";
 
 export default async function Page() {

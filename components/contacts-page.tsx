@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import ChildrenPanel from "./shared/children-panel";
 import { ResizableHandle, ResizablePanel } from "./ui/resizable";
 import { useLayout } from "@/contexts/use-layout";
-import { PageHeader } from "./header";
+import { PageHeader } from "./headers";
 import { useTranslation } from "react-i18next";
 import ContactsList from "./contacts-list";
 

@@ -19,14 +19,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## In Progress
 - Add meta data like tab image and title
 - Implement DNS
-- Pop ups on mobile
 
 ## In progress:
-- Fix colors for dark mode
-  - Theme mode in settings dark mode
-- Sender Select only valid for ETPZP sms
 - Fix mobile issues with nav panel and shit
-- Make it possible to select a row in the insert contacts modal, to select the contact instead of just the checkbox
+- Pop ups on mobile
 
 ### Project Regrets
 - No uniform way to name functions or rules for type names
@@ -35,6 +31,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Not having clear/consistent naming conventions for schemas, and especially types 
 - Not use all the features provided by i18next, and i18nexus with plural and translation branching
 - No really uniform way to handle errors in server actions
+- Repeating the scroll area calculation so often
 
 ### Latest Conversation
 - For Domain name, we will use a dynamic IP service called No-IP. This is a program that you need to run on the server which will open a connection to their server. Their server will accept requests on that domain name, and will redirect that traffic to my server.

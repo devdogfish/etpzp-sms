@@ -7,9 +7,11 @@ import { Button } from "./ui/button";
 import { useLayout } from "@/contexts/use-layout";
 import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
+import { cn } from "@/lib/utils";
+import Account from "./shared/account";
 
 type PageHeaderProps = {
-  title: string;
+  title?: string;
   skeleton?: boolean;
   marginRight?: boolean;
   children?: React.ReactNode;
@@ -22,25 +24,18 @@ export function PageHeader({
   children,
 }: PageHeaderProps) {
   const onMobile = useIsMobile();
-  const { setMobileNavPanel } = useLayout();
   return (
     <>
-      <div className="flex items-center gap-2 px-4 h-[var(--simple-header-height)] border-b">
-        {onMobile && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            type="button"
-            onClick={() => setMobileNavPanel(true)}
-          >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle mobile menu</span>
-          </Button>
+      <div
+        className={cn(
+          "flex items-center gap-2 px-4 h-[var(--simple-header-height)]",
+          title && "border-b"
         )}
+      >
+        <MobileHamburgerButton />
         {skeleton ? (
           <Skeleton
-            // Consider to set this to 158 later which is the width of `Nova mensagem` title
+            // Consider to set this to 158 later which is the width of `New Message` title
             width=""
             height={28}
             containerClassName="mr-auto w-[30%]"
@@ -48,7 +43,11 @@ export function PageHeader({
         ) : (
           <h2 className={marginRight ? "mr-auto" : ""}>{title}</h2>
         )}
-        {children}
+        {onMobile ? (
+          <Account profilePicPosition="RIGHT" hideNameRoleOnXS />
+        ) : (
+          children
+        )}
       </div>
     </>
   );
@@ -76,4 +75,22 @@ export function SectionHeader({
       <div className="space-y-5 px-5">{children}</div>
     </div>
   );
+}
+
+export function MobileHamburgerButton() {
+  const onMobile = useIsMobile();
+  const { setMobileNavPanel } = useLayout();
+  if (onMobile)
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden"
+        type="button"
+        onClick={() => setMobileNavPanel(true)}
+      >
+        <Menu className="h-5 w-5" />
+        <span className="sr-only">Toggle mobile menu</span>
+      </Button>
+    );
 }

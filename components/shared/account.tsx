@@ -25,14 +25,16 @@ import { ThemeMode } from "@/types/theme";
 
 export default function Account({
   hideNameRole = false,
+  hideNameRoleOnXS,
   profilePicPosition = "LEFT",
   className,
 }: {
   hideNameRole?: boolean;
+  hideNameRoleOnXS?: boolean;
   profilePicPosition?: "LEFT" | "RIGHT";
   className?: string;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common"]);
   const { session, loading } = useSession();
   const { theme } = useNextTheme();
 
@@ -66,17 +68,19 @@ export default function Account({
           <ProfilePic
             size={9}
             name={settings.displayName}
-            colorProperties={
-              getThemeByIndex(settings.profileColorId || 1, theme as ThemeMode)
-            }
+            colorProperties={getThemeByIndex(
+              settings.profileColorId || 1,
+              theme as ThemeMode
+            )}
             loading={loading}
             className={cn(profilePicPosition === "RIGHT" && "order-2")}
           />
           <div
             className={cn(
-              "flex flex-col ",
+              "flex flex-col",
               profilePicPosition === "RIGHT" && "items-end", // align the text to the right depending on layout
-              (hideNameRole || loading) && "hidden"
+              (hideNameRole || loading) && "hidden",
+              hideNameRoleOnXS && "hidden xs:flex"
             )}
           >
             <p className="font-semibold mb-[-3px]">
@@ -101,7 +105,7 @@ export default function Account({
             <Link href="/settings">
               <DropdownMenuItem>
                 <Settings />
-                {t("navigation:settings")}
+                {t("common:account-settings")}
               </DropdownMenuItem>
             </Link>
             {session?.isAdmin && (
@@ -118,7 +122,7 @@ export default function Account({
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>
             <LogOut />
-            {t("navigation:log_out")}
+            {t("common:account-log_out")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

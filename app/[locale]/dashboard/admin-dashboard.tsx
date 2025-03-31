@@ -3,7 +3,7 @@
 import CountryMessagesChart from "@/components/admin-dashboard/country-chart";
 import MessageHistoryChart from "@/components/admin-dashboard/message-chart";
 import UserRanking from "@/components/admin-dashboard/user-chart";
-import { PageHeader } from "@/components/header";
+import { PageHeader } from "@/components/headers";
 import Account from "@/components/shared/account";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

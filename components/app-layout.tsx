@@ -48,7 +48,7 @@ export default function AppLayout({
       highlightColor={theme === "dark" ? "#3a3a3a" : undefined}
     >
       {/* Modern layout bar here */}
-      {settings.layout === "MODERN" && !isFullscreen && (
+      {settings.layout === "MODERN" && !isFullscreen && !onMobile && (
         <TranslationsProvider
           resources={resources}
           locale={locale}

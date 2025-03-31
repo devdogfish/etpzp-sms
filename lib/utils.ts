@@ -312,3 +312,7 @@ export function extractFirstWord(sentence: string) {
   // Return the first word if it exists, otherwise return null
   return words.length > 0 ? words[0] : null;
 }
+
+export function getScrollAreaHeightStyles(additionalHeightPx: number) {
+  return `h-[calc(100vh - var(--simple-header-height) - ${additionalHeightPx}px)] md:h-[calc(100vh-var(--header-height)-${additionalHeightPx}px)]`;
+}

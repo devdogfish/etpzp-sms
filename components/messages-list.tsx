@@ -2,12 +2,13 @@
 
 import { cn, getDateFnsLocale } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ComponentProps, useEffect } from "react";
+import { ComponentProps } from "react";
 import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import { Badge } from "@/components/ui/badge";
 import type { DBMessage } from "@/types";
 import { useTranslation } from "react-i18next";
 import ClockIcon from "./clock-icon";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type MessageListProps = {
   messages: DBMessage[];
@@ -21,14 +22,16 @@ export function MessageList({
   setSelected,
 }: MessageListProps) {
   const { t, i18n } = useTranslation(["messages-page"]);
-  useEffect(() => {
-    console.log("MESSAGES:");
-
-    console.log(messages);
-  }, []);
+  const onMobile = useIsMobile();
 
   return (
-    <ScrollArea className="h-[calc(100vh-var(--header-height)-68px)]">
+    <ScrollArea
+      className={
+        onMobile
+          ? `h-[calc(100vh-var(--simple-header-height)-68px)]`
+          : `h-[calc(100vh-var(--header-height)-68px)]`
+      }
+    >
       <div className="flex flex-col gap-2 p-4 pt-0">
         {messages.map((message) => {
           const sendInFuture = message.send_time.getTime() > Date.now();

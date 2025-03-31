@@ -3,8 +3,8 @@
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ProfilePic from "./profile-pic";
-
 import type { DBContact } from "@/types/contact";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type ContactListProps = {
   contacts: DBContact[];
@@ -17,8 +17,15 @@ export default function ContactsList({
   selectedContactId,
   setSelected,
 }: ContactListProps) {
+  const onMobile = useIsMobile();
   return (
-    <ScrollArea className="h-[calc(100vh-var(--header-height)-68px)]">
+    <ScrollArea
+      className={
+        onMobile
+          ? `h-[calc(100vh-var(--simple-header-height)-68px)]`
+          : `h-[calc(100vh-var(--header-height)-68px)]`
+      }
+    >
       <div className="flex flex-col gap-2 p-4 pt-0">
         {contacts.map((contact) => (
           <button

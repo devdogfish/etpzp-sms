@@ -10,7 +10,7 @@ import {
   X,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { PageHeader } from "@/components/header";
+import { PageHeader } from "@/components/headers";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
