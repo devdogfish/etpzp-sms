@@ -99,7 +99,7 @@ export function SettingItem({
       value={value}
       onChange={(e) => handleChange(e.target.value)}
       onBlur={(e?: any, v?: any) => handleSubmit(e, v)}
-      style={{ width: "max-content" }}
+      className="w-max"
       disabled={isPending}
       {...inputProps}
     />

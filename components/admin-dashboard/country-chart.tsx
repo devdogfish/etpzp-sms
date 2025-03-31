@@ -153,7 +153,7 @@ function CustomTooltip({ active, payload }: any) {
     return (
       <div
         className={cn(
-          "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-slate-200 border-slate-200/50 bg-white px-2.5 py-1.5 text-xs shadow-xl dark:border-slate-800 dark:border-slate-800/50 dark:bg-slate-950"
+          "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-slate-200/50 bg-background px-2.5 py-1.5 text-xs shadow-xl dark:border-slate-800 dark:border-slate-800/50 bg-background"
         )}
       >
         <div className="grid gap-1.5">
@@ -169,7 +169,7 @@ function CustomTooltip({ active, payload }: any) {
             return (
               <div
                 key={item.dataKey}
-                className={cn("flex w-full flex-col items-stretch gap-2 ")} //[&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-slate-500 dark:[&>svg]:text-slate-400
+                className={cn("flex w-full flex-col items-stretch gap-2 ")} //[&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground dark:[&>svg]:text-muted-foreground
               >
                 <div className="flex items-center gap-1">
                   <div
@@ -210,7 +210,7 @@ function KeyValueInTooltip({
   return (
     <div className={cn("flex flex-1 justify-between leading-none")}>
       <div className="grid gap-1.5">
-        <span className="text-slate-500 dark:text-slate-400">{name}</span>
+        <span className="text-muted-foreground ">{name}</span>
       </div>
       {value && (
         <span className="font-mono font-medium tabular-nums text-slate-950 dark:text-slate-50">

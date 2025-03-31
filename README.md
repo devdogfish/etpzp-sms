@@ -23,11 +23,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## In progress:
 - Fix colors for dark mode
-  - Primary color in calendar
-  - Input in settings dark mode display name
+  - Theme mode in settings dark mode
 - Sender Select only valid for ETPZP sms
 - Fix mobile issues with nav panel and shit
-- make it possible to select a row in the insert contacts modal, to select the contact instead of just the checkbox
+- Make it possible to select a row in the insert contacts modal, to select the contact instead of just the checkbox
 
 ### Project Regrets
 - No uniform way to name functions or rules for type names

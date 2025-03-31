@@ -71,7 +71,7 @@ export default function WelcomePage() {
             href="https://github.com/devdogfish"
             className={cn(
               buttonVariants({ variant: "link" }),
-              "p-0"
+              "p-0 h-min"
               // "underline hover:no-underline"
             )}
           >
