@@ -94,9 +94,7 @@ export default function RecipientInfoModal({
         {allowContactCreation && (
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline" className="mr-auto">
-                {t("common:close")}
-              </Button>
+              <Button variant="outline">{t("common:close")}</Button>
             </DialogClose>
             {!recipient.contact?.id && (
               <Button onClick={showCreateModal}>

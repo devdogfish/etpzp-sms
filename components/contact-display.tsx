@@ -102,20 +102,6 @@ export default function ContactDisplay({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => console.log("User wants to export a contact")}
-                disabled={!contact}
-              >
-                <Share className="h-4 w-4" />
-                <span className="sr-only">{t("common:export")}</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{t("common:export")}</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
                 onClick={() =>
                   setModal((m) => ({
                     ...m,

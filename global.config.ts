@@ -20,3 +20,5 @@ export const EMPTY_MESSAGE: MessageState = {
   scheduledDateModified: false,
   scheduledDateConfirmed: false,
 };
+
+export const APP_NAME = "ETPZP-SMS";

@@ -197,7 +197,12 @@ export function ThemeToggle({
     }, 200);
   };
   return (
-    <div className={cn(className, "grid max-w-md grid-cols-2 gap-8 pt-2")}>
+    <div
+      className={cn(
+        className,
+        "flex flex-col gap-1 sm:flex-row sm:gap-8 max-w-md pt-2"
+      )}
+    >
       <div
         onClick={isPending ? () => {} : () => handleChange("light")}
         className={cn(isPending && "opacity-50 cursor-not-allowed")}

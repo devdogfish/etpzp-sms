@@ -97,7 +97,7 @@ export default {
       xl: "1280px",
       "2xl": "1536px",
       // Custom breakpoints
-      xs: "410px",
+      xs: "435px",
     },
     aspectRatio: {
       "1": "1 / 1",

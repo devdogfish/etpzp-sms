@@ -93,7 +93,6 @@ const NewMessageForm = React.memo(function ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(message.scheduledDate.getTime(), Date.now());
 
     // Smaller than (<) means it is in the past, while larger than (>) means in the future
     if (
@@ -110,7 +109,7 @@ const NewMessageForm = React.memo(function ({
 
     const formData = new FormData(e.currentTarget);
     const result = await sendMessage(draft.id, {
-      sender: formData.get("sender") as string,
+      sender: /*formData.get("sender") as string */ "ETPZP",
       recipients: recipients as NewRecipient[],
       subject: formData.get("subject") as string,
       body: formData.get("body") as string,
@@ -123,7 +122,6 @@ const NewMessageForm = React.memo(function ({
     });
 
     setLoading(false);
-    console.log("Awaited result: ", result);
 
     // Update the message context with the result errors, so that they can be persisted between draft re-renders
     setMessage((m) => ({
@@ -268,11 +266,6 @@ const NewMessageForm = React.memo(function ({
 
   useEffect(() => {
     if (formRef.current) {
-      // console.log(
-      //   "Form re-rendered. Re-setting form element:",
-      //   formRef.current
-      // );
-
       setForm(formRef.current);
     }
   }, [formRef]);
@@ -334,7 +327,7 @@ const NewMessageForm = React.memo(function ({
         <div
           className={cn(
             "flex flex-col",
-            isFullscreen === true
+            isFullscreen || onMobile
               ? "h-[calc(100vh-var(--simple-header-height))]"
               : "h-[calc(100vh-var(--header-height))]"
           )}
@@ -413,7 +406,7 @@ const NewMessageForm = React.memo(function ({
               onClick={discardDraft}
             >
               <Trash2 className="h-4 w-4" />
-              {t("discard")}
+              <span className="hidden xs:inline">{t("discard")}</span>
             </Button>
 
             <SendButton loading={loading} />

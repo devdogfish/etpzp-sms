@@ -18,11 +18,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 # TODO
 ## In Progress
 - Add meta data like tab image and title
-- Implement DNS
-
-## In progress:
-- Fix mobile issues with nav panel and shit
-- Pop ups on mobile
 
 ### Project Regrets
 - No uniform way to name functions or rules for type names

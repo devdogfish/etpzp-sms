@@ -155,10 +155,10 @@ export default function CreateContactModal({
             </Alert>
           )}
 
-          <DialogFooter className="mt-5">
+          <DialogFooter>
             <DialogClose
               type="button"
-              className={cn(buttonVariants({ variant: "outline" }), "mr-auto")}
+              className={cn(buttonVariants({ variant: "outline" }))}
             >
               {t("common:cancel")}
             </DialogClose>

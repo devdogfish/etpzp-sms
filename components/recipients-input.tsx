@@ -323,7 +323,7 @@ export default function RecipientsInput({
             {/* Begin suggested recipients dropdown */}
             {isDropdownOpen && suggestedRecipients.length !== 0 && (
               <div className="absolute top-[85%] bg-background rounded-lg border shadow-md dark:shadow-lg-light">
-                <ScrollArea className="w-[300px] h-[330px]">
+                <ScrollArea className="w-[230px] xs:w-[300px] h-[330px]">
                   <div
                     className="p-2" /* this is necessary to have a separate container so that the items scroll all the way up to the end of the container */
                   >

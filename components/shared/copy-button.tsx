@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, MouseEvent } from "react";
 import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface CopyButtonProps {
   children?: React.ReactNode;
@@ -23,14 +24,45 @@ export function CopyButton({
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleCopy = (e: MouseEvent<HTMLButtonElement>) => {
+  // We need this complex logic or it won't work in some browsers
+  const handleCopy = async (e: MouseEvent<HTMLButtonElement>) => {
     if (!copied) {
-      navigator.clipboard.writeText(text);
-      setCopied(true);
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => setCopied(false), 2000);
+      try {
+        // Check if the Clipboard API is supported
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(text);
+          setCopied(true);
+          toast.success("Text copied to clipboard!"); // Notify success
+        } else {
+          // Fallback for browsers that do not support the Clipboard API
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.style.position = "fixed"; // Prevent scrolling to bottom of page in MS Edge.
+          textarea.style.opacity = "0"; // Make it invisible
+          textarea.setAttribute("readonly", ""); // Make it read-only
+          document.body.appendChild(textarea);
+          textarea.select();
+          const successful = document.execCommand("copy");
+          document.body.removeChild(textarea);
+
+          if (successful) {
+            setCopied(true);
+            toast.success("Text copied to clipboard!"); // Notify success
+          } else {
+            throw new Error("Copy command was unsuccessful.");
+          }
+        }
+
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => setCopied(false), 2000);
+      } catch (error) {
+        // Handle any errors that occur during the copy process
+        console.log("Failed to copy text: ", error);
+        toast.error("Failed to copy text. Please try again."); // Notify failure
+      }
     }
   };
+
   return (
     <Button
       variant={variant}

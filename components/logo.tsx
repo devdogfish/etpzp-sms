@@ -1,3 +1,4 @@
+import { APP_NAME } from "@/global.config";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -16,10 +17,10 @@ export default function Logo({ isCollapsed }: { isCollapsed: boolean }) {
         {!isCollapsed && (
           <span
             // className=""
-            style={{ fontFamily: "var(--font-disket-mono-regular)", background: "var(--color-yellow)" }}
-            className="font-bold user-select-none tracking-tight text-xl" // or text-2xl
+            style={{ fontFamily: "", background: "var(--color-yellow)" }}
+            className="font-bold user-select-none tracking-tight text-xl font-disket-mono-regular" // or text-2xl
           >
-            ETPZP-SMS
+            {APP_NAME}
           </span>
         )}
       </Link>

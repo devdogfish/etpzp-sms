@@ -12,6 +12,8 @@ import Contact from "@/public/icons/user-solid.svg";
 import { Metadata } from "next";
 import { MobileHamburgerButton, PageHeader } from "@/components/headers";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { APP_NAME } from "@/global.config";
 
 // why doesn't this work
 export const metaData: Metadata = {
@@ -21,6 +23,7 @@ export const metaData: Metadata = {
 export default function WelcomePage() {
   const { amountIndicators } = useLayout();
   const { themeColor } = useThemeContext();
+  const onMobile = useIsMobile();
 
   const { t, i18n } = useTranslation(["welcome-page"]);
   const gradientStyle = {
@@ -34,20 +37,23 @@ export default function WelcomePage() {
   return (
     <ChildrenPanel>
       <ScrollArea className="h-full">
-        <PageHeader />
+        {onMobile && <PageHeader />}
 
         <div className="flex-1 flex flex-col p-4 min-h-[calc(100vh-var(--simple-header-height))]">
-          <div className="flex-1 flex flex-col items-center justify-center gap-5">
+          <div className="flex-1 flex flex-col items-center justify-center gap-10">
             {/* <PageHeader title="Welcome to the Etpzp SMS App!" /> */}
-            <h1 className="text-center">
-              <Trans i18nKey="welcome-page:welcome_message" i18n={i18n}>
-                Welcome to the
-                <div className="text-6xl _gradient-text">ETPZP-SMS</div>
-                app
-              </Trans>
-            </h1>
+
+            <div className="text-center">
+              <span className="text-xl text-muted-foreground block">
+                {t("welcome_message")}{" "}
+              </span>
+              <span className="text-6xl leading-tighter gradient-text">
+                {APP_NAME}
+              </span>
+            </div>
+
             {/*  */}
-            <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 w-full justify-center items-center">
+            <div className="flex flex-col xs:flex-row gap-2 w-full justify-center items-center">
               <LinkCard
                 href="/contacts"
                 heroValue={amountIndicators?.contacts || 0}
@@ -75,6 +81,7 @@ export default function WelcomePage() {
                 "p-0 h-min"
                 // "underline hover:no-underline"
               )}
+              target="_blank"
             >
               Luigi Girke
             </Link>

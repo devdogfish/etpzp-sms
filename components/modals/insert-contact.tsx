@@ -81,7 +81,7 @@ export default function InsertContactModal() {
     setInsertModal(false);
   };
 
-  const onSelect = (contact: DBContact) => {
+  const onSelectOne = (contact: DBContact) => {
     const isSelected = !!selected.find((item) => item.id === contact.id);
     isSelected
       ? // it is already checked, so uncheck it:
@@ -90,6 +90,11 @@ export default function InsertContactModal() {
         )
       : // it is not checked yet, so add it to the selectedArr
         setSelected((prevSelected) => [...prevSelected, contact]);
+  };
+  const onSelectAll = () => {
+    selected.length === contacts.length
+      ? setSelected([])
+      : setSelected(contacts);
   };
   const showCreateModal = () => {
     showInfoAbout(null);
@@ -125,16 +130,12 @@ export default function InsertContactModal() {
               <Table>
                 {/* <TableCaption>A list of your contacts.</TableCaption> */}
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="cursor-pointer" onClick={onSelectAll}>
                     <TableHead className="flex items-center">
                       <Checkbox
                         className="w-6 h-6 rounded-md"
                         checked={selected.length === contacts.length}
-                        onClick={() => {
-                          selected.length === contacts.length
-                            ? setSelected([])
-                            : setSelected(contacts);
-                        }}
+                        onClick={onSelectAll}
                       />
                     </TableHead>
                     <TableHead>{t("common:name")}</TableHead>
@@ -149,8 +150,8 @@ export default function InsertContactModal() {
                     return (
                       <TableRow
                         key={contact.id}
-                        className="h-6 max-h-6 cursor-pointer"
-                        onClick={() => onSelect(contact)}
+                        className="cursor-pointer"
+                        onClick={() => onSelectOne(contact)}
                       >
                         <TableCell
                           // This fixes the layout shifting
@@ -163,7 +164,7 @@ export default function InsertContactModal() {
                               width: "24px !important",
                             }}
                             checked={isSelected}
-                            onClick={() => onSelect(contact)}
+                            onClick={() => onSelectOne(contact)}
                           />
                         </TableCell>
                         <TableCell>{contact.name}</TableCell>
@@ -191,29 +192,27 @@ export default function InsertContactModal() {
             </div>
           )}
           <DialogFooter>
-            <div className="flex w-full justify-between">
-              <DialogClose
-                className={cn(
-                  "w-full sm:w-min",
-                  buttonVariants({ variant: "outline" })
-                )}
-              >
-                {t("common:cancel")}
-              </DialogClose>
-              {contacts.length !== 0 && (
-                <Button
-                  onClick={onInsert}
-                  /* uncomment this if you prefer
-                  disabled={!selected.length} */
-                >
-                  {selected.length === 1
-                    ? t("insert_contact-button_insert_one")
-                    : t("insert_contact-button_insert_x", {
-                        amount: selected.length,
-                      })}
-                </Button>
+            <DialogClose
+              className={cn(
+                "w-full sm:w-min",
+                buttonVariants({ variant: "outline" })
               )}
-            </div>
+            >
+              {t("common:cancel")}
+            </DialogClose>
+            {contacts.length !== 0 && (
+              <Button
+                onClick={onInsert}
+                /* uncomment this if you prefer
+                  disabled={!selected.length} */
+              >
+                {selected.length === 1
+                  ? t("insert_contact-button_insert_one")
+                  : t("insert_contact-button_insert_x", {
+                      amount: selected.length,
+                    })}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
