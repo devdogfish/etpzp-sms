@@ -76,76 +76,72 @@ export default function ScheduleMessageModal() {
       open={modal.schedule}
       onOpenChange={() => setModal((m) => ({ ...m, schedule: false }))}
     >
-      <DialogContent className="p-6">
-        <div className="overflow-y-auto">
-          <DialogHeader className="mb-5">
-            <DialogTitle>{t("modals:schedule_message-header")}</DialogTitle>
-            <DialogDescription>
-              {t("modals:schedule_message-header_caption")}
-            </DialogDescription>
-          </DialogHeader>
-          <div
-            className="flex flex-col gap-4 items-center xs:items-start xs:flex-row h-[325px] max-w-[250px] xs:max-w-full mx-auto xs:mx-0 p-0" /** This is the exact maximum height of the calendar */
-          >
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date: Date | undefined) => {
-                setSelectedDate((prev) => (date ? date : prev));
-              }}
-              className="rounded-md border"
-            />
-            <div className="flex flex-col justify-between h-full w-full">
-              <div /** className="flex flex-col h-full justify-center" */>
-                <div className="flex flex-col gap-2 mb-3">
-                  <Label htmlFor="hour">
-                    {t("modals:schedule_message-hour_label")}
-                  </Label>
-                  <TimeInput
-                    id="hour"
-                    min={0}
-                    max={23}
-                    value={selectedDate.getHours()}
-                    onChange={(value) => {
-                      console.log("changing hours");
+      <DialogContent className="p-6 overflow-y-auto">
+        <DialogHeader className="mb-5">
+          <DialogTitle>{t("modals:schedule_message-header")}</DialogTitle>
+          <DialogDescription>
+            {t("modals:schedule_message-header_caption")}
+          </DialogDescription>
+        </DialogHeader>
+        <div
+          className="flex flex-col gap-4 items-center xs:items-start xs:flex-row h-[325px] max-w-[250px] xs:max-w-full mx-auto xs:mx-0 p-0" /** This is the exact maximum height of the calendar */
+        >
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={(date: Date | undefined) => {
+              setSelectedDate((prev) => (date ? date : prev));
+            }}
+            className="rounded-md border"
+          />
+          <div className="flex flex-col justify-between h-full w-full pb-6 xs:pb-0">
+            <div /** className="flex flex-col h-full justify-center" */>
+              <div className="flex flex-col gap-2 mb-3">
+                <Label htmlFor="hour">
+                  {t("modals:schedule_message-hour_label")}
+                </Label>
+                <TimeInput
+                  id="hour"
+                  min={0}
+                  max={23}
+                  value={selectedDate.getHours()}
+                  onChange={(value) => {
+                    console.log("changing hours");
 
-                      setSelectedDate((prev) => new Date(prev.setHours(value)));
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col gap-2 mb-3">
-                  <Label htmlFor="minute">
-                    {t("modals:schedule_message-minute_label")}
-                  </Label>
-                  <TimeInput
-                    id="minute"
-                    min={0}
-                    max={59}
-                    value={selectedDate.getMinutes()}
-                    onChange={(value) =>
-                      setSelectedDate(
-                        (prev) => new Date(prev.setMinutes(value))
-                      )
-                    }
-                  />
-                </div>
+                    setSelectedDate((prev) => new Date(prev.setHours(value)));
+                  }}
+                />
               </div>
-              <div className="flex flex-wrap gap-2 justify-end">
-                <Button
-                  variant="outline"
-                  onClick={handleCancelButtonClick}
-                  className="flex-1"
-                >
-                  {selectedDate > now
-                    ? t("modals:schedule_message-reset")
-                    : t("common:cancel")}
-                </Button>
-                <Button onClick={applySelectedDate} className="flex-1">
-                  {selectedDate > now
-                    ? t("modals:schedule_message-submit")
-                    : t("modals:schedule_message-submit_now")}
-                </Button>
+              <div className="flex flex-col gap-2 mb-3">
+                <Label htmlFor="minute">
+                  {t("modals:schedule_message-minute_label")}
+                </Label>
+                <TimeInput
+                  id="minute"
+                  min={0}
+                  max={59}
+                  value={selectedDate.getMinutes()}
+                  onChange={(value) =>
+                    setSelectedDate((prev) => new Date(prev.setMinutes(value)))
+                  }
+                />
               </div>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={handleCancelButtonClick}
+                className="flex-1"
+              >
+                {selectedDate > now
+                  ? t("modals:schedule_message-reset")
+                  : t("common:cancel")}
+              </Button>
+              <Button onClick={applySelectedDate} className="flex-1">
+                {selectedDate > now
+                  ? t("modals:schedule_message-submit")
+                  : t("modals:schedule_message-submit_now")}
+              </Button>
             </div>
           </div>
         </div>

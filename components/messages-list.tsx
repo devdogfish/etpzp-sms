@@ -9,6 +9,7 @@ import type { DBMessage } from "@/types";
 import { useTranslation } from "react-i18next";
 import ClockIcon from "./clock-icon";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "./ui/button";
 
 type MessageListProps = {
   messages: DBMessage[];
@@ -43,11 +44,12 @@ export function MessageList({
               : "SENT"
           ).toLowerCase();
           return (
-            <button
+            <Button
               key={message.id}
+              variant="ghost"
               className={cn(
-                "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-                selectedMessageId === message.id && "bg-muted"
+                "h-full flex flex-col items-start gap-2 rounded-lg border p-3 text-left mt-[1px]",
+                selectedMessageId === message.id && "bg-accent"
               )}
               onClick={() => setSelected(message)}
             >
@@ -103,7 +105,7 @@ export function MessageList({
                   {t(`status_${statusTranslationString}`).toUpperCase()}
                 </Badge>
               )}
-            </button>
+            </Button>
           );
         })}
       </div>

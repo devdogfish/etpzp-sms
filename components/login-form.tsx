@@ -14,7 +14,6 @@ import { login } from "@/lib/auth";
 import { FormEvent, useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Label } from "./ui/label";
-import { toast } from "sonner";
 import { ActionResponse } from "@/types/action";
 import { Login } from "@/lib/auth/config";
 import SubmitButton from "./shared/submit-button";
@@ -28,7 +27,6 @@ const initialState: ActionResponse<Login> = {
   message: [],
 };
 export default function LoginForm() {
-  const { i18n } = useTranslation();
   const [passInputType, setPassInputType] = useState("password");
   const [serverState, setServerState] = useState(initialState);
   const { syncWithDB } = useSettings();

@@ -48,8 +48,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useSettings } from "@/contexts/use-settings";
 import Account from "./shared/account";
-import Image from "next/image";
-import Logo from "./logo";
+import AppLogo from "./logo";
 
 export default function NavPanel() {
   const { layout, isCollapsed, setIsCollapsed, fallbackLayout, isFullscreen } =
@@ -166,7 +165,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             isCollapsed && "justify-center"
           )}
         >
-          <Logo isCollapsed={isCollapsed} />
+          <AppLogo isCollapsed={isCollapsed} />
         </div>
       )}
 

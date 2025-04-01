@@ -19,14 +19,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## In Progress
 - Add meta data like tab image and title
 - Change colors on pie chart to be more unique
-- Fix mobile panel expanding animation
+- Fix mobile panel expanding sheet animation
 - Add border to some profilePics - maybe add a prop to the component for this
 ⁃ Recipient chips are not aligned
-⁃ Add round telegram inspired + to on mobile to create new contact
-⁃ Add different focus primary outlines
-⁃ Reset schedule date to know on component mount. When I go to ne-message it is already prompting to schedule the send
-⁃ Change the padding in the new message schedule drop-down so that the scrolling looks nicer
-Add saved state to mobile new-message
+- Add saved state to mobile new-message
 
 ### Project Regrets
 - No uniform way to name functions or rules for type names

@@ -160,6 +160,9 @@ body {
   -webkit-text-fill-color: transparent; /* Make the text color transparent */
   display: inline-block; /* Ensure the gradient applies correctly */
 }
+.focus-primary-ring {
+  @apply focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-none;
+}
 
 .user-select-none {
   user-select: none; /* Prevent text selection */

@@ -54,14 +54,14 @@ export default function Account({
     <div
       // className={className}
       className={cn(
-        "flex h-[var(--header-header-height)] items-center justify-center ", // border-b
+        "flex h-[var(--header-header-height)] items-center justify-center", // border-b
         className
       )}
     >
       <DropdownMenu>
         <DropdownMenuTrigger
           className={cn(
-            "flex gap-3 items-center justify-start w-full",
+            "flex gap-3 items-center justify-start w-full focus-primary-ring",
             hideNameRole && "w-9 h-9"
           )}
         >

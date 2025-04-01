@@ -13,7 +13,7 @@ import ContactDisplay from "./contact-display";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Search from "./shared/search";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, Plus } from "lucide-react";
 import { Button } from "./ui/button";
 import { useModal } from "@/contexts/use-modal";
 import { DBContact } from "@/types/contact";
@@ -28,6 +28,7 @@ export default function ContactsPage() {
   const [filteredContacts, setFilteredContacts] = useState(contacts);
   const onMobile = useIsMobile();
   const isMounted = useIsMounted();
+  const { modal, setModal } = useModal();
 
   const [selected, setSelected] = useState<DBContact | null>(
     filteredContacts[0] || null
@@ -37,6 +38,12 @@ export default function ContactsPage() {
 
   const onSearch = (searchTerm: string) => {
     setFilteredContacts(searchContacts(contacts, searchTerm));
+  };
+  const showCreateModal = () => {
+    setModal((m) => ({
+      ...m,
+      contact: { ...m.contact, create: true },
+    }));
   };
 
   useEffect(() => {
@@ -57,11 +64,13 @@ export default function ContactsPage() {
     }
   }, [isMounted]);
 
-  const { setModal } = useModal();
   return (
     <>
+      <CreateContactModal
+        onCreateSuccess={(contact: DBContact) => setSelected(contact)}
+      />
       <ResizablePanel
-        className={cn(onMobile && selected !== null && "hidden")} // If we are on mobile and a contact is selected we only want to show the column containing the selected contact.
+        className={cn("relative", onMobile && selected !== null && "hidden")} // If we are on mobile and a contact is selected we only want to show the column containing the selected contact.
         // Check if the layout is a 3-column middle-bar panel. Use the previous 3-column layout if available; otherwise, render the fallback for different or undefined layouts.
         defaultSize={
           Array.isArray(layout) && layout.length === 3
@@ -73,18 +82,7 @@ export default function ContactsPage() {
       >
         <PageHeader title={t("header")}>
           {/* Not sure if this is allowed to be here */}
-          <CreateContactModal
-            onCreateSuccess={(contact: DBContact) => setSelected(contact)}
-          />
-          <Button
-            size="sm"
-            onClick={() =>
-              setModal((m) => ({
-                ...m,
-                contact: { ...m.contact, create: true },
-              }))
-            }
-          >
+          <Button size="sm" onClick={showCreateModal}>
             <CirclePlus />
             {t("new")}
           </Button>
@@ -104,6 +102,21 @@ export default function ContactsPage() {
           <div className="p-8 text-center text-muted-foreground">
             {contactFetchError || t("none_found")}
           </div>
+        )}
+        {onMobile && (
+          <Button
+            className="absolute w-11 h-11 bg-primary bottom-0 right-0 m-6 rounded-full"
+            onClick={() => {
+              console.log("create contact modal", modal);
+
+              setModal((m) => ({
+                ...m,
+                contact: { ...m.contact, create: true },
+              }));
+            }}
+          >
+            <Plus />
+          </Button>
         )}
       </ResizablePanel>
       <ResizableHandle withHandle className={cn(onMobile && "hidden")} />

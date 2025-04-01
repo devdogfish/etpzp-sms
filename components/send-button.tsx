@@ -20,6 +20,7 @@ import { PT_DATE_FORMAT } from "@/global.config";
 
 export default function SendButton({ loading }: { loading: boolean }) {
   const now = new Date();
+  now.setMinutes(now.getMinutes() + 1); // Add one or two minutes margin so that when the page loads slowly, the now date will appear to be in the past, displaying send now on the button
   const { modal, setModal, scheduleDropdown, setScheduleDropdown } = useModal();
   const { message, setMessage } = useNewMessage();
   const { t } = useTranslation(["messages-page", "modals", "common"]);

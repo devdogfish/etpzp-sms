@@ -16,10 +16,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { APP_NAME } from "@/global.config";
 
 // why doesn't this work
-export const metaData: Metadata = {
-  title: `${process.env.APP_NAME} - Welcome`,
-  description: "Welcome to the application!",
-};
+// export const metaData: Metadata = {
+//   title: `${process.env.APP_NAME} - Welcome`,
+//   description: "Welcome to the application!",
+// };
 export default function WelcomePage() {
   const { amountIndicators } = useLayout();
   const { themeColor } = useThemeContext();

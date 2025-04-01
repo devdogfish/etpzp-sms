@@ -1,6 +1,6 @@
 "use client";
 
-import { Input } from "@/components/shared/input";
+import { Input } from "@/components/ui/input";
 import { Search as SearchIcon } from "lucide-react";
 
 type SearchProps = React.InputHTMLAttributes<HTMLInputElement> & {
@@ -37,6 +37,7 @@ export default function Search({ onSearch, ...props }: SearchProps) {
           onChange={(e) => {
             handleSearch(e.target.value);
           }}
+          className="focus-visible:ring-1 focus-visible:ring-primary"
           defaultValue={params.get("query")?.toString()}
           {...props}
         />

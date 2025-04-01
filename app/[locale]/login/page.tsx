@@ -13,7 +13,7 @@ export default async function LoginPage() {
 }
 export const metadata: Metadata = {
   title: `${process.env.APP_NAME} - Login`,
-  description: "Login in to ETPZP-SMS with your active directory account.",
+  description: "Log in to ETPZP-SMS with your active directory account.",
 };
 
 async function getActiveDirectoryData() {

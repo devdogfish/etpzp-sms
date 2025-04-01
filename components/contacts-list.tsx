@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ProfilePic from "./profile-pic";
 import type { DBContact } from "@/types/contact";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "./ui/button";
 
 type ContactListProps = {
   contacts: DBContact[];
@@ -28,11 +29,12 @@ export default function ContactsList({
     >
       <div className="flex flex-col gap-2 p-4 pt-0">
         {contacts.map((contact) => (
-          <button
+          <Button
             key={contact.id}
+            variant="ghost"
             className={cn(
-              "flex contacts-start items-center gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-              selectedContactId === contact.id && "bg-muted"
+              "h-full flex items-center justify-start gap-2 rounded-lg border p-3 text-left mt-[1px]",
+              selectedContactId === contact.id && "bg-accent"
             )}
             onClick={() => setSelected(contact)}
           >
@@ -41,7 +43,7 @@ export default function ContactsList({
               <div className="font-semibold">{contact.name}</div>
               <div className="text-xs font-medium">{contact.phone}</div>
             </div>
-          </button>
+          </Button>
         ))}
       </div>
     </ScrollArea>

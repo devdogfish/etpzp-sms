@@ -15,7 +15,10 @@ export default function LinkCard({
   Icon,
 }: LinkCardProps) {
   return (
-    <Link href={href} className="flex-1 max-w-[350px]">
+    <Link
+      href={href}
+      className="flex-1 max-w-[350px]  focus-primary-ring rounded-xl"
+    >
       <Card className="shadow-none hover:bg-muted dark:hover:bg-muted relative overflow-hidden ">
         <CardHeader>
           <div className="flex justify-between items-center gap-8">

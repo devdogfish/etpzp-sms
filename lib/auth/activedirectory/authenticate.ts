@@ -81,6 +81,7 @@ export async function dummyAuthenticate({
 
       primary_color_id: 1,
       dark_mode: false,
+      appearance_layout: "MODERN",
     },
     isAuthenticated: true,
     isAdmin: true,

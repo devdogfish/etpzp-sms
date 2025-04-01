@@ -7,7 +7,7 @@ import { SkeletonTheme } from "react-loading-skeleton";
 import { useLayout } from "@/contexts/use-layout";
 import { useSettings } from "@/contexts/use-settings";
 import TranslationsProvider from "@/contexts/translations-provider";
-import Logo from "./logo";
+import AppLogo from "./logo";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Account from "./shared/account";
 import { useEffect } from "react";
@@ -57,7 +57,7 @@ export default function AppLayout({
         >
           <div className="w-full min-h-[var(--simple-header-height)] flex justify-between items-center border-b px-2">
             <div className="flex items-center gap-2">
-              <Logo isCollapsed={onMobile} />
+              <AppLogo isCollapsed={onMobile} />
             </div>
             <div className="">
               <Account profilePicPosition="RIGHT" />
