@@ -23,6 +23,7 @@ import { useTheme as useNextTheme } from "next-themes";
 import { useThemeContext } from "@/contexts/theme-data-provider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { METADATA_APP_NAME } from "@/global.config";
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -210,3 +211,4 @@ export default function Settings() {
     </>
   );
 }
+

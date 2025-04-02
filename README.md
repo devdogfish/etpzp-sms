@@ -15,10 +15,6 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-# TODO
-## In Progress
-- Add meta data like tab image and title
-
 ### Project Regrets
 - No uniform way to name functions or rules for type names
 - No snippets for repetitive code

@@ -1,6 +1,7 @@
 import initTranslations from "@/app/i18n";
 import TranslationsProvider from "@/contexts/translations-provider";
 import ChildrenPanel from "@/components/shared/children-panel";
+import { METADATA_APP_NAME } from "@/global.config";
 
 type LayoutProps = Readonly<{
   children: React.ReactNode;
@@ -27,4 +28,17 @@ export default async function TranslationLayout({
       <ChildrenPanel>{children}</ChildrenPanel>
     </TranslationsProvider>
   );
+}
+
+export async function generateMetadata({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  const { t } = await initTranslations(locale, ["metadata"]);
+
+  return {
+    title: METADATA_APP_NAME + t("settings-title"),
+    description: t("settings-description"),
+  };
 }

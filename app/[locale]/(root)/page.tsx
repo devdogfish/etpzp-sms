@@ -9,17 +9,11 @@ import LinkCard from "@/components/cards";
 import { useThemeContext } from "@/contexts/theme-data-provider";
 import Envelope from "@/public/icons/envelope-solid.svg";
 import Contact from "@/public/icons/user-solid.svg";
-import { Metadata } from "next";
-import { MobileHamburgerButton, PageHeader } from "@/components/headers";
+import { PageHeader } from "@/components/headers";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { APP_NAME } from "@/global.config";
 
-// why doesn't this work
-// export const metaData: Metadata = {
-//   title: `${process.env.APP_NAME} - Welcome`,
-//   description: "Welcome to the application!",
-// };
 export default function WelcomePage() {
   const { amountIndicators } = useLayout();
   const { themeColor } = useThemeContext();

@@ -3,6 +3,7 @@ import TranslationsProvider from "@/contexts/translations-provider";
 import ChildrenPanel from "@/components/shared/children-panel";
 import { ContactsProvider } from "@/contexts/use-contacts";
 import { fetchContacts } from "@/lib/db/contact";
+import { METADATA_APP_NAME } from "@/global.config";
 
 type LayoutProps = Readonly<{
   children: React.ReactNode;
@@ -33,4 +34,17 @@ export default async function TranslationLayout({
       </ChildrenPanel>
     </TranslationsProvider>
   );
+}
+
+export async function generateMetadata({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  const { t } = await initTranslations(locale, ["metadata"]);
+
+  return {
+    title: METADATA_APP_NAME + t("new_message-title"),
+    description: t("new_message-description"),
+  };
 }

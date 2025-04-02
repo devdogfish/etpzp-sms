@@ -16,12 +16,6 @@ export const disketMonoRegular = localFont({
   weight: "100 900",
 });
 
-// I commented this out because it might be blocking other shits
-// export const metadata: Metadata = {
-//   title: "SMS app",
-//   description: "Created by me",
-// };
-
 export default async function RootLayout({
   children,
 }: {

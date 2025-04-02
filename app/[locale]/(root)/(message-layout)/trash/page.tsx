@@ -1,4 +1,6 @@
+import initTranslations from "@/app/i18n";
 import MessagesPage from "@/components/messages-page";
+import { METADATA_APP_NAME } from "@/global.config";
 import { fetchTrashedMessages } from "@/lib/db/message";
 
 export default async function Page() {
@@ -11,4 +13,17 @@ export default async function Page() {
       category="TRASH"
     />
   );
+}
+
+export async function generateMetadata({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  const { t } = await initTranslations(locale, ["metadata"]);
+
+  return {
+    title: METADATA_APP_NAME + t("trash-title"),
+    description: t("trash-description"),
+  };
 }

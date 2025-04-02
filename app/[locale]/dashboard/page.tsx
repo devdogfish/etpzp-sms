@@ -4,16 +4,10 @@ import {
   fetchUsers,
 } from "@/lib/db/dashboard";
 import { format } from "date-fns";
-import { Metadata } from "next";
 import AdminDashboard from "@/components/admin-dashboard";
 import { DEFAULT_START_DATE, ISO8601_DATE_FORMAT } from "@/global.config";
 
 export type CountryStat = { country: string; amount: number; cost: number };
-export const metadata: Metadata = {
-  title: `${process.env.APP_NAME} - Admin dashboard`,
-  description:
-    "View statistics on message traffic and costs, along with user and country data related to sent messages in the Admin Dashboard.",
-};
 
 export default async function Dashboard({
   searchParams,

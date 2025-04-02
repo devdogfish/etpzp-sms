@@ -1,6 +1,7 @@
 import initTranslations from "@/app/i18n";
 import AppLayout from "@/components/app-layout";
 import { SettingsProvider } from "@/contexts/use-settings";
+import { METADATA_APP_NAME } from "@/global.config";
 
 type LayoutProps = Readonly<{
   children: React.ReactNode;
@@ -28,4 +29,17 @@ export default async function NavPanelLayout({
       </AppLayout>
     </SettingsProvider>
   );
+}
+
+export async function generateMetadata({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  const { t } = await initTranslations(locale, ["metadata"]);
+
+  return {
+    title: METADATA_APP_NAME + t("welcome-title"),
+    description: t("welcome-description"),
+  };
 }

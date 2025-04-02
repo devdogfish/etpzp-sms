@@ -19,11 +19,8 @@ export const EMPTY_MESSAGE: MessageState = {
   scheduledDate: new Date(),
   scheduledDateModified: false,
   scheduledDateConfirmed: false,
-  draft: {
-    id: null,
-    pending: false,
-    lastSaveSuccessful: false,
-  },
 };
 
 export const APP_NAME = "ETPZP-SMS";
+
+export const METADATA_APP_NAME = "ETPZP SMS | ";

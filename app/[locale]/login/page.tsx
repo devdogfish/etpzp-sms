@@ -1,7 +1,6 @@
 import LoginForm from "@/components/login-form";
 import { activeDirectoryConfig } from "@/lib/auth/config";
 import ActiveDirectory from "activedirectory2";
-import { Metadata } from "next";
 
 export default async function LoginPage() {
   // getActiveDirectoryData();
@@ -11,10 +10,6 @@ export default async function LoginPage() {
     </main>
   );
 }
-export const metadata: Metadata = {
-  title: `${process.env.APP_NAME} - Login`,
-  description: "Log in to ETPZP-SMS with your active directory account.",
-};
 
 async function getActiveDirectoryData() {
   var ad = new ActiveDirectory(activeDirectoryConfig);
