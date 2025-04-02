@@ -68,7 +68,7 @@ export default function Account({
           <ProfilePic
             size={9}
             name={settings.displayName}
-            colorProperties={getThemeByIndex(
+            colorObj={getThemeByIndex(
               settings.profileColorId || 1,
               theme as ThemeMode
             )}

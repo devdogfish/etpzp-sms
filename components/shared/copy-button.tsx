@@ -5,6 +5,7 @@ import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface CopyButtonProps {
   children?: React.ReactNode;
@@ -23,6 +24,8 @@ export function CopyButton({
 }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { t } = useTranslation(["common"]);
+  const successMessage = t("copy_btn-success");
 
   // We need this complex logic or it won't work in some browsers
   const handleCopy = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -32,7 +35,7 @@ export function CopyButton({
         if (navigator.clipboard) {
           await navigator.clipboard.writeText(text);
           setCopied(true);
-          toast.success("Text copied to clipboard!"); // Notify success
+          toast.success(successMessage); // Notify success
         } else {
           // Fallback for browsers that do not support the Clipboard API
           const textarea = document.createElement("textarea");
@@ -47,7 +50,7 @@ export function CopyButton({
 
           if (successful) {
             setCopied(true);
-            toast.success("Text copied to clipboard!"); // Notify success
+            toast.success(successMessage); // Notify success
           } else {
             throw new Error("Copy command was unsuccessful.");
           }
@@ -58,7 +61,7 @@ export function CopyButton({
       } catch (error) {
         // Handle any errors that occur during the copy process
         console.log("Failed to copy text: ", error);
-        toast.error("Failed to copy text. Please try again."); // Notify failure
+        toast.error("copy_btn-error"); // Notify failure
       }
     }
   };

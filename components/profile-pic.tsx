@@ -1,27 +1,25 @@
 "use client";
+
 import React from "react";
 import { cn, getNameInitials } from "@/lib/utils";
-import { CircleUser, CircleUserRound, UserRound } from "lucide-react";
+import { UserRound } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import { ThemeProperties } from "@/types/theme";
 
 type ProfilePicProps = {
   size?: number;
-  colorProperties?: ThemeProperties;
   name?: string;
+  colorObj?: ThemeProperties | undefined;
   loading?: boolean;
-  customSize?: boolean;
-  fill?: boolean;
   className?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export default function ProfilePic({
   size = 9,
   name,
-  colorProperties,
+  // Will be filled use the colorObj's properties if it is provided
+  colorObj,
   loading,
-  fill = true,
-  customSize = false,
   className,
   ...props
 }: ProfilePicProps) {
@@ -35,22 +33,18 @@ export default function ProfilePic({
       />
     );
 
-  const sizeStyling =
-    customSize === true
-      ? {}
-      : { width: `${size * 4}px`, height: `${size * 4}px` };
   return (
     <div
       className={cn(
         `flex justify-center items-center rounded-full`, // border border-muted-foreground - Don't like this
-
         className // add additional passed in classNames
       )}
       // For some reason we need to use inline styles for this, as it seems to get overridden
       style={{
-        ...sizeStyling,
-        backgroundColor: `hsl(${colorProperties?.primary})`,
-        color: `hsl(${colorProperties?.primaryForeground})`,
+        width: `${size * 4}px`,
+        height: `${size * 4}px`,
+        backgroundColor: `hsl(${colorObj?.primary})`,
+        color: `hsl(${colorObj?.primaryForeground})`,
       }}
       {...props}
     >

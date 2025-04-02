@@ -72,7 +72,7 @@ export default function RecipientInfoModal({
           <Separator />
           <div className="flex gap-4 justify-between items-center p-4 text-sm">
             <div>{t("common:phone_number")}</div>
-            <CopyButton text={recipient.phone} variant="none">
+            <CopyButton text={recipient.phone} variant="none" className="pr-0">
               {recipient.phone}
             </CopyButton>
           </div>
@@ -83,9 +83,11 @@ export default function RecipientInfoModal({
                 <p>{t("common:description")}</p>
 
                 {recipient.contact?.description?.trim() ? (
-                  <p>{recipient.contact?.description}</p>
+                  <p className="text-right">{recipient.contact?.description}</p>
                 ) : (
-                  <p className="italic">{t("common:no_description")}</p>
+                  <p className="italic text-right">
+                    {t("common:no_description")}
+                  </p>
                 )}
               </div>
             </>

@@ -1,8 +1,7 @@
 "use client";
 
 import { format } from "date-fns/format";
-import { ArrowLeft, Edit, Share, Trash2, X } from "lucide-react";
-
+import { ArrowLeft, Edit, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -146,7 +145,11 @@ export default function ContactDisplay({
             <div className="flex flex-1 flex-col">
               <div className="flex items-start p-4">
                 <div className="flex items-center gap-4 text-sm">
-                  <ProfilePic name={contact.name} size={9} />
+                  <ProfilePic
+                    name={contact.name}
+                    size={10}
+                    className="border"
+                  />
                   <h2>{contact.name}</h2>
                 </div>
 
@@ -163,7 +166,11 @@ export default function ContactDisplay({
               <div className="flex gap-4 justify-between items-center p-4 text-sm">
                 <p>{t("common:phone_number")}</p>
                 <div className="flex">
-                  <CopyButton text={contact.phone} variant="none" />
+                  <CopyButton
+                    text={contact.phone}
+                    variant="none"
+                    className="pr-1"
+                  />
                   <Button
                     variant="link"
                     className="p-0"
@@ -178,9 +185,11 @@ export default function ContactDisplay({
                 <p>{t("common:description")}</p>
 
                 {contact.description?.trim() ? (
-                  <p>{contact.description}</p>
+                  <p className="text-right">{contact.description}</p>
                 ) : (
-                  <p className="italic">{t("common:no_description")}</p>
+                  <p className="italic text-right">
+                    {t("common:no_description")}
+                  </p>
                 )}
               </div>
             </div>

@@ -95,6 +95,7 @@ export default function NavPanel() {
 export function MobileNavPanel() {
   const { mobileNavPanel, setMobileNavPanel } = useLayout();
   const router = useRouter();
+  const { t } = useTranslation(["navigation"]);
 
   useEffect(() => {
     setMobileNavPanel(false);
@@ -119,7 +120,7 @@ export function MobileNavPanel() {
       /* You can change the animation duration inside the shadCn component (easiest way) */
     >
       <SheetContent side="left" className="w-[300px] p-0">
-        <SheetTitle className="sr-only">Navigation menu</SheetTitle>
+        <SheetTitle className="sr-only">{t("sr_only-nav_menu")}</SheetTitle>
         <nav onClick={handleNavClick}>
           <NavPanelContent
             isCollapsed={false} // on mobile it will never be collapsed

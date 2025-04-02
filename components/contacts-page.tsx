@@ -105,7 +105,7 @@ export default function ContactsPage() {
         )}
         {onMobile && (
           <Button
-            className="absolute w-11 h-11 bg-primary bottom-0 right-0 m-6 rounded-full"
+            className="absolute w-11 h-11 bg-primary bottom-0 right-0 m-8 rounded-full"
             onClick={() => {
               console.log("create contact modal", modal);
 

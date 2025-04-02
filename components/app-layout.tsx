@@ -52,8 +52,8 @@ export default function AppLayout({
         <TranslationsProvider
           resources={resources}
           locale={locale}
-          /* Currently account only needs navigation and common namespaces */
-          namespaces={["navigation", "common"]}
+          /* Currently account only uses `common` namespace */
+          namespaces={["common"]}
         >
           <div className="w-full min-h-[var(--simple-header-height)] flex justify-between items-center border-b px-2">
             <div className="flex items-center gap-2">

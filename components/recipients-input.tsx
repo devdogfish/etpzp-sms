@@ -8,16 +8,14 @@ import React, {
   type KeyboardEvent,
   type ChangeEvent,
 } from "react";
-import { Key, Search, UserPlus, X } from "lucide-react";
+import { UserPlus, X } from "lucide-react";
 
-import { Button, buttonVariants } from "./ui/button";
-import { cn, generateUniqueId, getNameInitials } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 import { useNewMessage } from "@/contexts/use-new-message";
 import { useModal } from "@/contexts/use-modal";
 import { ScrollArea } from "./ui/scroll-area";
-import { useSearchParams } from "next/navigation";
 import { NewRecipient } from "@/types/recipient";
-import { DBContact } from "@/types/contact";
 import useIsMounted from "@/hooks/use-mounted";
 import ProfilePic from "./profile-pic";
 import { useTranslation } from "react-i18next";
@@ -27,7 +25,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { useContacts } from "@/contexts/use-contacts";
 
 const OFF_FOCUSED_RECIPIENT_AMOUNT = 5;
 React.memo(RecipientsInput);
@@ -53,7 +50,6 @@ export default function RecipientsInput({
     suggestedRecipients,
     searchRecipients,
     showInfoAbout,
-
     focusedInput,
 
     // Which one in the suggested recipients/contacts is currently selected. You can change the selection with up and down arrow keys.
@@ -337,9 +333,9 @@ export default function RecipientsInput({
                         <button
                           key={recipient.phone}
                           className={cn(
-                            "flex items-center w-full gap-2 rounded-lg border-2 p-3 text-left text-sm transition-all hover:bg-accent",
+                            "flex items-center w-full gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
                             selectedPhone === recipient.phone &&
-                              "border-foreground"
+                              "border-primary"
                           )}
                           type="button"
                           onMouseDown={(e) => {
@@ -351,7 +347,7 @@ export default function RecipientsInput({
                           <ProfilePic
                             name={recipient.contact?.name || undefined}
                             size={10}
-                            fill={true}
+                            className="border"
                           />
                           <div className="space-y-1">
                             <div className="font-semibold">
