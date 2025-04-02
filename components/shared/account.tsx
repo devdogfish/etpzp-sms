@@ -4,7 +4,6 @@ import ProfilePic from "../profile-pic";
 import { useSession } from "@/hooks/use-session";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { useIsMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
   DropdownMenuContent,

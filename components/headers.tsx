@@ -16,6 +16,7 @@ type PageHeaderProps = {
   title?: string;
   skeleton?: boolean;
   marginRight?: boolean;
+  className?: string;
   children?: React.ReactNode;
 };
 
@@ -23,6 +24,7 @@ export function PageHeader({
   title,
   skeleton,
   marginRight = true,
+  className,
   children,
 }: PageHeaderProps) {
   const onMobile = useIsMobile();
@@ -33,31 +35,34 @@ export function PageHeader({
       <div
         className={cn(
           "flex items-center gap-2 px-4 h-[var(--simple-header-height)]",
-          title && "border-b"
+          title && "border-b",
+          className
         )}
       >
-        {onMobile &&
-          (pathname.includes("/dashboard") ? (
-            <Link
-              href="/"
-              className={buttonVariants({ variant: "ghost", size: "icon" })}
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
+        <div className="shrink flex items-center min-w-min whitespace-nowrap">
+          {onMobile &&
+            (pathname.includes("/dashboard") ? (
+              <Link
+                href="/"
+                className={buttonVariants({ variant: "ghost", size: "icon" })}
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            ) : (
+              <MobileHamburgerButton />
+            ))}
+          {skeleton ? (
+            <Skeleton
+              // Consider to set this to 158 later which is the width of `New Message` title
+              width=""
+              height={28}
+              containerClassName="mr-auto w-[30%]"
+            />
           ) : (
-            <MobileHamburgerButton />
-          ))}
-        {skeleton ? (
-          <Skeleton
-            // Consider to set this to 158 later which is the width of `New Message` title
-            width=""
-            height={28}
-            containerClassName="mr-auto w-[30%]"
-          />
-        ) : (
-          <h2 className={marginRight ? "mr-auto" : ""}>{title}</h2>
-        )}
-        <div className="flex items-center gap-2">
+            <h2 className={marginRight ? "mr-auto" : ""}>{title}</h2>
+          )}
+        </div>
+        <div className="grow flex items-center gap-2 justify-end">
           {children}
           {onMobile && <Account profilePicPosition="RIGHT" hideNameRole />}
         </div>

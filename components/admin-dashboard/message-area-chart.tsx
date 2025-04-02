@@ -38,10 +38,12 @@ import { LightDBMessage } from "@/types/dashboard";
 import { zodISODate } from "@/lib/form.schemas";
 import { buttonVariants } from "../ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getThemeByIndex } from "@/lib/theme.colors";
+import { useSettings } from "@/contexts/use-settings";
+import { useTheme as useNextTheme } from "next-themes";
+import { ThemeMode } from "@/types/theme";
 
-const CHART_COLORS = ["#FEBE06", "#309BF4", "#25A544", "#0279FE"];
-
-export default function MessageHistoryChart({
+export default function MessageAreaChart({
   messages,
 }: {
   messages: LightDBMessage[];
@@ -53,6 +55,15 @@ export default function MessageHistoryChart({
   const pathname = usePathname();
   const onMobile = useIsMobile();
   const searchParams = useSearchParams();
+  const { settings } = useSettings();
+  const { theme } = useNextTheme();
+  const areaChartColors = [
+    `hsl(${
+      getThemeByIndex(settings.profileColorId || 1, theme as ThemeMode)?.primary
+    })`, // Current profile theme color-props
+    "hsl(var(--primary))", // Current appearance theme color-props
+  ];
+
   // This should get updated by re-renders, if not, turn it into a useState that gets set by a useEffect
   const selectedStartDate = {
     ISO_date: searchParams.get("start_date"),
@@ -84,11 +95,9 @@ export default function MessageHistoryChart({
   const chartConfig = {
     amount: {
       label: t("messages_amount"),
-      // color: "hsl(var(--chart-1))", // TODO: Learn how to customize colors
     },
     price: {
       label: t("cost"),
-      // color: "hsl(var(--chart-2))", // TODO: Learn how to customize colors
     },
   } satisfies ChartConfig;
 
@@ -157,27 +166,28 @@ export default function MessageHistoryChart({
         >
           <AreaChart data={data}>
             <defs>
+              {/* Gradient of the chart waves */}
               <linearGradient id="fillPrice" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor={CHART_COLORS[0]}
+                  stopColor={areaChartColors[0]}
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor={CHART_COLORS[0]}
+                  stopColor={areaChartColors[0]}
                   stopOpacity={0.1}
                 />
               </linearGradient>
               <linearGradient id="fillAmount" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor={CHART_COLORS[1]}
+                  stopColor={areaChartColors[1]}
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor={CHART_COLORS[1]}
+                  stopColor={areaChartColors[1]}
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -214,18 +224,19 @@ export default function MessageHistoryChart({
                 />
               }
             />
+            {/* Line at the top of the chart waves */}
             <Area
               dataKey="price"
               type="natural"
               fill="url(#fillPrice)"
-              stroke={CHART_COLORS[0]}
+              stroke={areaChartColors[0]}
               stackId="a"
             />
             <Area
               dataKey="amount"
               type="natural"
               fill="url(#fillAmount)"
-              stroke={CHART_COLORS[1]}
+              stroke={areaChartColors[1]}
               stackId="a"
             />
             <ChartLegend content={<ChartLegendContent />} />

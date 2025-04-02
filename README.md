@@ -18,9 +18,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 # TODO
 ## In Progress
 - Add meta data like tab image and title
-- Change colors on pie chart to be more unique
 - Fix mobile panel expanding sheet animation
-- Add saved state to mobile new-message. Draft saved revamp with one icon button to save or have it disabled if the draft is already saved.
 ⁃ Recipient chips are not aligned
 
 ### Project Regrets

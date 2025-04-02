@@ -279,7 +279,7 @@ export const themes: Themes = {
   },
 };
 
-// Function to get theme by index
+// Function to get theme by index starting at 1, not 0
 export function getThemeByIndex(
   index: number,
   themeMode: "light" | "dark" | undefined = "light"
@@ -306,11 +306,11 @@ export default function setGlobalColorTheme(
 }
 
 // Create a new array to hold the themes in a 1-based index format
-const themesArray = Object.keys(themes).map((key, index) => {
+export const themesArray = Object.keys(themes).map((key, index) => {
   return { index: index + 1, name: key, value: themes[key] };
 });
 
-export const PRIMARY_COLOR_CSS_NAMES = [
+export const PROFILE_COLOR_CSS_NAMES = [
   "salmon",
   "dodgerblue",
   "gold",

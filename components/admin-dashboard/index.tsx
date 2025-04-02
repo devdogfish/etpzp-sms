@@ -1,8 +1,8 @@
 "use client";
 
-import CountryMessagesChart from "@/components/admin-dashboard/country-chart";
-import MessageHistoryChart from "@/components/admin-dashboard/message-chart";
-import UserRanking from "@/components/admin-dashboard/user-chart";
+import MessagePieChart from "@/components/admin-dashboard/message-pie-chart";
+import MessageAreaChart from "@/components/admin-dashboard/message-area-chart";
+import UserRankingTable from "@/components/admin-dashboard/user-table";
 import { PageHeader } from "@/components/headers";
 import Account from "@/components/shared/account";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -16,7 +16,6 @@ import { CountryStat } from "../../app/[locale]/dashboard/page";
 import { LightDBMessage } from "@/types/dashboard";
 import { ScrollArea } from "../ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { ArrowLeft } from "lucide-react";
 
 export type TimeRange = {
@@ -54,27 +53,19 @@ export default function AdminDashboard({
         }
         marginRight={onMobile}
       >
-        {onMobile ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={() => {}}>
-                <ArrowLeft className="h-4 w-4" />
-                <span className="sr-only">{t("common:go_back")}</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{t("common:go_back")}</TooltipContent>
-          </Tooltip>
-        ) : (
-          <Link
-            href="/"
-            className={cn(buttonVariants({ variant: "link" }), "mx-2")}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            {t("back_to_app")}
-          </Link>
-        )}
+        {!onMobile && (
+          <>
+            <Link
+              href="/"
+              className={cn(buttonVariants({ variant: "link" }), "mx-2")}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {t("back_to_app")}
+            </Link>
 
-        <Account className="ml-auto" profilePicPosition="RIGHT" />
+            <Account className="ml-auto" profilePicPosition="RIGHT" />
+          </>
+        )}
       </PageHeader>
 
       <ScrollArea
@@ -175,13 +166,13 @@ export default function AdminDashboard({
           </Card> */}
             <div className="col-span-3">
               <div className="h-min">
-                <MessageHistoryChart messages={messages || []} />
+                <MessageAreaChart messages={messages || []} />
               </div>
             </div>
             <div className={cn("col-span-2", onMobile && "order-6")}>
-              <UserRanking users={users || []} messages={messages || []} />
+              <UserRankingTable users={users || []} messages={messages || []} />
             </div>
-            <CountryMessagesChart data={countryStats} />
+            <MessagePieChart data={countryStats} />
           </div>
         </div>
       </ScrollArea>

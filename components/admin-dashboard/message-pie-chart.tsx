@@ -13,16 +13,30 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
-import { capitalize, cn } from "@/lib/utils";
+import { capitalize, cn, shuffleArray } from "@/lib/utils";
 import { CountryStat } from "@/app/[locale]/dashboard/page";
+import { themesArray } from "@/lib/theme.colors";
+import { useTheme as useNextTheme } from "next-themes";
+import { ThemeMode } from "@/types/theme";
+import { useThemeContext } from "@/contexts/theme-data-provider";
 
-const COLORS = ["#309BF4", "#FEBE06"];
-
-export default function CountryMessagesChart({
+export default function MessagePieChart({
   data,
 }: {
   data: CountryStat[] | undefined;
 }) {
+  const { theme } = useNextTheme();
+  const { themeColor } = useThemeContext();
+  const userLikesZinc = themeColor === 1;
+  const slicedArray = [
+    ...themesArray.slice(
+      userLikesZinc ? 0 : 1, // remove Zinc color if the user doesn't like it. If he does, leave it
+      themesArray.length
+    ),
+  ];
+
+  const [pieChartColors, setPieChartColors] = useState<string[]>([]);
+
   const totalMessages = useMemo(() => {
     return data?.reduce((acc, curr) => acc + curr.amount, 0);
   }, [data]);
@@ -65,6 +79,17 @@ export default function CountryMessagesChart({
       </g>
     );
   };
+
+  useEffect(() => {
+    // Randomize colors on component mount only, so that when user changes the input the colors don't change
+    shuffleArray(slicedArray);
+    setPieChartColors(
+      slicedArray.map(
+        (themeColor) =>
+          `hsl(${themeColor.value[(theme as ThemeMode) || "light"].primary})`
+      )
+    );
+  }, []);
 
   return (
     <Card className="flex flex-col min-h-[400px]">
@@ -115,16 +140,22 @@ export default function CountryMessagesChart({
                     dataKey="amount"
                     nameKey="country"
                   >
-                    {data.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                        // Adjust these values
-                        strokeWidth={1.8}
-                        stroke="hsl(var(--background))"
-                        // strokeOpacity={0.3}
-                      />
-                    ))}
+                    {data.map((entry, index) => {
+                      console.log(
+                        "Chose this color",
+                        pieChartColors[index % pieChartColors.length]
+                      );
+                      return (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={pieChartColors[index % pieChartColors.length]}
+                          // Adjust these values
+                          strokeWidth={0.5}
+                          stroke="hsl(var(--background))"
+                          // strokeOpacity={0.3}
+                        />
+                      );
+                    })}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
@@ -159,7 +190,7 @@ function CustomTooltip({ active, payload }: any) {
     return (
       <div
         className={cn(
-          "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-slate-200/50 bg-background px-2.5 py-1.5 text-xs shadow-xl dark:border-slate-800 dark:border-slate-800/50 bg-background"
+          "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-slate-200/50 bg-background px-2.5 py-1.5 text-xs shadow-xl dark:border-slate-800 dark:border-slate-800/50"
         )}
       >
         <div className="grid gap-1.5">

@@ -37,7 +37,7 @@ import { DBRecipient, NewRecipient } from "@/types/recipient";
 import { useTranslation } from "react-i18next";
 import { PT_DATE_FORMAT } from "@/global.config";
 import { useContacts } from "@/contexts/use-contacts";
-import { PRIMARY_COLOR_CSS_NAMES } from "@/lib/theme.colors";
+import { PROFILE_COLOR_CSS_NAMES } from "@/lib/theme.colors";
 import React, { useEffect, useMemo, useState } from "react";
 import { useModal } from "@/contexts/use-modal";
 import RecipientInfoModal from "./modals/recipient-info";
@@ -135,7 +135,7 @@ function MessageDisplay({
     }
   };
 
-  const initialColors = PRIMARY_COLOR_CSS_NAMES;
+  const initialColors = PROFILE_COLOR_CSS_NAMES;
   let colors = [...initialColors]; // Create a copy of the array by spreading it.
   useEffect(() => {
     if (message) {

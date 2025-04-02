@@ -8,13 +8,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DBUser } from "@/types/user";
-import { DBMessage } from "@/types";
 import ProfilePic from "../profile-pic";
 import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
 import { LightDBMessage } from "@/types/dashboard";
 
-export default function UserRanking({
+export default function UserRankingTable({
   users,
   messages,
 }: {
@@ -49,7 +48,7 @@ export default function UserRanking({
                   </td>
                   <td className="w-1/12 p-2">
                     {/* Second column for profile picture */}
-                    <ProfilePic name={user.name} />
+                    <ProfilePic name={user.name} className="border" />
                   </td>
                   <td className="p-2">
                     {/* Last column for user details */}
