@@ -1,6 +1,5 @@
 "use client";
 
-import ChildrenPanel from "@/components/shared/children-panel";
 import ErrorComponent from "@/components/shared/error-component";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
