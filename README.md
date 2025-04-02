@@ -18,8 +18,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 # TODO
 ## In Progress
 - Add meta data like tab image and title
-- Fix mobile panel expanding sheet animation
-⁃ Recipient chips are not aligned
 
 ### Project Regrets
 - No uniform way to name functions or rules for type names
@@ -29,6 +27,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Not use all the features provided by i18next, and i18nexus with plural and translation branching
 - No really uniform way to handle errors in server actions
 - Repeating the scroll area calculation so often
+- Sheet component is not compatible with ScrollArea
 
 ### Latest Conversation
 - For Domain name, we will use a dynamic IP service called No-IP. This is a program that you need to run on the server which will open a connection to their server. Their server will accept requests on that domain name, and will redirect that traffic to my server.

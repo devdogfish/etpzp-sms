@@ -140,22 +140,16 @@ export default function MessagePieChart({
                     dataKey="amount"
                     nameKey="country"
                   >
-                    {data.map((entry, index) => {
-                      console.log(
-                        "Chose this color",
-                        pieChartColors[index % pieChartColors.length]
-                      );
-                      return (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={pieChartColors[index % pieChartColors.length]}
-                          // Adjust these values
-                          strokeWidth={0.5}
-                          stroke="hsl(var(--background))"
-                          // strokeOpacity={0.3}
-                        />
-                      );
-                    })}
+                    {data.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={pieChartColors[index % pieChartColors.length]}
+                        // Adjust these values
+                        strokeWidth={0.5}
+                        stroke="hsl(var(--background))"
+                        // strokeOpacity={0.3}
+                      />
+                    ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>

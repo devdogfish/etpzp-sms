@@ -65,7 +65,7 @@ export default function RecipientInfoModal({
         <div className="flex flex-1 flex-col">
           <div className="flex items-start p-4">
             <div className="flex items-center gap-4 text-sm">
-              <ProfilePic name={recipient.contact?.name} />
+              <ProfilePic name={recipient.contact?.name} className="border" />
               <h2>{recipient.contact?.name || t("info-name_fallback")}</h2>
             </div>
           </div>

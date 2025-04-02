@@ -189,8 +189,8 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
         ]}
       />
 
-      {/* Maybe we need a fixed height here, but if everything works, all good. */}
-      <ScrollArea>
+      {/* Maybe we need a fixed height here, but if everything works, all good. Use div instead of ScrollArea, because otherwise it the Sheet component glitches out */}
+      <div className="overflow-auto">
         <div
           className="flex flex-col"
           // In tailwind, this doesn't work, and I don't know why
@@ -340,7 +340,7 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             )}
           </div>
         </div>
-      </ScrollArea>
+      </div>
     </>
   );
 }

@@ -109,11 +109,6 @@ function ContactDisplaySkeleton() {
           </Button>
 
           <Button variant="ghost" size="icon" disabled>
-            <Share className="h-4 w-4" />
-            <span className="sr-only">{t("common:export")}</span>
-          </Button>
-
-          <Button variant="ghost" size="icon" disabled>
             <Edit className="h-4 w-4" />
             <span className="sr-only">{t("common:edit")}</span>
           </Button>

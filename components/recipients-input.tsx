@@ -186,7 +186,7 @@ export default function RecipientsInput({
               <div
                 key={recipient.phone}
                 // Height of the row/container
-                className={"flex items-center h-7"}
+                className="flex items-center h-7"
               >
                 <div
                   // Height of the contact chip itself
@@ -203,12 +203,12 @@ export default function RecipientsInput({
                             !recipient.isValid &&
                               "bg-red-100/70 dark:bg-red-900/50",
                             recipient.error?.type === "warning" &&
-                              "bg-yellow-50 dark:bg-yellow-400/50"
+                              "bg-yellow-50 dark:bg-yellow-400/40"
                           )}
                         >
                           <div
                             onClick={() => showRecipientInfo(recipient)}
-                            className="h-full content-center rounded-l-xl pl-1.5"
+                            className="h-full flex items-center rounded-l-xl pl-1.5"
                           >
                             {recipient?.contact?.name || recipient.phone}
                           </div>
