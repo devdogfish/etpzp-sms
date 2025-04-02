@@ -57,11 +57,10 @@ export function PageHeader({
         ) : (
           <h2 className={marginRight ? "mr-auto" : ""}>{title}</h2>
         )}
-        {onMobile ? (
-          <Account profilePicPosition="RIGHT" hideNameRoleOnXS />
-        ) : (
-          children
-        )}
+        <div className="flex items-center gap-2">
+          {children}
+          {onMobile && <Account profilePicPosition="RIGHT" hideNameRole />}
+        </div>
       </div>
     </>
   );

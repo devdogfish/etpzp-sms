@@ -41,6 +41,7 @@ export default async function Page({ searchParams }: NewMessagePageProps) {
               }
             : undefined
         }
+        draftId={fetchedDraft?.id || null}
       >
         <NewMessageForm message_id={fetchedDraft} />
       </NewMessageProvider>

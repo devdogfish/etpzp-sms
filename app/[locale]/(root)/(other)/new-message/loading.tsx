@@ -41,7 +41,7 @@ export default function Loading() {
       <PageHeader title={t("header")} skeleton>
         <p>{t("common:loading")}</p>
         {!onMobile && (
-          <Button variant="ghost" className="aspect-1 p-0" disabled>
+          <Button variant="ghost" size="icon" disabled>
             {isFullscreen ? (
               <Minimize2 className="h-4 w-4" />
             ) : (

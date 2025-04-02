@@ -53,6 +53,11 @@ export type MessageState = Message & {
   scheduledDateModified: boolean;
   scheduledDateConfirmed: boolean;
 };
+type DraftState = {
+  id: string | null;
+  pending: boolean;
+  lastSaveSuccessful: boolean;
+};
 
 type MessageContextValues = {
   // Message state
@@ -82,11 +87,14 @@ type MessageContextValues = {
 
   form: HTMLFormElement | null;
   setForm: React.Dispatch<React.SetStateAction<HTMLFormElement | null>>;
+  draft: DraftState;
+  setDraft: React.Dispatch<React.SetStateAction<DraftState>>;
 };
 type ContextProps = {
   children: React.ReactNode;
   rankedRecipients: RankedRecipient[];
   initialMessage?: MessageState;
+  draftId: string | null;
 };
 
 const NewMessageContext = createContext<MessageContextValues | null>(null);
@@ -95,11 +103,18 @@ export function NewMessageProvider({
   children,
   rankedRecipients,
   initialMessage,
+  draftId,
 }: ContextProps) {
   // Message state
   const [message, setMessage] = useState<MessageState>(
     initialMessage || EMPTY_MESSAGE
   );
+  // keep draft state separate because we don't want the draft saver to get triggered when this data gets updated
+  const [draft, setDraft] = useState<DraftState>({
+    id: draftId,
+    pending: false,
+    lastSaveSuccessful: !!initialMessage ? true : false,
+  });
   const { contacts } = useContacts();
   const { t } = useTranslation(["new-message-page"]);
 
@@ -339,6 +354,8 @@ export function NewMessageProvider({
 
         form,
         setForm,
+        draft,
+        setDraft,
       }}
     >
       {/* We move modals here, because unlike the form component, this doesn't re-render when a draft gets saved */}

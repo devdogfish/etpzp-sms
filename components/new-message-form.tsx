@@ -2,7 +2,16 @@
 
 import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
-import { Maximize2, Minimize2, Trash2, X } from "lucide-react";
+import {
+  Check,
+  FileCheck,
+  Loader2,
+  Maximize2,
+  Minimize2,
+  Save,
+  Trash2,
+  X,
+} from "lucide-react";
 import SendButton from "./send-button";
 import { capitalize, cn, toastActionResult } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -66,17 +75,14 @@ const NewMessageForm = React.memo(function ({
     setFocusedInput,
     form,
     setForm,
+    draft,
+    setDraft,
   } = useNewMessage();
   const { setModal } = useModal();
   const [loading, setLoading] = useState(false);
   const { isFullscreen, setIsFullscreen } = useLayout();
   const pathname = usePathname();
   const onMobile = useIsMobile();
-  const [pendingDraft, setPendingDraft] = useState(false);
-  const [draft, setDraft] = useState({
-    id: message_id?.id || null,
-    pending: false,
-  });
 
   const isMounted = useIsMounted();
   const debouncedSaveDraft = useDebounce(message, 2000);
@@ -197,24 +203,30 @@ const NewMessageForm = React.memo(function ({
     );
   }
   // Saving draft logic
-  useEffect(() => {
-    if (!isMounted) return;
-
+  const handleSaveDraft = () => {
     const save = async () => {
       if (
         JSON.stringify(debouncedSaveDraft) !==
         JSON.stringify(previousDraftRef.current)
       ) {
-        setPendingDraft(true);
+        setDraft((prev) => ({ ...prev, pending: true }));
         const { draftId } = await saveDraft(draft.id || undefined, message);
-        setPendingDraft(false);
+        setDraft((prev) => ({ ...prev, pending: false }));
 
         if (draftId) {
-          setDraft((prev) => ({ ...prev, id: draftId || null }));
+          setDraft((prev) => ({
+            ...prev,
+            id: draftId || null,
+            lastSaveSuccessful: true,
+          }));
           // Updating the URL revalidates the server (including fetching amount indicators) and re-renders the component.
           const params = new URLSearchParams(searchParams.toString());
           params.set("message_id", draftId);
           router.replace(pathname + "?" + params.toString());
+        } else {
+          console.log("error occurred while saving draft");
+
+          setDraft((prev) => ({ ...prev, lastSaveSuccessful: false }));
         }
       }
     };
@@ -237,6 +249,10 @@ const NewMessageForm = React.memo(function ({
     } else {
       save();
     }
+  };
+  useEffect(() => {
+    if (!isMounted) return;
+    handleSaveDraft();
   }, [debouncedSaveDraft]);
   useEffect(() => {
     // Reapply input focus state - sender focusing logic not needed as it is a <Select>.
@@ -266,58 +282,102 @@ const NewMessageForm = React.memo(function ({
 
   useEffect(() => {
     if (formRef.current) {
+      console.log(draft);
+
       setForm(formRef.current);
     }
   }, [formRef]);
+  useEffect(() => {
+    if (isMounted) {
+      setMessage((m) => ({ ...m, draft: { id: message_id?.id || null } }));
+    }
+  }, [isMounted]);
   return (
     <>
-      <PageHeader title={message.subject ? message.subject : t("header")}>
-        <p>
-          {messageIsEmpty()
-            ? ""
-            : pendingDraft
-            ? t("saving_draft")
-            : t("saved_draft")}
-        </p>
-        {!onMobile && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                className="aspect-1 p-0"
-                onClick={() =>
-                  setIsFullscreen((prevFullscreen) => !prevFullscreen)
-                }
-              >
-                {isFullscreen ? (
-                  <Minimize2 className="h-4 w-4" />
-                ) : (
-                  <Maximize2 className="h-4 w-4" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{t("toggle_fullscreen")}</TooltipContent>
-          </Tooltip>
-        )}
-
+      <PageHeader
+        title={
+          message.subject
+            ? message.subject.length > (onMobile ? 22 : 60)
+              ? message.subject.substring(0, (onMobile ? 22 : 60) - 3) + "..."
+              : message.subject
+            : t("header")
+        }
+      >
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
-              className={cn(
-                buttonVariants({ variant: "ghost" }),
-                "aspect-1 p-0"
-              )}
+              size="icon"
+              type="button"
               onClick={() => {
-                setIsFullscreen(false);
-                router.push("/sent");
+                // We only disable it if the message is empty so we need more checks here to prevent the user from clicking the button over and over
+                if (draft.pending || messageIsEmpty()) return; // not empty and not pending means it is saved
+                handleSaveDraft();
               }}
+              // disabled={messageIsEmpty()}
             >
-              <X className="h-4 w-4" />
+              {draft.pending ? (
+                <Loader2 className="animate-spin" />
+              ) : messageIsEmpty() || !draft.lastSaveSuccessful ? (
+                // draft is pending either it is saved or not
+                // this comes first because we don't want to show the result if message is empty
+                <Save className="w-4 h-4" />
+              ) : (
+                <FileCheck className="h-4 w-4" />
+              )}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>{t("common:close")}</TooltipContent>
+          <TooltipContent>
+            {draft.pending
+              ? t("draft_btn-saving")
+              : messageIsEmpty() || !draft.lastSaveSuccessful
+              ? // draft is pending either it is saved or not
+                // this comes first because we don't want to show the result if message is empty
+                t("draft_btn-save")
+              : t("draft_btn-saved")}
+          </TooltipContent>
         </Tooltip>
+        {!onMobile && (
+          <>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() =>
+                    setIsFullscreen((prevFullscreen) => !prevFullscreen)
+                  }
+                >
+                  {isFullscreen ? (
+                    <Minimize2 className="h-4 w-4" />
+                  ) : (
+                    <Maximize2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t("toggle_fullscreen")}</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    buttonVariants({ variant: "ghost" }),
+                    "aspect-1 p-0"
+                  )}
+                  onClick={() => {
+                    setIsFullscreen(false);
+                    router.push("/sent");
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t("common:close")}</TooltipContent>
+            </Tooltip>
+          </>
+        )}
       </PageHeader>
       <form
         ref={formRef}

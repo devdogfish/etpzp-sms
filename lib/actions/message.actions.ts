@@ -9,6 +9,7 @@ import { getSession } from "../auth/sessions";
 import db from "../db";
 import { revalidatePath } from "next/cache";
 import { DBMessage, Message } from "@/types";
+import { sleep } from "../utils";
 
 export async function toggleTrash(
   id: string,
@@ -145,8 +146,11 @@ export async function saveDraft(
   const session = await getSession();
   const userId = session?.user?.id;
   let draft;
-
+  // DEBUG
+  // await sleep(1000);
   try {
+    // DEBUG
+    // throw 1;
     if (!userId) throw new Error("Invalid user id.");
 
     console.log("BEGIN IF block for saving draft... With this data:");
