@@ -8,8 +8,6 @@ import { LoginSchema } from "@/lib/form.schemas";
 import { Login, SessionData } from "./config";
 import { ActionResponse } from "@/types/action";
 
-// This function is for actually authenticating the user and fetching all the users data
-// Once the data is fetched we save it to the session using createSession()
 export async function login(
   formData: FormData
 ): Promise<ActionResponse<Login>> {
@@ -27,18 +25,13 @@ export async function login(
     };
   }
 
-  console.log("\n");
-  console.log("\n");
-  console.log("STARTING AUTHENTICATION");
-  console.log(email, password);
-
-  const user: SessionData /**& { errors: string[] } */ = await dummyAuthenticate({
+  // 2. Authenticate user using AD and save to db
+  const user: SessionData = await authenticate({
     email,
     password,
   });
 
   if (!user.isAuthenticated) {
-    console.log("Wrong credentials!");
     return {
       success: false,
       message: ["server-wrong_credentials"],
@@ -46,7 +39,7 @@ export async function login(
     };
   }
 
-  // If everything went well create a new session and redirect user to dashboard
+  // 3. Create new session cookie
   await createSession(user);
   return {
     success: true,

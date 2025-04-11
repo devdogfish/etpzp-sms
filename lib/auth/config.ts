@@ -32,6 +32,6 @@ export const sessionOptions: SessionOptions = {
 export const activeDirectoryConfig = {
   url: process.env.AD_URL!,
   baseDN: process.env.AD_BASE_DN!,
-  username: process.env.AD_EMAIL!, // what they call username - is what we store as email!
+  username: process.env.AD_EMAIL!, // we store emails in the username field
   password: process.env.AD_PASSWORD!,
 };

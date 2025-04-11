@@ -16,7 +16,7 @@ export default async function authenticate({
 }): Promise<SessionData & { errors: string[] }> {
   const ad = new ActiveDirectory(activeDirectoryConfig);
 
-  // 1. Check if user exists on in the active directory server
+  // 1. Check if user even exists in the active directory server
   const exists = await userExists(ad, email, password);
   if (!exists.success) {
     return {
@@ -25,35 +25,31 @@ export default async function authenticate({
       errors: [exists.error ? exists.error : ""],
     };
   }
-  // 2. Check if user is allowed to use the app (inside the group)
+  // 2. Check if user is allowed to use the app
   const userGroup = "Utilizadores-SMS";
   const hasAppPermission = await userInGroup(ad, email, userGroup);
 
-  // 3. Check if user has admin privileges (inside the group)
+  // 3. Check if user has admin privileges
   const adminGroup = "Administradores-SMS";
   const hasAdminPermission = await userInGroup(ad, email, adminGroup);
 
-  console.log(exists);
-  console.log(hasAppPermission);
-  console.log(hasAdminPermission);
-
   // 4. Sync all of this with the database
   const userResult = await saveUser(ad, email, hasAdminPermission.success);
-
-  // Check if this is the same
-  console.log("This should get shown...");
-  console.log(
-    "but for some reason I saw the messages from the saveUser resolve."
-  );
 
   return {
     user: userResult.success ? userResult.data : undefined,
     isAuthenticated: hasAppPermission.success,
     isAdmin: hasAdminPermission.success,
     errors: [
-      exists.error !== null ? exists.error : "",
-      hasAppPermission.error !== null ? hasAppPermission.error : "",
-      hasAdminPermission.error !== null ? hasAdminPermission.error : "",
+      exists.error !== null
+        ? exists.error
+        : "An error occurred while checking if user exists",
+      hasAppPermission.error !== null
+        ? hasAppPermission.error
+        : "An error occurred while checking if user is allowed to use the app",
+      hasAdminPermission.error !== null
+        ? hasAdminPermission.error
+        : "An error occurred while checking if user is an admin",
     ],
   };
 }

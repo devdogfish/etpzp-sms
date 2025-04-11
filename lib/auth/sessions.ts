@@ -12,15 +12,14 @@ export async function getSession(req?: NextRequest, res?: NextResponse) {
       ? await getIronSession<SessionData>(req, res, sessionOptions)
       : await getIronSession<SessionData>(await cookies(), sessionOptions);
 
-  // If user visits for the first time session returns an empty object.
-  // You could check for user in the database, or check server. If he got blocked or something, the user should get kicked out immediately
+  // For security, you can double-check the user's existence in the database or AD server, but this slows down the app.
   return session;
 }
 
 export async function createSession(user: SessionData) {
   const session = await getSession();
-  console.log(`Creating session ${session}`);
 
+  // Store user data in the cookie by mapping over each of the object's property
   Object.entries(user).forEach(([key, value]) => {
     if (!(key in session)) {
       (session as any)[key] = value;
@@ -28,7 +27,6 @@ export async function createSession(user: SessionData) {
   });
 
   await session.save();
-  console.log(`Session saved ${session}`);
 }
 
 export async function getSessionOnClient(): Promise<SessionData> {
