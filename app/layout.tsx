@@ -1,4 +1,3 @@
-// import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { dir } from "i18next";
@@ -10,7 +9,7 @@ import { LayoutProvider } from "@/contexts/use-layout";
 import { Toaster } from "sonner";
 import { fetchAmountIndicators } from "@/lib/db/general";
 
-export const disketMonoRegular = localFont({
+const disketMonoRegular = localFont({
   src: "./fonts/Disket-Mono-Bold.ttf",
   variable: "--font-disket-mono-regular",
   weight: "100 900",
@@ -44,7 +43,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${disketMonoRegular.variable} ${disketMonoRegular.variable} antialiased flex flex-col h-screen`}
+        className={`${disketMonoRegular.variable} antialiased flex flex-col h-screen`}
       >
         <NextThemesProvider
           attribute="class"
