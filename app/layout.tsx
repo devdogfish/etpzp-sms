@@ -9,6 +9,7 @@ import { LayoutProvider } from "@/contexts/use-layout";
 import { Toaster } from "sonner";
 import { fetchAmountIndicators } from "@/lib/db/general";
 
+// We can't export this, because in layout or page files Next.js expects only components and some other stuff to be exported
 const disketMonoRegular = localFont({
   src: "./fonts/Disket-Mono-Bold.ttf",
   variable: "--font-disket-mono-regular",
