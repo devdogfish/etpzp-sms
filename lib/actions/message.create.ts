@@ -52,7 +52,7 @@ export async function sendMessage(
   const { validRecipients, invalidRecipients } = analyzeRawRecipients(
     data.recipients
   );
-  // This is the only place where we return a invalid recipient error / the recipient error handling is not handled in the zod validation
+  // The recipient error handling is not handled in the zod validation, so we do validate them ourselves
   if (!validRecipients.length) {
     return {
       success: false,
@@ -61,22 +61,23 @@ export async function sendMessage(
     };
   }
 
-  // Convert the our send time from seconds to milliseconds
-  // JavaScript's Date object uses milliseconds, so we multiply by 1000 to turn send time into ms. as well
-  const isScheduled =
-    !!validatedData.data.secondsUntilSend &&
-    validatedData.data.secondsUntilSend > 2; // api requires a minimum of 2
   let scheduledUnixSeconds: number = 0;
   if (
     validatedData.data.secondsUntilSend &&
     validatedData.data.secondsUntilSend > 2
   ) {
+    // JavaScript's Date object uses milliseconds, so we divide by 1000 to the timestamp into seconds.
     scheduledUnixSeconds =
       Date.now() / 1000 + validatedData.data.secondsUntilSend;
-    console.log("UNIX EPOCH SECONDS CALCULATED: ", scheduledUnixSeconds);
-    console.log(validatedData.data.secondsUntilSend);
+    console.log(
+      "Message will be scheduled for this epoch timestamp in seconds:",
+      scheduledUnixSeconds
+    );
   }
 
+  const isScheduled =
+    !!validatedData.data.secondsUntilSend &&
+    validatedData.data.secondsUntilSend > 2; // api requires a minimum of 2 seconds in the future
   try {
     const payload = {
       // This shit can only be one full word with no special characters or spaces
@@ -91,10 +92,8 @@ export async function sendMessage(
       destaddr: "DISPLAY", // Flash SMS
 
       // The API is case-sensitive - `sendtime` has to be spelled exactly like this
-      sendtime: isScheduled ? scheduledUnixSeconds : undefined, // Extract the UNIX timestamp for scheduled messages
+      sendtime: isScheduled ? scheduledUnixSeconds : undefined, // Insert the UNIX timestamp if the message is scheduled
     };
-
-    console.log("Calling fetch with this body:", payload);
 
     const res = await fetch(`${process.env.GATEWAYAPI_URL}/rest/mtsms`, {
       method: "POST",
@@ -105,30 +104,13 @@ export async function sendMessage(
       body: JSON.stringify(payload),
     });
     const resJson = await res.json();
-    console.log(res, resJson);
+    console.log("Called fetch with:", payload, "\nResults:", res, resJson);
 
-    console.log("WE ARE STILL IN TRY BLOCK");
-
-    // const res = SuccessResponse;
-    // const resJson = { ids: [null] };
-
-    // if (!res.ok) {
-    //   console.log("Something went wrong:", JSON.stringify(resJson));
-
-    //   // throw new Error(
-    //   //   "Network resJson was not ok " + res?.statusText
-    //   // );
-    // }
-
-    // console.log("SAVING REFERENCE_ID", resJson.ids[0] || null);
-
-    console.log("WE ARE STILL IN TRY BLOCK 2");
-    console.log("BEGIN DATABASE LOGIC");
-
-    // -------- BEGIN DATABASE LOGIC --------
+    // -------- BEGIN DATABASE LOGIC -------- //
+    console.log("\n\nFetch completed! Moving on to database logic...");
     if (typeof existingDraftId === "undefined" || !existingDraftId) {
       console.log(
-        "The draftId is not defined, creating new message with INSERT query"
+        "The draftId is not defined, so INSERT a new message into the database..."
       );
 
       // Insert new message and recipients
@@ -189,12 +171,10 @@ export async function sendMessage(
       );
     } else {
       console.log(
-        `Updating existing message item with draftId: ${existingDraftId}`
+        `Message already exists as draft (message_id:${existingDraftId}). Changing existing message using UPDATE query...`
       );
 
-      console.log();
-
-      // Update existing message record
+      // 1. Update message data
       const result = await db(
         `
           UPDATE message
@@ -242,18 +222,18 @@ export async function sendMessage(
         throw new Error("Invalid message id provided");
       }
 
-      // Update or replace the recipients. For simplicity, here we delete the old ones and insert new ones.
+      // 2. Delete old recipients
       await db(`DELETE FROM recipient WHERE message_id = $1`, [
         existingDraftId,
       ]);
-      // check if for this query I can use VALUES instead of SELECT
+      // 3. Then insert new recipients
       await db(
         `
         INSERT INTO recipient (message_id, phone, index)
         SELECT $1, 
           unnest($2::text[]), 
           unnest($3::int[])
-        `,
+        `, // check if for this query I can use VALUES instead of SELECT
         [
           existingDraftId,
           validRecipients.map((r) => r.phone),
@@ -261,7 +241,7 @@ export async function sendMessage(
         ]
       );
     }
-    // -------- END DATABASE LOGIC --------
+    // -------- END DATABASE LOGIC -------- //
 
     // Update the amount indicators in the nav panel
     revalidatePath("/new-message");
@@ -285,7 +265,7 @@ export async function sendMessage(
       clearForm: true,
     };
   } catch (error) {
-    console.log("in catch block:", error);
+    console.log("Error got caught in catch block:", error);
 
     return {
       success: false,

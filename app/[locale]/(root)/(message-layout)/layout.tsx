@@ -2,7 +2,6 @@ import initTranslations from "@/app/i18n";
 import TranslationsProvider from "@/contexts/translations-provider";
 import { ContactsProvider } from "@/contexts/use-contacts";
 import { fetchContacts } from "@/lib/db/contact";
-import { Metadata } from "next";
 
 type LayoutProps = Readonly<{
   children: React.ReactNode;

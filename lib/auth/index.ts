@@ -26,7 +26,7 @@ export async function login(
   }
 
   // 2. Authenticate user using AD and save to db
-  const user: SessionData = await authenticate({
+  const user: SessionData = await dummyAuthenticate({
     email,
     password,
   });
