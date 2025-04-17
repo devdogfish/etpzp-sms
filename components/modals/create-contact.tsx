@@ -34,12 +34,9 @@ const initialState: CreateContactResponse = {
 export default function CreateContactModal({
   defaultPhone,
   onCreateSuccess,
-}: // This is for /new-message, where we keep a state of the recipient you are creating a contact from
-// onClose,
-{
+}: {
   defaultPhone?: string;
   onCreateSuccess?: (contact: DBContact) => void;
-  // onClose?: () => void;
 }) {
   const { modal, setModal } = useModal();
   const [serverState, action, pending] = useActionState(
