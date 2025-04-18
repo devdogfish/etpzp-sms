@@ -15,6 +15,7 @@ export const defaultSession: SessionData = {
   isAdmin: false,
 };
 
+// Iron session config object
 export const sessionOptions: SessionOptions = {
   cookieName: "my-etpzp-app-session", // anything you want
   password: process.env.SESSION_SECRET!, // TypeScript non-null assertion operator

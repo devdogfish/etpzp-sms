@@ -32,18 +32,17 @@ export default function AdminDashboard({
   users: DBUser[];
   countryStats: CountryStat[] | undefined;
 }) {
-  // Prevent non-admins from viewing the admin-dashboard and display an authorization message.
   const { t } = useTranslation(["dashboard-page", "errors", "common"]);
   const messageCounts = countMessages(messages);
   const { settings } = useSettings();
   const onMobile = useIsMobile();
-  const isBigScreen = false;
+  const onBigScreen = false;
 
   return (
     <div className="flex flex-col">
       <PageHeader
         title={
-          isBigScreen
+          onBigScreen
             ? t("header_long", {
                 first_name: settings.displayName
                   ? extractFirstWord(settings.displayName)

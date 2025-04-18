@@ -10,14 +10,14 @@ export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const locale = request.cookies.get("NEXT_LOCALE")?.value || "en";
 
-  // Pathname checks use `.includes()` instead of `.startsWith()`, because there could be a locale in between url segments.
-  // Redirect logged in users to home
+  // Pathname checks use `.includes()` instead of `.startsWith()`, because of possible locale between url segments.
   if (session.isAuthenticated && pathname.includes("/login")) {
+    // Redirect logged in users to home
     return NextResponse.redirect(new URL(`/${locale}/`, request.url));
   }
 
-  // Redirect unauthorized users to login
   if (!session.isAuthenticated && !pathname.includes("/login")) {
+    // Redirect unauthorized users to login
     return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
   }
 
@@ -25,6 +25,7 @@ export default async function middleware(request: NextRequest) {
   return i18nResponse;
 }
 
+// applies this middleware only to files in the app directory
 export const config = {
   matcher: "/((?!api|static|.*\\..*|_next).*)",
 };
