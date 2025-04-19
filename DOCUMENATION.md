@@ -81,24 +81,6 @@ I have 3 main layouts in my app directory, organized in [route groups](https://n
 
 ### lib
 
-Inside the lib folder will be backend stuff. I will have server actions, as well as data-fetching files. These files follow the following folder structure:
-
-```lib folder
-lib/
-  page1/
-    data.ts
-    actions.ts
-  page2/
-    data.ts
-    actions.ts
-  shared/
-    actions/
-      userActions.ts
-      productActions.ts
-    data/
-      api.ts
-      db.ts
-```
 
 I want to use the same structure for my components.
 

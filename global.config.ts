@@ -1,5 +1,6 @@
 import { MessageState } from "./contexts/use-new-message";
 
+// These date formats are used for the date-fns library
 export const PT_DATE_FORMAT = "dd/MM/yyyy HH:mm";
 export const PT_DATE_FORMAT_NO_TIME = "dd/MM/yyyy";
 export const ISO8601_DATE_FORMAT = "yyyy-MM-dd";
@@ -21,6 +22,5 @@ export const EMPTY_MESSAGE: MessageState = {
   scheduledDateConfirmed: false,
 };
 
-export const APP_NAME = "ETPZP-SMS";
-
+// This is used in the metadata
 export const METADATA_APP_NAME = "ETPZP SMS | ";

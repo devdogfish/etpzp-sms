@@ -12,7 +12,6 @@ import Contact from "@/public/icons/user-solid.svg";
 import { PageHeader } from "@/components/headers";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { APP_NAME } from "@/global.config";
 
 export default function WelcomePage() {
   const { amountIndicators } = useLayout();
@@ -42,7 +41,7 @@ export default function WelcomePage() {
                 {t("welcome_message")}{" "}
               </span>
               <span className="text-6xl leading-tighter gradient-text">
-                {APP_NAME}
+                ETPZP-SMS
               </span>
             </div>
 

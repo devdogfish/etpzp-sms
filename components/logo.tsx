@@ -1,4 +1,3 @@
-import { APP_NAME } from "@/global.config";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -21,7 +20,7 @@ export default function AppLogo({ isCollapsed }: { isCollapsed: boolean }) {
           <span
             className="font-bold user-select-none tracking-tight text-xl font-disket-mono-regular" // or text-2xl
           >
-            {APP_NAME}
+            ETPZP-SMS
           </span>
         )}
       </Link>
