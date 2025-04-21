@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project
+This is a [Next.js 15](https://nextjs.org/) app router project
 
 ## Getting Started
 First, run the development server:
@@ -16,32 +16,8 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 TODO: 
-- Write Pages explanations for all the pages
-- Move documentation from here and DOCUMENTATION.md to the obsidian document.
-- remove front-end console.logs
-- Add installation and configuration section
-- Find an alternative image to postgres:18-alpine with no critical vulnerabilities
+- Remove front-end console.logs
 
-## Important Commands
-Deleting all tables
-```sql
-DROP TABLE IF EXISTS recipient, contact, message, public.user;
-```
-Simple messages query
-```sql
-SELECT COUNT(*) FROM message WHERE send_time >= CURRENT_DATE - INTERVAL '1 months' AND in_trash = false AND status NOT IN ('FAILED', 'DRAFTED');
-```
-### On MacOS/UNIX based system:
-Seed the database
-```shell
-\i ~/dev/etpzp-sms/lib/db/seed.sql
-```
-Open Nginx config
-```shell
-code /opt/homebrew/etc/nginx/nginx.conf
-```
-### Windows
-Seed the database
-```shell
-\i /Users/Utilizador/dev/etpzp-sms/lib/db/seed.sql
-```
+- Write Pages explanations for all the pages
+
+- Correct, think about which grammar and tense is the best for following chapters: INTRODUCTION, CONCLUSION including its sections, GUIDES & TUTORIALS
