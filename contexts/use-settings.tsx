@@ -102,10 +102,6 @@ export function SettingsProvider({
   };
 
   const syncWithDB = async () => {
-    console.log("Sync with DB got called - refetching settings");
-    if (hasLanguageCookie() === false) {
-      console.log("Syncing with DB because NEXT_LOCALE cookie doesn't exist");
-    }
     const settings = await fetchUserSettings();
 
     if (settings) {
@@ -135,10 +131,6 @@ export function SettingsProvider({
         profileColorId: profile_color_id,
         layout: appearance_layout,
       });
-    } else {
-      console.log(
-        "An error during the settings fetch from the database occurred."
-      );
     }
   };
 

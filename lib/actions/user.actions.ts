@@ -34,8 +34,6 @@ export default async function saveUser(
       [email]
     );
     if (selectResult.rows.length) {
-      console.log("User already exists in db. Authentication successful!");
-
       return {
         success: true,
         message: ["Authentication successful!", "User already exists"],
@@ -43,17 +41,14 @@ export default async function saveUser(
       };
     } else {
       // User has never signed up before
-      console.log("Creating new user in DB...");
 
       return new Promise((resolve) => {
         ad.findUser(email, async (err, user: any) => {
           if (err || !user) {
-            console.log("ERROR: " + JSON.stringify(err));
             resolve({ success: false, message: ["User not found."] });
             return;
           }
 
-          console.log("USER INFORMATION FOUND");
           const { cn, displayName, givenName, sn } = user;
           try {
             const insertResult = await db(
@@ -99,10 +94,6 @@ export async function dummySaveUser(
       [user.email]
     );
     if (selectResult.rows.length) {
-      console.log(
-        "User already exists in db. Dummy-Authentication successful!"
-      );
-
       return {
         success: true,
         message: ["Authentication successful!", "User already exists"],
@@ -110,8 +101,6 @@ export async function dummySaveUser(
       };
     } else {
       // User has never signed up before
-      console.log("Creating new user in DB...");
-
       try {
         const insertResult = await db(
           "INSERT INTO public.user (email, name, role, first_name, last_name, display_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email, role, first_name, last_name;",
@@ -138,7 +127,7 @@ export async function dummySaveUser(
       }
     }
   } catch (error) {
-    console.log("dummy save user error:", error);
+    console.log("Dummy save user error:", error);
 
     return {
       success: false,
@@ -161,8 +150,6 @@ export async function updateSetting(
   };
 
   if (!validSettingNames.includes(rawData.name)) {
-    console.log(rawData.name);
-
     return {
       success: false,
       error: "Invalid setting",
@@ -173,14 +160,8 @@ export async function updateSetting(
     if (!userId) throw new Error("Invalid user id.");
     // Try to validate and parse the raw data.
     const parsedData = UpdateSettingSchema.parse(rawData);
-    console.log(`Updating database ${parsedData.name} setting`);
 
     // If validation passed, you can proceed to update the database accordingly.
-    console.log(
-      `Updating database ${parsedData.name} with value:`,
-      parsedData.value
-    );
-
     const { rows } = await db(
       `UPDATE public.user SET ${parsedData.name} = $2, updated_at = NOW() WHERE id = $1 RETURNING *;`,
       [userId, parsedData.value]

@@ -64,16 +64,16 @@ export async function dummyAuthenticate({
   const dummyUser: SessionData & { user: DBUser } = {
     user: {
       id: "1",
-      email: "pepe@gmail.com",
-      name: "Pepe Maximus",
-      first_name: "Pepe",
-      last_name: "Maximus",
+      email: "dummy@user.com",
+      name: "Dummy User",
+      first_name: "Dummy",
+      last_name: "User",
       role: "ADMIN",
 
       lang: "pt",
 
       profile_color_id: 1,
-      display_name: "Pepe Maximus",
+      display_name: "Dummy User",
 
       primary_color_id: 1,
       dark_mode: false,
@@ -83,32 +83,10 @@ export async function dummyAuthenticate({
     isAdmin: true,
   };
   const userResult = await dummySaveUser(dummyUser.user as DBUser);
-  console.log("DUmmy authenticate result:", dummyUser);
 
   return {
     user: userResult.success ? userResult.data : undefined,
     isAuthenticated: userResult.success,
     isAdmin: userResult.success,
   };
-}
-
-export async function testConnection() {
-  const ad = new ActiveDirectory(activeDirectoryConfig);
-
-  ad.authenticate(
-    activeDirectoryConfig.username, // what they call username is actually an email
-    activeDirectoryConfig.password,
-    function (err, auth) {
-      if (err) {
-        console.log("ERROR: " + JSON.stringify(err));
-        return;
-      }
-
-      if (auth) {
-        console.log("Authenticated!");
-      } else {
-        console.log("Authentication failed!");
-      }
-    }
-  );
 }

@@ -224,8 +224,6 @@ const NewMessageForm = React.memo(function ({
           params.set("message_id", draftId);
           router.replace(pathname + "?" + params.toString());
         } else {
-          console.log("error occurred while saving draft");
-
           setDraft((prev) => ({ ...prev, lastSaveSuccessful: false }));
         }
       }
@@ -282,8 +280,6 @@ const NewMessageForm = React.memo(function ({
 
   useEffect(() => {
     if (formRef.current) {
-      console.log(draft);
-
       setForm(formRef.current);
     }
   }, [formRef]);

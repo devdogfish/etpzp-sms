@@ -31,7 +31,7 @@ export async function toggleTrash(
 
     revalidatePath("/failed"); // we need this
 
-    // TEST_PRODUCTION: Don't know why it works without the following lines. We need to test this in production and if necessary, uncomment these lines
+    // Don't know why it works without the following lines. We need to test this in production and if necessary, uncomment these lines
     // revalidatePath("/sent");
     // revalidatePath("/trash");
 
@@ -102,7 +102,6 @@ export async function cancelCurrentlyScheduled(
         },
       }
     );
-    console.log(res);
 
     if (!res.ok) {
       return {
@@ -146,19 +145,11 @@ export async function saveDraft(
   const session = await getSession();
   const userId = session?.user?.id;
   let draft;
-  // DEBUG
-  // await sleep(1000);
+
   try {
-    // DEBUG
-    // throw 1;
     if (!userId) throw new Error("Invalid user id.");
 
-    console.log("BEGIN IF block for saving draft... With this data:");
-    console.log(data);
-
     if (draftId) {
-      console.log("Updating old draft...");
-
       // 1. Delete old recipients first
       await db(`DELETE FROM recipient WHERE message_id = $1`, [draftId]);
 
@@ -193,8 +184,6 @@ export async function saveDraft(
         ]
       );
     } else {
-      console.log("Creating new draft...");
-
       // Create new draft
       draft = await db(
         `

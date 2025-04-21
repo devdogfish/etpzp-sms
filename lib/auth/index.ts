@@ -56,8 +56,7 @@ export async function logout() {
     session.destroy();
     return { success: true };
   } catch (error) {
-    console.log("LOGOUT FAILED");
-    console.log(error);
+    console.log("LOGOUT FAILED:", error);
 
     return { success: false };
   }

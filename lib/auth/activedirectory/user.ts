@@ -13,10 +13,8 @@ export default async function userExists(
       password,
       (err: string | null, authenticated: boolean) => {
         if (err || !authenticated) {
-          console.log("Error during authentication: " + err);
           resolve({ success: false, error: err });
         } else {
-          console.log(`Authenticated successfully!`);
           resolve({ success: authenticated, error: null });
         }
       }

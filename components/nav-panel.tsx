@@ -100,9 +100,6 @@ export function MobileNavPanel() {
   useEffect(() => {
     setMobileNavPanel(false);
   }, [router]);
-  useEffect(() => {
-    console.log(mobileNavPanel);
-  }, [mobileNavPanel]);
 
   // add a click event listener to the nav element
   const handleNavClick = useCallback((event: React.MouseEvent<HTMLElement>) => {

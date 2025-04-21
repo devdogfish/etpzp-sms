@@ -107,8 +107,6 @@ export default function ContactsPage() {
           <Button
             className="absolute w-11 h-11 bg-primary bottom-0 right-0 m-8 rounded-full"
             onClick={() => {
-              console.log("create contact modal", modal);
-
               setModal((m) => ({
                 ...m,
                 contact: { ...m.contact, create: true },

@@ -13,7 +13,6 @@ export async function fetchMessagesInDateRange(input: {
 }) {
   const session = await getSession();
 
-  console.log(`Fetching sent messages...`);
   try {
     if (!session?.isAdmin || !session?.isAuthenticated)
       throw new Error("User is not an admin or not authenticated.");
@@ -21,7 +20,6 @@ export async function fetchMessagesInDateRange(input: {
     // Validate input using Zod
     const validatedDates = DateRangeSchema.parse(input);
     const { startDate, endDate } = validatedDates;
-    console.log("validatedDates", validatedDates);
 
     const result = await db(
       `
@@ -34,7 +32,6 @@ export async function fetchMessagesInDateRange(input: {
         `,
       [startDate, endDate]
     );
-    console.log("Light messages: ", result.rows.slice(0, 20));
 
     return result.rows as LightDBMessage[];
   } catch (error) {}
@@ -43,7 +40,6 @@ export async function fetchMessagesInDateRange(input: {
 export async function fetchUsers() {
   const session = await getSession();
 
-  console.log(`Fetching sent messages...`);
   try {
     if (!session?.isAdmin || !session?.isAuthenticated)
       throw new Error("User is not an admin or not authenticated.");
@@ -69,7 +65,6 @@ export async function fetchCountryStats(input: {
     if (!validatedDates.success || validatedDates.data.startDate == undefined)
       throw new Error("Invalid input.");
     const { startDate, endDate } = validatedDates.data;
-    console.log("validatedDates", validatedDates);
 
     const res = await fetch(`${process.env.GATEWAYAPI_URL}/api/usage/labels`, {
       method: "POST",
@@ -87,8 +82,6 @@ export async function fetchCountryStats(input: {
       throw new Error("Network response was not ok");
     }
     const resJson = await res.json();
-    console.log(res);
-    console.log(resJson);
 
     return resJson
       .filter((country: { label: string | null }) => country.label === null)

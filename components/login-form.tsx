@@ -42,7 +42,6 @@ export default function LoginForm() {
     setServerState(result);
     toastActionResult(result, t);
     if (result.success) {
-      console.log("Login successful, redirecting using router.replace()");
       await syncWithDB(); // Fetch users settings from database on login
       router.replace("/");
     }

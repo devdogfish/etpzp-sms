@@ -9,7 +9,6 @@ export async function fetchMessagesByStatus(status: StatusEnums) {
   const session = await getSession();
   const userId = session?.user?.id;
 
-  console.log(`Fetching messages that are in ${status} status...`);
   try {
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(
@@ -40,7 +39,6 @@ export async function fetchTrashedMessages() {
   const session = await getSession();
   const userId = session?.user?.id;
 
-  console.log("Fetching trashed messages...");
   try {
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(
@@ -63,7 +61,6 @@ export async function fetchTrashedMessages() {
       [userId]
     );
 
-    console.log(result.rows);
     return result.rows as DBMessage[];
   } catch (error) {}
 }
@@ -72,7 +69,6 @@ export async function fetchSentIn(time: "FUTURE" | "PAST") {
   const session = await getSession();
   const userId = session?.user?.id;
 
-  console.log(`Fetching sent messages...`);
   try {
     if (!userId) throw new Error("Invalid user id.");
     const result = await db(

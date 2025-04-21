@@ -19,8 +19,6 @@ export async function sendMessage(
     clearForm?: boolean;
   }
 > {
-  console.log("\n\n\n\n\nReceived data on server", data);
-
   // 1. Check authentication
   const { isAuthenticated, user } = await getSession();
   const userId = user?.id;
@@ -69,10 +67,6 @@ export async function sendMessage(
     // JavaScript's Date object uses milliseconds, so we divide by 1000 to the timestamp into seconds.
     scheduledUnixSeconds =
       Date.now() / 1000 + validatedData.data.secondsUntilSend;
-    console.log(
-      "Message will be scheduled for this epoch timestamp in seconds:",
-      scheduledUnixSeconds
-    );
   }
 
   const isScheduled =
@@ -104,15 +98,9 @@ export async function sendMessage(
       body: JSON.stringify(payload),
     });
     const resJson = await res.json();
-    console.log("Called fetch with:", payload, "\nResults:", res, resJson);
 
     // -------- BEGIN DATABASE LOGIC -------- //
-    console.log("\n\nFetch completed! Moving on to database logic...");
     if (typeof existingDraftId === "undefined" || !existingDraftId) {
-      console.log(
-        "The draftId is not defined, so INSERT a new message into the database..."
-      );
-
       // Insert new message and recipients
       await db(
         `
@@ -170,10 +158,6 @@ export async function sendMessage(
         ]
       );
     } else {
-      console.log(
-        `Message already exists as draft (message_id:${existingDraftId}). Changing existing message using UPDATE query...`
-      );
-
       // 1. Update message data
       const result = await db(
         `
@@ -253,7 +237,6 @@ export async function sendMessage(
         clearForm: true,
       };
 
-    console.log("All operations executed without errors \n------\n\n");
     return {
       success: true,
       message: [

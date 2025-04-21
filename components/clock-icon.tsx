@@ -17,7 +17,6 @@ import {
 function ClockIcon({ hour }: { hour: number }) {
   // Ensure the hour is between 1 and 12
   const validHour = Math.max(1, Math.min(12, hour));
-  // console.log("Chose", validHour, "clock icon");
 
   // Map the hour to the corresponding icon
   const icons: { [key: number]: JSX.Element } = {

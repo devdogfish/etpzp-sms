@@ -13,10 +13,8 @@ export default async function userInGroup(
       group,
       (err: object | null, isMember: boolean) => {
         if (err) {
-          console.log("Error during group search: " + JSON.stringify(err));
           resolve({ success: false, error: JSON.stringify(err) });
         } else {
-          console.log(`Sucess, ${username} isMemberOf ${group}: ${isMember}`);
           resolve({ success: isMember, error: null });
         }
       }

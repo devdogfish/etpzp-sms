@@ -9,7 +9,6 @@ export async function fetchUserSettings() {
   const session = await getSession();
   const userId = session?.user?.id;
 
-  console.log("fetching user settings");
   try {
     if (!userId) throw new Error("Invalid user id.");
     const { rows } = await db(

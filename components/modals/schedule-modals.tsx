@@ -106,8 +106,6 @@ export default function ScheduleMessageModal() {
                   max={23}
                   value={selectedDate.getHours()}
                   onChange={(value) => {
-                    console.log("changing hours");
-
                     setSelectedDate((prev) => new Date(prev.setHours(value)));
                   }}
                 />

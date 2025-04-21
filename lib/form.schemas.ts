@@ -103,8 +103,6 @@ export const UpdateSettingSchema = z.discriminatedUnion("name", [
   z.object({
     name: z.literal("dark_mode"),
     value: z.preprocess((val) => {
-      console.log("parsing bool from string. current value:", val);
-
       // Convert strings "true" and "false" to actual booleans.
       if (val === "dark") return true;
       if (val === "light") return false;

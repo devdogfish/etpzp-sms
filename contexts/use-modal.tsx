@@ -30,10 +30,6 @@ export function ModalProvider({
   });
   const [scheduleDropdown, setScheduleDropdown] = useState(false);
 
-  // useEffect(() => {
-  //   console.log(modal);
-  // }, [modal]);
-
   return (
     <ModalContext.Provider
       value={{ modal, setModal, scheduleDropdown, setScheduleDropdown }}

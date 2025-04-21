@@ -60,8 +60,7 @@ export function CopyButton({
         timerRef.current = setTimeout(() => setCopied(false), 2000);
       } catch (error) {
         // Handle any errors that occur during the copy process
-        console.log("Failed to copy text: ", error);
-        toast.error("copy_btn-error"); // Notify failure
+        toast.error("copy_btn-error");
       }
     }
   };

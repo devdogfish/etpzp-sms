@@ -308,7 +308,6 @@ export function NewMessageProvider({
   useEffect(() => {
     // Revalidate recipients when contacts get re-fetched
     revalidateRecipients();
-    console.log(suggestedRecipients);
   }, [contacts]);
 
   useEffect(() => {

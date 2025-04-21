@@ -122,8 +122,6 @@ export default function InsertContactModal() {
             <DialogDescription>
               {t("insert_contact-header_caption")}
             </DialogDescription>
-            {/* DEBUG */}
-            {/* <Button onClick={showCreateModal}>Create new</Button> */}
           </DialogHeader>
           {contacts.length ? (
             <div className="max-h-[400px] overflow-auto">

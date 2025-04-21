@@ -13,7 +13,6 @@ export default function ResizablePanelWrapper({
       direction="horizontal"
       onLayout={(sizes: number[]) => {
         setLayout(sizes);
-        // console.log(`Saving layout cookie with new sizes: ${sizes}`);
         const cookieValue = JSON.stringify(sizes);
         const cookiePath = "/"; // Specify a url path. The layout should be the same, no matter where it got saved.
         document.cookie = `react-resizable-panels:layout:mail=${cookieValue}; path=${cookiePath};`;
