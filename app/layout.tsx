@@ -31,7 +31,7 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const currentLocale = cookieStore.get("NEXT_LOCALE")?.value;
 
-  const layoutCookie = cookieStore.get("react-resizable-panels:layout:mail");
+  const layoutCookie = cookieStore.get("react-resizable-panels:layout:app");
   const collapsedCookie = cookieStore.get("react-resizable-panels:collapsed");
 
   const initialLayout: number[] = layoutCookie

@@ -49,7 +49,7 @@ export function PageHeader({
                 <ArrowLeft className="w-4 h-4" />
               </Link>
             ) : (
-              <MobileHamburgerButton />
+              <MobileHamburgerButton className="mr-2" />
             ))}
           {skeleton ? (
             <Skeleton
@@ -95,13 +95,13 @@ export function SectionHeader({
   );
 }
 
-export function MobileHamburgerButton() {
+export function MobileHamburgerButton({ className }: { className: string }) {
   const { setMobileNavPanel } = useLayout();
   return (
     <Button
       variant="ghost"
       size="icon"
-      className="md:hidden"
+      className={cn("md:hidden", className)}
       type="button"
       onClick={() => setMobileNavPanel(true)}
     >

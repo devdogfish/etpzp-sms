@@ -47,13 +47,11 @@ export default function ContactsPage() {
   };
 
   useEffect(() => {
+    const oldSelected = contacts.find((c) => c.id === selected?.id);
     setFilteredContacts(searchContacts(contacts, searchParams.get("query")));
-    if (selected && contacts.some((msg) => msg.id === selected.id)) {
+    if (oldSelected) {
       // Keep the current selection
-      setSelected(selected);
-    } else {
-      // If the selected contact is not in the new messages, select the first contact or handle accordingly
-      setSelected(contacts[0] || null);
+      setSelected(oldSelected);
     }
   }, [contacts]);
 
@@ -81,11 +79,12 @@ export default function ContactsPage() {
         maxSize={50}
       >
         <PageHeader title={t("header")}>
-          {/* Not sure if this is allowed to be here */}
-          <Button size="sm" onClick={showCreateModal}>
-            <CirclePlus />
-            {t("new")}
-          </Button>
+          {!onMobile && (
+            <Button size="sm" onClick={showCreateModal}>
+              <CirclePlus />
+              {t("new")}
+            </Button>
+          )}
         </PageHeader>
         <Search
           onSearch={onSearch}

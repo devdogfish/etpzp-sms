@@ -22,6 +22,7 @@ import { useTranslation } from "react-i18next";
 import ProfilePic from "./profile-pic";
 import { PT_DATE_FORMAT } from "@/global.config";
 import { ScrollArea } from "./ui/scroll-area";
+import { useContacts } from "@/contexts/use-contacts";
 
 export default function ContactDisplay({
   contact,
@@ -34,11 +35,13 @@ export default function ContactDisplay({
   const router = useRouter();
   const { t } = useTranslation(["contacts-page", "common"]);
   const { setModal } = useModal();
+  const { refetchContacts } = useContacts();
 
   const handleDelete = async () => {
     if (contact) {
       const result = await deleteContact(contact.id);
       toastActionResult(result, t);
+      if (result.success) refetchContacts();
     }
   };
   const messageContact = async () => {

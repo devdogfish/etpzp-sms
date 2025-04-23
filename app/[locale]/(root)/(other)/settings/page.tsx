@@ -17,13 +17,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
-import SettingItem from "../../../../../components/settings-item";
+import SettingsItem from "../../../../../components/settings-item";
 import { cn } from "@/lib/utils";
 import { useTheme as useNextTheme } from "next-themes";
 import { useThemeContext } from "@/contexts/theme-data-provider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { METADATA_APP_NAME } from "@/global.config";
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -55,14 +54,16 @@ export default function Settings() {
             : "h-[calc(100vh-var(--header-height))]"
         }
       >
-        <div className="p-4" /* Inside looks better with rimless bottom */>
+        <div
+          className="p-4" /* Inside looks better with rimless bottom on scroll on scroll */
+        >
           <div className="space-y-12">
             <SectionHeader
               title={t("language-header")}
               subtitle={t("language-header_caption")}
               anchorName="language"
             >
-              <SettingItem
+              <SettingsItem
                 name="lang"
                 label={t("language-language_label")}
                 caption={t("language-language_label_caption")}
@@ -95,7 +96,7 @@ export default function Settings() {
               subtitle={t("profile-header_caption")}
               anchorName="profile"
             >
-              <SettingItem
+              <SettingsItem
                 name="profile_color_id" // this might need to be the exact database field
                 label={t("profile-color_label")}
                 caption={t("profile-color_label_caption")}
@@ -112,7 +113,7 @@ export default function Settings() {
                   />
                 )}
               />
-              <SettingItem
+              <SettingsItem
                 name="display_name"
                 label={t("profile-name_label")}
                 caption={t("profile-name_label_caption")}
@@ -125,7 +126,7 @@ export default function Settings() {
               subtitle={t("appearance-header_caption")}
               anchorName="appearance"
             >
-              <SettingItem
+              <SettingsItem
                 name="primary_color_id" // this might need to be the exact database field
                 label={t("appearance-color_label")}
                 caption={t("appearance-color_label_caption")}
@@ -146,7 +147,7 @@ export default function Settings() {
                 )}
               />
 
-              <SettingItem
+              <SettingsItem
                 name="appearance_layout" // this might need to be the exact database field
                 label={t("appearance-layout_label")}
                 caption={t("appearance-layout_label_caption")}
@@ -188,7 +189,7 @@ export default function Settings() {
                   );
                 }}
               />
-              <SettingItem
+              <SettingsItem
                 name="dark_mode"
                 label={t("appearance-theme_label")}
                 caption={t("appearance-theme_label_caption")}
@@ -211,4 +212,3 @@ export default function Settings() {
     </>
   );
 }
-

@@ -25,7 +25,7 @@ export type RenderInputArgs = {
   setServerState?: React.Dispatch<SetStateAction<UpdateSettingResponse>>;
 };
 
-type SettingItemProps = InputHTMLAttributes<HTMLInputElement> & {
+type SettingsItemProps = InputHTMLAttributes<HTMLInputElement> & {
   name: string;
   initialValue?: string;
   label?: string;
@@ -40,7 +40,7 @@ const initialState: UpdateSettingResponse = {
   input: "",
 };
 
-export function SettingItem({
+export function SettingsItem({
   name,
   initialValue = "",
   label,
@@ -49,7 +49,7 @@ export function SettingItem({
   renderInput,
   onUpdate,
   ...inputProps
-}: SettingItemProps) {
+}: SettingsItemProps) {
   const [value, setValue] = useState<string>(initialValue);
   const [isPending, setIsPending] = useState<boolean>(false);
   const [serverState, setServerState] = useState(initialState);
@@ -142,4 +142,4 @@ export function SettingItem({
   );
 }
 
-export default SettingItem;
+export default SettingsItem;

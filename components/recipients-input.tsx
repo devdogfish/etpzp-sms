@@ -16,7 +16,6 @@ import { useNewMessage } from "@/contexts/use-new-message";
 import { useModal } from "@/contexts/use-modal";
 import { ScrollArea } from "./ui/scroll-area";
 import { NewRecipient } from "@/types/recipient";
-import useIsMounted from "@/hooks/use-mounted";
 import ProfilePic from "./profile-pic";
 import { useTranslation } from "react-i18next";
 import {
@@ -58,8 +57,6 @@ export default function RecipientsInput({
   } = useNewMessage();
   const { setModal } = useModal();
   const { t } = useTranslation(["new-message-page"]);
-
-  const isMounted = useIsMounted();
 
   // reset the input's value
   function clearInputValue() {

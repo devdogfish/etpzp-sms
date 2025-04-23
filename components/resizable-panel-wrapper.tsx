@@ -15,7 +15,7 @@ export default function ResizablePanelWrapper({
         setLayout(sizes);
         const cookieValue = JSON.stringify(sizes);
         const cookiePath = "/"; // Specify a url path. The layout should be the same, no matter where it got saved.
-        document.cookie = `react-resizable-panels:layout:mail=${cookieValue}; path=${cookiePath};`;
+        document.cookie = `react-resizable-panels:layout:app=${cookieValue}; path=${cookiePath};`;
       }}
       className="h-full items-stretch"
     >

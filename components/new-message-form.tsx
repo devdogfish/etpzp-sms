@@ -202,7 +202,8 @@ const NewMessageForm = React.memo(function ({
       message.sender === "ETPZP"
     );
   }
-  // Saving draft logic
+
+  // Draft saving logic
   const handleSaveDraft = () => {
     const save = async () => {
       if (

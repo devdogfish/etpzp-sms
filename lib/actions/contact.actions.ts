@@ -1,5 +1,5 @@
 "use server";
-
+// !!If you are using the contacts context, refetch contacts on client after each server action instead of revalidating!!
 import db from "../db";
 import { ContactSchema } from "../form.schemas";
 import { DBContact } from "@/types/contact";
@@ -102,7 +102,6 @@ export async function updateContact(
       [name, validatedPhone, description || null, userId, id]
     );
 
-    revalidatePath("/contacts");
     return { success: true, message: ["modals:edit_contact-success"] };
   } catch (error) {
     let message;
@@ -134,7 +133,6 @@ export async function deleteContact(
       id,
     ]);
 
-    revalidatePath("/contacts");
     return {
       success: true,
       message: ["contacts-page:server-delete_success"],

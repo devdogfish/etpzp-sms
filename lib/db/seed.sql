@@ -11,7 +11,7 @@ CREATE TABLE "user" (
     -- User settings: 
     -- All have defaults except display name, which defaults to the user's AD name when they first sign up.
     lang VARCHAR(2) NOT NULL DEFAULT 'pt', -- ISO 639-1 language code
-    profile_color_id SMALLINT NOT NULL DEFAULT 1,
+    profile_color_id SMALLINT NOT NULL DEFAULT 2,
     display_name VARCHAR(50) NOT NULL,
     primary_color_id SMALLINT NOT NULL DEFAULT 1,
     appearance_layout VARCHAR(20) CHECK (appearance_layout IN ('MODERN', 'SIMPLE')) NOT NULL DEFAULT 'MODERN',

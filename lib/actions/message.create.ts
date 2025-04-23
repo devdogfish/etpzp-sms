@@ -145,8 +145,6 @@ export async function sendMessage(
           res.ok ? null : res.status, // api_error_code
           res.ok ? null : JSON.stringify(resJson), // api_error_details_json
 
-          // for the ordering of the recipient
-
           resJson.usage.total_cost,
           resJson.usage.currency,
 
@@ -197,7 +195,7 @@ export async function sendMessage(
 
           // Other
           userId, // user_id
-          existingDraftId, // id of the draft to update
+          existingDraftId, // id of the database draft to update
         ]
       );
 
@@ -230,12 +228,13 @@ export async function sendMessage(
     // Update the amount indicators in the nav panel
     revalidatePath("/new-message");
 
-    if (!res.ok)
+    if (!res.ok) {
       return {
         success: false,
         message: ["server-some_api_error"],
         clearForm: true,
       };
+    }
 
     return {
       success: true,

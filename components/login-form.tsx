@@ -29,12 +29,14 @@ const initialState: ActionResponse<Login> = {
 export default function LoginForm() {
   const [passInputType, setPassInputType] = useState("password");
   const [serverState, setServerState] = useState(initialState);
+  const [pending, setPending] = useState(false);
   const { syncWithDB } = useSettings();
   const router = useRouter();
   const { t } = useTranslation(["login-page", "common"]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setPending(true);
     // Create a FormData from the HTML form element
     const formData = new FormData(event.currentTarget);
 
@@ -45,82 +47,85 @@ export default function LoginForm() {
       await syncWithDB(); // Fetch users settings from database on login
       router.replace("/");
     }
+    setPending(false);
   }
   return (
-    <form onSubmit={handleSubmit}>
-      <Card className="mx-auto max-w-sm">
-        <CardHeader>
-          <div className="relative w-[60%] overflow-hidden mb-2">
-            {/* Set a height for the parent */}
-            <Image
-              src="/etpzp_sms-logo.png"
-              width={80}
-              height={80}
-              alt="Microsoft logo"
-              // layout="fill" // This makes the image fill the parent container
-              // objectFit="cover" // This will crop the image to fill the container
-              quality={100}
-            />
-          </div>
-          <CardTitle className="text-2xl">
-            {t("header")} {/**with Microsoft */}
-          </CardTitle>
-          <CardDescription>{t("header_caption")}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-2">
-          <div>
-            <Label htmlFor="email">{t("email_label")}</Label>
-            <Input
-              name="email"
-              id="email"
-              type="email"
-              defaultValue={serverState.inputs?.email}
-              placeholder={t("email_placeholder")}
-              aria-describedby="email"
-            />
-            {serverState.errors?.email && (
-              <p id="email-error" className="text-sm text-red-500">
-                {t(serverState.errors.email[0])}
-              </p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="password">{t("password_label")}</Label>
-            <div className="flex items-center gap-1 relative">
-              <Input
-                name="password"
-                id="password"
-                type={passInputType}
-                defaultValue={serverState.inputs?.password}
-                aria-describedby="password"
+    <main className="flex items-center justify-center w-screen h-screen p-3">
+      <form onSubmit={handleSubmit}>
+        <Card className="mx-auto max-w-sm">
+          <CardHeader>
+            <div className="relative w-[60%] overflow-hidden mb-2">
+              {/* Set a height for the parent */}
+              <Image
+                src="/etpzp_sms-logo.png"
+                width={80}
+                height={80}
+                alt="Microsoft logo"
+                // layout="fill" // This makes the image fill the parent container
+                // objectFit="cover" // This will crop the image to fill the container
+                quality={100}
               />
-              <Button
-                className="absolute right-0 z-10"
-                type="button"
-                variant="none"
-                onClick={() =>
-                  setPassInputType((prev) =>
-                    prev === "text" ? "password" : "text"
-                  )
-                }
-              >
-                <Eye className="w-4 h-4" />
-              </Button>
             </div>
-            {serverState.errors?.password && (
-              <p id="password-error" className="text-sm text-red-500">
-                {t(serverState.errors.password[0])}
+            <CardTitle className="text-2xl">{t("header")}</CardTitle>
+            <CardDescription>{t("header_caption")}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            <div>
+              <Label htmlFor="email">{t("email_label")}</Label>
+              <Input
+                name="email"
+                id="email"
+                type="email"
+                defaultValue={serverState.inputs?.email}
+                placeholder={t("email_placeholder")}
+                aria-describedby="email"
+                disabled={pending}
+              />
+              {serverState.errors?.email && (
+                <p id="email-error" className="text-sm text-red-500">
+                  {t(serverState.errors.email[0])}
+                </p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="password">{t("password_label")}</Label>
+              <div className="flex items-center gap-1 relative">
+                <Input
+                  name="password"
+                  id="password"
+                  type={passInputType}
+                  defaultValue={serverState.inputs?.password}
+                  aria-describedby="password"
+                  disabled={pending}
+                />
+                <Button
+                  className="absolute right-0 z-10"
+                  type="button"
+                  variant="none"
+                  onClick={() =>
+                    setPassInputType((prev) =>
+                      prev === "text" ? "password" : "text"
+                    )
+                  }
+                >
+                  <Eye className="w-4 h-4" />
+                </Button>
+              </div>
+              {serverState.errors?.password && (
+                <p id="password-error" className="text-sm text-red-500">
+                  {t(serverState.errors.password[0])}
+                </p>
+              )}
+            </div>
+            {!serverState.success && (
+              <p className="text-sm text-destructive text-center">
+                {t(serverState.message[0])}
               </p>
             )}
-          </div>
-          {!serverState.success && (
-            <p className="text-sm text-destructive text-center">
-              {t(serverState.message[0])}
-            </p>
-          )}
-          <SubmitButton className="w-full">{t("button_submit")}</SubmitButton>
-        </CardContent>
-      </Card>
-    </form>
+            <SubmitButton className="w-full">{t("button_submit")}</SubmitButton>
+          </CardContent>
+        </Card>
+      </form>
+    </main>
   );
 }

@@ -57,17 +57,6 @@ export default function MessagesPage({
       // If the selected message is not in the new messages, set it to null or handle accordingly
       setSelected(messages[0] || null);
     }
-
-    // We are managing state for when to replace icons with words. The breakpoint be less on big screens while on smaller screens, the icons should show up faster.
-    const handleResize = () => {
-      const _isLarge = window.matchMedia("(min-width: 1024px)").matches;
-      setIsLarge({ bool: _isLarge, breakpoint: _isLarge ? 33 : 49 });
-    };
-
-    handleResize(); // Check on mount
-    window.addEventListener("resize", handleResize); // Check on resize
-
-    return () => window.removeEventListener("resize", handleResize); // Cleanup
   }, [messages]);
 
   useEffect(() => {

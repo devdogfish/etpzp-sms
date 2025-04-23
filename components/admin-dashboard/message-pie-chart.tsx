@@ -30,7 +30,7 @@ export default function MessagePieChart({
   const userLikesZinc = themeColor === 1;
   const slicedArray = [
     ...themesArray.slice(
-      userLikesZinc ? 0 : 1, // remove Zinc color if the user doesn't like it. If he does, leave it
+      userLikesZinc ? 0 : 1, // remove Zinc color if the user doesn't like it, because it looks bad with the other colors. If he does, leave it in
       themesArray.length
     ),
   ];
@@ -120,10 +120,9 @@ export default function MessagePieChart({
           <CardContent className="flex-1 pb-0 h-[300px]">
             <div className="mx-auto aspect-square h-full max-w-[300px] flex justify-center">
               <ResponsiveContainer
+                /* Docs say percentages, but numerical values work better */
                 width={250}
-                aspect={
-                  1
-                } /* Docs say percentages, but numerical values work better */
+                aspect={1}
               >
                 <PieChart className="">
                   <Tooltip content={<CustomTooltip />} />

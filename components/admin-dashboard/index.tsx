@@ -46,7 +46,7 @@ export default function AdminDashboard({
             ? t("header_long", {
                 first_name: settings.displayName
                   ? extractFirstWord(settings.displayName)
-                  : "user",
+                  : "User",
               })
             : t("header")
         }
@@ -71,7 +71,9 @@ export default function AdminDashboard({
         /** We always want simple header height here due to only having 1 simple nav-panel, regardless of any layout*/
         className="h-[calc(100vh-var(--simple-header-height))]"
       >
-        <div className="p-4" /* Inside looks better with rimless bottom */>
+        <div
+          className="p-4" /* Inside looks better with rimless bottom on scroll */
+        >
           <div className="flex flex-col md:grid grid-cols-3 gap-4">
             <TextCard
               label={t("text_card_1-title")}

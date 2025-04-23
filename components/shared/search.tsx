@@ -25,7 +25,7 @@ export default function Search({ onSearch, ...props }: SearchProps) {
       params.delete("query");
     }
 
-    // Update the URL without reloading the page
+    // Update the URL quietly without reloading the page
     url.search = params.toString();
     window.history.pushState({}, "", url);
   };
