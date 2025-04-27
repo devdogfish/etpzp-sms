@@ -8,6 +8,7 @@ import {
   useCallback,
   useMemo,
   useEffect,
+  useRef,
 } from "react";
 import { toast } from "sonner";
 import type { Message } from "@/types";
@@ -59,6 +60,12 @@ type DraftState = {
   lastSaveSuccessful: boolean;
 };
 
+type InputNames = "new-recipient" | "subject" | "body";
+type InputSelectionRange = {
+  selectionStart: number;
+  selectionEnd: number;
+  selectionDirection?: "forward" | "backward" | "none";
+};
 type MessageContextValues = {
   // Message state
   message: MessageState;
@@ -82,11 +89,20 @@ type MessageContextValues = {
   updateSelectedPhone: (direction: "ArrowDown" | "ArrowUp") => void;
 
   revalidateRecipients: () => void;
-  focusedInput: string | null;
-  setFocusedInput: React.Dispatch<React.SetStateAction<string | null>>;
+  focusedInput: InputNames | null;
+  setFocusedInput: React.Dispatch<InputNames | null>;
 
+  selectionRange: InputSelectionRange;
+
+  // Element Refs
   form: HTMLFormElement | null;
   setForm: React.Dispatch<React.SetStateAction<HTMLFormElement | null>>;
+  typeableInputRefs: {
+    "new-recipient": React.RefObject<HTMLInputElement | null>;
+    subject: React.RefObject<HTMLInputElement | null>;
+    body: React.RefObject<HTMLTextAreaElement | null>;
+  };
+
   draft: DraftState;
   setDraft: React.Dispatch<React.SetStateAction<DraftState>>;
 };
@@ -127,8 +143,44 @@ export function NewMessageProvider({
   const [selectedPhone, setSelectedPhone] = useState<string | null>(null);
   const [suggestedRecipients, setSuggestedRecipients] =
     useState(initialRecipients);
-  const [focusedInput, setFocusedInput] = useState<string | null>(null);
+  const [focusedInput, setFocusedInput] = useState<InputNames | null>(null);
+
+  const [selectionRange, setSelectionRange] = useState<InputSelectionRange>({
+    selectionStart: 0,
+    selectionEnd: 0,
+  });
   const [form, setForm] = useState<HTMLFormElement | null>(null);
+
+  const typeableInputRefs = {
+    "new-recipient": useRef(null) as React.RefObject<HTMLInputElement | null>,
+    subject: useRef(null) as React.RefObject<HTMLInputElement | null>,
+    body: useRef(null) as React.RefObject<HTMLTextAreaElement | null>,
+  };
+
+  // Listen for selection changes in the form to persist cursor position across re-renders
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      if (!focusedInput) return; // Exit if no input is focused
+      const inputElement = typeableInputRefs[focusedInput].current;
+
+      if (inputElement) {
+        const { selectionStart, selectionEnd } = inputElement;
+        if (selectionStart !== null && selectionEnd !== null) {
+          setSelectionRange({
+            selectionStart: selectionStart,
+            selectionEnd: selectionEnd,
+          }); // Update the selection state
+        }
+      }
+    };
+
+    document.addEventListener("selectionchange", handleSelectionChange);
+
+    // Clean up the listener when `focusedInput` changes or component unmounts
+    return () => {
+      document.removeEventListener("selectionchange", handleSelectionChange);
+    };
+  }, [focusedInput]); // Re-run the effect when `focusedInput` changes
 
   // Memoized values
   const recommendedRecipients: WithContact[] = useMemo(() => {
@@ -350,6 +402,8 @@ export function NewMessageProvider({
         revalidateRecipients,
         focusedInput,
         setFocusedInput,
+        typeableInputRefs,
+        selectionRange,
 
         form,
         setForm,

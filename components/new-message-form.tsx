@@ -73,16 +73,19 @@ const NewMessageForm = React.memo(function ({
     message,
     focusedInput,
     setFocusedInput,
-    form,
     setForm,
     draft,
     setDraft,
+    selectionRange,
+
+    typeableInputRefs,
   } = useNewMessage();
   const { setModal } = useModal();
   const [loading, setLoading] = useState(false);
   const { isFullscreen, setIsFullscreen } = useLayout();
   const pathname = usePathname();
   const onMobile = useIsMobile();
+  const RecipientInputRef = useRef(null);
 
   const isMounted = useIsMounted();
   const debouncedSaveDraft = useDebounce(message, 2000);
@@ -256,34 +259,33 @@ const NewMessageForm = React.memo(function ({
   useEffect(() => {
     // Reapply input focus state - sender focusing logic not needed as it is a <Select>.
     if (focusedInput) {
-      const inputElement = document.querySelector(
-        `[name="${focusedInput}"]`
-      ) as HTMLElement;
+      const inputElement = typeableInputRefs[focusedInput].current;
 
       // Move cursor to end of textarea to prevent default behavior of placing it at the beginning.
       if (inputElement) {
-        if (
-          focusedInput === "body" &&
-          inputElement instanceof HTMLTextAreaElement
-        ) {
-          // For textarea, set cursor at the end
-          inputElement.focus();
-          inputElement.setSelectionRange(
-            inputElement.value.length,
-            inputElement.value.length
-          );
-        } else {
-          inputElement.focus();
-        }
+        inputElement.focus();
       }
     }
   }, [focusedInput]);
 
+  // Draft got saved / component re-renders
   useEffect(() => {
     if (formRef.current) {
       setForm(formRef.current);
+
+      const inputElement =
+        focusedInput !== null
+          ? typeableInputRefs[focusedInput].current
+          : undefined;
+      if (inputElement) {
+        inputElement.setSelectionRange(
+          selectionRange.selectionStart,
+          selectionRange.selectionEnd
+        );
+      }
     }
-  }, [formRef]);
+  }, [formRef.current]);
+
   useEffect(() => {
     if (isMounted) {
       setMessage((m) => ({ ...m, draft: { id: message_id?.id || null } }));
@@ -423,6 +425,7 @@ const NewMessageForm = React.memo(function ({
             />
 
             <Input
+              ref={typeableInputRefs["subject"]}
               name="subject"
               placeholder={t("subject_placeholder")}
               className={cn(
@@ -436,6 +439,7 @@ const NewMessageForm = React.memo(function ({
           </div>
           <div className="px-4 flex-grow mt-[1.25rem] mb-2">
             <Textarea
+              ref={typeableInputRefs["body"]}
               name="body"
               className={cn(
                 "border-none rounded-none h-full p-0 focus-visible:ring-0 shadow-none resize-none placeholder:text-muted-foreground",

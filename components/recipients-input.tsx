@@ -50,6 +50,7 @@ export default function RecipientsInput({
     searchRecipients,
     showInfoAbout,
     focusedInput,
+    typeableInputRefs,
 
     // Which one in the suggested recipients/contacts is currently selected. You can change the selection with up and down arrow keys.
     selectedPhone,
@@ -69,7 +70,7 @@ export default function RecipientsInput({
     }));
   }
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     setTimeout(() => {
       if (container.current) {
         // automatically scroll to the bottom of the recipients container when user starts typing
@@ -240,8 +241,8 @@ export default function RecipientsInput({
                   },
                 }));
                 setTimeout(() => {
-                  if (inputElement.current) {
-                    inputElement.current.focus();
+                  if (typeableInputRefs["new-recipient"].current) {
+                    typeableInputRefs["new-recipient"].current.focus();
                   }
                 }, 0);
               }}
@@ -263,7 +264,7 @@ export default function RecipientsInput({
             )} /* we are taking advantage of the default positioning of absolute elements this common parent div */
           >
             <Input
-              ref={inputElement}
+              ref={typeableInputRefs["new-recipient"]}
               // this name only used for the focus state, not for submitting any value
               name="new-recipient"
               className={cn(
