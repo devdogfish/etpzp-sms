@@ -26,6 +26,7 @@ const initialState: ActionResponse<Login> = {
   success: false,
   message: [],
 };
+// Why is this not using useActionState
 export default function LoginForm() {
   const [passInputType, setPassInputType] = useState("password");
   const [serverState, setServerState] = useState(initialState);
@@ -60,7 +61,7 @@ export default function LoginForm() {
                 src="/etpzp_sms-logo.png"
                 width={80}
                 height={80}
-                alt="Microsoft logo"
+                alt="ETPZP-SMS logo"
                 // layout="fill" // This makes the image fill the parent container
                 // objectFit="cover" // This will crop the image to fill the container
                 quality={100}
