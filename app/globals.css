@@ -156,6 +156,7 @@ body {
     hsl(var(--primary)),
     hsl(var(--primaryForeground))
   );
+  background-clip: text;
   -webkit-background-clip: text; /* Clip the background to the text */
   -webkit-text-fill-color: transparent; /* Make the text color transparent */
   display: inline-block; /* Ensure the gradient applies correctly */
