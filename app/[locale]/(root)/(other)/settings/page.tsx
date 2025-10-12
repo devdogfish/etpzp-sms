@@ -77,7 +77,7 @@ export default function Settings() {
                 }) => {
                   return (
                     <LanguageChanger
-                      // This component has custom behavior—only select props are used as it handles its own submission,
+                      // This component has custom behavior. Only select props are used as it handles its own submission,
                       // and setServerState is passed so elements update with errors.
                       id={id}
                       value={value}

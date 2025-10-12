@@ -7,7 +7,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button, buttonVariants } from "@/components/ui/button";
 import {
   AlertTriangle,
   Calendar,
@@ -30,7 +29,6 @@ import { Separator } from "./ui/separator";
 import NavLinks from "./nav-links";
 import { useTranslation } from "react-i18next";
 import { useLayout } from "@/contexts/use-layout";
-import { ScrollArea } from "./ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "@/hooks/use-session";

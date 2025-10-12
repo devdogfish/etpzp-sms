@@ -32,7 +32,6 @@ type NavProps = {
 
 export default function NavLinks({ links, isCollapsed, onMobile }: NavProps) {
   const pathname = usePathname();
-  const { i18n } = useTranslation();
   const { normalizePath } = useSettings();
 
   const activeStyles =

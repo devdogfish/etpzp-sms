@@ -5,11 +5,7 @@ import db from "../db";
 import ActiveDirectory from "activedirectory2";
 import { z } from "zod";
 import { UpdateSettingSchema } from "../form.schemas";
-import {
-  ActionResponse,
-  DataActionResponse,
-  UpdateSettingResponse,
-} from "@/types/action";
+import { DataActionResponse } from "@/types/action";
 import { getSession } from "../auth/sessions";
 import { validSettingNames } from "@/types/user";
 
@@ -137,9 +133,7 @@ export async function dummySaveUser(
 }
 
 // Settings page calls this function to update one setting at a time
-export async function updateSetting(
-  formData: FormData
-): Promise<UpdateSettingResponse> {
+export async function updateSetting(formData: FormData) {
   const session = await getSession();
   const userId = session?.user?.id;
 
