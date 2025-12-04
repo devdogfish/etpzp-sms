@@ -90,8 +90,8 @@ export function MessageList({
                   </div>
                 </div>
               </div>
-              <div className="line-clamp-2 text-xs text-muted-foreground">
-                {message.body.substring(0, 300)}
+              <div className="line-clamp-2 text-xs text-muted-foreground whitespace-pre-wrap">
+                {message.body}
               </div>
 
               {/* If we are on the trash page, render a badge to show what the message was before it got moved to the trash */}

@@ -7,8 +7,6 @@ import { fetchSentIn } from "@/lib/db/message";
 export default async function Page() {
   const messages = await fetchSentIn("PAST");
 
-  console.log(await db("SELECT * FROM message;"));
-
   return (
     <MessagesPage
       messages={messages || []}
