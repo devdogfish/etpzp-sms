@@ -9,6 +9,9 @@ import { NewRecipient } from "@/types/recipient";
 import { ActionResponse } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
+function randomBigInt() {
+  return Math.floor(Math.random() * 922337203685477);
+}
 export async function sendMessage(
   existingDraftId: string | null,
   data: Message
@@ -22,6 +25,8 @@ export async function sendMessage(
   // 1. Check authentication
   const { isAuthenticated, user } = await getSession();
   const userId = user?.id;
+  console.log("USERID", userId);
+
   if (!isAuthenticated || !userId) {
     return {
       success: false,
@@ -89,18 +94,20 @@ export async function sendMessage(
       sendtime: isScheduled ? scheduledUnixSeconds : undefined, // Insert the UNIX timestamp if the message is scheduled
     };
 
-    const res = await fetch(`${process.env.GATEWAYAPI_URL}/rest/mtsms`, {
-      method: "POST",
-      headers: {
-        Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-    const resJson = await res.json();
+    // const res = await fetch(`${process.env.GATEWAYAPI_URL}/rest/mtsms`, {
+    //   method: "POST",
+    //   headers: {
+    //     Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(payload),
+    // });
+    // const resJson = await res.json();
 
     // -------- BEGIN DATABASE LOGIC -------- //
     if (typeof existingDraftId === "undefined" || !existingDraftId) {
+      console.log("CREATING NEW MESSAGE");
+
       // Insert new message and recipients
       await db(
         `
@@ -117,7 +124,7 @@ export async function sendMessage(
               cost_currency,
               user_id
             ) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9 $10) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
             RETURNING id
           )
           INSERT INTO recipient (message_id, phone, index)
@@ -131,29 +138,29 @@ export async function sendMessage(
           // Message data
           validatedData.data.subject, // subject
           validatedData.data.body, // body
-          res.ok // status
-            ? scheduledUnixSeconds
-              ? "SCHEDULED"
-              : "SENT"
-            : "FAILED",
+          // res.ok ? // status
+          scheduledUnixSeconds ? "SCHEDULED" : "SENT",
+          // : "FAILED",
           scheduledUnixSeconds // sendtime
             ? new Date(scheduledUnixSeconds * 1000)
             : new Date(Date.now()),
-          resJson?.ids?.length ? resJson?.ids[0] : null, // sms_reference_id
+
+          randomBigInt(), // resJson?.ids?.length ? resJson?.ids[0] : null, // sms_reference_id
 
           // Api errors
-          res.ok ? null : res.status, // api_error_code
-          res.ok ? null : JSON.stringify(resJson), // api_error_details_json
+          null, // res.ok ? null : res.status, // api_error_code
+          null, // res.ok ? null : JSON.stringify(resJson), // api_error_details_json
 
-          resJson.usage.total_cost,
-          resJson.usage.currency,
+          0.7, // default is 7 cents // resJson.usage.total_cost,
+          "EUR", // resJson.usage.currency,
 
-          userId, // user_id
+          1, // user_id
 
           // Recipients
           validRecipients.map((recipient) => recipient.phone), // phone number array
           validRecipients.map((_, index) => index),
-        ]
+        ],
+        true
       );
     } else {
       // 1. Update message data
@@ -176,31 +183,29 @@ export async function sendMessage(
           // Message data
           validatedData.data.subject, // subject
           validatedData.data.body, // body
-          res.ok // status
-            ? scheduledUnixSeconds
-              ? "SCHEDULED"
-              : "SENT"
-            : "FAILED",
+          // res.ok ? // status
+          scheduledUnixSeconds ? "SCHEDULED" : "SENT",
+          // : "FAILED",
           scheduledUnixSeconds // sendtime
             ? new Date(scheduledUnixSeconds * 1000)
             : new Date(Date.now()),
-          resJson?.ids?.length ? resJson?.ids[0] : null, // sms_reference_id
+          randomBigInt(), // resJson?.ids?.length ? resJson?.ids[0] : null, // sms_reference_id
 
           // Api errors
-          res.ok ? null : res.status, // api_error_code
-          res.ok ? null : JSON.stringify(resJson), // api_error_details_json
+          null, // res.ok ? null : res.status, // api_error_code
+          null, // res.ok ? null : JSON.stringify(resJson), // api_error_details_json
 
-          resJson.usage.total_cost,
-          resJson.usage.currency,
+          0.7, // default is 7 cents // resJson.usage.total_cost,
+          "EUR", // resJson.usage.currency,
 
           // Other
-          userId, // user_id
+          1, // user_id
           existingDraftId, // id of the database draft to update
         ]
       );
 
       // In case update didn't match any rows - invalid message id
-      if (result.rowCount === 0) {
+      if (result.rows.length === 0) {
         throw new Error("Invalid message id provided");
       }
 
@@ -228,13 +233,13 @@ export async function sendMessage(
     // Update the amount indicators in the nav panel
     revalidatePath("/new-message");
 
-    if (!res.ok) {
-      return {
-        success: false,
-        message: ["server-some_api_error"],
-        clearForm: true,
-      };
-    }
+    // if (!res.ok) {
+    //   return {
+    //     success: false,
+    //     message: ["server-some_api_error"],
+    //     clearForm: true,
+    //   };
+    // }
 
     return {
       success: true,

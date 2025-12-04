@@ -1,10 +1,13 @@
 import initTranslations from "@/app/i18n";
 import MessagesPage from "@/components/messages-page";
 import { METADATA_APP_NAME } from "@/global.config";
+import db from "@/lib/db";
 import { fetchSentIn } from "@/lib/db/message";
 
 export default async function Page() {
   const messages = await fetchSentIn("PAST");
+
+  console.log(await db("SELECT * FROM message;"));
 
   return (
     <MessagesPage

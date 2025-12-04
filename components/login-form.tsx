@@ -26,7 +26,7 @@ const initialState: ActionResponse<Login> = {
   success: false,
   message: [],
 };
-// Why is this not using useActionState
+// Why is this not using useActionState - because we need to perform custom actions after authenticating
 export default function LoginForm() {
   const [passInputType, setPassInputType] = useState("password");
   const [serverState, setServerState] = useState(initialState);
