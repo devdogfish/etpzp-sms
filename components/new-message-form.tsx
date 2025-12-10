@@ -200,9 +200,11 @@ const NewMessageForm = React.memo(function ({
   function messageIsEmpty() {
     return (
       !message.body &&
-      !message.subject &&
-      !message.recipients.length &&
-      message.sender === "ETPZP"
+        !message.subject &&
+        !message.recipients.length &&
+        message.sender === "ETPZP",
+      // Edge-case fix: If the message is scheduled, consider it not empty so it doesn't get deleted.
+      message.scheduledDate?.getTime() <= Date.now()
     );
   }
 

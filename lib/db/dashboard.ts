@@ -60,44 +60,8 @@ export async function fetchCountryStats(input: {
     if (!session?.isAdmin || !session?.isAuthenticated)
       throw new Error("User is not an admin or not authenticated.");
 
-    // Validate input using Zod
-    const validatedDates = DateRangeSchema.safeParse(input);
-    if (!validatedDates.success || validatedDates.data.startDate == undefined)
-      throw new Error("Invalid input.");
-    const { startDate, endDate } = validatedDates.data;
-
-    const res = await fetch(`${process.env.GATEWAYAPI_URL}/api/usage/labels`, {
-      method: "POST",
-      headers: {
-        Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
-        Accept: "application/json, text/javascript",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: format(startDate, API_DATE_FORMAT),
-        to: format(endDate || new Date(), API_DATE_FORMAT),
-      }),
-    });
-    if (!res.ok) {
-      throw new Error("Network response was not ok");
-    }
-    const resJson = await res.json();
-
-    return resJson
-      .filter((country: { label: string | null }) => country.label === null)
-      .map(
-        (item: {
-          amount: number;
-          cost: number;
-          country: string;
-          currency: string;
-          label: null;
-        }) => ({
-          country: item.country,
-          cost: item.cost,
-          amount: item.amount,
-        })
-      );
+    // DEMO_FEATURE: The API call is disabled here. Please switch to the main branch to view the implementation
+    return [];
   } catch (error) {
     console.log(error);
   }

@@ -10,7 +10,7 @@ import { getSession } from "../auth/sessions";
 import { validSettingNames } from "@/types/user";
 
 // These are guaranteed properties when you find the user using A.D.
-type userResult = {
+type UserResult = {
   displayName: string; // display name
 
   givenName: string; // first name

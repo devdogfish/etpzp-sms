@@ -64,6 +64,8 @@ export async function deleteMessage(
 
   try {
     if (!userId) throw new Error("Invalid user id.");
+    console.log("DANGER: DELETE MESSAGE CALLED");
+
     await db(`DELETE FROM message WHERE user_id = $1 AND id = $2`, [
       userId,
       id,
@@ -92,25 +94,7 @@ export async function cancelCurrentlyScheduled(
   try {
     if (!userId) throw new Error("Invalid user id.");
 
-    const res = await fetch(
-      `${process.env.GATEWAYAPI_URL}/rest/mtsms/${sms_reference_id}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!res.ok) {
-      return {
-        success: false,
-        message: [`api_error_${res.status}`],
-      };
-    }
-
-    // TEST_PRODUCTION: This didn't work with the 2 WHERE conditions on the dev server on Windows
+    // DEMO_FEATURE: The API call is disabled here. Please switch to the main branch to view the implementation
     const result = await db(
       `
         UPDATE message

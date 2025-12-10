@@ -78,31 +78,7 @@ export async function sendMessage(
     !!validatedData.data.secondsUntilSend &&
     validatedData.data.secondsUntilSend > 2; // api requires a minimum of 2 seconds in the future
   try {
-    const payload = {
-      // This shit can only be one full word with no special characters or spaces
-      sender: /**validatedData.data.sender */ "ETPZP", // Hardcode this for now
-
-      message: validatedData.data.body, // this can be any string
-
-      recipients: validRecipients.map(({ phone }) => ({
-        msisdn: phone,
-      })),
-
-      destaddr: "DISPLAY", // Flash SMS
-
-      // The API is case-sensitive - `sendtime` has to be spelled exactly like this
-      sendtime: isScheduled ? scheduledUnixSeconds : undefined, // Insert the UNIX timestamp if the message is scheduled
-    };
-
-    // const res = await fetch(`${process.env.GATEWAYAPI_URL}/rest/mtsms`, {
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: `Token ${process.env.GATEWAYAPI_TOKEN}`,
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(payload),
-    // });
-    // const resJson = await res.json();
+    // DEMO_FEATURE: The API call is disabled here. Please switch to the main branch to view the implementation
 
     // -------- BEGIN DATABASE LOGIC -------- //
     if (typeof existingDraftId === "undefined" || !existingDraftId) {
@@ -232,14 +208,6 @@ export async function sendMessage(
 
     // Update the amount indicators in the nav panel
     revalidatePath("/new-message");
-
-    // if (!res.ok) {
-    //   return {
-    //     success: false,
-    //     message: ["server-some_api_error"],
-    //     clearForm: true,
-    //   };
-    // }
 
     return {
       success: true,

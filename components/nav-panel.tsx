@@ -176,8 +176,8 @@ function NavPanelContent({ isCollapsed }: { isCollapsed: boolean }) {
             size: "xl",
             isNewButton: true,
             action: () => {
-              // We need to manually refresh so all the inputs actually get refreshed
-              router.push("/new-message");
+              // Force Next.js to re-render the client component and clear values when clicking "New Message" on the same page
+              router.push(`/new-message?reset=${Date.now()}`);
               router.refresh();
             },
           },

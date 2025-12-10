@@ -11,7 +11,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { login } from "@/lib/auth";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Label } from "./ui/label";
 import { ActionResponse } from "@/types/action";
@@ -21,6 +21,15 @@ import { Eye, Router } from "lucide-react";
 import { useSettings } from "@/contexts/use-settings";
 import { useTranslation } from "react-i18next";
 import { toastActionResult } from "@/lib/utils";
+import { toast } from "sonner";
+import useIsMounted from "@/hooks/use-mounted";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DialogHeader } from "./ui/dialog";
 
 const initialState: ActionResponse<Login> = {
   success: false,
@@ -34,6 +43,8 @@ export default function LoginForm() {
   const { syncWithDB } = useSettings();
   const router = useRouter();
   const { t } = useTranslation(["login-page", "common"]);
+  const isMounted = useIsMounted();
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -50,8 +61,48 @@ export default function LoginForm() {
     }
     setPending(false);
   }
+
+  useEffect(() => {
+    if (isMounted) {
+      toast("This is a Demo Version", {
+        action: {
+          label: "Read more",
+          onClick: () => setInfoDialogOpen(true),
+        },
+        duration: Infinity, // or duration: 0 in some versions
+        dismissible: true, // allows user to close manually
+      });
+    }
+  }, [isMounted]);
+
   return (
     <main className="flex items-center justify-center w-screen h-screen p-3">
+      <Dialog
+        open={infoDialogOpen}
+        onOpenChange={(value) => setInfoDialogOpen(value)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Demo Version of the App</DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="flex flex-col gap-2">
+            <span>
+              1. You can sign in with any string; this version does not use the
+              Active Directory authentication and will log you in as a dummy
+              user.
+            </span>
+            <span>
+              2. API functionality is disabled. Messages are saved in the
+              database but not actually sent.
+            </span>
+            <span>
+              3. This demo runs on Vercel. The full school version is deployed
+              internally. Regardless, the deployment files are available for
+              reference and testing.
+            </span>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
       <form onSubmit={handleSubmit}>
         <Card className="mx-auto max-w-sm">
           <CardHeader>
