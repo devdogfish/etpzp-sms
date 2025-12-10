@@ -33,13 +33,14 @@ const nextConfig: NextConfig = {
   // header time for static pages
   // swrDelta: 3600 // seconds
 
-  // Add the ability to dynamically alter the props of local SVGs
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ["@svgr/webpack"],
-    });
-    return config;
+  // Configure Turbopack to import .svg files and render them as React components: https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#configuring-webpack-loaders
+  turbopack: {
+    rules: {
+      "*.svg": {
+        loaders: ["@svgr/webpack"],
+        as: "*.js",
+      },
+    },
   },
 };
 

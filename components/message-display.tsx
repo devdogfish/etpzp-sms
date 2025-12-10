@@ -363,14 +363,17 @@ function MessageDisplay({
                                 index === 1 && styles["profile-top-left"],
                                 index === 2 && styles["profile-bottom-left"],
                                 index === 3 && styles["profile-top-right"],
-                                index === 4 && styles["profile-bottom-right"]
+                                index === 4 && styles["profile-bottom-right"],
+                                //
+
+                                !foundContactName &&
+                                  "border-[1px] border-border bg-background"
                               )}
-                              // The dynamically generated class `bg-${chosenColor}` won't work because Tailwind purges unused classes in production, and it doesn't recognize dynamically created class names.
+                              // The dynamically generated class `bg-${chosenColor}` won't work because Tailwind purges unused classes in production, and it doesn't recognize dynamically created class names. // Only show color for saved contacts
                               style={{
-                                // Only show color for saved contacts
-                                backgroundColor: foundContactName
-                                  ? profileColors[index]
-                                  : "",
+                                ...(foundContactName && {
+                                  backgroundColor: profileColors[index],
+                                }),
                               }}
                             />
                           );

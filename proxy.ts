@@ -3,7 +3,7 @@ import { i18nConfig } from "./i18n.config";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "./lib/auth/sessions";
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   // Handle i18n routing
   const i18nResponse = i18nRouter(request, i18nConfig);
   const session = await getSession(request, i18nResponse);

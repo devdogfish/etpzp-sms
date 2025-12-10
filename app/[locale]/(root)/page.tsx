@@ -4,7 +4,7 @@ import { useLayout } from "@/contexts/use-layout";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import LinkCard from "@/components/cards";
 import { useThemeContext } from "@/contexts/theme-data-provider";
 import Envelope from "@/public/icons/envelope-solid.svg";
